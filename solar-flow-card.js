@@ -7,7 +7,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "1.5.0";
+const CARD_VERSION = "1.5.1";
 const CARD_TAG = "solar-flow-card";
 const EDITOR_TAG = "solar-flow-card-editor";
 const THEMES = ["diorama", "aurora", "paper", "lcars", "atlantis", "expanse", "foundation", "galaxy", "gate", "reactor"];
@@ -177,7 +177,7 @@ const TRANSLATIONS = {
     "atTime": "at {time}",
     "socRange": "Battery today",
     "batteryCycles": "Battery cycles",
-    "offGrid": "Without the grid",
+    "offGrid": "No grid import",
     "compareTitle": "Comparison",
     "colYesterday": "Yesterday",
     "colAvg7": "7-day avg",
@@ -264,7 +264,8 @@ const TRANSLATIONS = {
     "vsDay": "Today: {h} h with a surplus · {kwh} balanced",
     "autarkyHourly": "Self-suff. with hourly balance",
     "vsNone": "No surplus this hour",
-    "otherDetails": "Other readings"
+    "otherDetails": "Other readings",
+    "computedHint": "Calculated from the other sensors"
   },
   "nl": {
     "languageName": "Nederlands",
@@ -426,7 +427,7 @@ const TRANSLATIONS = {
     "atTime": "om {time}",
     "socRange": "Batterij vandaag",
     "batteryCycles": "Batterijcycli",
-    "offGrid": "Zonder net",
+    "offGrid": "Zonder netafname",
     "compareTitle": "Vergelijking",
     "colYesterday": "Gisteren",
     "colAvg7": "Gem. 7 dagen",
@@ -513,7 +514,8 @@ const TRANSLATIONS = {
     "vsDay": "Vandaag: {h} u met overschot · {kwh} verrekend",
     "autarkyHourly": "Zelfvoorz. met uurbalans",
     "vsNone": "Geen overschot dit uur",
-    "otherDetails": "Overige metingen"
+    "otherDetails": "Overige metingen",
+    "computedHint": "Berekend uit de andere sensoren"
   },
   "pl": {
     "languageName": "Polski",
@@ -675,7 +677,7 @@ const TRANSLATIONS = {
     "atTime": "o {time}",
     "socRange": "Magazyn dziś",
     "batteryCycles": "Cykle magazynu",
-    "offGrid": "Bez sieci",
+    "offGrid": "Bez poboru z sieci",
     "compareTitle": "Porównanie",
     "colYesterday": "Wczoraj",
     "colAvg7": "Śr. 7 dni",
@@ -762,7 +764,8 @@ const TRANSLATIONS = {
     "vsDay": "Dziś: {h} h z nadwyżką · zbilansowano {kwh}",
     "autarkyHourly": "Samowystarcz. z bilansem godz.",
     "vsNone": "Brak nadwyżki w tej godzinie",
-    "otherDetails": "Inne odczyty"
+    "otherDetails": "Inne odczyty",
+    "computedHint": "Wyliczone z pozostałych czujników"
   }
 };
 
@@ -2032,8 +2035,11 @@ function tilesHtml(m) {
     <div class="sfc-tiles">
       ${TILE_DEFS.filter(([name]) => (m.config.showSolar || name !== "solar") && (m.config.showBattery || (name !== "charge" && name !== "discharge"))).map(([name, icon, label]) => {
         const entityId = m.ids.energy[name];
+        // Without its own sensor (e.g. consumption worked out from the others)
+        // a value shows as usual, it just has nothing to open.
+        const computed = !entityId && isNum(m.totals[name]);
         return `
-          <button class="sfc-tile ${name}" ${entityId ? `data-entity="${escapeHtml(entityId)}"` : "disabled"}>
+          <button class="sfc-tile ${name}${computed ? " computed" : ""}" ${entityId ? `data-entity="${escapeHtml(entityId)}"` : `disabled${computed ? ` title="${escapeHtml(m.t.computedHint)}"` : ""}`}>
             <span class="sfc-tile-icon">${MINI_ICONS[icon]}</span>
             <span class="sfc-tile-copy">
               <small>${escapeHtml(m.t[label])}</small>
@@ -3900,6 +3906,7 @@ const BASE_CSS = `
   .sfc-tile { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 10px 12px; text-align: left;
     border-radius: var(--sfc-tile-radius, 13px); border: 1px solid var(--sfc-border); background: var(--sfc-tile-bg); color: var(--sfc-c); }
   .sfc-tile:disabled { opacity: .55; cursor: default; }
+  .sfc-tile.computed:disabled { opacity: 1; }
   .sfc-tile.solar, .sfc-summary-item.selfuse, .sfc-summary-item.yield { --sfc-c: var(--sfc-pv); }
   .sfc-tile.load { --sfc-c: var(--sfc-load); }
   .sfc-tile.gridImport, .sfc-tile.gridExport, .sfc-summary-item.autarky { --sfc-c: var(--sfc-grid); }
@@ -4951,6 +4958,7 @@ class SolarFlowCard extends HTMLElement {
         this._width = width;
         if (this._config?.wide !== true) return;
         this._signature = "";
+        this._html = null;
         this._render();
       });
     }
@@ -5057,7 +5065,7 @@ class SolarFlowCard extends HTMLElement {
   // month. Shown in the wide layout, or anywhere with show_insights: true.
   _insights(resolved, today, forecast) {
     const config = this._config;
-    if (config.show_insights === false || !(config.wide === true || config.show_insights === true)) return null;
+    if (!insightsShown(config)) return null;
     const history = this._powerHistory(resolved, "today");
     const day = history?.entry.data ? dayHighlights(this._powerChartData(history.entry.data.series, history.spec), history.spec, today, forecast) : null;
     const week = this._periodEnergy(resolved, "7d", today);
@@ -5260,11 +5268,12 @@ class SolarFlowCard extends HTMLElement {
       };
       model.systemStatus = systemStatus(status, forecast, panels, system);
 
-      this._paint(
+      const painted = this._paint(
         BASE_CSS + THEME_CSS[theme],
         ["sfc", `theme-${theme}`, config.animation === false && "no-anim", config.background === "glass" && "glass", live.exportActive ? "grid-export" : live.importActive && "grid-import"].filter(Boolean).join(" "),
         wide ? wideLayout(theme, THEME_RENDER[theme](model)) : THEME_RENDER[theme](model),
       );
+      if (!painted) return;
       this._wire(model);
       if (wide) this._balanceWide();
     } catch (error) {
@@ -5286,13 +5295,29 @@ class SolarFlowCard extends HTMLElement {
       root.innerHTML = "<style></style><ha-card></ha-card>";
       [style, card] = [root.querySelector("style"), root.querySelector("ha-card")];
       this._css = null;
+      this._html = null;
     }
     if (this._css !== css) {
       style.textContent = css;
       this._css = css;
     }
     if (card.className !== className) card.className = className;
+    if (this._html === html) return false;
+    this._html = html;
+    // Keep the card's height while its contents are replaced and laid out
+    // (the wide layout moves sections into columns afterwards): a card that
+    // is shorter even for a moment makes Safari on iOS jump to the top while
+    // scrolling (#70). Released once the new contents have their own height.
+    const height = card.offsetHeight;
+    if (height) {
+      card.style.minHeight = `${height}px`;
+      cancelAnimationFrame(this._holdFrame);
+      this._holdFrame = requestAnimationFrame(() => {
+        this._holdFrame = requestAnimationFrame(() => { card.style.minHeight = ""; });
+      });
+    }
     card.innerHTML = html;
+    return true;
   }
 
   // Balance once the card has a layout; retried for a few frames while
@@ -5364,6 +5389,12 @@ const EDITOR_NUMBERS = [
   ["price_export", "editorPriceExport", "0.01"],
   ["co2_factor", "editorCo2", "0.01"],
 ];
+// "Today at a glance" and the comparison: shown in the wide layout unless
+// switched off, elsewhere only when switched on.
+function insightsShown(config) {
+  return config.show_insights === true || (config.show_insights !== false && config.wide === true);
+}
+
 // The inverter's PV strings, for one "panels on this string" field each.
 function editorStrings(hass, config) {
   try {
@@ -5499,7 +5530,7 @@ class SolarFlowCardEditor extends HTMLElement {
             <input id="${key}" type="checkbox" ${this._config[key] === false ? "" : "checked"} /></div>`).join("")}
         ${EDITOR_OPTIN.map(([key, label, value]) => `
           <div class="switch"><label for="${key}" style="color:inherit">${escapeHtml(t[label])}</label>
-            <input id="${key}" type="checkbox" ${this._config[key] === (value ?? true) ? "checked" : ""} /></div>`).join("")}
+            <input id="${key}" type="checkbox" ${(key === "show_insights" ? insightsShown(this._config) : this._config[key] === (value ?? true)) ? "checked" : ""} /></div>`).join("")}
         <p class="hint">${escapeHtml(t.editorHint)}</p>
       </div>`;
     const root = this.shadowRoot;
@@ -5528,9 +5559,16 @@ class SolarFlowCardEditor extends HTMLElement {
       const number = Number.parseFloat(e.target.value);
       this._set(key, Number.isFinite(number) ? number : undefined);
     }));
-    EDITOR_OPTIN.forEach(([key, , value]) => root.getElementById(key)?.addEventListener("change", (e) =>
-      this._set(key, e.target.checked ? value ?? true : undefined)
-    ));
+    EDITOR_OPTIN.forEach(([key, , value]) => root.getElementById(key)?.addEventListener("change", (e) => {
+      if (key === "show_insights") {
+        // Shown by default in the wide layout: store only a change from that.
+        this._set(key, e.target.checked === (this._config.wide === true) ? undefined : e.target.checked);
+        return;
+      }
+      this._set(key, e.target.checked ? value ?? true : undefined);
+      // The insights switch follows the layout's default.
+      if (key === "wide") this._render();
+    }));
     EDITOR_SWITCHES.forEach(([key]) => root.getElementById(key)?.addEventListener("change", (e) =>
       this._set(key, e.target.checked ? undefined : false)
     ));

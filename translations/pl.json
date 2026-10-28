@@ -158,7 +158,7 @@
   "atTime": "o {time}",
   "socRange": "Magazyn dziś",
   "batteryCycles": "Cykle magazynu",
-  "offGrid": "Bez sieci",
+  "offGrid": "Bez poboru z sieci",
   "compareTitle": "Porównanie",
   "colYesterday": "Wczoraj",
   "colAvg7": "Śr. 7 dni",
@@ -245,5 +245,6 @@
   "vsDay": "Dziś: {h} h z nadwyżką · zbilansowano {kwh}",
   "autarkyHourly": "Samowystarcz. z bilansem godz.",
   "vsNone": "Brak nadwyżki w tej godzinie",
-  "otherDetails": "Inne odczyty"
+  "otherDetails": "Inne odczyty",
+  "computedHint": "Wyliczone z pozostałych czujników"
 }

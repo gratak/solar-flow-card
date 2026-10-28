@@ -158,7 +158,7 @@
   "atTime": "at {time}",
   "socRange": "Battery today",
   "batteryCycles": "Battery cycles",
-  "offGrid": "Without the grid",
+  "offGrid": "No grid import",
   "compareTitle": "Comparison",
   "colYesterday": "Yesterday",
   "colAvg7": "7-day avg",
@@ -245,5 +245,6 @@
   "vsDay": "Today: {h} h with a surplus · {kwh} balanced",
   "autarkyHourly": "Self-suff. with hourly balance",
   "vsNone": "No surplus this hour",
-  "otherDetails": "Other readings"
+  "otherDetails": "Other readings",
+  "computedHint": "Calculated from the other sensors"
 }

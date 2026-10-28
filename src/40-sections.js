@@ -47,8 +47,11 @@ function tilesHtml(m) {
     <div class="sfc-tiles">
       ${TILE_DEFS.filter(([name]) => (m.config.showSolar || name !== "solar") && (m.config.showBattery || (name !== "charge" && name !== "discharge"))).map(([name, icon, label]) => {
         const entityId = m.ids.energy[name];
+        // Without its own sensor (e.g. consumption worked out from the others)
+        // a value shows as usual, it just has nothing to open.
+        const computed = !entityId && isNum(m.totals[name]);
         return `
-          <button class="sfc-tile ${name}" ${entityId ? `data-entity="${escapeHtml(entityId)}"` : "disabled"}>
+          <button class="sfc-tile ${name}${computed ? " computed" : ""}" ${entityId ? `data-entity="${escapeHtml(entityId)}"` : `disabled${computed ? ` title="${escapeHtml(m.t.computedHint)}"` : ""}`}>
             <span class="sfc-tile-icon">${MINI_ICONS[icon]}</span>
             <span class="sfc-tile-copy">
               <small>${escapeHtml(m.t[label])}</small>

@@ -57,6 +57,7 @@ const BASE_CSS = `
   .sfc-tile { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 10px 12px; text-align: left;
     border-radius: var(--sfc-tile-radius, 13px); border: 1px solid var(--sfc-border); background: var(--sfc-tile-bg); color: var(--sfc-c); }
   .sfc-tile:disabled { opacity: .55; cursor: default; }
+  .sfc-tile.computed:disabled { opacity: 1; }
   .sfc-tile.solar, .sfc-summary-item.selfuse, .sfc-summary-item.yield { --sfc-c: var(--sfc-pv); }
   .sfc-tile.load { --sfc-c: var(--sfc-load); }
   .sfc-tile.gridImport, .sfc-tile.gridExport, .sfc-summary-item.autarky { --sfc-c: var(--sfc-grid); }

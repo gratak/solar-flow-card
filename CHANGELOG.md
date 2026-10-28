@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.5.1
+
+- The card keeps its height while it updates, so it is never shorter for a moment. A shorter card can make Safari on iPhone jump to the top of the dashboard while scrolling (#70). The card also skips updates that would show exactly the same thing.
+- Editor: the "Today at a glance and comparison" switch shows whether the section is really shown. It is on by default in the wide layout, and the switch now reflects that (#64).
+- A consumption calculated by the card (no consumption sensor) is no longer greyed out like a missing value. The tile shows as usual; it just has no sensor to open (#68).
+- "Today at a glance": "Without the grid" is renamed "No grid import". It is the time today the home took no power from the grid (#65).
+
 ## 1.5.0
 
 **Visual change:** the card no longer loads fonts from Google Fonts by default, so it connects to no outside server (thanks @frenck). Each theme now uses fonts already on your device, with fallbacks chosen per theme (rounded, condensed, monospace or serif). To get the themes' own fonts back, set `load_fonts: true` (also in the editor) or host them yourself with `font_url`. See [Fonts](README.md#fonts).

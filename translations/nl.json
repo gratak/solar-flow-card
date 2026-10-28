@@ -158,7 +158,7 @@
   "atTime": "om {time}",
   "socRange": "Batterij vandaag",
   "batteryCycles": "Batterijcycli",
-  "offGrid": "Zonder net",
+  "offGrid": "Zonder netafname",
   "compareTitle": "Vergelijking",
   "colYesterday": "Gisteren",
   "colAvg7": "Gem. 7 dagen",
@@ -245,5 +245,6 @@
   "vsDay": "Vandaag: {h} u met overschot · {kwh} verrekend",
   "autarkyHourly": "Zelfvoorz. met uurbalans",
   "vsNone": "Geen overschot dit uur",
-  "otherDetails": "Overige metingen"
+  "otherDetails": "Overige metingen",
+  "computedHint": "Berekend uit de andere sensoren"
 }
