@@ -10,6 +10,12 @@ const EDITOR_NUMBERS = [
   ["price_export", "editorPriceExport", "0.01"],
   ["co2_factor", "editorCo2", "0.01"],
 ];
+// "Today at a glance" and the comparison: shown in the wide layout unless
+// switched off, elsewhere only when switched on.
+function insightsShown(config) {
+  return config.show_insights === true || (config.show_insights !== false && config.wide === true);
+}
+
 // The inverter's PV strings, for one "panels on this string" field each.
 function editorStrings(hass, config) {
   try {
@@ -145,7 +151,7 @@ class SolarFlowCardEditor extends HTMLElement {
             <input id="${key}" type="checkbox" ${this._config[key] === false ? "" : "checked"} /></div>`).join("")}
         ${EDITOR_OPTIN.map(([key, label, value]) => `
           <div class="switch"><label for="${key}" style="color:inherit">${escapeHtml(t[label])}</label>
-            <input id="${key}" type="checkbox" ${this._config[key] === (value ?? true) ? "checked" : ""} /></div>`).join("")}
+            <input id="${key}" type="checkbox" ${(key === "show_insights" ? insightsShown(this._config) : this._config[key] === (value ?? true)) ? "checked" : ""} /></div>`).join("")}
         <p class="hint">${escapeHtml(t.editorHint)}</p>
       </div>`;
     const root = this.shadowRoot;
@@ -174,9 +180,16 @@ class SolarFlowCardEditor extends HTMLElement {
       const number = Number.parseFloat(e.target.value);
       this._set(key, Number.isFinite(number) ? number : undefined);
     }));
-    EDITOR_OPTIN.forEach(([key, , value]) => root.getElementById(key)?.addEventListener("change", (e) =>
-      this._set(key, e.target.checked ? value ?? true : undefined)
-    ));
+    EDITOR_OPTIN.forEach(([key, , value]) => root.getElementById(key)?.addEventListener("change", (e) => {
+      if (key === "show_insights") {
+        // Shown by default in the wide layout: store only a change from that.
+        this._set(key, e.target.checked === (this._config.wide === true) ? undefined : e.target.checked);
+        return;
+      }
+      this._set(key, e.target.checked ? value ?? true : undefined);
+      // The insights switch follows the layout's default.
+      if (key === "wide") this._render();
+    }));
     EDITOR_SWITCHES.forEach(([key]) => root.getElementById(key)?.addEventListener("change", (e) =>
       this._set(key, e.target.checked ? undefined : false)
     ));

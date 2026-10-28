@@ -108,6 +108,7 @@ class SolarFlowCard extends HTMLElement {
         this._width = width;
         if (this._config?.wide !== true) return;
         this._signature = "";
+        this._html = null;
         this._render();
       });
     }
@@ -214,7 +215,7 @@ class SolarFlowCard extends HTMLElement {
   // month. Shown in the wide layout, or anywhere with show_insights: true.
   _insights(resolved, today, forecast) {
     const config = this._config;
-    if (config.show_insights === false || !(config.wide === true || config.show_insights === true)) return null;
+    if (!insightsShown(config)) return null;
     const history = this._powerHistory(resolved, "today");
     const day = history?.entry.data ? dayHighlights(this._powerChartData(history.entry.data.series, history.spec), history.spec, today, forecast) : null;
     const week = this._periodEnergy(resolved, "7d", today);
@@ -417,11 +418,12 @@ class SolarFlowCard extends HTMLElement {
       };
       model.systemStatus = systemStatus(status, forecast, panels, system);
 
-      this._paint(
+      const painted = this._paint(
         BASE_CSS + THEME_CSS[theme],
         ["sfc", `theme-${theme}`, config.animation === false && "no-anim", config.background === "glass" && "glass", live.exportActive ? "grid-export" : live.importActive && "grid-import"].filter(Boolean).join(" "),
         wide ? wideLayout(theme, THEME_RENDER[theme](model)) : THEME_RENDER[theme](model),
       );
+      if (!painted) return;
       this._wire(model);
       if (wide) this._balanceWide();
     } catch (error) {
@@ -443,13 +445,29 @@ class SolarFlowCard extends HTMLElement {
       root.innerHTML = "<style></style><ha-card></ha-card>";
       [style, card] = [root.querySelector("style"), root.querySelector("ha-card")];
       this._css = null;
+      this._html = null;
     }
     if (this._css !== css) {
       style.textContent = css;
       this._css = css;
     }
     if (card.className !== className) card.className = className;
+    if (this._html === html) return false;
+    this._html = html;
+    // Keep the card's height while its contents are replaced and laid out
+    // (the wide layout moves sections into columns afterwards): a card that
+    // is shorter even for a moment makes Safari on iOS jump to the top while
+    // scrolling (#70). Released once the new contents have their own height.
+    const height = card.offsetHeight;
+    if (height) {
+      card.style.minHeight = `${height}px`;
+      cancelAnimationFrame(this._holdFrame);
+      this._holdFrame = requestAnimationFrame(() => {
+        this._holdFrame = requestAnimationFrame(() => { card.style.minHeight = ""; });
+      });
+    }
     card.innerHTML = html;
+    return true;
   }
 
   // Balance once the card has a layout; retried for a few frames while
