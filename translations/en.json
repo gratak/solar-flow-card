@@ -246,5 +246,6 @@
   "autarkyHourly": "Self-suff. with hourly balance",
   "vsNone": "No surplus this hour",
   "otherDetails": "Other readings",
-  "computedHint": "Calculated from the other sensors"
+  "computedHint": "Calculated from the other sensors",
+  "vsShort": "Virtual storage"
 }

@@ -176,26 +176,31 @@ class SolarFlowCard extends HTMLElement {
 
   // Virtual storage (#43): the current hour, the full hours of today, and the
   // import left after hourly balancing for the selected period.
-  _virtualStorage(resolved, config, period, now) {
+  _virtualStorage(resolved, config, period, now, totals) {
     const vs = virtualStorageConfig(config);
-    if (!vs) return { store: null, netImport: null };
+    if (!vs) return { store: null, net: null };
     const ids = GRID_COUNTERS.map((name) => resolved.energy[name]?.entityId);
     const counters = ids.every(Boolean) && typeof this._hass.callWS === "function";
     let current = null;
     let todayHours = null;
-    let netImport = null;
+    let net = null;
     if (counters) {
       const hourStart = startOfHour(now).getTime();
       current = hourSoFar(resolved, this._fetch(`vs-hour|${ids.join(",")}|${hourStart}`, 5 * 60000, () => loadCurrentHour(this._hass, resolved.energy)).data);
       const hourly = (start) => this._fetch(`vs-hours|${ids.join(",")}|${start.getTime()}`, 5 * 60000, () => loadHourlyGrid(this._hass, resolved.energy, start)).data || null;
       const today = startOfDay(now);
       todayHours = hourly(today);
-      if (period !== "all") {
-        const start = period === "today" ? today : statsSpec(period).start;
-        netImport = hourlyNetImport(period === "today" ? todayHours : hourly(start), start.getTime(), current);
+      if (period !== "today" && period !== "all") {
+        const start = statsSpec(period).start;
+        net = hourlyNet(hourly(start), start.getTime(), current);
       }
     }
-    return { store: virtualStorage(this._hass, resolved, vs, todayHours, current, now), netImport };
+    const store = virtualStorage(this._hass, resolved, vs, todayHours, current, now);
+    // Today: the same counters as the rest of the card, less what was balanced.
+    if (period === "today" && store.day && isNum(totals.gridImport)) {
+      net = { gridImport: Math.max(0, totals.gridImport - store.day.balanced), gridExport: isNum(totals.gridExport) ? Math.max(0, totals.gridExport - store.day.balanced) : null };
+    }
+    return { store, net };
   }
 
   // Recorder history of the power sensors for today or the last 3 days,
@@ -358,7 +363,7 @@ class SolarFlowCard extends HTMLElement {
       };
       if (bank && !ids.live.soc && !ids.live.battery) ids.live.soc = bank.items[0].entityId;
       const now = new Date();
-      const vstore = this._virtualStorage(resolved, config, period, now);
+      const vstore = this._virtualStorage(resolved, config, period, now, today);
       this._introAt ??= Date.now();
       const introElapsed = (Date.now() - this._introAt) / 1000;
       const introAt = introElapsed < 2.6 ? introElapsed : null;
@@ -398,7 +403,7 @@ class SolarFlowCard extends HTMLElement {
         period,
         totals: energy.totals || {},
         energyLoading: Boolean(energy.loading),
-        summary: periodSummary(energy.totals || {}, config, t, locale, vstore.netImport),
+        summary: periodSummary(energy.totals || {}, config, t, locale, vstore.net),
         virtualStorage: vstore.store,
         since,
         chart,

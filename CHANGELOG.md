@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.6.0
+
+- Virtual storage (#43, #67):
+  - **Savings** follow the hourly settlement. The import and export left after each hour's balancing are what you pay and get paid for.
+  - Diorama's "Where today's power came from" bar has a **virtual storage** segment: the import balanced by export within the same hour. The grid segment shows only the rest. A legend shows each share.
+  - `virtual_storage: { count_as_own: true }` counts the balanced energy as your own. It applies to self-sufficiency in the period summary, in that bar and in the themes' "self-sufficiency today". The separate "with hourly balancing" value is then not shown.
+
 ## 1.5.1
 
 - The card keeps its height while it updates, so it is never shorter for a moment. A shorter card can make Safari on iPhone jump to the top of the dashboard while scrolling (#70). The card also skips updates that would show exactly the same thing.

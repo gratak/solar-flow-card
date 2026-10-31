@@ -219,9 +219,13 @@ async function loadTodayStats(hass, energy) {
 // optional ready net balance `entity` and `negative: show|zero`.
 function virtualStorageConfig(config) {
   const vs = config.virtual_storage;
-  if (vs === true) return { entity: null, negative: "show" };
+  if (vs === true) return { entity: null, negative: "show", countAsOwn: false };
   if (!vs || typeof vs !== "object" || Array.isArray(vs)) return null;
-  return { entity: typeof vs.entity === "string" && vs.entity ? vs.entity : null, negative: vs.negative === "zero" ? "zero" : "show" };
+  return {
+    entity: typeof vs.entity === "string" && vs.entity ? vs.entity : null,
+    negative: vs.negative === "zero" ? "zero" : "show",
+    countAsOwn: vs.count_as_own === true,
+  };
 }
 
 function startOfHour(date) {
@@ -302,12 +306,17 @@ function hourSoFar(resolved, current) {
   return out;
 }
 
-// Import left after balancing import and export within each hour.
-function hourlyNetImport(hours, since, current) {
+// What the utility bills with hourly balancing: the import left after each
+// hour's balancing, and the export left over.
+function hourlyNet(hours, since, current) {
   if (!hours) return null;
-  let net = 0;
-  for (const [at, h] of hours) if (at >= since) net += Math.max(0, h.gridImport - h.gridExport);
-  if (current) net += Math.max(0, current.gridImport - current.gridExport);
+  const net = { gridImport: 0, gridExport: 0 };
+  const add = (h) => {
+    net.gridImport += Math.max(0, h.gridImport - h.gridExport);
+    net.gridExport += Math.max(0, h.gridExport - h.gridImport);
+  };
+  for (const [at, h] of hours) if (at >= since) add(h);
+  if (current) add(current);
   return net;
 }
 
@@ -336,7 +345,17 @@ function virtualStorage(hass, resolved, vs, todayHours, current, now = new Date(
   }
   const deficit = isNum(value) && value < -0.0005;
   if (deficit && vs.negative === "zero") value = 0;
-  return { value, deficit, entityId, minutesLeft, progress: ((60 - minutesLeft) / 60) * 100, day };
+  return { value, deficit, countAsOwn: vs.countAsOwn, entityId, minutesLeft, progress: ((60 - minutesLeft) / 60) * 100, day };
+}
+
+// Today's self-sufficiency, with the energy balanced within the hour counted
+// as your own when `virtual_storage: { count_as_own: true }`.
+function todayOwnShare(m) {
+  const { load, gridImport } = m.today;
+  if (!isNum(load) || !isNum(gridImport) || load <= 0.05) return null;
+  const v = m.virtualStorage;
+  const fromGrid = v?.countAsOwn && v.day ? Math.max(0, gridImport - v.day.balanced) : gridImport;
+  return clamp(((load - fromGrid) / load) * 100, 0, 100);
 }
 
 // Long-term statistics query for a period other than today.
@@ -422,17 +441,21 @@ function migrateConfig(config) {
   return next;
 }
 
-function periodSummary(totals, config, t, locale, netImport = null) {
+// `net`: with virtual storage, the import and export left after hourly
+// balancing (see hourlyNet()).
+function periodSummary(totals, config, t, locale, net = null) {
   const { solar, load, gridImport, gridExport } = totals;
   const items = [];
   const show = (key) => config[key] !== false;
   const hasSolar = show("show_solar");
-  if (show("show_self_sufficiency") && isNum(load) && isNum(gridImport) && load > 0.05) {
-    items.push(["autarky", t.autarky, formatPercent(clamp(((load - gridImport) / load) * 100, 0, 100), locale)]);
+  const countAsOwn = Boolean(net) && virtualStorageConfig(config)?.countAsOwn;
+  const ownImport = countAsOwn ? net.gridImport : gridImport;
+  if (show("show_self_sufficiency") && isNum(load) && isNum(ownImport) && load > 0.05) {
+    items.push(["autarky", t.autarky, formatPercent(clamp(((load - ownImport) / load) * 100, 0, 100), locale)]);
   }
-  // With virtual storage: the import left after hourly balancing.
-  if (show("show_self_sufficiency") && isNum(load) && isNum(netImport) && load > 0.05) {
-    items.push(["autarky", t.autarkyHourly, formatPercent(clamp(((load - netImport) / load) * 100, 0, 100), locale)]);
+  // Both values, unless the balanced energy already counts as your own.
+  if (!countAsOwn && net && show("show_self_sufficiency") && isNum(load) && load > 0.05) {
+    items.push(["autarky", t.autarkyHourly, formatPercent(clamp(((load - net.gridImport) / load) * 100, 0, 100), locale)]);
   }
   if (hasSolar && show("show_self_use") && isNum(solar) && isNum(gridExport) && solar > 0.05) {
     items.push(["selfuse", t.selfUse, formatPercent(clamp(((solar - gridExport) / solar) * 100, 0, 100), locale)]);
@@ -440,7 +463,10 @@ function periodSummary(totals, config, t, locale, netImport = null) {
   const priceImport = positiveNumber(config.price_import);
   if (show("show_savings") && priceImport !== null && isNum(load) && isNum(gridImport)) {
     const priceExport = positiveNumber(config.price_export) || 0;
-    const saved = Math.max(0, load - gridImport) * priceImport + (isNum(gridExport) ? gridExport : 0) * priceExport;
+    // Hourly balancing: billed are only the import and export left after it.
+    const billedImport = net ? net.gridImport : gridImport;
+    const billedExport = net ? net.gridExport : gridExport;
+    const saved = Math.max(0, load - billedImport) * priceImport + (isNum(billedExport) ? billedExport : 0) * priceExport;
     items.push(["money", t.savings, `${formatNumber(saved, locale, 2)} ${config.currency ?? t.currency}`.trim()]);
   }
   if (hasSolar && show("show_co2") && isNum(solar)) {

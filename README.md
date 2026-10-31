@@ -232,6 +232,9 @@ virtual_storage:
 |---|---|---|
 | `entity` | – | A sensor with this hour's balance in kWh (positive = surplus), resetting every full hour, e.g. the net balance of [ha-balance-neto](https://github.com/miguelangellv/ha-balance-neto). Without it the card calculates the balance itself. |
 | `negative` | `show` | `zero` shows a deficit as 0 kWh. |
+| `count_as_own` | `false` | `true` counts the energy balanced within the hour as your own: self-sufficiency (the period summary, today's bar and the themes' "self-sufficiency today") then includes hourly balancing, and the separate "with hourly balancing" value is not shown. |
+
+With virtual storage, the **savings** follow the hourly settlement: the import and export left after each hour's balancing are what the utility bills. In Diorama, "Where today's power came from" shows the balanced energy as its own segment (virtual storage), and the grid segment only the import left after balancing.
 
 The card calculates the balance from the `grid_import_energy` and `grid_export_energy` sensors (daily or lifetime counters, with `state_class: total_increasing` or `total`): Home Assistant's 5-minute statistics since the full hour plus what the counters added since. Today's hours and the extra self-sufficiency value come from the hourly statistics, so they also need these two sensors when you use `entity`.
 

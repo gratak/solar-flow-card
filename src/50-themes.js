@@ -225,11 +225,15 @@ function renderDiorama(m) {
   const when = batteryWhen(m);
   const today = m.today;
   const load = today.load;
-  const fromGrid = isNum(today.gridImport) ? today.gridImport : 0;
+  const imported = isNum(today.gridImport) ? today.gridImport : 0;
   const fromBattery = isNum(today.discharge) ? today.discharge : 0;
+  // Virtual storage: the import balanced by export within the same hour.
+  const fromVirtual = m.virtualStorage?.day ? clamp(m.virtualStorage.day.balanced, 0, imported) : 0;
+  const fromGrid = imported - fromVirtual;
   const shares = isNum(load) && load > 0.05
-    ? [Math.max(0, load - fromGrid - fromBattery) / load, fromBattery / load, fromGrid / load].map((v) => clamp(v * 100, 0, 100))
+    ? [Math.max(0, load - imported - fromBattery) / load, fromBattery / load, fromVirtual / load, fromGrid / load].map((v) => clamp(v * 100, 0, 100))
     : null;
+  const ownShare = todayOwnShare(m);
   return `
     <div class="dio-scene" style="--sky-a:${sky.sky[0]};--sky-b:${sky.sky[1]}">
       <svg viewBox="0 0 520 360" aria-hidden="true">${svg}</svg>
@@ -252,8 +256,11 @@ function renderDiorama(m) {
       </div>
       ${shares ? `
         <div class="dio-share">
-          <header>${escapeHtml(t.whereFrom)}<span>${escapeHtml(t.autarky.toLowerCase())} ${escapeHtml(formatPercent(100 - shares[2], locale))}</span></header>
-          <div class="dio-track"><div class="pv" style="width:${shares[0]}%"></div><div class="battery" style="width:${shares[1]}%"></div><div class="grid" style="width:${shares[2]}%"></div></div>
+          <header>${escapeHtml(t.whereFrom)}<span>${escapeHtml(t.autarky.toLowerCase())} ${escapeHtml(formatPercent(ownShare, locale))}</span></header>
+          <div class="dio-track">${[["pv", t.solar], ["battery", t.battery], ["vstore", t.vsShort], ["grid", t.grid]]
+            .map(([cls, name], i) => `<div class="${cls}" style="width:${shares[i]}%" title="${escapeHtml(`${name} ${formatPercent(shares[i], locale)}`)}"></div>`).join("")}</div>
+          ${m.virtualStorage ? `<div class="dio-legend">${[["pv", t.solar], ["battery", t.battery], ["vstore", t.vsShort], ["grid", t.grid]]
+            .map(([cls, name], i) => (shares[i] >= 0.5 ? `<span class="${cls}">${escapeHtml(name)} ${escapeHtml(formatPercent(shares[i], locale))}</span>` : "")).join("")}</div>` : ""}
         </div>` : ""}
     </div>
     <div class="sfc-sections">${standardSections(m)}</div>`;
@@ -464,8 +471,7 @@ function renderLcars(m) {
   const cellsOn = isNum(live.soc) ? Math.round(clamp(live.soc, 0, 100) / 10) : 0;
   const f = m.forecast;
   const status = m.systemStatus;
-  const autarkyToday = isNum(m.today.load) && isNum(m.today.gridImport) && m.today.load > 0.05
-    ? formatPercent(clamp(((m.today.load - m.today.gridImport) / m.today.load) * 100, 0, 100), locale) : "—";
+  const autarkyToday = formatPercent(todayOwnShare(m), locale);
   const code = String(m.station || "47").replace(/\D/g, "").slice(-5).padStart(5, "0");
   const side = [
     ...(m.panels ? [["c1", "01", t.lcarsPanels, 'data-action="panels"']] : []),
@@ -996,8 +1002,7 @@ function renderGate(m) {
           : live.importActive ? ["on", t.gateImport]
             : ["", t.gateIdle];
   const kv = (label, value) => `<div class="gt-kv"><small>${escapeHtml(label)}</small><b>${escapeHtml(value)}</b></div>`;
-  const own = isNum(m.today.load) && isNum(m.today.gridImport) && m.today.load > 0.05
-    ? formatPercent(clamp(((m.today.load - m.today.gridImport) / m.today.load) * 100, 0, 100), locale) : "—";
+  const own = formatPercent(todayOwnShare(m), locale);
   const corner = (cls, pos, label, value) => `<div class="gt-node ${cls}" style="${pos}">${escapeHtml(label)}<b>${escapeHtml(value)}</b></div>`;
   const values = {
     pv: [t.solar, formatPower(live.solar, locale), m.ids.live.solar],
