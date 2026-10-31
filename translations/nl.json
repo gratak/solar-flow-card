@@ -247,5 +247,6 @@
   "vsNone": "Geen overschot dit uur",
   "otherDetails": "Overige metingen",
   "computedHint": "Berekend uit de andere sensoren",
-  "vsShort": "Virtuele opslag"
+  "vsShort": "Virtuele opslag",
+  "editorCollapsible": "Inklapbare secties (tik op de titel)"
 }

@@ -7,7 +7,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "1.5.1";
+const CARD_VERSION = "1.6.0";
 const CARD_TAG = "solar-flow-card";
 const EDITOR_TAG = "solar-flow-card-editor";
 const THEMES = ["diorama", "aurora", "paper", "lcars", "atlantis", "expanse", "foundation", "galaxy", "gate", "reactor"];
@@ -266,7 +266,8 @@ const TRANSLATIONS = {
     "vsNone": "No surplus this hour",
     "otherDetails": "Other readings",
     "computedHint": "Calculated from the other sensors",
-    "vsShort": "Virtual storage"
+    "vsShort": "Virtual storage",
+    "editorCollapsible": "Collapsible sections (tap a section's title)"
   },
   "nl": {
     "languageName": "Nederlands",
@@ -517,7 +518,8 @@ const TRANSLATIONS = {
     "vsNone": "Geen overschot dit uur",
     "otherDetails": "Overige metingen",
     "computedHint": "Berekend uit de andere sensoren",
-    "vsShort": "Virtuele opslag"
+    "vsShort": "Virtuele opslag",
+    "editorCollapsible": "Inklapbare secties (tik op de titel)"
   },
   "pl": {
     "languageName": "Polski",
@@ -768,7 +770,8 @@ const TRANSLATIONS = {
     "vsNone": "Brak nadwyżki w tej godzinie",
     "otherDetails": "Inne odczyty",
     "computedHint": "Wyliczone z pozostałych czujników",
-    "vsShort": "Wirtualny magazyn"
+    "vsShort": "Wirtualny magazyn",
+    "editorCollapsible": "Zwijane sekcje (dotknij tytułu sekcji)"
   }
 };
 
@@ -2315,7 +2318,7 @@ function systemHtml(m) {
 // Today at a glance and the comparison table.
 function insightsHtml(m) {
   const data = m.insights;
-  if (!data || (!data.day && !data.compare)) return "";
+  if (!data?.day) return "";
   const { t, locale } = m;
   const d = data.day;
   const kv = (cls, label, value, note) => `<div class="sfc-insight ${cls}"><small>${escapeHtml(label)}</small><b>${escapeHtml(value)}</b>${note ? `<span>${escapeHtml(note)}</span>` : ""}</div>`;
@@ -2326,6 +2329,22 @@ function insightsHtml(m) {
     m.config.showBattery && isNum(d.cycles) && kv("battery", t.batteryCycles, formatNumber(d.cycles, locale, 2), ""),
     isNum(d.offGridMinutes) && kv("grid", t.offGrid, formatDuration(d.offGridMinutes / 60, t), ""),
   ].filter(Boolean).join("") : "";
+  return tiles ? `
+    <section class="sfc-section sfc-insights">
+      <div class="sfc-head"><div><span class="sfc-kicker">${MINI_ICONS.bolt}</span><h3>${escapeHtml(t.insightsTitle)}</h3></div></div>
+      <div class="sfc-insight-grid">${tiles}</div>
+    </section>` : "";
+}
+
+function compareTableRows(m) {
+  return (m.insights?.compare || []).filter((row) => m.config.showSolar || row.name !== "solar");
+}
+
+// Today compared with yesterday, the 7-day average and this month.
+function comparisonHtml(m) {
+  const rows = compareTableRows(m);
+  if (!rows.length) return "";
+  const { t, locale } = m;
   const labels = { solar: t.pvProduction, load: t.consumption, gridImport: t.gridImport, gridExport: t.gridExport };
   const cell = (v) => `<td>${escapeHtml(isNum(v) ? formatNumber(v, locale, v < 10 ? 1 : 0) : "—")}</td>`;
   const trend = (row) => {
@@ -2335,28 +2354,109 @@ function insightsHtml(m) {
     const good = (pct >= 0) === (row.name === "solar" || row.name === "gridExport");
     return `<td class="${good ? "good" : "bad"}">${pct >= 0 ? "▲" : "▼"} ${escapeHtml(formatNumber(Math.abs(pct), locale, 0))}%</td>`;
   };
-  const rows = (data.compare || []).filter((row) => m.config.showSolar || row.name !== "solar");
   return `
-    ${tiles ? `
-    <section class="sfc-section sfc-insights">
-      <div class="sfc-head"><div><span class="sfc-kicker">${MINI_ICONS.bolt}</span><h3>${escapeHtml(t.insightsTitle)}</h3></div></div>
-      <div class="sfc-insight-grid">${tiles}</div>
-    </section>` : ""}
-    ${rows.length ? `
     <section class="sfc-section sfc-compare">
       <div class="sfc-head"><div><span class="sfc-kicker">kWh</span><h3>${escapeHtml(t.compareTitle)}</h3></div></div>
       <div class="sfc-compare-scroll"><table class="sfc-compare-table">
         <thead><tr><th></th><th>${escapeHtml(t.periodToday)}</th><th>${escapeHtml(t.colYesterday)}</th><th></th><th>${escapeHtml(t.colAvg7)}</th><th>${escapeHtml(t.colMonth)}</th></tr></thead>
         <tbody>${rows.map((row) => `<tr class="${row.name}"><th><i></i>${escapeHtml(labels[row.name])}</th>${cell(row.today)}${cell(row.yesterday)}${trend(row)}${cell(row.average)}${cell(row.month)}</tr>`).join("")}</tbody>
       </table></div>
-    </section>` : ""}`;
+    </section>`;
 }
 
-function standardSections(m) {
-  // Wide: the energy section leads across the full width, the rest flow
-  // into balanced columns below it.
-  if (m.config.wide) return `${energySectionHtml(m)}<div class="sfc-wide-rest">${inverterHtml(m)}${forecastHtml(m)}${virtualStorageHtml(m)}${insightsHtml(m)}${systemHtml(m)}${panelsHtml(m)}</div>`;
-  return `${inverterHtml(m)}${forecastHtml(m)}${virtualStorageHtml(m)}${systemHtml(m)}${energySectionHtml(m)}${insightsHtml(m)}${panelsHtml(m)}`;
+// The sections below a theme's main view, and the `sections:` option that
+// picks and orders them. `flow`, `today` and `sources` are parts of the
+// themes' main view (the last two in Diorama).
+const SECTION_HTML = {
+  inverter: inverterHtml,
+  forecast: forecastHtml,
+  virtual_storage: virtualStorageHtml,
+  system: systemHtml,
+  energy: energySectionHtml,
+  insights: insightsHtml,
+  comparison: comparisonHtml,
+  panels: panelsHtml,
+};
+const SECTION_IDS = ["flow", "today", "sources", ...Object.keys(SECTION_HTML)];
+const SECTION_ORDER = ["inverter", "forecast", "virtual_storage", "system", "energy", "insights", "comparison", "panels"];
+const SECTION_ORDER_WIDE = ["energy", "inverter", "forecast", "virtual_storage", "insights", "comparison", "system", "panels"];
+
+// The listed sections in order, or null without the option.
+function sectionList(config) {
+  if (!Array.isArray(config.sections)) return null;
+  return [...new Set(config.sections.map((id) => String(id).trim().toLowerCase()).filter((id) => SECTION_IDS.includes(id)))];
+}
+
+function sectionShown(m, id) {
+  return !m.sections || m.sections.includes(id);
+}
+
+function sectionOrder(m, defaults) {
+  return m.sections ? m.sections.filter((id) => SECTION_HTML[id]) : defaults;
+}
+
+// What a collapsed section still shows: its title and one key value.
+function foldSummary(m, id) {
+  const { t, locale } = m;
+  if (id === "energy") {
+    const solar = m.config.showSolar && isNum(m.totals.solar);
+    return [periodLabels(t)[m.period][1], solar ? t.pvProduction : t.consumption, formatEnergy(solar ? m.totals.solar : m.totals.load, locale)];
+  }
+  if (id === "forecast") return [t.batteryForecast, t.battery, formatPercent(m.forecast.soc, locale)];
+  if (id === "virtual_storage") {
+    const v = m.virtualStorage?.value;
+    return [t.vsTitle, "", isNum(v) ? `${v > 0.0005 ? "+" : v < -0.0005 ? "−" : ""}${formatEnergy(Math.abs(v), locale)}` : "—"];
+  }
+  if (id === "system") {
+    const inv = m.system?.inverter;
+    return isNum(inv?.share) ? [t.systemTitle, t.inverterLoad, formatPercent(inv.share, locale)] : [t.systemTitle, "", ""];
+  }
+  if (id === "insights") {
+    const peak = m.insights?.day?.solarPeak;
+    return peak && m.config.showSolar ? [t.insightsTitle, t.peakSolar, formatPower(peak.value, locale)] : [t.insightsTitle, "", ""];
+  }
+  if (id === "comparison") {
+    const row = compareTableRows(m)[0];
+    const names = { solar: t.pvProduction, load: t.consumption, gridImport: t.gridImport, gridExport: t.gridExport };
+    return row ? [t.compareTitle, names[row.name], formatEnergy(row.today, locale)] : [t.compareTitle, "", ""];
+  }
+  if (id === "panels") return [t.panelsTitle, "", isNum(m.panels?.average) ? fill(t.panelAvg, { kwh: formatEnergy(m.panels.average, locale) }) : ""];
+  return null;
+}
+
+// `collapsible: true`: the section's title folds it. A collapsed section
+// becomes one line with its title and key value.
+function foldable(m, id, html) {
+  if (!m.config.collapsible || !html.trim() || id === "inverter") return html;
+  if (m.collapsed.has(id)) {
+    const [title, label, value] = foldSummary(m, id);
+    return `
+    <section class="sfc-section sfc-folded" data-fold="${id}">
+      <button type="button" class="sfc-fold-head" data-fold-toggle="${id}" aria-expanded="false">
+        <span>${escapeHtml(title)}</span>${value ? `<b>${label ? `<small>${escapeHtml(label)}</small> ` : ""}${escapeHtml(value)}</b>` : ""}<i aria-hidden="true"></i>
+      </button>
+    </section>`;
+  }
+  const toggle = `data-fold-toggle="${id}" role="button" tabindex="0" aria-expanded="true"`;
+  if (html.includes('<div class="sfc-head">')) return html.replace('<div class="sfc-head">', `<div class="sfc-head sfc-foldable" ${toggle}>`);
+  // The forecast and the virtual storage: their small title folds them.
+  return html.replace("<small>", `<small class="sfc-foldable" ${toggle}>`);
+}
+
+function sectionHtml(m, id) {
+  return SECTION_HTML[id] ? foldable(m, id, SECTION_HTML[id](m)) : "";
+}
+
+// `defaults`: a theme's own set and order, `exclude`: sections the theme
+// places itself (Gate: the energy section; it shows the battery on its dial).
+function standardSections(m, defaults, exclude = []) {
+  if (m.config.wide && !defaults) {
+    // Wide: the energy section leads across the full width, the rest flow
+    // into balanced columns below it.
+    const rest = sectionOrder(m, SECTION_ORDER_WIDE).filter((id) => id !== "energy");
+    return `${sectionShown(m, "energy") ? sectionHtml(m, "energy") : ""}<div class="sfc-wide-rest">${rest.map((id) => sectionHtml(m, id)).join("")}</div>`;
+  }
+  return sectionOrder(m, defaults || SECTION_ORDER).filter((id) => !exclude.includes(id)).map((id) => sectionHtml(m, id)).join("");
 }
 
 // ---------------------------------------------------------------------------
@@ -2842,8 +2942,10 @@ function renderDiorama(m) {
     ? [Math.max(0, load - imported - fromBattery) / load, fromBattery / load, fromVirtual / load, fromGrid / load].map((v) => clamp(v * 100, 0, 100))
     : null;
   const ownShare = todayOwnShare(m);
+  const showChips = sectionShown(m, "today");
+  const showShare = Boolean(shares) && sectionShown(m, "sources");
   return `
-    <div class="dio-scene" style="--sky-a:${sky.sky[0]};--sky-b:${sky.sky[1]}">
+    ${sectionShown(m, "flow") ? `<div class="dio-scene" style="--sky-a:${sky.sky[0]};--sky-b:${sky.sky[1]}">
       <svg viewBox="0 0 520 360" aria-hidden="true">${svg}</svg>
       <div class="dio-title"><h1>${escapeHtml(m.name)}</h1>${liveBadge(m)}</div>
       <div class="dio-clock">${escapeHtml(clockText(m))}${isNum(m.weather?.temperature) ? ` <button class="dio-temp" ${entityAttr(m.weather.entityId)}>${escapeHtml(`${formatNumber(m.weather.temperature, locale, 0)}${m.weather.unit}`)}</button>` : ""}</div>
@@ -2851,9 +2953,9 @@ function renderDiorama(m) {
       ${m.config.showBattery ? pill(22, 208, "battery", formatPercent(live.soc, locale), batteryNote, batteryEntityId(m)) : ""}
       ${pill(378, 240, "grid", formatPower(gridValue, locale), `${live.exportActive ? "↑ " : live.importActive ? "↓ " : ""}${t.grid.toLowerCase()}`, gridEntityId(m))}
       ${pill(120, 296, "load", formatPower(live.load, locale), t.inHome, m.ids.live.load)}
-    </div>
-    <div class="dio-bottom">
-      <div class="dio-chips">
+    </div>` : ""}
+    ${showChips || showShare ? `<div class="dio-bottom">
+      ${showChips ? `<div class="dio-chips">
         ${m.config.showSolar
           ? `<button class="dio-chip sun" ${entityAttr(m.ids.energy.solar)}><small>${escapeHtml(t.chipRoof)}</small><b>${escapeHtml(formatEnergy(today.solar, locale))}</b></button>`
           : `<button class="dio-chip grid" ${entityAttr(m.ids.energy.gridImport)}><small>${escapeHtml(t.gridImport)}</small><b>${escapeHtml(formatEnergy(today.gridImport, locale))}</b></button>`}
@@ -2861,8 +2963,8 @@ function renderDiorama(m) {
           ? `<button class="dio-chip bat" ${entityAttr(batteryEntityId(m))}><small>${escapeHtml(when.label)}</small><b>${escapeHtml(when.value)}</b></button>`
           : `<button class="dio-chip grid" ${entityAttr(m.ids.energy.gridExport)}><small>${escapeHtml(t.gridExport)}</small><b>${escapeHtml(formatEnergy(today.gridExport, locale))}</b></button>`}
         <button class="dio-chip home" ${entityAttr(m.ids.energy.load)}><small>${escapeHtml(t.chipHome)}</small><b>${escapeHtml(formatEnergy(today.load, locale))}</b></button>
-      </div>
-      ${shares ? `
+      </div>` : ""}
+      ${showShare ? `
         <div class="dio-share">
           <header>${escapeHtml(t.whereFrom)}<span>${escapeHtml(t.autarky.toLowerCase())} ${escapeHtml(formatPercent(ownShare, locale))}</span></header>
           <div class="dio-track">${[["pv", t.solar], ["battery", t.battery], ["vstore", t.vsShort], ["grid", t.grid]]
@@ -2870,7 +2972,7 @@ function renderDiorama(m) {
           ${m.virtualStorage ? `<div class="dio-legend">${[["pv", t.solar], ["battery", t.battery], ["vstore", t.vsShort], ["grid", t.grid]]
             .map(([cls, name], i) => (shares[i] >= 0.5 ? `<span class="${cls}">${escapeHtml(name)} ${escapeHtml(formatPercent(shares[i], locale))}</span>` : "")).join("")}</div>` : ""}
         </div>` : ""}
-    </div>
+    </div>` : ""}
     <div class="sfc-sections">${standardSections(m)}</div>`;
 }
 
@@ -3668,8 +3770,8 @@ function renderGate(m) {
           ${kv(t.autarkyToday, own)}
         </div>
       </div>
-      <div class="gt-energy">${energySectionHtml(m)}</div>
-      <div class="sfc-sections">${inverterHtml(m)}${virtualStorageHtml(m)}${insightsHtml(m)}${systemHtml(m)}${panelsHtml(m)}</div>
+      <div class="gt-energy">${sectionShown(m, "energy") ? sectionHtml(m, "energy") : ""}</div>
+      <div class="sfc-sections">${standardSections(m, ["inverter", "virtual_storage", "insights", "comparison", "system", "panels"], ["energy"])}</div>
     </div>`;
 }
 
@@ -3940,6 +4042,17 @@ const BASE_CSS = `
   .sfc-tile { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 10px 12px; text-align: left;
     border-radius: var(--sfc-tile-radius, 13px); border: 1px solid var(--sfc-border); background: var(--sfc-tile-bg); color: var(--sfc-c); }
   .sfc-tile:disabled { opacity: .55; cursor: default; }
+  /* collapsible: true – a section's title folds it; folded, one line. */
+  .sfc-foldable { cursor: pointer; }
+  .sfc-head.sfc-foldable h3::after, small.sfc-foldable::after, .sfc-fold-head i::before {
+    content: ""; display: inline-block; width: .42em; height: .42em; margin-left: .5em; vertical-align: .18em;
+    border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-135deg); opacity: .6; }
+  .sfc-fold-head { width: 100%; display: flex; align-items: center; gap: 10px; padding: 0; border: 0; background: none; cursor: pointer; text-align: left; }
+  .sfc-fold-head span { flex: 1; min-width: 0; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--sfc-heading-font, inherit); }
+  .sfc-fold-head b { white-space: nowrap; font-family: var(--sfc-num-font, inherit); }
+  .sfc-fold-head b small { color: var(--sfc-muted); font-weight: 500; font-size: .8em; font-family: var(--sfc-font); }
+  .sfc-fold-head i::before { transform: rotate(45deg); vertical-align: .3em; }
+  .sfc-section.sfc-folded { padding-top: 12px; padding-bottom: 12px; }
   .sfc-tile.computed:disabled { opacity: 1; }
   .sfc-tile.solar, .sfc-summary-item.selfuse, .sfc-summary-item.yield { --sfc-c: var(--sfc-pv); }
   .sfc-tile.load { --sfc-c: var(--sfc-load); }
@@ -4916,6 +5029,31 @@ function saveHiddenSeries(hidden) {
   }
 }
 
+// Sections the viewer collapsed (`collapsible: true`), remembered in this
+// browser. `collapsed:` in the config sets the starting state; changing it
+// starts over from the new list.
+const COLLAPSED_KEY = "solar-flow-card:collapsed";
+
+function loadCollapsed(config) {
+  const defaults = Array.isArray(config.collapsed) ? config.collapsed.map((id) => String(id).trim().toLowerCase()) : [];
+  try {
+    const saved = JSON.parse(localStorage.getItem(COLLAPSED_KEY) || "null");
+    if (saved && JSON.stringify(saved.defaults) === JSON.stringify(defaults) && Array.isArray(saved.ids)) return new Set(saved.ids);
+  } catch (error) {
+    // Unavailable storage (private mode): start from the config.
+  }
+  return new Set(defaults);
+}
+
+function saveCollapsed(config, collapsed) {
+  const defaults = Array.isArray(config.collapsed) ? config.collapsed.map((id) => String(id).trim().toLowerCase()) : [];
+  try {
+    localStorage.setItem(COLLAPSED_KEY, JSON.stringify({ defaults, ids: [...collapsed] }));
+  } catch (error) {
+    // Not persisted; the choice still applies until the page reloads.
+  }
+}
+
 // Wide layout: the theme's main view on the left, the sections beside it in
 // a grid that flows, so a missing section leaves no gap. Below ~880 px the
 // card falls back to the normal stacked layout. LCARS and Gate arrange
@@ -4925,6 +5063,14 @@ function wideLayout(theme, html) {
   const at = html.lastIndexOf('<div class="sfc-sections">');
   if (at < 0) return html;
   return `<div class="sfc-wide"><div class="sfc-wide-main">${html.slice(0, at)}<div class="sfc-wide-fill"></div></div>${html.slice(at)}</div>`;
+}
+
+// `sections:` without `flow`: the theme's main view is left out. Diorama
+// leaves out its parts itself; LCARS and Gate keep their frame.
+function withoutFlow(theme, html, flowShown) {
+  if (flowShown || ["diorama", "lcars", "gate"].includes(theme)) return html;
+  const at = html.lastIndexOf('<div class="sfc-sections">');
+  return at < 0 ? html : html.slice(at);
 }
 
 // Wide layout: deal the sections, in order, to the shorter of the two
@@ -4961,6 +5107,7 @@ class SolarFlowCard extends HTMLElement {
     this._inverterOpen = false;
     this._cache = new Map();
     this._hiddenSeries = loadHiddenSeries();
+    this._collapsed = new Set();
     this._signature = "";
   }
 
@@ -4982,6 +5129,7 @@ class SolarFlowCard extends HTMLElement {
     const normalized = config && typeof config === "object" && !Array.isArray(config) ? config : {};
     this._config = { ...DEFAULT_CONFIG, ...migrateConfig(normalized) };
     if (!THEMES.includes(this._config.theme)) this._config.theme = "diorama";
+    this._collapsed = loadCollapsed(this._config);
     this._signature = "";
     this._render();
   }
@@ -5107,7 +5255,8 @@ class SolarFlowCard extends HTMLElement {
   // month. Shown in the wide layout, or anywhere with show_insights: true.
   _insights(resolved, today, forecast) {
     const config = this._config;
-    if (!insightsShown(config)) return null;
+    const listed = sectionList(config);
+    if (listed ? !listed.includes("insights") && !listed.includes("comparison") : !insightsShown(config)) return null;
     const history = this._powerHistory(resolved, "today");
     const day = history?.entry.data ? dayHighlights(this._powerChartData(history.entry.data.series, history.spec), history.spec, today, forecast) : null;
     const week = this._periodEnergy(resolved, "7d", today);
@@ -5234,7 +5383,10 @@ class SolarFlowCard extends HTMLElement {
       const insights = this._insights(resolved, today, forecast);
       const weather = theme === "diorama" || theme === "reactor" ? weatherData(this._hass, config) : null;
       // The wide layout has room for everything: inverter details stay open.
-      const wide = config.wide === true;
+      const sections = sectionList(config);
+      const flowShown = !sections || sections.includes("flow");
+      // The wide layout puts the sections beside the theme's main view.
+      const wide = config.wide === true && flowShown;
       // Nothing to show: no details section and no link to it.
       const hasDetails = readings.length > 0;
       const inverterOpen = hasDetails && (wide || this._inverterOpen);
@@ -5260,6 +5412,7 @@ class SolarFlowCard extends HTMLElement {
         panels?.panels.map((p) => [p.today, p.power]), system, bank, insights && [insights.loading, insights.at, insights.day?.offGridMinutes], weather && [weather.condition, weather.temperature], inverterOpen,
         inverter?.map((d) => [[...d.strings.values()].map((s) => Object.values(s).map((r) => r.value)), d.temperatures.map((r) => r.value), d.battery.map((r) => r.value), d.grid.map((r) => r.value)]),
         vstore,
+        [...this._collapsed],
         Math.floor(now.getTime() / 60000),
       ]);
       if (signature === this._signature) return;
@@ -5282,6 +5435,7 @@ class SolarFlowCard extends HTMLElement {
           showSystem: config.show_system !== false,
           showBattery,
           wide,
+          collapsible: config.collapsible === true,
         },
         ids,
         live,
@@ -5303,6 +5457,8 @@ class SolarFlowCard extends HTMLElement {
         weather,
         inverterOpen,
         hasDetails,
+        sections,
+        collapsed: this._collapsed,
         hiddenSeries: this._hiddenSeries,
         // Seconds since the card was first shown, during its start-up
         // animation (re-renders continue it), then null.
@@ -5313,7 +5469,7 @@ class SolarFlowCard extends HTMLElement {
       const painted = this._paint(
         BASE_CSS + THEME_CSS[theme],
         ["sfc", `theme-${theme}`, config.animation === false && "no-anim", config.background === "glass" && "glass", live.exportActive ? "grid-export" : live.importActive && "grid-import"].filter(Boolean).join(" "),
-        wide ? wideLayout(theme, THEME_RENDER[theme](model)) : THEME_RENDER[theme](model),
+        wide ? wideLayout(theme, THEME_RENDER[theme](model)) : withoutFlow(theme, THEME_RENDER[theme](model), flowShown),
       );
       if (!painted) return;
       this._wire(model);
@@ -5415,6 +5571,24 @@ class SolarFlowCard extends HTMLElement {
         this._render();
       });
     });
+    root.querySelectorAll("[data-fold-toggle]").forEach((element) => {
+      const toggle = (event) => {
+        event.stopPropagation();
+        const id = element.dataset.foldToggle;
+        if (this._collapsed.has(id)) this._collapsed.delete(id);
+        else this._collapsed.add(id);
+        saveCollapsed(this._config, this._collapsed);
+        this._signature = "";
+        this._render();
+      };
+      element.addEventListener("click", toggle);
+      element.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          toggle(event);
+        }
+      });
+    });
     wireChart(root, model.chart?.data, model.t, model.locale, model.hiddenSeries);
   }
 }
@@ -5448,7 +5622,7 @@ function editorStrings(hass, config) {
 }
 
 // Switches that are off unless set: [config key, label key, value when on].
-const EDITOR_OPTIN = [["wide", "editorWide"], ["show_insights", "editorInsights"], ["panels_average", "editorPanelsAverage", "per_string"], ["background", "editorGlass", "glass"], ["load_fonts", "editorFonts"]];
+const EDITOR_OPTIN = [["wide", "editorWide"], ["show_insights", "editorInsights"], ["panels_average", "editorPanelsAverage", "per_string"], ["background", "editorGlass", "glass"], ["load_fonts", "editorFonts"], ["collapsible", "editorCollapsible"]];
 const EDITOR_SWITCHES = [
   ["show_solar", "editorSolar"],
   ["show_battery", "editorBattery"],

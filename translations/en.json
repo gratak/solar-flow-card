@@ -247,5 +247,6 @@
   "vsNone": "No surplus this hour",
   "otherDetails": "Other readings",
   "computedHint": "Calculated from the other sensors",
-  "vsShort": "Virtual storage"
+  "vsShort": "Virtual storage",
+  "editorCollapsible": "Collapsible sections (tap a section's title)"
 }

@@ -156,6 +156,39 @@ A font installed on your device is used too, with neither option.
 | `show_panels` | `true` | Optimizer / panel tiles (shown only when panel data exists). |
 | `inverter_details` | – | Any sensors to show in the Inverter details, e.g. the temperature or status of an inverter that is not DeyeCloud. See the [configuration guide](docs/configuration.md#installation-section-all-optional). |
 | `virtual_storage` | – | Virtual storage with hourly net balancing, see [below](#virtual-storage-hourly-net-balancing). |
+| `sections` | all | Which parts the card shows and in what order, see [Choosing and ordering sections](#choosing-and-ordering-sections). |
+| `collapsible` | `false` | `true`: tap a section's title to fold it into one line with its key value (also in the editor). The browser remembers what you folded. |
+| `collapsed` | – | With `collapsible`: the sections that start folded, e.g. `[panels, system]`. |
+
+#### Choosing and ordering sections
+
+`sections:` lists what the card shows, in that order. Anything left out is hidden. Without it the card shows everything as before, and the `show_…` options keep working either way.
+
+| Id | Section |
+|---|---|
+| `flow` | The theme's main view (the animated scene) |
+| `today` | Diorama: the three "today" tiles under the scene |
+| `sources` | Diorama: "Where today's home power comes from" |
+| `inverter` | Inverter details (opened from the inverter in the main view) |
+| `forecast` | Battery forecast |
+| `virtual_storage` | Virtual storage |
+| `system` | Installation |
+| `energy` | Energy: period tabs, chart, tiles and summary |
+| `insights` | Today at a glance |
+| `comparison` | Comparison with yesterday, the week and the month |
+| `panels` | Panels |
+
+```yaml
+sections:
+  - today
+  - sources
+  - virtual_storage
+  - energy
+collapsible: true
+collapsed: [energy]
+```
+
+Listing `insights` or `comparison` shows them in the compact layout too. In the wide layout the energy section leads across the full width and the others follow in your order. Without `flow` the card uses the compact layout. LCARS and Gate keep their frame: there `flow` always shows, and Gate places the energy section itself.
 
 ### Period summary
 
@@ -266,6 +299,11 @@ The 3D, 7D, month and all-time totals and bars come from the long-term statistic
 
 Planned, in no particular order. Ideas and votes are welcome in [issues](https://github.com/gratak/solar-flow-card/issues).
 
+- **PV production forecast** ([#69](https://github.com/gratak/solar-flow-card/issues/69)), planned for 1.7.0, from forecast sensors such as Solcast or Forecast.Solar:
+  - today's forecast and what is still expected ("forecast 25 kWh · 8 kWh left") next to the solar reading, the remaining value from its own sensor;
+  - a forecast section with today and the next days as bars in kWh, scaled automatically, with the pessimistic–optimistic range where the sensor gives it (Solcast `estimate10` / `estimate90`);
+  - today's progress: produced so far next to what is still expected;
+  - the hourly forecast as a line in the 24H chart next to the actual production (Solcast `detailedHourly`).
 - **Several inverters** (`inverters:`, like `batteries:`): power and energy summed by the card without helper sensors, for example an on-grid and an off-grid inverter of different brands, with each inverter listed separately in the Installation section. Until then, combine them with Home Assistant "Sum" helpers under `entities:`.
 
 ## Translations

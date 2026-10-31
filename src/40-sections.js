@@ -298,7 +298,7 @@ function systemHtml(m) {
 // Today at a glance and the comparison table.
 function insightsHtml(m) {
   const data = m.insights;
-  if (!data || (!data.day && !data.compare)) return "";
+  if (!data?.day) return "";
   const { t, locale } = m;
   const d = data.day;
   const kv = (cls, label, value, note) => `<div class="sfc-insight ${cls}"><small>${escapeHtml(label)}</small><b>${escapeHtml(value)}</b>${note ? `<span>${escapeHtml(note)}</span>` : ""}</div>`;
@@ -309,6 +309,22 @@ function insightsHtml(m) {
     m.config.showBattery && isNum(d.cycles) && kv("battery", t.batteryCycles, formatNumber(d.cycles, locale, 2), ""),
     isNum(d.offGridMinutes) && kv("grid", t.offGrid, formatDuration(d.offGridMinutes / 60, t), ""),
   ].filter(Boolean).join("") : "";
+  return tiles ? `
+    <section class="sfc-section sfc-insights">
+      <div class="sfc-head"><div><span class="sfc-kicker">${MINI_ICONS.bolt}</span><h3>${escapeHtml(t.insightsTitle)}</h3></div></div>
+      <div class="sfc-insight-grid">${tiles}</div>
+    </section>` : "";
+}
+
+function compareTableRows(m) {
+  return (m.insights?.compare || []).filter((row) => m.config.showSolar || row.name !== "solar");
+}
+
+// Today compared with yesterday, the 7-day average and this month.
+function comparisonHtml(m) {
+  const rows = compareTableRows(m);
+  if (!rows.length) return "";
+  const { t, locale } = m;
   const labels = { solar: t.pvProduction, load: t.consumption, gridImport: t.gridImport, gridExport: t.gridExport };
   const cell = (v) => `<td>${escapeHtml(isNum(v) ? formatNumber(v, locale, v < 10 ? 1 : 0) : "—")}</td>`;
   const trend = (row) => {
@@ -318,28 +334,109 @@ function insightsHtml(m) {
     const good = (pct >= 0) === (row.name === "solar" || row.name === "gridExport");
     return `<td class="${good ? "good" : "bad"}">${pct >= 0 ? "▲" : "▼"} ${escapeHtml(formatNumber(Math.abs(pct), locale, 0))}%</td>`;
   };
-  const rows = (data.compare || []).filter((row) => m.config.showSolar || row.name !== "solar");
   return `
-    ${tiles ? `
-    <section class="sfc-section sfc-insights">
-      <div class="sfc-head"><div><span class="sfc-kicker">${MINI_ICONS.bolt}</span><h3>${escapeHtml(t.insightsTitle)}</h3></div></div>
-      <div class="sfc-insight-grid">${tiles}</div>
-    </section>` : ""}
-    ${rows.length ? `
     <section class="sfc-section sfc-compare">
       <div class="sfc-head"><div><span class="sfc-kicker">kWh</span><h3>${escapeHtml(t.compareTitle)}</h3></div></div>
       <div class="sfc-compare-scroll"><table class="sfc-compare-table">
         <thead><tr><th></th><th>${escapeHtml(t.periodToday)}</th><th>${escapeHtml(t.colYesterday)}</th><th></th><th>${escapeHtml(t.colAvg7)}</th><th>${escapeHtml(t.colMonth)}</th></tr></thead>
         <tbody>${rows.map((row) => `<tr class="${row.name}"><th><i></i>${escapeHtml(labels[row.name])}</th>${cell(row.today)}${cell(row.yesterday)}${trend(row)}${cell(row.average)}${cell(row.month)}</tr>`).join("")}</tbody>
       </table></div>
-    </section>` : ""}`;
+    </section>`;
 }
 
-function standardSections(m) {
-  // Wide: the energy section leads across the full width, the rest flow
-  // into balanced columns below it.
-  if (m.config.wide) return `${energySectionHtml(m)}<div class="sfc-wide-rest">${inverterHtml(m)}${forecastHtml(m)}${virtualStorageHtml(m)}${insightsHtml(m)}${systemHtml(m)}${panelsHtml(m)}</div>`;
-  return `${inverterHtml(m)}${forecastHtml(m)}${virtualStorageHtml(m)}${systemHtml(m)}${energySectionHtml(m)}${insightsHtml(m)}${panelsHtml(m)}`;
+// The sections below a theme's main view, and the `sections:` option that
+// picks and orders them. `flow`, `today` and `sources` are parts of the
+// themes' main view (the last two in Diorama).
+const SECTION_HTML = {
+  inverter: inverterHtml,
+  forecast: forecastHtml,
+  virtual_storage: virtualStorageHtml,
+  system: systemHtml,
+  energy: energySectionHtml,
+  insights: insightsHtml,
+  comparison: comparisonHtml,
+  panels: panelsHtml,
+};
+const SECTION_IDS = ["flow", "today", "sources", ...Object.keys(SECTION_HTML)];
+const SECTION_ORDER = ["inverter", "forecast", "virtual_storage", "system", "energy", "insights", "comparison", "panels"];
+const SECTION_ORDER_WIDE = ["energy", "inverter", "forecast", "virtual_storage", "insights", "comparison", "system", "panels"];
+
+// The listed sections in order, or null without the option.
+function sectionList(config) {
+  if (!Array.isArray(config.sections)) return null;
+  return [...new Set(config.sections.map((id) => String(id).trim().toLowerCase()).filter((id) => SECTION_IDS.includes(id)))];
+}
+
+function sectionShown(m, id) {
+  return !m.sections || m.sections.includes(id);
+}
+
+function sectionOrder(m, defaults) {
+  return m.sections ? m.sections.filter((id) => SECTION_HTML[id]) : defaults;
+}
+
+// What a collapsed section still shows: its title and one key value.
+function foldSummary(m, id) {
+  const { t, locale } = m;
+  if (id === "energy") {
+    const solar = m.config.showSolar && isNum(m.totals.solar);
+    return [periodLabels(t)[m.period][1], solar ? t.pvProduction : t.consumption, formatEnergy(solar ? m.totals.solar : m.totals.load, locale)];
+  }
+  if (id === "forecast") return [t.batteryForecast, t.battery, formatPercent(m.forecast.soc, locale)];
+  if (id === "virtual_storage") {
+    const v = m.virtualStorage?.value;
+    return [t.vsTitle, "", isNum(v) ? `${v > 0.0005 ? "+" : v < -0.0005 ? "−" : ""}${formatEnergy(Math.abs(v), locale)}` : "—"];
+  }
+  if (id === "system") {
+    const inv = m.system?.inverter;
+    return isNum(inv?.share) ? [t.systemTitle, t.inverterLoad, formatPercent(inv.share, locale)] : [t.systemTitle, "", ""];
+  }
+  if (id === "insights") {
+    const peak = m.insights?.day?.solarPeak;
+    return peak && m.config.showSolar ? [t.insightsTitle, t.peakSolar, formatPower(peak.value, locale)] : [t.insightsTitle, "", ""];
+  }
+  if (id === "comparison") {
+    const row = compareTableRows(m)[0];
+    const names = { solar: t.pvProduction, load: t.consumption, gridImport: t.gridImport, gridExport: t.gridExport };
+    return row ? [t.compareTitle, names[row.name], formatEnergy(row.today, locale)] : [t.compareTitle, "", ""];
+  }
+  if (id === "panels") return [t.panelsTitle, "", isNum(m.panels?.average) ? fill(t.panelAvg, { kwh: formatEnergy(m.panels.average, locale) }) : ""];
+  return null;
+}
+
+// `collapsible: true`: the section's title folds it. A collapsed section
+// becomes one line with its title and key value.
+function foldable(m, id, html) {
+  if (!m.config.collapsible || !html.trim() || id === "inverter") return html;
+  if (m.collapsed.has(id)) {
+    const [title, label, value] = foldSummary(m, id);
+    return `
+    <section class="sfc-section sfc-folded" data-fold="${id}">
+      <button type="button" class="sfc-fold-head" data-fold-toggle="${id}" aria-expanded="false">
+        <span>${escapeHtml(title)}</span>${value ? `<b>${label ? `<small>${escapeHtml(label)}</small> ` : ""}${escapeHtml(value)}</b>` : ""}<i aria-hidden="true"></i>
+      </button>
+    </section>`;
+  }
+  const toggle = `data-fold-toggle="${id}" role="button" tabindex="0" aria-expanded="true"`;
+  if (html.includes('<div class="sfc-head">')) return html.replace('<div class="sfc-head">', `<div class="sfc-head sfc-foldable" ${toggle}>`);
+  // The forecast and the virtual storage: their small title folds them.
+  return html.replace("<small>", `<small class="sfc-foldable" ${toggle}>`);
+}
+
+function sectionHtml(m, id) {
+  return SECTION_HTML[id] ? foldable(m, id, SECTION_HTML[id](m)) : "";
+}
+
+// `defaults`: a theme's own set and order, `exclude`: sections the theme
+// places itself (Gate: the energy section; it shows the battery on its dial).
+function standardSections(m, defaults, exclude = []) {
+  if (m.config.wide && !defaults) {
+    // Wide: the energy section leads across the full width, the rest flow
+    // into balanced columns below it.
+    const rest = sectionOrder(m, SECTION_ORDER_WIDE).filter((id) => id !== "energy");
+    return `${sectionShown(m, "energy") ? sectionHtml(m, "energy") : ""}<div class="sfc-wide-rest">${rest.map((id) => sectionHtml(m, id)).join("")}</div>`;
+  }
+  return sectionOrder(m, defaults || SECTION_ORDER).filter((id) => !exclude.includes(id)).map((id) => sectionHtml(m, id)).join("");
 }
 
 // ---------------------------------------------------------------------------

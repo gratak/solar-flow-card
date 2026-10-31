@@ -247,5 +247,6 @@
   "vsNone": "Brak nadwyżki w tej godzinie",
   "otherDetails": "Inne odczyty",
   "computedHint": "Wyliczone z pozostałych czujników",
-  "vsShort": "Wirtualny magazyn"
+  "vsShort": "Wirtualny magazyn",
+  "editorCollapsible": "Zwijane sekcje (dotknij tytułu sekcji)"
 }

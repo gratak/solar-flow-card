@@ -29,6 +29,31 @@ function saveHiddenSeries(hidden) {
   }
 }
 
+// Sections the viewer collapsed (`collapsible: true`), remembered in this
+// browser. `collapsed:` in the config sets the starting state; changing it
+// starts over from the new list.
+const COLLAPSED_KEY = "solar-flow-card:collapsed";
+
+function loadCollapsed(config) {
+  const defaults = Array.isArray(config.collapsed) ? config.collapsed.map((id) => String(id).trim().toLowerCase()) : [];
+  try {
+    const saved = JSON.parse(localStorage.getItem(COLLAPSED_KEY) || "null");
+    if (saved && JSON.stringify(saved.defaults) === JSON.stringify(defaults) && Array.isArray(saved.ids)) return new Set(saved.ids);
+  } catch (error) {
+    // Unavailable storage (private mode): start from the config.
+  }
+  return new Set(defaults);
+}
+
+function saveCollapsed(config, collapsed) {
+  const defaults = Array.isArray(config.collapsed) ? config.collapsed.map((id) => String(id).trim().toLowerCase()) : [];
+  try {
+    localStorage.setItem(COLLAPSED_KEY, JSON.stringify({ defaults, ids: [...collapsed] }));
+  } catch (error) {
+    // Not persisted; the choice still applies until the page reloads.
+  }
+}
+
 // Wide layout: the theme's main view on the left, the sections beside it in
 // a grid that flows, so a missing section leaves no gap. Below ~880 px the
 // card falls back to the normal stacked layout. LCARS and Gate arrange
@@ -38,6 +63,14 @@ function wideLayout(theme, html) {
   const at = html.lastIndexOf('<div class="sfc-sections">');
   if (at < 0) return html;
   return `<div class="sfc-wide"><div class="sfc-wide-main">${html.slice(0, at)}<div class="sfc-wide-fill"></div></div>${html.slice(at)}</div>`;
+}
+
+// `sections:` without `flow`: the theme's main view is left out. Diorama
+// leaves out its parts itself; LCARS and Gate keep their frame.
+function withoutFlow(theme, html, flowShown) {
+  if (flowShown || ["diorama", "lcars", "gate"].includes(theme)) return html;
+  const at = html.lastIndexOf('<div class="sfc-sections">');
+  return at < 0 ? html : html.slice(at);
 }
 
 // Wide layout: deal the sections, in order, to the shorter of the two
@@ -74,6 +107,7 @@ class SolarFlowCard extends HTMLElement {
     this._inverterOpen = false;
     this._cache = new Map();
     this._hiddenSeries = loadHiddenSeries();
+    this._collapsed = new Set();
     this._signature = "";
   }
 
@@ -95,6 +129,7 @@ class SolarFlowCard extends HTMLElement {
     const normalized = config && typeof config === "object" && !Array.isArray(config) ? config : {};
     this._config = { ...DEFAULT_CONFIG, ...migrateConfig(normalized) };
     if (!THEMES.includes(this._config.theme)) this._config.theme = "diorama";
+    this._collapsed = loadCollapsed(this._config);
     this._signature = "";
     this._render();
   }
@@ -220,7 +255,8 @@ class SolarFlowCard extends HTMLElement {
   // month. Shown in the wide layout, or anywhere with show_insights: true.
   _insights(resolved, today, forecast) {
     const config = this._config;
-    if (!insightsShown(config)) return null;
+    const listed = sectionList(config);
+    if (listed ? !listed.includes("insights") && !listed.includes("comparison") : !insightsShown(config)) return null;
     const history = this._powerHistory(resolved, "today");
     const day = history?.entry.data ? dayHighlights(this._powerChartData(history.entry.data.series, history.spec), history.spec, today, forecast) : null;
     const week = this._periodEnergy(resolved, "7d", today);
@@ -347,7 +383,10 @@ class SolarFlowCard extends HTMLElement {
       const insights = this._insights(resolved, today, forecast);
       const weather = theme === "diorama" || theme === "reactor" ? weatherData(this._hass, config) : null;
       // The wide layout has room for everything: inverter details stay open.
-      const wide = config.wide === true;
+      const sections = sectionList(config);
+      const flowShown = !sections || sections.includes("flow");
+      // The wide layout puts the sections beside the theme's main view.
+      const wide = config.wide === true && flowShown;
       // Nothing to show: no details section and no link to it.
       const hasDetails = readings.length > 0;
       const inverterOpen = hasDetails && (wide || this._inverterOpen);
@@ -373,6 +412,7 @@ class SolarFlowCard extends HTMLElement {
         panels?.panels.map((p) => [p.today, p.power]), system, bank, insights && [insights.loading, insights.at, insights.day?.offGridMinutes], weather && [weather.condition, weather.temperature], inverterOpen,
         inverter?.map((d) => [[...d.strings.values()].map((s) => Object.values(s).map((r) => r.value)), d.temperatures.map((r) => r.value), d.battery.map((r) => r.value), d.grid.map((r) => r.value)]),
         vstore,
+        [...this._collapsed],
         Math.floor(now.getTime() / 60000),
       ]);
       if (signature === this._signature) return;
@@ -395,6 +435,7 @@ class SolarFlowCard extends HTMLElement {
           showSystem: config.show_system !== false,
           showBattery,
           wide,
+          collapsible: config.collapsible === true,
         },
         ids,
         live,
@@ -416,6 +457,8 @@ class SolarFlowCard extends HTMLElement {
         weather,
         inverterOpen,
         hasDetails,
+        sections,
+        collapsed: this._collapsed,
         hiddenSeries: this._hiddenSeries,
         // Seconds since the card was first shown, during its start-up
         // animation (re-renders continue it), then null.
@@ -426,7 +469,7 @@ class SolarFlowCard extends HTMLElement {
       const painted = this._paint(
         BASE_CSS + THEME_CSS[theme],
         ["sfc", `theme-${theme}`, config.animation === false && "no-anim", config.background === "glass" && "glass", live.exportActive ? "grid-export" : live.importActive && "grid-import"].filter(Boolean).join(" "),
-        wide ? wideLayout(theme, THEME_RENDER[theme](model)) : THEME_RENDER[theme](model),
+        wide ? wideLayout(theme, THEME_RENDER[theme](model)) : withoutFlow(theme, THEME_RENDER[theme](model), flowShown),
       );
       if (!painted) return;
       this._wire(model);
@@ -526,6 +569,24 @@ class SolarFlowCard extends HTMLElement {
         saveHiddenSeries(this._hiddenSeries);
         this._signature = "";
         this._render();
+      });
+    });
+    root.querySelectorAll("[data-fold-toggle]").forEach((element) => {
+      const toggle = (event) => {
+        event.stopPropagation();
+        const id = element.dataset.foldToggle;
+        if (this._collapsed.has(id)) this._collapsed.delete(id);
+        else this._collapsed.add(id);
+        saveCollapsed(this._config, this._collapsed);
+        this._signature = "";
+        this._render();
+      };
+      element.addEventListener("click", toggle);
+      element.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          toggle(event);
+        }
       });
     });
     wireChart(root, model.chart?.data, model.t, model.locale, model.hiddenSeries);
