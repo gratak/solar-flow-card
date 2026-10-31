@@ -2,6 +2,8 @@
 
 ## 1.6.0
 
+- **`sections:`** (#62, #66): choose which parts the card shows and in what order. Besides the sections below the main view, it covers the main view itself (`flow`) and, in Diorama, the "today" tiles (`today`) and "Where today's power came from" (`sources`). "Today at a glance" (`insights`) and the comparison (`comparison`) are now separate sections.
+- **Collapsible sections** (`collapsible: true`, also in the editor, #63): tap a section's title to fold it into one line with its key value. For example, the energy section shows today's production and the installation the inverter load. The browser remembers what you folded, and `collapsed: [...]` sets what starts folded.
 - Virtual storage (#43, #67):
   - **Savings** follow the hourly settlement. The import and export left after each hour's balancing are what you pay and get paid for.
   - Diorama's "Where today's power came from" bar has a **virtual storage** segment: the import balanced by export within the same hour. The grid segment shows only the rest. A legend shows each share.

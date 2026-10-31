@@ -6,7 +6,7 @@
  *
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
-const CARD_VERSION = "1.5.1";
+const CARD_VERSION = "1.6.0";
 const CARD_TAG = "solar-flow-card";
 const EDITOR_TAG = "solar-flow-card-editor";
 const THEMES = ["diorama", "aurora", "paper", "lcars", "atlantis", "expanse", "foundation", "galaxy", "gate", "reactor"];

@@ -57,6 +57,17 @@ const BASE_CSS = `
   .sfc-tile { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 10px 12px; text-align: left;
     border-radius: var(--sfc-tile-radius, 13px); border: 1px solid var(--sfc-border); background: var(--sfc-tile-bg); color: var(--sfc-c); }
   .sfc-tile:disabled { opacity: .55; cursor: default; }
+  /* collapsible: true – a section's title folds it; folded, one line. */
+  .sfc-foldable { cursor: pointer; }
+  .sfc-head.sfc-foldable h3::after, small.sfc-foldable::after, .sfc-fold-head i::before {
+    content: ""; display: inline-block; width: .42em; height: .42em; margin-left: .5em; vertical-align: .18em;
+    border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-135deg); opacity: .6; }
+  .sfc-fold-head { width: 100%; display: flex; align-items: center; gap: 10px; padding: 0; border: 0; background: none; cursor: pointer; text-align: left; }
+  .sfc-fold-head span { flex: 1; min-width: 0; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--sfc-heading-font, inherit); }
+  .sfc-fold-head b { white-space: nowrap; font-family: var(--sfc-num-font, inherit); }
+  .sfc-fold-head b small { color: var(--sfc-muted); font-weight: 500; font-size: .8em; font-family: var(--sfc-font); }
+  .sfc-fold-head i::before { transform: rotate(45deg); vertical-align: .3em; }
+  .sfc-section.sfc-folded { padding-top: 12px; padding-bottom: 12px; }
   .sfc-tile.computed:disabled { opacity: 1; }
   .sfc-tile.solar, .sfc-summary-item.selfuse, .sfc-summary-item.yield { --sfc-c: var(--sfc-pv); }
   .sfc-tile.load { --sfc-c: var(--sfc-load); }
