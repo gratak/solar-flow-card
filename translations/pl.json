@@ -246,5 +246,6 @@
   "autarkyHourly": "Samowystarcz. z bilansem godz.",
   "vsNone": "Brak nadwyżki w tej godzinie",
   "otherDetails": "Inne odczyty",
-  "computedHint": "Wyliczone z pozostałych czujników"
+  "computedHint": "Wyliczone z pozostałych czujników",
+  "vsShort": "Wirtualny magazyn"
 }

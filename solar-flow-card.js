@@ -265,7 +265,8 @@ const TRANSLATIONS = {
     "autarkyHourly": "Self-suff. with hourly balance",
     "vsNone": "No surplus this hour",
     "otherDetails": "Other readings",
-    "computedHint": "Calculated from the other sensors"
+    "computedHint": "Calculated from the other sensors",
+    "vsShort": "Virtual storage"
   },
   "nl": {
     "languageName": "Nederlands",
@@ -515,7 +516,8 @@ const TRANSLATIONS = {
     "autarkyHourly": "Zelfvoorz. met uurbalans",
     "vsNone": "Geen overschot dit uur",
     "otherDetails": "Overige metingen",
-    "computedHint": "Berekend uit de andere sensoren"
+    "computedHint": "Berekend uit de andere sensoren",
+    "vsShort": "Virtuele opslag"
   },
   "pl": {
     "languageName": "Polski",
@@ -765,7 +767,8 @@ const TRANSLATIONS = {
     "autarkyHourly": "Samowystarcz. z bilansem godz.",
     "vsNone": "Brak nadwyżki w tej godzinie",
     "otherDetails": "Inne odczyty",
-    "computedHint": "Wyliczone z pozostałych czujników"
+    "computedHint": "Wyliczone z pozostałych czujników",
+    "vsShort": "Wirtualny magazyn"
   }
 };
 
@@ -1225,9 +1228,13 @@ async function loadTodayStats(hass, energy) {
 // optional ready net balance `entity` and `negative: show|zero`.
 function virtualStorageConfig(config) {
   const vs = config.virtual_storage;
-  if (vs === true) return { entity: null, negative: "show" };
+  if (vs === true) return { entity: null, negative: "show", countAsOwn: false };
   if (!vs || typeof vs !== "object" || Array.isArray(vs)) return null;
-  return { entity: typeof vs.entity === "string" && vs.entity ? vs.entity : null, negative: vs.negative === "zero" ? "zero" : "show" };
+  return {
+    entity: typeof vs.entity === "string" && vs.entity ? vs.entity : null,
+    negative: vs.negative === "zero" ? "zero" : "show",
+    countAsOwn: vs.count_as_own === true,
+  };
 }
 
 function startOfHour(date) {
@@ -1308,12 +1315,17 @@ function hourSoFar(resolved, current) {
   return out;
 }
 
-// Import left after balancing import and export within each hour.
-function hourlyNetImport(hours, since, current) {
+// What the utility bills with hourly balancing: the import left after each
+// hour's balancing, and the export left over.
+function hourlyNet(hours, since, current) {
   if (!hours) return null;
-  let net = 0;
-  for (const [at, h] of hours) if (at >= since) net += Math.max(0, h.gridImport - h.gridExport);
-  if (current) net += Math.max(0, current.gridImport - current.gridExport);
+  const net = { gridImport: 0, gridExport: 0 };
+  const add = (h) => {
+    net.gridImport += Math.max(0, h.gridImport - h.gridExport);
+    net.gridExport += Math.max(0, h.gridExport - h.gridImport);
+  };
+  for (const [at, h] of hours) if (at >= since) add(h);
+  if (current) add(current);
   return net;
 }
 
@@ -1342,7 +1354,17 @@ function virtualStorage(hass, resolved, vs, todayHours, current, now = new Date(
   }
   const deficit = isNum(value) && value < -0.0005;
   if (deficit && vs.negative === "zero") value = 0;
-  return { value, deficit, entityId, minutesLeft, progress: ((60 - minutesLeft) / 60) * 100, day };
+  return { value, deficit, countAsOwn: vs.countAsOwn, entityId, minutesLeft, progress: ((60 - minutesLeft) / 60) * 100, day };
+}
+
+// Today's self-sufficiency, with the energy balanced within the hour counted
+// as your own when `virtual_storage: { count_as_own: true }`.
+function todayOwnShare(m) {
+  const { load, gridImport } = m.today;
+  if (!isNum(load) || !isNum(gridImport) || load <= 0.05) return null;
+  const v = m.virtualStorage;
+  const fromGrid = v?.countAsOwn && v.day ? Math.max(0, gridImport - v.day.balanced) : gridImport;
+  return clamp(((load - fromGrid) / load) * 100, 0, 100);
 }
 
 // Long-term statistics query for a period other than today.
@@ -1428,17 +1450,21 @@ function migrateConfig(config) {
   return next;
 }
 
-function periodSummary(totals, config, t, locale, netImport = null) {
+// `net`: with virtual storage, the import and export left after hourly
+// balancing (see hourlyNet()).
+function periodSummary(totals, config, t, locale, net = null) {
   const { solar, load, gridImport, gridExport } = totals;
   const items = [];
   const show = (key) => config[key] !== false;
   const hasSolar = show("show_solar");
-  if (show("show_self_sufficiency") && isNum(load) && isNum(gridImport) && load > 0.05) {
-    items.push(["autarky", t.autarky, formatPercent(clamp(((load - gridImport) / load) * 100, 0, 100), locale)]);
+  const countAsOwn = Boolean(net) && virtualStorageConfig(config)?.countAsOwn;
+  const ownImport = countAsOwn ? net.gridImport : gridImport;
+  if (show("show_self_sufficiency") && isNum(load) && isNum(ownImport) && load > 0.05) {
+    items.push(["autarky", t.autarky, formatPercent(clamp(((load - ownImport) / load) * 100, 0, 100), locale)]);
   }
-  // With virtual storage: the import left after hourly balancing.
-  if (show("show_self_sufficiency") && isNum(load) && isNum(netImport) && load > 0.05) {
-    items.push(["autarky", t.autarkyHourly, formatPercent(clamp(((load - netImport) / load) * 100, 0, 100), locale)]);
+  // Both values, unless the balanced energy already counts as your own.
+  if (!countAsOwn && net && show("show_self_sufficiency") && isNum(load) && load > 0.05) {
+    items.push(["autarky", t.autarkyHourly, formatPercent(clamp(((load - net.gridImport) / load) * 100, 0, 100), locale)]);
   }
   if (hasSolar && show("show_self_use") && isNum(solar) && isNum(gridExport) && solar > 0.05) {
     items.push(["selfuse", t.selfUse, formatPercent(clamp(((solar - gridExport) / solar) * 100, 0, 100), locale)]);
@@ -1446,7 +1472,10 @@ function periodSummary(totals, config, t, locale, netImport = null) {
   const priceImport = positiveNumber(config.price_import);
   if (show("show_savings") && priceImport !== null && isNum(load) && isNum(gridImport)) {
     const priceExport = positiveNumber(config.price_export) || 0;
-    const saved = Math.max(0, load - gridImport) * priceImport + (isNum(gridExport) ? gridExport : 0) * priceExport;
+    // Hourly balancing: billed are only the import and export left after it.
+    const billedImport = net ? net.gridImport : gridImport;
+    const billedExport = net ? net.gridExport : gridExport;
+    const saved = Math.max(0, load - billedImport) * priceImport + (isNum(billedExport) ? billedExport : 0) * priceExport;
     items.push(["money", t.savings, `${formatNumber(saved, locale, 2)} ${config.currency ?? t.currency}`.trim()]);
   }
   if (hasSolar && show("show_co2") && isNum(solar)) {
@@ -2804,11 +2833,15 @@ function renderDiorama(m) {
   const when = batteryWhen(m);
   const today = m.today;
   const load = today.load;
-  const fromGrid = isNum(today.gridImport) ? today.gridImport : 0;
+  const imported = isNum(today.gridImport) ? today.gridImport : 0;
   const fromBattery = isNum(today.discharge) ? today.discharge : 0;
+  // Virtual storage: the import balanced by export within the same hour.
+  const fromVirtual = m.virtualStorage?.day ? clamp(m.virtualStorage.day.balanced, 0, imported) : 0;
+  const fromGrid = imported - fromVirtual;
   const shares = isNum(load) && load > 0.05
-    ? [Math.max(0, load - fromGrid - fromBattery) / load, fromBattery / load, fromGrid / load].map((v) => clamp(v * 100, 0, 100))
+    ? [Math.max(0, load - imported - fromBattery) / load, fromBattery / load, fromVirtual / load, fromGrid / load].map((v) => clamp(v * 100, 0, 100))
     : null;
+  const ownShare = todayOwnShare(m);
   return `
     <div class="dio-scene" style="--sky-a:${sky.sky[0]};--sky-b:${sky.sky[1]}">
       <svg viewBox="0 0 520 360" aria-hidden="true">${svg}</svg>
@@ -2831,8 +2864,11 @@ function renderDiorama(m) {
       </div>
       ${shares ? `
         <div class="dio-share">
-          <header>${escapeHtml(t.whereFrom)}<span>${escapeHtml(t.autarky.toLowerCase())} ${escapeHtml(formatPercent(100 - shares[2], locale))}</span></header>
-          <div class="dio-track"><div class="pv" style="width:${shares[0]}%"></div><div class="battery" style="width:${shares[1]}%"></div><div class="grid" style="width:${shares[2]}%"></div></div>
+          <header>${escapeHtml(t.whereFrom)}<span>${escapeHtml(t.autarky.toLowerCase())} ${escapeHtml(formatPercent(ownShare, locale))}</span></header>
+          <div class="dio-track">${[["pv", t.solar], ["battery", t.battery], ["vstore", t.vsShort], ["grid", t.grid]]
+            .map(([cls, name], i) => `<div class="${cls}" style="width:${shares[i]}%" title="${escapeHtml(`${name} ${formatPercent(shares[i], locale)}`)}"></div>`).join("")}</div>
+          ${m.virtualStorage ? `<div class="dio-legend">${[["pv", t.solar], ["battery", t.battery], ["vstore", t.vsShort], ["grid", t.grid]]
+            .map(([cls, name], i) => (shares[i] >= 0.5 ? `<span class="${cls}">${escapeHtml(name)} ${escapeHtml(formatPercent(shares[i], locale))}</span>` : "")).join("")}</div>` : ""}
         </div>` : ""}
     </div>
     <div class="sfc-sections">${standardSections(m)}</div>`;
@@ -3043,8 +3079,7 @@ function renderLcars(m) {
   const cellsOn = isNum(live.soc) ? Math.round(clamp(live.soc, 0, 100) / 10) : 0;
   const f = m.forecast;
   const status = m.systemStatus;
-  const autarkyToday = isNum(m.today.load) && isNum(m.today.gridImport) && m.today.load > 0.05
-    ? formatPercent(clamp(((m.today.load - m.today.gridImport) / m.today.load) * 100, 0, 100), locale) : "—";
+  const autarkyToday = formatPercent(todayOwnShare(m), locale);
   const code = String(m.station || "47").replace(/\D/g, "").slice(-5).padStart(5, "0");
   const side = [
     ...(m.panels ? [["c1", "01", t.lcarsPanels, 'data-action="panels"']] : []),
@@ -3575,8 +3610,7 @@ function renderGate(m) {
           : live.importActive ? ["on", t.gateImport]
             : ["", t.gateIdle];
   const kv = (label, value) => `<div class="gt-kv"><small>${escapeHtml(label)}</small><b>${escapeHtml(value)}</b></div>`;
-  const own = isNum(m.today.load) && isNum(m.today.gridImport) && m.today.load > 0.05
-    ? formatPercent(clamp(((m.today.load - m.today.gridImport) / m.today.load) * 100, 0, 100), locale) : "—";
+  const own = formatPercent(todayOwnShare(m), locale);
   const corner = (cls, pos, label, value) => `<div class="gt-node ${cls}" style="${pos}">${escapeHtml(label)}<b>${escapeHtml(value)}</b></div>`;
   const values = {
     pv: [t.solar, formatPower(live.solar, locale), m.ids.live.solar],
@@ -4173,7 +4207,10 @@ const THEME_CSS = {
     .dio-share header { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; }
     .dio-share header span { color: #6a7d92; font-weight: 700; }
     .dio-track { height: 14px; margin-top: 7px; display: flex; overflow: hidden; border-radius: 999px; background: #eef2f6; }
-    .dio-track .pv { background: #ffc23d; } .dio-track .battery { background: #2bc48f; } .dio-track .grid { background: #7aa4f2; }
+    .dio-track .pv { background: #ffc23d; } .dio-track .battery { background: #2bc48f; } .dio-track .grid { background: #7aa4f2; } .dio-track .vstore { background: #3cc5d6; }
+    .dio-legend { display: flex; flex-wrap: wrap; gap: 2px 12px; margin-top: 6px; font-size: 11px; font-weight: 700; color: #6a7d92; }
+    .dio-legend span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 5px; border-radius: 50%; background: currentColor; }
+    .dio-legend .pv::before { background: #ffc23d; } .dio-legend .battery::before { background: #2bc48f; } .dio-legend .vstore::before { background: #3cc5d6; } .dio-legend .grid::before { background: #7aa4f2; }
     .sfc-section { border: 0; border-radius: 20px; }
     .sfc-flow { --sfc-dash: 1 9; }
   `,
@@ -5026,26 +5063,31 @@ class SolarFlowCard extends HTMLElement {
 
   // Virtual storage (#43): the current hour, the full hours of today, and the
   // import left after hourly balancing for the selected period.
-  _virtualStorage(resolved, config, period, now) {
+  _virtualStorage(resolved, config, period, now, totals) {
     const vs = virtualStorageConfig(config);
-    if (!vs) return { store: null, netImport: null };
+    if (!vs) return { store: null, net: null };
     const ids = GRID_COUNTERS.map((name) => resolved.energy[name]?.entityId);
     const counters = ids.every(Boolean) && typeof this._hass.callWS === "function";
     let current = null;
     let todayHours = null;
-    let netImport = null;
+    let net = null;
     if (counters) {
       const hourStart = startOfHour(now).getTime();
       current = hourSoFar(resolved, this._fetch(`vs-hour|${ids.join(",")}|${hourStart}`, 5 * 60000, () => loadCurrentHour(this._hass, resolved.energy)).data);
       const hourly = (start) => this._fetch(`vs-hours|${ids.join(",")}|${start.getTime()}`, 5 * 60000, () => loadHourlyGrid(this._hass, resolved.energy, start)).data || null;
       const today = startOfDay(now);
       todayHours = hourly(today);
-      if (period !== "all") {
-        const start = period === "today" ? today : statsSpec(period).start;
-        netImport = hourlyNetImport(period === "today" ? todayHours : hourly(start), start.getTime(), current);
+      if (period !== "today" && period !== "all") {
+        const start = statsSpec(period).start;
+        net = hourlyNet(hourly(start), start.getTime(), current);
       }
     }
-    return { store: virtualStorage(this._hass, resolved, vs, todayHours, current, now), netImport };
+    const store = virtualStorage(this._hass, resolved, vs, todayHours, current, now);
+    // Today: the same counters as the rest of the card, less what was balanced.
+    if (period === "today" && store.day && isNum(totals.gridImport)) {
+      net = { gridImport: Math.max(0, totals.gridImport - store.day.balanced), gridExport: isNum(totals.gridExport) ? Math.max(0, totals.gridExport - store.day.balanced) : null };
+    }
+    return { store, net };
   }
 
   // Recorder history of the power sensors for today or the last 3 days,
@@ -5208,7 +5250,7 @@ class SolarFlowCard extends HTMLElement {
       };
       if (bank && !ids.live.soc && !ids.live.battery) ids.live.soc = bank.items[0].entityId;
       const now = new Date();
-      const vstore = this._virtualStorage(resolved, config, period, now);
+      const vstore = this._virtualStorage(resolved, config, period, now, today);
       this._introAt ??= Date.now();
       const introElapsed = (Date.now() - this._introAt) / 1000;
       const introAt = introElapsed < 2.6 ? introElapsed : null;
@@ -5248,7 +5290,7 @@ class SolarFlowCard extends HTMLElement {
         period,
         totals: energy.totals || {},
         energyLoading: Boolean(energy.loading),
-        summary: periodSummary(energy.totals || {}, config, t, locale, vstore.netImport),
+        summary: periodSummary(energy.totals || {}, config, t, locale, vstore.net),
         virtualStorage: vstore.store,
         since,
         chart,
