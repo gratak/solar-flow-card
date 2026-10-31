@@ -299,6 +299,14 @@ The 3D, 7D, month and all-time totals and bars come from the long-term statistic
 
 Planned, in no particular order. Ideas and votes are welcome in [issues](https://github.com/gratak/solar-flow-card/issues).
 
+- **A visual editor for every option, rethought**: not everyone likes writing YAML. The editor covers the theme, the numbers and the switches today. It should also cover:
+  - the sensors (`entities:`) with entity pickers, the most important part for inverters other than DeyeCloud;
+  - `energy_sensors`, `invert_grid` and `invert_battery`;
+  - `sections:` (pick and drag to reorder) and `collapsed`;
+  - `virtual_storage` (entity, negative balance, count as own);
+  - `inverter_details`, `batteries`, `panels` and `weather_entity`.
+  
+  The editor itself is to be reorganized into groups (appearance, sensors, sections, summary, advanced), so that the growing number of options stays easy to find.
 - **PV production forecast** ([#69](https://github.com/gratak/solar-flow-card/issues/69)), planned for 1.7.0, from forecast sensors such as Solcast or Forecast.Solar:
   - today's forecast and what is still expected ("forecast 25 kWh · 8 kWh left") next to the solar reading, the remaining value from its own sensor;
   - a forecast section with today and the next days as bars in kWh, scaled automatically, with the pessimistic–optimistic range where the sensor gives it (Solcast `estimate10` / `estimate90`);
