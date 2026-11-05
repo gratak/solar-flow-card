@@ -63,6 +63,14 @@ const BASE_CSS = `
   .sfc-tile { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 10px 12px; text-align: left;
     border-radius: var(--sfc-tile-radius, 13px); border: 1px solid var(--sfc-border); background: var(--sfc-tile-bg); color: var(--sfc-c); }
   .sfc-tile:disabled { opacity: .55; cursor: default; }
+  .sfc-pvf-days { display: grid; gap: 6px; }
+  .sfc-pvf-day { display: grid; grid-template-columns: 4.6em minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 2px 0; border: 0; background: none; text-align: left; }
+  .sfc-pvf-day small { color: var(--sfc-muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sfc-pvf-day.today small { color: var(--sfc-text); font-weight: 700; }
+  .sfc-pvf-day strong { min-width: 4.8em; text-align: right; font-size: 13px; font-family: var(--sfc-num-font, inherit); }
+  .sfc-pvf-bar { position: relative; height: 10px; border-radius: 999px; background: var(--sfc-track); overflow: hidden; }
+  .sfc-pvf-bar i { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: color-mix(in srgb, var(--sfc-pv) 45%, transparent); }
+  .sfc-pvf-bar b { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--sfc-pv); }
   /* collapsible: true – a section's title folds it; folded, one line. */
   .sfc-foldable { cursor: pointer; }
   .sfc-head.sfc-foldable h3::after, small.sfc-foldable::after, .sfc-fold-head i::before {
@@ -337,6 +345,7 @@ const THEME_CSS = {
     .dio-chip.sun { background: #fff6dc; } .dio-chip.grid { background: #e6eefc; } .dio-chip.bat { background: #e3f7ee; } .dio-chip.home { background: #fde9e4; }
     .dio-chip small { display: block; font-size: 11px; font-weight: 700; color: #6a7d92; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .dio-chip b { display: block; margin-top: 2px; font-size: clamp(15px, 3.8cqw, 20px); font-weight: 800; }
+    .dio-chip em { display: block; margin-top: 1px; font-size: 11px; font-style: normal; font-weight: 700; color: #b07a12; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .dio-share { margin-top: 14px; }
     .dio-share header { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; }
     .dio-share header span { color: #6a7d92; font-weight: 700; }

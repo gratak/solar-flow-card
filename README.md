@@ -156,6 +156,7 @@ A font installed on your device is used too, with neither option.
 | `show_panels` | `true` | Optimizer / panel tiles (shown only when panel data exists). |
 | `inverter_details` | – | Any sensors to show in the Inverter details, e.g. the temperature or status of an inverter that is not DeyeCloud. See the [configuration guide](docs/configuration.md#installation-section-all-optional). |
 | `virtual_storage` | – | Virtual storage with hourly net balancing, see [below](#virtual-storage-hourly-net-balancing). |
+| `pv_forecast` | – | PV production forecast from Solcast, Forecast.Solar or similar sensors, see [below](#pv-production-forecast). |
 | `sections` | all | Which parts the card shows and in what order, see [Choosing and ordering sections](#choosing-and-ordering-sections). |
 | `collapsible` | `false` | `true`: tap a section's title to fold it into one line with its key value (also in the editor). The browser remembers what you folded. |
 | `collapsed` | – | With `collapsible`: the sections that start folded, e.g. `[panels, system]`. |
@@ -171,6 +172,7 @@ A font installed on your device is used too, with neither option.
 | `sources` | Diorama: "Where today's home power comes from" |
 | `inverter` | Inverter details (opened from the inverter in the main view) |
 | `forecast` | Battery forecast |
+| `pv_forecast` | PV production forecast |
 | `virtual_storage` | Virtual storage |
 | `system` | Installation |
 | `energy` | Energy: period tabs, chart, tiles and summary |
@@ -265,6 +267,24 @@ panels:                                        # optional, energy today per pane
     name: South 2
 ```
 
+### PV production forecast
+
+With forecast sensors from an integration such as [Solcast](https://github.com/BJReplay/ha-solcast-solar) or Forecast.Solar, the card shows:
+- what is still expected today at the solar reading ("≈ 3.8 kWh to go"; in Diorama under "Today from the roof");
+- a **PV forecast** section with today and the next days as bars. Today's bar also shows what is already produced.
+
+```yaml
+pv_forecast:
+  today: sensor.solcast_pv_forecast_forecast_today
+  remaining: sensor.solcast_pv_forecast_forecast_remaining_today   # optional
+  days:                                                             # optional: tomorrow, then the days after
+    - sensor.solcast_pv_forecast_forecast_tomorrow
+    - sensor.solcast_pv_forecast_forecast_day_3
+    - sensor.solcast_pv_forecast_forecast_day_4
+```
+
+With Forecast.Solar: `today: sensor.energy_production_today`, `remaining: sensor.energy_production_today_remaining`, `days: [sensor.energy_production_tomorrow]`. The sensors are read in kWh (Wh and MWh are converted). Without `remaining` the card shows today's forecast instead; the value is never calculated, so a missing sensor shows nothing rather than a guess.
+
 ### Virtual storage (hourly net balancing)
 
 Some tariffs balance import and export within each hour: energy sent to the grid earlier in the hour pays for energy taken later in the same hour. `virtual_storage` shows that hour's balance as a virtual battery: the energy exported minus imported since the full hour (green while there is a surplus, red for a deficit), a bar with the time until it resets, and today's hours with a surplus and the energy balanced. The period summary gets an extra value, **self-sufficiency with hourly balancing**: the share of consumption not covered by the import left after each hour's balancing (for 24H, 3D, 7D and month).
@@ -325,11 +345,7 @@ Planned, in no particular order. Ideas and votes are welcome in [issues](https:/
   - `inverter_details`, `batteries`, `panels` and `weather_entity`.
   
   The editor itself is to be reorganized into groups (appearance, sensors, sections, summary, advanced), so that the growing number of options stays easy to find.
-- **PV production forecast** ([#69](https://github.com/gratak/solar-flow-card/issues/69)), planned for 1.7.0, from forecast sensors such as Solcast or Forecast.Solar:
-  - today's forecast and what is still expected ("forecast 25 kWh · 8 kWh left") next to the solar reading, the remaining value from its own sensor;
-  - a forecast section with today and the next days as bars in kWh, scaled automatically, with the pessimistic–optimistic range where the sensor gives it (Solcast `estimate10` / `estimate90`);
-  - today's progress: produced so far next to what is still expected;
-  - the hourly forecast as a line in the 24H chart next to the actual production (Solcast `detailedHourly`).
+- **PV forecast, more detail** ([#69](https://github.com/gratak/solar-flow-card/issues/69)): the hourly forecast as a line in the 24H chart next to the actual production (Solcast `detailedHourly`), and the pessimistic–optimistic range of each day (Solcast `estimate10` / `estimate90`).
 - **Several inverters** (`inverters:`, like `batteries:`): power and energy summed by the card without helper sensors, for example an on-grid and an off-grid inverter of different brands, with each inverter listed separately in the Installation section. Until then, combine them with Home Assistant "Sum" helpers under `entities:`.
 
 ## Translations

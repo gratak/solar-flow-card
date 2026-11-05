@@ -249,7 +249,7 @@ function renderDiorama(m) {
     ${showChips || showShare ? `<div class="dio-bottom">
       ${showChips ? `<div class="dio-chips">
         ${m.config.showSolar
-          ? `<button class="dio-chip sun" ${entityAttr(m.ids.energy.solar)}><small>${escapeHtml(t.chipRoof)}</small><b>${escapeHtml(formatEnergy(today.solar, locale))}</b></button>`
+          ? `<button class="dio-chip sun" ${entityAttr(m.ids.energy.solar)}><small>${escapeHtml(t.chipRoof)}</small><b>${escapeHtml(formatEnergy(today.solar, locale))}</b>${pvForecastNote(m) ? `<em>${escapeHtml(pvForecastNote(m))}</em>` : ""}</button>`
           : `<button class="dio-chip grid" ${entityAttr(m.ids.energy.gridImport)}><small>${escapeHtml(t.gridImport)}</small><b>${escapeHtml(formatEnergy(today.gridImport, locale))}</b></button>`}
         ${m.config.showBattery
           ? `<button class="dio-chip bat" ${entityAttr(batteryEntityId(m))}><small>${escapeHtml(when.label)}</small><b>${escapeHtml(when.value)}</b></button>`
@@ -314,7 +314,7 @@ function renderAurora(m) {
         ${flowLabel(132, 146, "battery", live.chargeActive || live.dischargeActive, Math.abs(batteryFlow))}
         ${flowLabel(300, 146, "grid", live.importActive || live.exportActive, gridValue)}
       </svg>
-      ${m.config.showSolar ? ring("pv", 238, 58, t.legendPv, powerParts(live.solar, locale), "", live.solarActive ? "" : t.idle, m.ids.live.solar) : ""}
+      ${m.config.showSolar ? ring("pv", 238, 58, t.legendPv, powerParts(live.solar, locale), "", pvForecastNote(m) || (live.solarActive ? "" : t.idle), m.ids.live.solar) : ""}
       ${!m.config.showBattery ? "" : ring("battery", 62, 165, t.legendSoc, [formatPercent(live.soc, locale), ""], batteryFlow ? `${batteryFlow < 0 ? "−" : "+"}${formatPower(Math.abs(batteryFlow), locale)}` : t.idle, batteryNote, batteryEntityId(m), socArc)}
       ${ring("grid", 414, 165, t.grid, powerParts(gridValue, locale), "", gridStatus(m), gridEntityId(m))}
       ${ring("home", 238, 282, t.home, powerParts(live.load, locale), "", "", m.ids.live.load)}
@@ -570,7 +570,7 @@ function renderAtlantis(m) {
         <small>${escapeHtml(t.inverter)}</small><b>${escapeHtml(formatPower(hub.power, locale))}</b>
         ${isNum(hub.share) ? `<small>${escapeHtml(formatPercent(hub.share, locale))}</small>` : ""}
       </button>
-      ${m.config.showSolar ? label("left:50%;top:3%", "", formatPower(live.solar, locale), t.sun, m.ids.live.solar, "pv") : ""}
+      ${m.config.showSolar ? label("left:50%;top:3%", "", formatPower(live.solar, locale), pvForecastNote(m) || t.sun, m.ids.live.solar, "pv") : ""}
       ${!m.config.showBattery ? "" : label("left:10%;top:50%", batteryLabel(m), formatPower(batteryFlow, locale), [live.chargeActive ? t.absorbing : live.dischargeActive ? t.supplying : t.idle, batteryWhenShort(m)].filter(Boolean).join(" "), batteryEntityId(m))}
       ${label("left:90%;top:50%", t.grid, formatPower(gridValue, locale), gridStatus(m), gridEntityId(m), "grid")}
       ${label("left:50%;top:97%", "", formatPower(live.load, locale), t.home, m.ids.live.load, "load")}
@@ -628,7 +628,7 @@ function renderExpanse(m) {
         </g>
       </svg>
       <button class="exp-core" style="${pos(240, 165)}" data-action="inverter" title="${escapeHtml(t.inverterDetails)}"></button>
-      ${m.config.showSolar ? box("pv", 92, 72, "SOL-01", t.solar, formatPower(live.solar, locale), live.solarActive ? "" : t.idle, entityAttr(m.ids.live.solar)) : ""}
+      ${m.config.showSolar ? box("pv", 92, 72, "SOL-01", t.solar, formatPower(live.solar, locale), pvForecastNote(m) || (live.solarActive ? "" : t.idle), entityAttr(m.ids.live.solar)) : ""}
       ${box("grid", 388, 72, "GRD-02", t.grid, formatPower(gridValue, locale), gridStatus(m), entityAttr(gridEntityId(m)))}
       ${!m.config.showBattery ? "" : box("battery", 92, 258, "BAT-03", t.battery, formatPower(batteryFlow, locale), batteryStatus(m), entityAttr(batteryEntityId(m)))}
       ${box("load", 388, 258, "HAB-04", t.home, formatPower(live.load, locale), "", entityAttr(m.ids.live.load))}
@@ -721,7 +721,7 @@ function renderFoundation(m) {
       <button class="fnd-center" style="${pos(240, 170)}" data-action="inverter" title="${escapeHtml(t.inverterDetails)}">
         <b>${escapeHtml(formatPower(inverterHub(m).power, locale))}</b><small>${escapeHtml(t.inverter)}</small>
       </button>
-      ${m.config.showSolar ? node("pv", 240, 22, t.sun, formatPower(live.solar, locale), "", entityAttr(m.ids.live.solar)) : ""}
+      ${m.config.showSolar ? node("pv", 240, 22, t.sun, formatPower(live.solar, locale), pvForecastNote(m), entityAttr(m.ids.live.solar)) : ""}
       ${!m.config.showBattery ? "" : node("battery", 60, 170, batteryLabel(m), formatPower(batteryFlow, locale), batteryStatus(m), entityAttr(batteryEntityId(m)))}
       ${node("grid", 420, 170, t.grid, formatPower(gridValue, locale), gridStatus(m), entityAttr(gridEntityId(m)))}
       ${node("load", 240, 318, t.home, formatPower(live.load, locale), "", entityAttr(m.ids.live.load))}
@@ -773,7 +773,7 @@ function renderGalaxy(m) {
         <b>${escapeHtml(formatPower(inverterHub(m).power, locale))}</b>
         <small>${escapeHtml(t.inverter)}</small>
       </button>
-      ${m.config.showSolar ? readout("pv", 62, 118, t.solar, formatPower(live.solar, locale), "", entityAttr(m.ids.live.solar)) : ""}
+      ${m.config.showSolar ? readout("pv", 62, 118, t.solar, formatPower(live.solar, locale), pvForecastNote(m), entityAttr(m.ids.live.solar)) : ""}
       ${!m.config.showBattery ? "" : readout(`battery ${lock}`, 62, 182, batteryLabel(m), formatPower(batteryFlow, locale), batteryStatus(m), entityAttr(batteryEntityId(m)))}
       ${readout("grid", 418, 118, t.grid, formatPower(gridValue, locale), gridStatus(m), entityAttr(gridEntityId(m)))}
       ${readout("load", 418, 182, t.home, formatPower(live.load, locale), "", entityAttr(m.ids.live.load))}
@@ -990,7 +990,7 @@ function renderGate(m) {
   const batteryFlow = live.dischargeActive ? live.discharge : live.charge;
   const max = Math.max(1000, (pvCapacity || 0) * 1000, live.solar, live.load, live.charge, live.discharge, live.gridImport, live.gridExport);
   const rows = [
-    config.showSolar && ["pv", t.solar, live.solar, live.solarActive, pvCapacity ? fill(t.gateOfCapacity, { pct: formatNumber((live.solar / (pvCapacity * 1000)) * 100, locale, 0), size: `${formatNumber(pvCapacity, locale, 1)} kWp` }) : "", m.ids.live.solar],
+    config.showSolar && ["pv", t.solar, live.solar, live.solarActive, pvForecastNote(m) || (pvCapacity ? fill(t.gateOfCapacity, { pct: formatNumber((live.solar / (pvCapacity * 1000)) * 100, locale, 0), size: `${formatNumber(pvCapacity, locale, 1)} kWp` }) : ""), m.ids.live.solar],
     config.showBattery && ["battery", t.battery, batteryFlow, live.chargeActive || live.dischargeActive, batteryStatus(m), batteryEntityId(m)],
     ["grid", t.grid, gridValue, live.importActive || live.exportActive, gridStatus(m), gridEntityId(m)],
     ["load", t.home, live.load, live.loadActive, t.consumption, m.ids.live.load],
@@ -1063,7 +1063,7 @@ function renderGate(m) {
         </div>
       </div>
       <div class="gt-energy">${sectionShown(m, "energy") ? sectionHtml(m, "energy") : ""}</div>
-      <div class="sfc-sections">${standardSections(m, ["inverter", "virtual_storage", "insights", "comparison", "system", "panels"], ["energy"])}</div>
+      <div class="sfc-sections">${standardSections(m, ["inverter", "pv_forecast", "virtual_storage", "insights", "comparison", "system", "panels"], ["energy"])}</div>
     </div>`;
 }
 
@@ -1246,7 +1246,7 @@ function renderReactor(m) {
           ${isNum(m.intro) ? `<g class="rx-bootseg">${Array.from({ length: 10 }, (_, i) => { const a = i * 36; const P2 = (rr, aa) => P(rr, aa).map((v) => v.toFixed(1)).join(" "); return `<path style="--i:${i}" d="M${P2(101, a + 7)}A101 101 0 0 1 ${P2(101, a + 29)}L${P2(63, a + 29)}A63 63 0 0 0 ${P2(63, a + 7)}Z"/>`; }).join("")}</g>` : ""}
           ${sky.glass}
         </svg>
-        ${config.showSolar ? node("pv", 260, 60, t.sun, formatPower(live.solar, locale), "", entityAttr(m.ids.live.solar)) : ""}
+        ${config.showSolar ? node("pv", 260, 60, t.sun, formatPower(live.solar, locale), pvForecastNote(m), entityAttr(m.ids.live.solar)) : ""}
         ${config.showBattery ? node("battery", 104, 440, batteryLabel(m), formatPower(batteryFlow, locale), [batteryStatus(m), batteryWhenShort(m)].filter(Boolean).join(" "), entityAttr(batteryEntityId(m))) : ""}
         ${node("grid", 416, 440, t.grid, formatPower(gridValue, locale), gridStatus(m), entityAttr(gridEntityId(m)))}
         ${node("load", 260, 488, t.home, formatPower(live.load, locale), "", entityAttr(m.ids.live.load))}

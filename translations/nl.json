@@ -249,5 +249,9 @@
   "computedHint": "Berekend uit de andere sensoren",
   "vsShort": "Virtuele opslag",
   "editorCollapsible": "Inklapbare secties (tik op de titel)",
-  "panelEachToday": "≈ {power} en {kwh} vandaag per paneel"
+  "panelEachToday": "≈ {power} en {kwh} vandaag per paneel",
+  "pvForecastTitle": "PV-prognose",
+  "pvLeft": "nog ≈ {kwh}",
+  "pvForecastNote": "prognose {kwh}",
+  "pvProducedOf": "{done} van {total} opgewekt"
 }

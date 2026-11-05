@@ -402,6 +402,7 @@ class SolarFlowCard extends HTMLElement {
       const forecast = batteryForecast(live, bank?.capacity && !positiveNumber(config.battery_capacity) ? { ...config, battery_capacity: bank.capacity } : config);
       const readings = inverterReadings(resolved, this._hass, config);
       const panels = showSolar ? panelData(this._hass, resolved, config) || estimatePanels(readings, config, today) : null;
+      const pvForecast = showSolar ? pvForecastData(this._hass, config, today) : null;
       const insights = this._insights(resolved, today, forecast);
       const weather = theme === "diorama" || theme === "reactor" ? weatherData(this._hass, config) : null;
       // The wide layout has room for everything: inverter details stay open.
@@ -435,6 +436,7 @@ class SolarFlowCard extends HTMLElement {
         inverter?.map((d) => [[...d.strings.values()].map((s) => Object.values(s).map((r) => r.value)), d.temperatures.map((r) => r.value), d.battery.map((r) => r.value), d.grid.map((r) => r.value)]),
         vstore,
         [...this._collapsed],
+        pvForecast && [pvForecast.total, pvForecast.remaining, pvForecast.days.map((d) => d.value)],
         Math.floor(now.getTime() / 60000),
       ]);
       if (signature === this._signature) return;
@@ -472,6 +474,7 @@ class SolarFlowCard extends HTMLElement {
         chart,
         forecast,
         panels,
+        pvForecast,
         inverter,
         system,
         bank,
