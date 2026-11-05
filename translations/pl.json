@@ -249,5 +249,9 @@
   "computedHint": "Wyliczone z pozostałych czujników",
   "vsShort": "Wirtualny magazyn",
   "editorCollapsible": "Zwijane sekcje (dotknij tytułu sekcji)",
-  "panelEachToday": "≈ {power} i {kwh} dziś na panel"
+  "panelEachToday": "≈ {power} i {kwh} dziś na panel",
+  "pvForecastTitle": "Prognoza PV",
+  "pvLeft": "jeszcze ≈ {kwh}",
+  "pvForecastNote": "prognoza {kwh}",
+  "pvProducedOf": "wyprodukowano {done} z {total}"
 }

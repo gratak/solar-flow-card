@@ -358,6 +358,34 @@ function todayOwnShare(m) {
   return clamp(((load - fromGrid) / load) * 100, 0, 100);
 }
 
+// PV production forecast (#69) from forecast sensors such as Solcast or
+// Forecast.Solar: `pv_forecast: { today, remaining, days: [...] }`, where
+// `days` lists the sensors for tomorrow and the days after it.
+function pvForecastData(hass, config, today, now = new Date()) {
+  const f = config.pv_forecast;
+  if (!f || typeof f !== "object" || Array.isArray(f)) return null;
+  const states = hass?.states || {};
+  const read = (id) => (typeof id === "string" ? kwhOf(states[id]) : null);
+  const total = read(f.today);
+  const remaining = read(f.remaining);
+  const ids = Array.isArray(f.days) ? f.days : [];
+  const days = [{ date: startOfDay(now), value: total, entityId: f.today, today: true }, ...ids.map((id, i) => ({
+    date: startOfDay(addDays(now, i + 1)),
+    value: read(id),
+    entityId: id,
+  }))].filter((d) => isNum(d.value));
+  if (!days.length && !isNum(remaining)) return null;
+  return { total, remaining, produced: isNum(today.solar) ? today.solar : null, days, entityId: f.remaining || f.today };
+}
+
+// The short note at the solar reading: what is still expected today.
+function pvForecastNote(m) {
+  const f = m.pvForecast;
+  if (!f) return "";
+  if (isNum(f.remaining)) return fill(m.t.pvLeft, { kwh: formatEnergy(f.remaining, m.locale) });
+  return isNum(f.total) ? fill(m.t.pvForecastNote, { kwh: formatEnergy(f.total, m.locale) }) : "";
+}
+
 // Long-term statistics query for a period other than today.
 function statsSpec(period) {
   const now = new Date();

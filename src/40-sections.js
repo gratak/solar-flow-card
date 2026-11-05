@@ -145,6 +145,36 @@ function virtualStorageHtml(m) {
     </section>`;
 }
 
+// PV forecast: today and the next days as bars, today's with what is
+// already produced.
+function pvForecastHtml(m) {
+  const f = m.pvForecast;
+  if (!f || !m.config.showSolar) return "";
+  const { t, locale } = m;
+  const max = Math.max(0.1, ...f.days.map((d) => d.value), isNum(f.produced) ? f.produced : 0);
+  const hint = pvForecastNote(m);
+  return `
+    <section class="sfc-section sfc-pvf">
+      <div class="sfc-head">
+        <div><span class="sfc-kicker">${MINI_ICONS.sun}</span><h3>${escapeHtml(t.pvForecastTitle)}</h3></div>
+        ${hint ? `<span class="sfc-hint">${escapeHtml(hint)}</span>` : ""}
+      </div>
+      <div class="sfc-pvf-days">
+        ${f.days.map((d) => {
+          const done = d.today && isNum(f.produced) ? clamp((f.produced / max) * 100, 0, 100) : 0;
+          return `
+          <button class="sfc-pvf-day ${d.today ? "today" : ""}" ${d.entityId ? `data-entity="${escapeHtml(d.entityId)}"` : ""}
+            title="${escapeHtml(d.today && isNum(f.produced) ? fill(t.pvProducedOf, { done: formatEnergy(f.produced, locale), total: formatEnergy(d.value, locale) }) : formatEnergy(d.value, locale))}">
+            <small>${escapeHtml(d.today ? t.periodToday : d.date.toLocaleDateString(locale, { weekday: "short", day: "numeric" }))}</small>
+            <span class="sfc-pvf-bar"><i style="width:${clamp((d.value / max) * 100, 0, 100).toFixed(1)}%"></i>${done ? `<b style="width:${done.toFixed(1)}%"></b>` : ""}</span>
+            <strong>${escapeHtml(formatEnergy(d.value, locale))}</strong>
+          </button>`;
+        }).join("")}
+      </div>
+      ${isNum(f.produced) && isNum(f.total) ? `<p class="sfc-panels-note">${escapeHtml(fill(t.pvProducedOf, { done: formatEnergy(f.produced, locale), total: formatEnergy(f.total, locale) }))}</p>` : ""}
+    </section>`;
+}
+
 function readingLabel(key) {
   return key.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/_/g, " ").replace(/\s+/g, " ").trim();
 }
@@ -373,6 +403,7 @@ function comparisonHtml(m) {
 const SECTION_HTML = {
   inverter: inverterHtml,
   forecast: forecastHtml,
+  pv_forecast: pvForecastHtml,
   virtual_storage: virtualStorageHtml,
   system: systemHtml,
   energy: energySectionHtml,
@@ -381,8 +412,8 @@ const SECTION_HTML = {
   panels: panelsHtml,
 };
 const SECTION_IDS = ["flow", "today", "sources", ...Object.keys(SECTION_HTML)];
-const SECTION_ORDER = ["inverter", "forecast", "virtual_storage", "system", "energy", "insights", "comparison", "panels"];
-const SECTION_ORDER_WIDE = ["energy", "inverter", "forecast", "virtual_storage", "insights", "comparison", "system", "panels"];
+const SECTION_ORDER = ["inverter", "forecast", "pv_forecast", "virtual_storage", "system", "energy", "insights", "comparison", "panels"];
+const SECTION_ORDER_WIDE = ["energy", "inverter", "forecast", "pv_forecast", "virtual_storage", "insights", "comparison", "system", "panels"];
 
 // The listed sections in order, or null without the option.
 function sectionList(config) {
@@ -406,6 +437,7 @@ function foldSummary(m, id) {
     return [periodLabels(t)[m.period][1], solar ? t.pvProduction : t.consumption, formatEnergy(solar ? m.totals.solar : m.totals.load, locale)];
   }
   if (id === "forecast") return [t.batteryForecast, t.battery, formatPercent(m.forecast.soc, locale)];
+  if (id === "pv_forecast") return [t.pvForecastTitle, "", pvForecastNote(m)];
   if (id === "virtual_storage") {
     const v = m.virtualStorage?.value;
     return [t.vsTitle, "", isNum(v) ? `${v > 0.0005 ? "+" : v < -0.0005 ? "−" : ""}${formatEnergy(Math.abs(v), locale)}` : "—"];

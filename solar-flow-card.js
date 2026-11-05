@@ -7,7 +7,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "1.6.0";
+const CARD_VERSION = "1.7.0";
 const CARD_TAG = "solar-flow-card";
 const EDITOR_TAG = "solar-flow-card-editor";
 const THEMES = ["diorama", "aurora", "paper", "lcars", "atlantis", "expanse", "foundation", "galaxy", "gate", "reactor"];
@@ -268,7 +268,11 @@ const TRANSLATIONS = {
     "computedHint": "Calculated from the other sensors",
     "vsShort": "Virtual storage",
     "editorCollapsible": "Collapsible sections (tap a section's title)",
-    "panelEachToday": "≈ {power} and {kwh} today per panel"
+    "panelEachToday": "≈ {power} and {kwh} today per panel",
+    "pvForecastTitle": "PV forecast",
+    "pvLeft": "≈ {kwh} to go",
+    "pvForecastNote": "forecast {kwh}",
+    "pvProducedOf": "{done} of {total} produced so far"
   },
   "nl": {
     "languageName": "Nederlands",
@@ -521,7 +525,11 @@ const TRANSLATIONS = {
     "computedHint": "Berekend uit de andere sensoren",
     "vsShort": "Virtuele opslag",
     "editorCollapsible": "Inklapbare secties (tik op de titel)",
-    "panelEachToday": "≈ {power} en {kwh} vandaag per paneel"
+    "panelEachToday": "≈ {power} en {kwh} vandaag per paneel",
+    "pvForecastTitle": "PV-prognose",
+    "pvLeft": "nog ≈ {kwh}",
+    "pvForecastNote": "prognose {kwh}",
+    "pvProducedOf": "{done} van {total} opgewekt"
   },
   "pl": {
     "languageName": "Polski",
@@ -774,7 +782,11 @@ const TRANSLATIONS = {
     "computedHint": "Wyliczone z pozostałych czujników",
     "vsShort": "Wirtualny magazyn",
     "editorCollapsible": "Zwijane sekcje (dotknij tytułu sekcji)",
-    "panelEachToday": "≈ {power} i {kwh} dziś na panel"
+    "panelEachToday": "≈ {power} i {kwh} dziś na panel",
+    "pvForecastTitle": "Prognoza PV",
+    "pvLeft": "jeszcze ≈ {kwh}",
+    "pvForecastNote": "prognoza {kwh}",
+    "pvProducedOf": "wyprodukowano {done} z {total}"
   }
 };
 
@@ -1371,6 +1383,34 @@ function todayOwnShare(m) {
   const v = m.virtualStorage;
   const fromGrid = v?.countAsOwn && v.day ? Math.max(0, gridImport - v.day.balanced) : gridImport;
   return clamp(((load - fromGrid) / load) * 100, 0, 100);
+}
+
+// PV production forecast (#69) from forecast sensors such as Solcast or
+// Forecast.Solar: `pv_forecast: { today, remaining, days: [...] }`, where
+// `days` lists the sensors for tomorrow and the days after it.
+function pvForecastData(hass, config, today, now = new Date()) {
+  const f = config.pv_forecast;
+  if (!f || typeof f !== "object" || Array.isArray(f)) return null;
+  const states = hass?.states || {};
+  const read = (id) => (typeof id === "string" ? kwhOf(states[id]) : null);
+  const total = read(f.today);
+  const remaining = read(f.remaining);
+  const ids = Array.isArray(f.days) ? f.days : [];
+  const days = [{ date: startOfDay(now), value: total, entityId: f.today, today: true }, ...ids.map((id, i) => ({
+    date: startOfDay(addDays(now, i + 1)),
+    value: read(id),
+    entityId: id,
+  }))].filter((d) => isNum(d.value));
+  if (!days.length && !isNum(remaining)) return null;
+  return { total, remaining, produced: isNum(today.solar) ? today.solar : null, days, entityId: f.remaining || f.today };
+}
+
+// The short note at the solar reading: what is still expected today.
+function pvForecastNote(m) {
+  const f = m.pvForecast;
+  if (!f) return "";
+  if (isNum(f.remaining)) return fill(m.t.pvLeft, { kwh: formatEnergy(f.remaining, m.locale) });
+  return isNum(f.total) ? fill(m.t.pvForecastNote, { kwh: formatEnergy(f.total, m.locale) }) : "";
 }
 
 // Long-term statistics query for a period other than today.
@@ -2168,6 +2208,36 @@ function virtualStorageHtml(m) {
     </section>`;
 }
 
+// PV forecast: today and the next days as bars, today's with what is
+// already produced.
+function pvForecastHtml(m) {
+  const f = m.pvForecast;
+  if (!f || !m.config.showSolar) return "";
+  const { t, locale } = m;
+  const max = Math.max(0.1, ...f.days.map((d) => d.value), isNum(f.produced) ? f.produced : 0);
+  const hint = pvForecastNote(m);
+  return `
+    <section class="sfc-section sfc-pvf">
+      <div class="sfc-head">
+        <div><span class="sfc-kicker">${MINI_ICONS.sun}</span><h3>${escapeHtml(t.pvForecastTitle)}</h3></div>
+        ${hint ? `<span class="sfc-hint">${escapeHtml(hint)}</span>` : ""}
+      </div>
+      <div class="sfc-pvf-days">
+        ${f.days.map((d) => {
+          const done = d.today && isNum(f.produced) ? clamp((f.produced / max) * 100, 0, 100) : 0;
+          return `
+          <button class="sfc-pvf-day ${d.today ? "today" : ""}" ${d.entityId ? `data-entity="${escapeHtml(d.entityId)}"` : ""}
+            title="${escapeHtml(d.today && isNum(f.produced) ? fill(t.pvProducedOf, { done: formatEnergy(f.produced, locale), total: formatEnergy(d.value, locale) }) : formatEnergy(d.value, locale))}">
+            <small>${escapeHtml(d.today ? t.periodToday : d.date.toLocaleDateString(locale, { weekday: "short", day: "numeric" }))}</small>
+            <span class="sfc-pvf-bar"><i style="width:${clamp((d.value / max) * 100, 0, 100).toFixed(1)}%"></i>${done ? `<b style="width:${done.toFixed(1)}%"></b>` : ""}</span>
+            <strong>${escapeHtml(formatEnergy(d.value, locale))}</strong>
+          </button>`;
+        }).join("")}
+      </div>
+      ${isNum(f.produced) && isNum(f.total) ? `<p class="sfc-panels-note">${escapeHtml(fill(t.pvProducedOf, { done: formatEnergy(f.produced, locale), total: formatEnergy(f.total, locale) }))}</p>` : ""}
+    </section>`;
+}
+
 function readingLabel(key) {
   return key.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/_/g, " ").replace(/\s+/g, " ").trim();
 }
@@ -2396,6 +2466,7 @@ function comparisonHtml(m) {
 const SECTION_HTML = {
   inverter: inverterHtml,
   forecast: forecastHtml,
+  pv_forecast: pvForecastHtml,
   virtual_storage: virtualStorageHtml,
   system: systemHtml,
   energy: energySectionHtml,
@@ -2404,8 +2475,8 @@ const SECTION_HTML = {
   panels: panelsHtml,
 };
 const SECTION_IDS = ["flow", "today", "sources", ...Object.keys(SECTION_HTML)];
-const SECTION_ORDER = ["inverter", "forecast", "virtual_storage", "system", "energy", "insights", "comparison", "panels"];
-const SECTION_ORDER_WIDE = ["energy", "inverter", "forecast", "virtual_storage", "insights", "comparison", "system", "panels"];
+const SECTION_ORDER = ["inverter", "forecast", "pv_forecast", "virtual_storage", "system", "energy", "insights", "comparison", "panels"];
+const SECTION_ORDER_WIDE = ["energy", "inverter", "forecast", "pv_forecast", "virtual_storage", "insights", "comparison", "system", "panels"];
 
 // The listed sections in order, or null without the option.
 function sectionList(config) {
@@ -2429,6 +2500,7 @@ function foldSummary(m, id) {
     return [periodLabels(t)[m.period][1], solar ? t.pvProduction : t.consumption, formatEnergy(solar ? m.totals.solar : m.totals.load, locale)];
   }
   if (id === "forecast") return [t.batteryForecast, t.battery, formatPercent(m.forecast.soc, locale)];
+  if (id === "pv_forecast") return [t.pvForecastTitle, "", pvForecastNote(m)];
   if (id === "virtual_storage") {
     const v = m.virtualStorage?.value;
     return [t.vsTitle, "", isNum(v) ? `${v > 0.0005 ? "+" : v < -0.0005 ? "−" : ""}${formatEnergy(Math.abs(v), locale)}` : "—"];
@@ -2983,7 +3055,7 @@ function renderDiorama(m) {
     ${showChips || showShare ? `<div class="dio-bottom">
       ${showChips ? `<div class="dio-chips">
         ${m.config.showSolar
-          ? `<button class="dio-chip sun" ${entityAttr(m.ids.energy.solar)}><small>${escapeHtml(t.chipRoof)}</small><b>${escapeHtml(formatEnergy(today.solar, locale))}</b></button>`
+          ? `<button class="dio-chip sun" ${entityAttr(m.ids.energy.solar)}><small>${escapeHtml(t.chipRoof)}</small><b>${escapeHtml(formatEnergy(today.solar, locale))}</b>${pvForecastNote(m) ? `<em>${escapeHtml(pvForecastNote(m))}</em>` : ""}</button>`
           : `<button class="dio-chip grid" ${entityAttr(m.ids.energy.gridImport)}><small>${escapeHtml(t.gridImport)}</small><b>${escapeHtml(formatEnergy(today.gridImport, locale))}</b></button>`}
         ${m.config.showBattery
           ? `<button class="dio-chip bat" ${entityAttr(batteryEntityId(m))}><small>${escapeHtml(when.label)}</small><b>${escapeHtml(when.value)}</b></button>`
@@ -3048,7 +3120,7 @@ function renderAurora(m) {
         ${flowLabel(132, 146, "battery", live.chargeActive || live.dischargeActive, Math.abs(batteryFlow))}
         ${flowLabel(300, 146, "grid", live.importActive || live.exportActive, gridValue)}
       </svg>
-      ${m.config.showSolar ? ring("pv", 238, 58, t.legendPv, powerParts(live.solar, locale), "", live.solarActive ? "" : t.idle, m.ids.live.solar) : ""}
+      ${m.config.showSolar ? ring("pv", 238, 58, t.legendPv, powerParts(live.solar, locale), "", pvForecastNote(m) || (live.solarActive ? "" : t.idle), m.ids.live.solar) : ""}
       ${!m.config.showBattery ? "" : ring("battery", 62, 165, t.legendSoc, [formatPercent(live.soc, locale), ""], batteryFlow ? `${batteryFlow < 0 ? "−" : "+"}${formatPower(Math.abs(batteryFlow), locale)}` : t.idle, batteryNote, batteryEntityId(m), socArc)}
       ${ring("grid", 414, 165, t.grid, powerParts(gridValue, locale), "", gridStatus(m), gridEntityId(m))}
       ${ring("home", 238, 282, t.home, powerParts(live.load, locale), "", "", m.ids.live.load)}
@@ -3304,7 +3376,7 @@ function renderAtlantis(m) {
         <small>${escapeHtml(t.inverter)}</small><b>${escapeHtml(formatPower(hub.power, locale))}</b>
         ${isNum(hub.share) ? `<small>${escapeHtml(formatPercent(hub.share, locale))}</small>` : ""}
       </button>
-      ${m.config.showSolar ? label("left:50%;top:3%", "", formatPower(live.solar, locale), t.sun, m.ids.live.solar, "pv") : ""}
+      ${m.config.showSolar ? label("left:50%;top:3%", "", formatPower(live.solar, locale), pvForecastNote(m) || t.sun, m.ids.live.solar, "pv") : ""}
       ${!m.config.showBattery ? "" : label("left:10%;top:50%", batteryLabel(m), formatPower(batteryFlow, locale), [live.chargeActive ? t.absorbing : live.dischargeActive ? t.supplying : t.idle, batteryWhenShort(m)].filter(Boolean).join(" "), batteryEntityId(m))}
       ${label("left:90%;top:50%", t.grid, formatPower(gridValue, locale), gridStatus(m), gridEntityId(m), "grid")}
       ${label("left:50%;top:97%", "", formatPower(live.load, locale), t.home, m.ids.live.load, "load")}
@@ -3362,7 +3434,7 @@ function renderExpanse(m) {
         </g>
       </svg>
       <button class="exp-core" style="${pos(240, 165)}" data-action="inverter" title="${escapeHtml(t.inverterDetails)}"></button>
-      ${m.config.showSolar ? box("pv", 92, 72, "SOL-01", t.solar, formatPower(live.solar, locale), live.solarActive ? "" : t.idle, entityAttr(m.ids.live.solar)) : ""}
+      ${m.config.showSolar ? box("pv", 92, 72, "SOL-01", t.solar, formatPower(live.solar, locale), pvForecastNote(m) || (live.solarActive ? "" : t.idle), entityAttr(m.ids.live.solar)) : ""}
       ${box("grid", 388, 72, "GRD-02", t.grid, formatPower(gridValue, locale), gridStatus(m), entityAttr(gridEntityId(m)))}
       ${!m.config.showBattery ? "" : box("battery", 92, 258, "BAT-03", t.battery, formatPower(batteryFlow, locale), batteryStatus(m), entityAttr(batteryEntityId(m)))}
       ${box("load", 388, 258, "HAB-04", t.home, formatPower(live.load, locale), "", entityAttr(m.ids.live.load))}
@@ -3455,7 +3527,7 @@ function renderFoundation(m) {
       <button class="fnd-center" style="${pos(240, 170)}" data-action="inverter" title="${escapeHtml(t.inverterDetails)}">
         <b>${escapeHtml(formatPower(inverterHub(m).power, locale))}</b><small>${escapeHtml(t.inverter)}</small>
       </button>
-      ${m.config.showSolar ? node("pv", 240, 22, t.sun, formatPower(live.solar, locale), "", entityAttr(m.ids.live.solar)) : ""}
+      ${m.config.showSolar ? node("pv", 240, 22, t.sun, formatPower(live.solar, locale), pvForecastNote(m), entityAttr(m.ids.live.solar)) : ""}
       ${!m.config.showBattery ? "" : node("battery", 60, 170, batteryLabel(m), formatPower(batteryFlow, locale), batteryStatus(m), entityAttr(batteryEntityId(m)))}
       ${node("grid", 420, 170, t.grid, formatPower(gridValue, locale), gridStatus(m), entityAttr(gridEntityId(m)))}
       ${node("load", 240, 318, t.home, formatPower(live.load, locale), "", entityAttr(m.ids.live.load))}
@@ -3507,7 +3579,7 @@ function renderGalaxy(m) {
         <b>${escapeHtml(formatPower(inverterHub(m).power, locale))}</b>
         <small>${escapeHtml(t.inverter)}</small>
       </button>
-      ${m.config.showSolar ? readout("pv", 62, 118, t.solar, formatPower(live.solar, locale), "", entityAttr(m.ids.live.solar)) : ""}
+      ${m.config.showSolar ? readout("pv", 62, 118, t.solar, formatPower(live.solar, locale), pvForecastNote(m), entityAttr(m.ids.live.solar)) : ""}
       ${!m.config.showBattery ? "" : readout(`battery ${lock}`, 62, 182, batteryLabel(m), formatPower(batteryFlow, locale), batteryStatus(m), entityAttr(batteryEntityId(m)))}
       ${readout("grid", 418, 118, t.grid, formatPower(gridValue, locale), gridStatus(m), entityAttr(gridEntityId(m)))}
       ${readout("load", 418, 182, t.home, formatPower(live.load, locale), "", entityAttr(m.ids.live.load))}
@@ -3724,7 +3796,7 @@ function renderGate(m) {
   const batteryFlow = live.dischargeActive ? live.discharge : live.charge;
   const max = Math.max(1000, (pvCapacity || 0) * 1000, live.solar, live.load, live.charge, live.discharge, live.gridImport, live.gridExport);
   const rows = [
-    config.showSolar && ["pv", t.solar, live.solar, live.solarActive, pvCapacity ? fill(t.gateOfCapacity, { pct: formatNumber((live.solar / (pvCapacity * 1000)) * 100, locale, 0), size: `${formatNumber(pvCapacity, locale, 1)} kWp` }) : "", m.ids.live.solar],
+    config.showSolar && ["pv", t.solar, live.solar, live.solarActive, pvForecastNote(m) || (pvCapacity ? fill(t.gateOfCapacity, { pct: formatNumber((live.solar / (pvCapacity * 1000)) * 100, locale, 0), size: `${formatNumber(pvCapacity, locale, 1)} kWp` }) : ""), m.ids.live.solar],
     config.showBattery && ["battery", t.battery, batteryFlow, live.chargeActive || live.dischargeActive, batteryStatus(m), batteryEntityId(m)],
     ["grid", t.grid, gridValue, live.importActive || live.exportActive, gridStatus(m), gridEntityId(m)],
     ["load", t.home, live.load, live.loadActive, t.consumption, m.ids.live.load],
@@ -3797,7 +3869,7 @@ function renderGate(m) {
         </div>
       </div>
       <div class="gt-energy">${sectionShown(m, "energy") ? sectionHtml(m, "energy") : ""}</div>
-      <div class="sfc-sections">${standardSections(m, ["inverter", "virtual_storage", "insights", "comparison", "system", "panels"], ["energy"])}</div>
+      <div class="sfc-sections">${standardSections(m, ["inverter", "pv_forecast", "virtual_storage", "insights", "comparison", "system", "panels"], ["energy"])}</div>
     </div>`;
 }
 
@@ -3980,7 +4052,7 @@ function renderReactor(m) {
           ${isNum(m.intro) ? `<g class="rx-bootseg">${Array.from({ length: 10 }, (_, i) => { const a = i * 36; const P2 = (rr, aa) => P(rr, aa).map((v) => v.toFixed(1)).join(" "); return `<path style="--i:${i}" d="M${P2(101, a + 7)}A101 101 0 0 1 ${P2(101, a + 29)}L${P2(63, a + 29)}A63 63 0 0 0 ${P2(63, a + 7)}Z"/>`; }).join("")}</g>` : ""}
           ${sky.glass}
         </svg>
-        ${config.showSolar ? node("pv", 260, 60, t.sun, formatPower(live.solar, locale), "", entityAttr(m.ids.live.solar)) : ""}
+        ${config.showSolar ? node("pv", 260, 60, t.sun, formatPower(live.solar, locale), pvForecastNote(m), entityAttr(m.ids.live.solar)) : ""}
         ${config.showBattery ? node("battery", 104, 440, batteryLabel(m), formatPower(batteryFlow, locale), [batteryStatus(m), batteryWhenShort(m)].filter(Boolean).join(" "), entityAttr(batteryEntityId(m))) : ""}
         ${node("grid", 416, 440, t.grid, formatPower(gridValue, locale), gridStatus(m), entityAttr(gridEntityId(m)))}
         ${node("load", 260, 488, t.home, formatPower(live.load, locale), "", entityAttr(m.ids.live.load))}
@@ -4074,6 +4146,14 @@ const BASE_CSS = `
   .sfc-tile { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 10px 12px; text-align: left;
     border-radius: var(--sfc-tile-radius, 13px); border: 1px solid var(--sfc-border); background: var(--sfc-tile-bg); color: var(--sfc-c); }
   .sfc-tile:disabled { opacity: .55; cursor: default; }
+  .sfc-pvf-days { display: grid; gap: 6px; }
+  .sfc-pvf-day { display: grid; grid-template-columns: 4.6em minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 2px 0; border: 0; background: none; text-align: left; }
+  .sfc-pvf-day small { color: var(--sfc-muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sfc-pvf-day.today small { color: var(--sfc-text); font-weight: 700; }
+  .sfc-pvf-day strong { min-width: 4.8em; text-align: right; font-size: 13px; font-family: var(--sfc-num-font, inherit); }
+  .sfc-pvf-bar { position: relative; height: 10px; border-radius: 999px; background: var(--sfc-track); overflow: hidden; }
+  .sfc-pvf-bar i { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: color-mix(in srgb, var(--sfc-pv) 45%, transparent); }
+  .sfc-pvf-bar b { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--sfc-pv); }
   /* collapsible: true – a section's title folds it; folded, one line. */
   .sfc-foldable { cursor: pointer; }
   .sfc-head.sfc-foldable h3::after, small.sfc-foldable::after, .sfc-fold-head i::before {
@@ -4348,6 +4428,7 @@ const THEME_CSS = {
     .dio-chip.sun { background: #fff6dc; } .dio-chip.grid { background: #e6eefc; } .dio-chip.bat { background: #e3f7ee; } .dio-chip.home { background: #fde9e4; }
     .dio-chip small { display: block; font-size: 11px; font-weight: 700; color: #6a7d92; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .dio-chip b { display: block; margin-top: 2px; font-size: clamp(15px, 3.8cqw, 20px); font-weight: 800; }
+    .dio-chip em { display: block; margin-top: 1px; font-size: 11px; font-style: normal; font-weight: 700; color: #b07a12; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .dio-share { margin-top: 14px; }
     .dio-share header { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; }
     .dio-share header span { color: #6a7d92; font-weight: 700; }
@@ -5434,6 +5515,7 @@ class SolarFlowCard extends HTMLElement {
       const forecast = batteryForecast(live, bank?.capacity && !positiveNumber(config.battery_capacity) ? { ...config, battery_capacity: bank.capacity } : config);
       const readings = inverterReadings(resolved, this._hass, config);
       const panels = showSolar ? panelData(this._hass, resolved, config) || estimatePanels(readings, config, today) : null;
+      const pvForecast = showSolar ? pvForecastData(this._hass, config, today) : null;
       const insights = this._insights(resolved, today, forecast);
       const weather = theme === "diorama" || theme === "reactor" ? weatherData(this._hass, config) : null;
       // The wide layout has room for everything: inverter details stay open.
@@ -5467,6 +5549,7 @@ class SolarFlowCard extends HTMLElement {
         inverter?.map((d) => [[...d.strings.values()].map((s) => Object.values(s).map((r) => r.value)), d.temperatures.map((r) => r.value), d.battery.map((r) => r.value), d.grid.map((r) => r.value)]),
         vstore,
         [...this._collapsed],
+        pvForecast && [pvForecast.total, pvForecast.remaining, pvForecast.days.map((d) => d.value)],
         Math.floor(now.getTime() / 60000),
       ]);
       if (signature === this._signature) return;
@@ -5504,6 +5587,7 @@ class SolarFlowCard extends HTMLElement {
         chart,
         forecast,
         panels,
+        pvForecast,
         inverter,
         system,
         bank,
