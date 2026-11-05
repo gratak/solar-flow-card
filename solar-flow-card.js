@@ -5289,6 +5289,13 @@ class SolarFlowCard extends HTMLElement {
   // shared by the chart and the day's highlights.
   _powerHistory(resolved, period) {
     const live = { ...resolved.live, ...bankHistorySources(this._hass, this._config) };
+    // `<key>_history` under entities: a recorded twin of a live sensor (e.g.
+    // a 5-minute copy of a sensor kept out of the recorder) for the charts.
+    const configured = this._config.entities || {};
+    for (const [name, def] of Object.entries(LIVE_METRICS)) {
+      const id = configured[`${def.key}_history`];
+      if (id && this._hass.states?.[id]) live[name] = { entityId: id, stateObj: this._hass.states[id] };
+    }
     const ids = Object.values(live).filter(Boolean).map((entry) => entry.entityId);
     if (!ids.length || typeof this._hass.callWS !== "function") return null;
     const spec = powerSpec(period);

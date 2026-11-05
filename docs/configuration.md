@@ -44,6 +44,18 @@ All entries are optional. The card shows what it gets. With nothing for the batt
 | `battery_charge_power`, `battery_discharge_power` | The same as two sensors, both ≥ 0. Use these *or* `battery_power`. | ≥ 0 |
 | `battery_soc` | Battery level. | % |
 
+#### Separate history sensors
+
+A live sensor that updates every second fills the recorder database. If you keep it out of the recorder and record a slower copy instead (for example a template sensor updated every 5 minutes), add that copy with `_history` after the key. The card shows the live sensor and draws the 24H and 3D charts and "Today at a glance" from the copy:
+
+```yaml
+entities:
+  grid_power: sensor.grid_power_total                    # live, excluded from the recorder
+  grid_power_history: sensor.grid_power_total_history    # recorded every 5 minutes
+```
+
+Every live power key above accepts a `_history` twin (`solar_power_history`, `load_power_history`, `battery_power_history`, `battery_soc_history`, …). Without one the card uses the live sensor's own history.
+
 ### Energy
 
 | Key | Meaning |
