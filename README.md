@@ -188,6 +188,23 @@ collapsible: true
 collapsed: [energy]
 ```
 
+**Several cards instead of one.** To place parts of the card separately on a dashboard, add the card several times, each with its own `sections:`. A card without `flow` shows its sections as one plain card (no box inside a box). The cards share the history and statistics they load, so Home Assistant is asked only once:
+
+```yaml
+type: custom:solar-flow-card
+sections: [flow, today, sources]     # the scene with today's tiles
+```
+
+```yaml
+type: custom:solar-flow-card
+sections: [energy]                   # the chart and the energy totals
+```
+
+```yaml
+type: custom:solar-flow-card
+sections: [system, virtual_storage]  # the installation and the virtual storage
+```
+
 Listing `insights` or `comparison` shows them in the compact layout too. In the wide layout the energy section leads across the full width and the others follow in your order. Without `flow` the card uses the compact layout. LCARS and Gate keep their frame: there `flow` always shows, and Gate places the energy section itself.
 
 ### Period summary

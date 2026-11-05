@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.0
+
+- **Several cards instead of one:** a card whose `sections:` leave out `flow` shows its sections as one plain card. The sections lose their own box and a line separates them, so parts of the card can sit anywhere on a dashboard. Cards on the same page share the history and statistics they load, so Home Assistant is asked once. See the README for an example.
+
 ## 1.6.0
 
 - **`sections:`** (#62, #66): choose which parts the card shows and in what order. Besides the sections below the main view, it covers the main view itself (`flow`) and, in Diorama, the "today" tiles (`today`) and "Where today's power came from" (`sources`). "Today at a glance" (`insights`) and the comparison (`comparison`) are now separate sections.

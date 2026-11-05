@@ -29,6 +29,15 @@ function saveHiddenSeries(hidden) {
   }
 }
 
+// History and statistics requests, shared by all cards on the page.
+const SHARED_CACHE = new Map();
+
+// The sensors a request reads, by role, for its cache key: two cards may use
+// the same sensor for different things.
+function sourcesKey(sources) {
+  return Object.entries(sources).filter(([, entry]) => entry?.entityId).map(([name, entry]) => `${name}=${entry.entityId}`).join(",");
+}
+
 // Sections the viewer collapsed (`collapsible: true`), remembered in this
 // browser. `collapsed:` in the config sets the starting state; changing it
 // starts over from the new list.
@@ -105,7 +114,6 @@ class SolarFlowCard extends HTMLElement {
     this._hass = null;
     this._period = null;
     this._inverterOpen = false;
-    this._cache = new Map();
     this._hiddenSeries = loadHiddenSeries();
     this._collapsed = new Set();
     this._signature = "";
@@ -167,21 +175,28 @@ class SolarFlowCard extends HTMLElement {
     return { columns: 12, rows: "auto", min_columns: 6 };
   }
 
-  // Cached async loader; a finished request re-renders the card.
+  // Cached async loader, shared by every card on the page: several cards
+  // showing parts of the same installation ask Home Assistant once. A
+  // finished request re-renders each card that waits for it.
   _fetch(key, ttl, loader) {
-    const cached = this._cache.get(key);
-    if (cached && (cached.loading || Date.now() - cached.at < ttl)) return cached;
-    const entry = { ...(cached || {}), loading: true };
-    this._cache.set(key, entry);
+    const cached = SHARED_CACHE.get(key);
+    if (cached && (cached.loading || Date.now() - cached.at < ttl)) {
+      if (cached.loading) cached.waiters.add(this);
+      return cached;
+    }
+    const entry = { data: cached?.data, at: cached?.at, error: cached?.error, loading: true, waiters: new Set([this]) };
+    SHARED_CACHE.set(key, entry);
     loader()
-      .then((data) => this._cache.set(key, { data, at: Date.now() }))
+      .then((data) => SHARED_CACHE.set(key, { data, at: Date.now() }))
       .catch((error) => {
         console.warn("Solar Flow Card: history unavailable", error);
-        this._cache.set(key, { error: true, data: cached?.data, at: Date.now() });
+        SHARED_CACHE.set(key, { error: true, data: cached?.data, at: Date.now() });
       })
       .finally(() => {
-        this._signature = "";
-        this._render();
+        for (const card of entry.waiters) {
+          card._signature = "";
+          card._render();
+        }
       });
     return entry;
   }
@@ -191,7 +206,7 @@ class SolarFlowCard extends HTMLElement {
     const ids = ENERGY_ORDER.map((name) => resolved.energy[name]?.entityId).filter(Boolean);
     if (!ids.length || typeof this._hass.callWS !== "function") return { totals: {}, error: true };
     const spec = statsSpec(period);
-    const entry = this._fetch(`stats|${period}|${ids.join(",")}|${spec.start.toDateString()}`, spec.ttl, () =>
+    const entry = this._fetch(`stats|${period}|${sourcesKey(resolved.energy)}|${spec.start.toDateString()}`, spec.ttl, () =>
       loadStatistics(this._hass, spec, resolved.energy)
     );
     if (!entry.data) return { totals: {}, loading: entry.loading, error: entry.error, spec };
@@ -205,7 +220,7 @@ class SolarFlowCard extends HTMLElement {
     if (this._config.energy_sensors !== "total") return undefined;
     const ids = ENERGY_ORDER.map((name) => resolved.energy[name]?.entityId).filter(Boolean);
     if (!ids.length || typeof this._hass.callWS !== "function") return null;
-    const entry = this._fetch(`today-stats|${ids.join(",")}|${new Date().toDateString()}`, 5 * 60000, () => loadTodayStats(this._hass, resolved.energy));
+    const entry = this._fetch(`today-stats|${sourcesKey(resolved.energy)}|${new Date().toDateString()}`, 5 * 60000, () => loadTodayStats(this._hass, resolved.energy));
     return entry.data || null;
   }
 
@@ -245,7 +260,7 @@ class SolarFlowCard extends HTMLElement {
     const ids = Object.values(live).filter(Boolean).map((entry) => entry.entityId);
     if (!ids.length || typeof this._hass.callWS !== "function") return null;
     const spec = powerSpec(period);
-    const entry = this._fetch(`history|${period}|${ids.join(",")}|${spec.start.toDateString()}`, spec.ttl, () =>
+    const entry = this._fetch(`history|${period}|${sourcesKey(live)}|${spec.start.toDateString()}`, spec.ttl, () =>
       loadPowerHistory(this._hass, spec, live)
     );
     return { entry, spec };
@@ -468,7 +483,7 @@ class SolarFlowCard extends HTMLElement {
 
       const painted = this._paint(
         BASE_CSS + THEME_CSS[theme],
-        ["sfc", `theme-${theme}`, config.animation === false && "no-anim", config.background === "glass" && "glass", live.exportActive ? "grid-export" : live.importActive && "grid-import"].filter(Boolean).join(" "),
+        ["sfc", `theme-${theme}`, config.animation === false && "no-anim", config.background === "glass" && "glass", !flowShown && theme !== "lcars" && theme !== "gate" && "parts", live.exportActive ? "grid-export" : live.importActive && "grid-import"].filter(Boolean).join(" "),
         wide ? wideLayout(theme, THEME_RENDER[theme](model)) : withoutFlow(theme, THEME_RENDER[theme](model), flowShown),
       );
       if (!painted) return;
