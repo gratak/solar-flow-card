@@ -27,6 +27,12 @@ const BASE_CSS = `
     background: var(--sfc-surface);
     border: 1px solid var(--sfc-border);
   }
+  /* sections: without flow – the card shows only its sections, as one card:
+     the sections lose their own box and are separated by a line. */
+  ha-card.sfc.parts .sfc-sections { padding: var(--sfc-parts-pad, 16px); gap: 14px; }
+  ha-card.sfc.parts .sfc-sections > .sfc-section, ha-card.sfc.parts .sfc-sections > .sfc-wide-rest > .sfc-section {
+    padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; clip-path: none; backdrop-filter: none; }
+  ha-card.sfc.parts .sfc-sections > .sfc-section + .sfc-section { padding-top: 14px; border-top: 1px solid var(--sfc-border); }
   .sfc-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
   .sfc-head > div { display: flex; align-items: center; gap: 8px; min-width: 0; }
   .sfc-head h3 { margin: 0; font-size: 16px; font-family: var(--sfc-heading-font, inherit); font-weight: var(--sfc-heading-weight, 700); }
@@ -405,7 +411,7 @@ const THEME_CSS = {
       --sfc-tab-bg: transparent; --sfc-tab-on-bg: transparent; --sfc-tab-on: #2a2722; --sfc-tip-bg: #fbf8f1;
       --sfc-radius: 6px; --sfc-section-radius: 0; --sfc-tile-radius: 0; --sfc-shadow: 0 20px 40px rgba(60,45,20,.15); --sfc-frame: #e6ddcd;
       --sfc-badge-bg: #ece4d4;
-      padding: 24px 22px 6px;
+      padding: 24px 22px 6px; --sfc-parts-pad: 0 0 16px;
     }
     .pap-eyebrow { display: flex; justify-content: space-between; gap: 10px; align-items: center; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--sfc-muted); }
     .pap-eyebrow .sfc-badge { letter-spacing: .04em; margin-left: 6px; }
