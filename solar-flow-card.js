@@ -97,7 +97,7 @@ const TRANSLATIONS = {
     "stringModules": "String {n} · {count} modules",
     "panelsEstimateHint": "≈ {energy} per panel today",
     "panelEach": "≈ {power} per panel",
-    "panelsEstimateNote": "Estimate: these panels have no optimizers and do not report their own data, so each value is the string's power divided evenly by its panels, and today's energy split evenly over all panels.",
+    "panelsEstimateNote": "Estimate: these panels have no optimizers and do not report their own data, so the values per panel are the string's power divided by its panels and today's energy split evenly over all panels.",
     "paperHeadline": "{power} to the home",
     "paperMix": "Right now: {parts}.",
     "paperOnly": "Right now everything comes from {source}.",
@@ -267,7 +267,8 @@ const TRANSLATIONS = {
     "otherDetails": "Other readings",
     "computedHint": "Calculated from the other sensors",
     "vsShort": "Virtual storage",
-    "editorCollapsible": "Collapsible sections (tap a section's title)"
+    "editorCollapsible": "Collapsible sections (tap a section's title)",
+    "panelEachToday": "≈ {power} and {kwh} today per panel"
   },
   "nl": {
     "languageName": "Nederlands",
@@ -349,7 +350,7 @@ const TRANSLATIONS = {
     "stringModules": "String {n} · {count} modules",
     "panelsEstimateHint": "≈ {energy} per paneel vandaag",
     "panelEach": "≈ {power} per paneel",
-    "panelsEstimateNote": "Schatting: deze panelen hebben geen optimizers en melden geen eigen gegevens, dus elke waarde is het vermogen van de string gelijk verdeeld over de panelen, en de energie van vandaag gelijk verdeeld over alle panelen.",
+    "panelsEstimateNote": "Schatting: deze panelen hebben geen optimizers en melden geen eigen gegevens, dus de waarden per paneel zijn het vermogen van de string gedeeld door de panelen en de energie van vandaag gelijk verdeeld over alle panelen.",
     "paperHeadline": "{power} naar de woning",
     "paperMix": "Momenteel: {parts}.",
     "paperOnly": "Momenteel komt alles van {source}.",
@@ -519,7 +520,8 @@ const TRANSLATIONS = {
     "otherDetails": "Overige metingen",
     "computedHint": "Berekend uit de andere sensoren",
     "vsShort": "Virtuele opslag",
-    "editorCollapsible": "Inklapbare secties (tik op de titel)"
+    "editorCollapsible": "Inklapbare secties (tik op de titel)",
+    "panelEachToday": "≈ {power} en {kwh} vandaag per paneel"
   },
   "pl": {
     "languageName": "Polski",
@@ -601,7 +603,7 @@ const TRANSLATIONS = {
     "stringModules": "String {n} · {count} modułów",
     "panelsEstimateHint": "≈ {energy} na panel dziś",
     "panelEach": "≈ {power} na panel",
-    "panelsEstimateNote": "Szacunek: panele nie mają optymalizatorów i nie przesyłają własnych danych, więc każda wartość to moc stringu podzielona po równo na jego panele, a dzisiejsza energia podzielona po równo na wszystkie panele.",
+    "panelsEstimateNote": "Szacunek: panele nie mają optymalizatorów i nie przesyłają własnych danych, więc wartości na panel to moc stringu podzielona przez liczbę jego paneli i dzisiejsza energia podzielona po równo na wszystkie panele.",
     "paperHeadline": "{power} do domu",
     "paperMix": "Teraz prąd daje {parts}.",
     "paperOnly": "Teraz cały prąd daje {source}.",
@@ -771,7 +773,8 @@ const TRANSLATIONS = {
     "otherDetails": "Inne odczyty",
     "computedHint": "Wyliczone z pozostałych czujników",
     "vsShort": "Wirtualny magazyn",
-    "editorCollapsible": "Zwijane sekcje (dotknij tytułu sekcji)"
+    "editorCollapsible": "Zwijane sekcje (dotknij tytułu sekcji)",
+    "panelEachToday": "≈ {power} i {kwh} dziś na panel"
   }
 };
 
@@ -2218,6 +2221,29 @@ function panelsHtml(m) {
     ? fill(t.panelWeak, { name: stats.weakest.name, pct: formatNumber((stats.weakest.today / stats.median) * 100, locale, 0) })
     : t.panelsEven}`;
   const note = data.estimate ? t.panelsEstimateNote : statsNote(data);
+  // Without optimizers every panel of a string would show the same estimate:
+  // one tile per string instead.
+  if (data.estimate) {
+    return `
+    <section class="sfc-section sfc-panels" id="sfc-panels">
+      <div class="sfc-head">
+        <div><span class="sfc-kicker">${data.panels.length}×</span><h3>${escapeHtml(t.panelsTitle)}</h3></div>
+        <span class="sfc-hint">${escapeHtml(fill(t.panelsEstimateHint, { energy: formatEnergy(data.average, locale) }))}</span>
+      </div>
+      <div class="sfc-strings sfc-panel-strings">
+        ${data.strings.map((string, i) => {
+          const each = data.stringPower[i];
+          return `
+          <button class="sfc-string" data-entity="${escapeHtml(string[0]?.entityId)}">
+            <span>${escapeHtml(fill(t.stringModules, { n: i + 1, count: string.length }))}</span>
+            <b>${escapeHtml(isNum(each) ? formatPower(each * string.length, locale) : "—")}</b>
+            <small>${escapeHtml(fill(t.panelEachToday, { power: isNum(each) ? formatPower(each, locale) : "—", kwh: formatEnergy(data.average, locale) }))}</small>
+          </button>`;
+        }).join("")}
+      </div>
+      <p class="sfc-panels-note estimate">${escapeHtml(note)}</p>
+    </section>`;
+  }
   return `
     <section class="sfc-section sfc-panels" id="sfc-panels">
       <div class="sfc-head">

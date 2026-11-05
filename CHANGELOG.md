@@ -3,6 +3,7 @@
 ## 1.7.0
 
 - **Several cards instead of one:** a card whose `sections:` leave out `flow` shows its sections as one plain card. The sections lose their own box and a line separates them, so parts of the card can sit anywhere on a dashboard. Cards on the same page share the history and statistics they load, so Home Assistant is asked once. See the README for an example.
+- **Panels without optimizers:** with `panels_per_string` the Panels section shows one tile per string (its power, and ≈ power and today's energy per panel) instead of a row of identical estimated tiles for every panel.
 
 ## 1.6.0
 

@@ -78,7 +78,7 @@
   "stringModules": "String {n} · {count} modules",
   "panelsEstimateHint": "≈ {energy} per panel today",
   "panelEach": "≈ {power} per panel",
-  "panelsEstimateNote": "Estimate: these panels have no optimizers and do not report their own data, so each value is the string's power divided evenly by its panels, and today's energy split evenly over all panels.",
+  "panelsEstimateNote": "Estimate: these panels have no optimizers and do not report their own data, so the values per panel are the string's power divided by its panels and today's energy split evenly over all panels.",
   "paperHeadline": "{power} to the home",
   "paperMix": "Right now: {parts}.",
   "paperOnly": "Right now everything comes from {source}.",
@@ -248,5 +248,6 @@
   "otherDetails": "Other readings",
   "computedHint": "Calculated from the other sensors",
   "vsShort": "Virtual storage",
-  "editorCollapsible": "Collapsible sections (tap a section's title)"
+  "editorCollapsible": "Collapsible sections (tap a section's title)",
+  "panelEachToday": "≈ {power} and {kwh} today per panel"
 }
