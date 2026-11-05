@@ -198,6 +198,29 @@ function panelsHtml(m) {
     ? fill(t.panelWeak, { name: stats.weakest.name, pct: formatNumber((stats.weakest.today / stats.median) * 100, locale, 0) })
     : t.panelsEven}`;
   const note = data.estimate ? t.panelsEstimateNote : statsNote(data);
+  // Without optimizers every panel of a string would show the same estimate:
+  // one tile per string instead.
+  if (data.estimate) {
+    return `
+    <section class="sfc-section sfc-panels" id="sfc-panels">
+      <div class="sfc-head">
+        <div><span class="sfc-kicker">${data.panels.length}×</span><h3>${escapeHtml(t.panelsTitle)}</h3></div>
+        <span class="sfc-hint">${escapeHtml(fill(t.panelsEstimateHint, { energy: formatEnergy(data.average, locale) }))}</span>
+      </div>
+      <div class="sfc-strings sfc-panel-strings">
+        ${data.strings.map((string, i) => {
+          const each = data.stringPower[i];
+          return `
+          <button class="sfc-string" data-entity="${escapeHtml(string[0]?.entityId)}">
+            <span>${escapeHtml(fill(t.stringModules, { n: i + 1, count: string.length }))}</span>
+            <b>${escapeHtml(isNum(each) ? formatPower(each * string.length, locale) : "—")}</b>
+            <small>${escapeHtml(fill(t.panelEachToday, { power: isNum(each) ? formatPower(each, locale) : "—", kwh: formatEnergy(data.average, locale) }))}</small>
+          </button>`;
+        }).join("")}
+      </div>
+      <p class="sfc-panels-note estimate">${escapeHtml(note)}</p>
+    </section>`;
+  }
   return `
     <section class="sfc-section sfc-panels" id="sfc-panels">
       <div class="sfc-head">

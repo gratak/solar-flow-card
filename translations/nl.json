@@ -78,7 +78,7 @@
   "stringModules": "String {n} · {count} modules",
   "panelsEstimateHint": "≈ {energy} per paneel vandaag",
   "panelEach": "≈ {power} per paneel",
-  "panelsEstimateNote": "Schatting: deze panelen hebben geen optimizers en melden geen eigen gegevens, dus elke waarde is het vermogen van de string gelijk verdeeld over de panelen, en de energie van vandaag gelijk verdeeld over alle panelen.",
+  "panelsEstimateNote": "Schatting: deze panelen hebben geen optimizers en melden geen eigen gegevens, dus de waarden per paneel zijn het vermogen van de string gedeeld door de panelen en de energie van vandaag gelijk verdeeld over alle panelen.",
   "paperHeadline": "{power} naar de woning",
   "paperMix": "Momenteel: {parts}.",
   "paperOnly": "Momenteel komt alles van {source}.",
@@ -248,5 +248,6 @@
   "otherDetails": "Overige metingen",
   "computedHint": "Berekend uit de andere sensoren",
   "vsShort": "Virtuele opslag",
-  "editorCollapsible": "Inklapbare secties (tik op de titel)"
+  "editorCollapsible": "Inklapbare secties (tik op de titel)",
+  "panelEachToday": "≈ {power} en {kwh} vandaag per paneel"
 }

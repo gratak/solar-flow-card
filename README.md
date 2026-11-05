@@ -42,7 +42,7 @@ DeyeCloud sensors are found automatically; any other inverter works by pointing 
 - **Battery forecast**: time until full while charging, time until the reserve while discharging.
 - **Installation**: power on each phase (L1/L2/L3) with grid power and voltage and the spread between phases, inverter load against its rated power, battery temperature, voltage and current with a warning when the battery is too cold or hot to charge fully, and the generator while it runs.
 - **Inverter details** (tap the inverter or the house): PV strings, temperatures, battery and grid readings.
-- **Panels**: one tile per optimizer with today's production; the weakest panel is highlighted when it falls below 85% of the median. Without optimizers, `panels_per_string` gives an estimate per panel from the string power.
+- **Panels**: one tile per optimizer with today's production; the weakest panel is highlighted when it falls below 85% of the median. Without optimizers, `panels_per_string` shows one tile per string with its power and an estimate per panel.
 - **Wide layout** (`wide: true`) for every theme: everything visible at once on a wide dashboard, plus "Today at a glance" (peaks, battery range and cycles, time without the grid) and a comparison with yesterday, the week and the month.
 - English, Polish and Dutch, with a visual editor; [more languages welcome](CONTRIBUTING.md#add-or-improve-a-translation).
 
@@ -129,7 +129,7 @@ co2_factor: 0.7
 | `pv_panels` | `8` | Modules drawn on the Diorama roof when no optimizers are found. |
 | `inverter_power_rating` | from the inverter | Inverter rated power in kW, for the inverter load. DeyeCloud reports it; set it for other inverters. |
 | `panels_average` | `all` | `per_string`: the average and the weakest panel for each string on its own, with a summary under each string (useful when the strings face different ways). `all`: over all panels. Also in the editor. |
-| `panels_per_string` | – | Panels on each string, a number or a list (`[11, 7]`). Groups the optimizer tiles into strings in that order, and without optimizers shows an estimate per panel from the inverter's string power, marked ≈ with a note. The editor shows one field per string the inverter reports, with its current voltage. |
+| `panels_per_string` | – | Panels on each string, a number or a list (`[11, 7]`). Groups the optimizer tiles into strings in that order, and without optimizers shows one tile per string: the string's power and an estimate per panel (≈ power and today's energy), with a note. The editor shows one field per string the inverter reports, with its current voltage. |
 | `panel_strings` | `1` (`2` above 8 panels) | Number of strings the panels are split into, in order. |
 | `price_import` | – | Price per kWh bought from the grid. Enables the savings. |
 | `price_export` | `0` | Price per kWh sold to the grid. |

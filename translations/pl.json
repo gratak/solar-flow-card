@@ -78,7 +78,7 @@
   "stringModules": "String {n} · {count} modułów",
   "panelsEstimateHint": "≈ {energy} na panel dziś",
   "panelEach": "≈ {power} na panel",
-  "panelsEstimateNote": "Szacunek: panele nie mają optymalizatorów i nie przesyłają własnych danych, więc każda wartość to moc stringu podzielona po równo na jego panele, a dzisiejsza energia podzielona po równo na wszystkie panele.",
+  "panelsEstimateNote": "Szacunek: panele nie mają optymalizatorów i nie przesyłają własnych danych, więc wartości na panel to moc stringu podzielona przez liczbę jego paneli i dzisiejsza energia podzielona po równo na wszystkie panele.",
   "paperHeadline": "{power} do domu",
   "paperMix": "Teraz prąd daje {parts}.",
   "paperOnly": "Teraz cały prąd daje {source}.",
@@ -248,5 +248,6 @@
   "otherDetails": "Inne odczyty",
   "computedHint": "Wyliczone z pozostałych czujników",
   "vsShort": "Wirtualny magazyn",
-  "editorCollapsible": "Zwijane sekcje (dotknij tytułu sekcji)"
+  "editorCollapsible": "Zwijane sekcje (dotknij tytułu sekcji)",
+  "panelEachToday": "≈ {power} i {kwh} dziś na panel"
 }

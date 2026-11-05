@@ -173,7 +173,7 @@ inverter_details:
 
 `load_power` and `load_energy` are left out: the card works out the home's consumption from the panels and the grid. Without per-phase consumption, the Installation section shows the grid power of each phase.
 
-With the PV string voltage and current, `panels_per_string: [11, 7]` estimates each panel's power and energy from its string (the optimizers' own readings are not used). The inverter's temperature, efficiency and status show in the Inverter details.
+With the PV string voltage and current, `panels_per_string: [11, 7]` shows each string with an estimate per panel (the optimizers' own readings are not used). The inverter's temperature, efficiency and status show in the Inverter details.
 
 With an hourly net-balancing tariff, add `virtual_storage: true`: the card works out each hour's balance from the two ZAMEL counters (see the [README](../README.md#virtual-storage-hourly-net-balancing)). With [ha-balance-neto](https://github.com/miguelangellv/ha-balance-neto) installed you can point it at its net balance sensor instead (`virtual_storage: { entity: sensor.… }`).
 
