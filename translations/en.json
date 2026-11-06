@@ -400,5 +400,17 @@
   "pricesAhead": "Coming up – cheapest: {cheap} ({cheapPrice}) · dearest: {dear} ({dearPrice})",
   "tomorrow": "tomorrow",
   "exportValue": "Value of energy sold",
-  "editorNoImportPrice": "Savings need an import price: until you set one, the card shows the value of the energy sold."
+  "editorNoImportPrice": "Savings need an import price: until you set one, the card shows the value of the energy sold.",
+  "editorSettlement": "Settlement with your utility",
+  "editorSettlementFixed": "Fixed prices",
+  "editorSettlementBilling": "Net-billing (energy sold at the RCE price)",
+  "editorSettlementMetering": "Net-metering (each kWh sent back worth 0.8 / 0.7 kWh)",
+  "editorSettlementHintFixed": "The prices below, or price sensors.",
+  "editorSettlementHintBilling": "The energy sent to the grid is sold at the hourly RCE price: enter only the import price. The card finds an RCE price sensor itself, or pick one below.",
+  "editorSettlementHintMetering": "Each kWh sent to the grid is worth {ratio} of a kWh bought: enter only the import price.",
+  "editorMeteringRatio": "Credit per kWh sent back",
+  "editorMeteringAuto": "automatic ({ratio}; 0.7 above 10 kWp)",
+  "editorRcePrice": "RCE price sensor",
+  "editorRceMissing": "No RCE price sensor found: pick one (e.g. from the PSE integration or your EMS), otherwise the energy sold has no price.",
+  "editorImportPriceHint": "Import price: what each kWh costs, energy plus the distribution charges billed per kWh, without monthly fixed fees."
 }

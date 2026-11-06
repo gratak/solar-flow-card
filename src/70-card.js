@@ -256,23 +256,30 @@ class SolarFlowCard extends HTMLElement {
   // Savings when a price comes from a sensor: hour by hour (month by month
   // for all time), each with its mean price. undefined with fixed prices
   // (the summary works them out from the totals), null while loading.
-  _savings(resolved, period, energy) {
+  _savings(resolved, period, energy, net) {
     const config = this._config;
-    const prices = { import: priceSetting(config.price_import), export: priceSetting(config.price_export) };
+    const prices = effectivePrices(this._hass, config);
+    // Net-metering: a kWh sent back is worth `ratio` of a kWh bought.
+    if (prices.ratio && prices.import) prices.export = prices.import.entity ? { entity: prices.import.entity, ratio: prices.ratio } : { value: prices.import.value * prices.ratio };
     // Only an export price: the value of the energy sold.
     const kind = prices.import ? "savings" : "exportValue";
     if (!prices.import && !prices.export) return undefined;
     if (!prices.import?.entity && !prices.export?.entity) {
-      if (prices.import) return undefined;
-      const exported = energy.totals?.gridExport;
-      return isNum(exported) ? { kind, value: exported * prices.export.value } : undefined;
+      const totals = energy.totals || {};
+      if (!prices.import) return isNum(totals.gridExport) ? { kind, value: totals.gridExport * prices.export.value } : undefined;
+      // Fixed prices as given: the summary works them out from the totals.
+      if (!config.settlement) return undefined;
+      if (!isNum(totals.load) || !isNum(totals.gridImport)) return undefined;
+      const billedImport = net ? net.gridImport : totals.gridImport;
+      const billedExport = net ? net.gridExport : totals.gridExport || 0;
+      return { kind, value: Math.max(0, totals.load - billedImport) * prices.import.value + billedExport * (prices.export?.value || 0) };
     }
     if (!prices.import) prices.import = { value: 0 };
     if (typeof this._hass.callWS !== "function") return undefined;
     const sources = sourcesKey(resolved.energy);
     if (!sources) return undefined;
     const states = this._hass.states;
-    const now = { import: currentPrice(states, prices.import), export: currentPrice(states, prices.export) ?? 0 };
+    const now = { import: currentPrice(states, prices.import), export: prices.export?.ratio ? null : currentPrice(states, prices.export) ?? 0 };
     let rows;
     let start;
     let statPeriod = "hour";
@@ -292,12 +299,13 @@ class SolarFlowCard extends HTMLElement {
       // Each hour with its consumption worked out, as in the totals.
       rows = [...hours.values()].map((row) => ({ ...deriveLoadEnergy(row), at: row.at }));
     }
-    const ids = Object.fromEntries(Object.entries(prices).filter(([, p]) => p?.entity).map(([name, p]) => [name, p.entity]));
+    const ids = Object.fromEntries(["import", "export"].filter((name) => prices[name]?.entity && !prices[name].ratio).map((name) => [name, prices[name].entity]));
     const stats = this._fetch(`prices|${JSON.stringify(ids)}|${start.getTime()}|${statPeriod}`, 15 * 60000, () => loadPriceStats(this._hass, ids, start, statPeriod));
     if (!stats.data) return { kind, value: null };
     const price = (kind, at) => {
       const setting = prices[kind];
       if (!setting) return 0;
+      if (setting.ratio) return setting.ratio * price("import", at);
       if (!setting.entity) return setting.value;
       const mean = at === null ? undefined : stats.data[kind]?.get(at);
       return mean ?? now[kind] ?? 0;
@@ -499,7 +507,7 @@ class SolarFlowCard extends HTMLElement {
       if (bank && !ids.live.soc && !ids.live.battery) ids.live.soc = bank.items[0].entityId;
       const now = new Date();
       const vstore = this._virtualStorage(resolved, config, period, now, today);
-      const money = this._savings(resolved, period, energy);
+      const money = this._savings(resolved, period, energy, vstore.net);
       this._introAt ??= Date.now();
       const introElapsed = (Date.now() - this._introAt) / 1000;
       const introAt = introElapsed < 2.6 ? introElapsed : null;

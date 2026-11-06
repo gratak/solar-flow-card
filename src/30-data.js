@@ -416,6 +416,41 @@ function pricedSavings(rows, rest, price, net) {
   return saved;
 }
 
+// How the energy sent to the grid is settled (`settlement`):
+// - net_billing: sold at the hourly RCE price; without `price_export` the
+//   card uses an RCE price sensor it finds (e.g. ProfitEMS, the PSE
+//   integration);
+// - net_metering: each kWh sent back is worth `metering_ratio` of a kWh
+//   bought: 0.8, or 0.7 above 10 kWp;
+// - unset: the fixed prices or price sensors as given.
+function detectRcePrice(hass) {
+  const candidates = Object.values(hass?.states || {}).filter((s) => s.entity_id.startsWith("sensor.")
+    && /(^|[^a-z])rce([^a-z]|$)/i.test(`${s.entity_id} ${s.attributes?.friendly_name || ""}`)
+    && /\/\s*[km]?wh$/i.test(stateUnit(s)) && stateNumber(s) !== null);
+  // One with the hours listed (for the chart) first.
+  const hourly = (s) => Object.values(s.attributes || {}).some((v) => Array.isArray(v) && v.length >= 12);
+  return (candidates.find(hourly) || candidates[0])?.entity_id || null;
+}
+
+function meteringRatio(config) {
+  const ratio = Number.parseFloat(config.metering_ratio);
+  if (ratio > 0 && ratio <= 1) return ratio;
+  return (positiveNumber(config.pv_capacity) || 0) > 10 ? 0.7 : 0.8;
+}
+
+function effectivePrices(hass, config) {
+  const prices = { import: priceSetting(config.price_import), export: priceSetting(config.price_export), ratio: null, detected: null };
+  if (config.settlement === "net_billing" && !prices.export) {
+    prices.detected = detectRcePrice(hass);
+    if (prices.detected) prices.export = { entity: prices.detected };
+  }
+  if (config.settlement === "net_metering") {
+    prices.ratio = meteringRatio(config);
+    prices.export = null;
+  }
+  return prices;
+}
+
 // Hourly prices for the price chart, from the attributes of the price
 // sensor (the export price's, else the import price's). Reads the common
 // formats: lists of { start, price } items (ProfitEMS "prices", Nord Pool
@@ -425,7 +460,8 @@ const PRICE_START_KEYS = ["start", "start_time", "starts_at", "startsAt", "perio
 const PRICE_VALUE_KEYS = ["price", "value", "price_per_kwh", "total"];
 
 function priceChartData(hass, config, now = new Date()) {
-  const setting = [priceSetting(config.price_export), priceSetting(config.price_import)].find((p) => p?.entity);
+  const effective = effectivePrices(hass, config);
+  const setting = [effective.export, effective.import].find((p) => p?.entity);
   const stateObj = setting && hass?.states?.[setting.entity];
   if (!stateObj) return null;
   const scale = priceScale(stateObj);

@@ -88,7 +88,7 @@ const FIELD_UNIT_NAMES = { power: "W / kW", energy: "kWh", soc: "%", voltage: "V
 // The notes under a sensor field: its value now, or what is wrong with it.
 function fieldNotes(hass, config, t, kind, value, auto) {
   const locale = t.locale;
-  if (!value) return auto ? [["note", fill(t.editorAuto, { entity: auto.entityId, value: fieldValue(auto.stateObj, kind, locale) })]] : [];
+  if (!value) return auto ? [["note", fill(t.editorAuto, { entity: auto.entityId, value: fieldValue(auto.stateObj, kind === "price" ? "any" : kind, locale) })]] : [];
   const stateObj = hass?.states?.[value];
   if (!stateObj) return [["warn", t.editorNotFound]];
   const notes = [];
@@ -501,21 +501,44 @@ class SolarFlowCardEditor extends HTMLElement {
   }
 
   _summaryHtml(t) {
+    const mode = this._config.settlement || "";
     const sensor = (key) => priceSetting(this._config[key])?.entity || "";
+    const number = (key, label) => this._numbers(t, [[key, label, "0.01"]]);
+    const detected = mode === "net_billing" && !priceSetting(this._config.price_export) ? detectRcePrice(this._hass) : null;
+    const ratio = formatNumber(meteringRatio({ ...this._config, metering_ratio: undefined }), t.locale, 1);
+    const option = (value, label) => `<option value="${value}" ${mode === value ? "selected" : ""}>${escapeHtml(label)}</option>`;
+    const ratioOption = (value, label) => `<option value="${value}" ${String(this._config.metering_ratio ?? "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`;
     return `
+      <label><span>${escapeHtml(t.editorSettlement)}</span>
+        <select data-select="settlement">
+          ${option("", t.editorSettlementFixed)}${option("net_billing", t.editorSettlementBilling)}${option("net_metering", t.editorSettlementMetering)}
+        </select>
+      </label>
+      <p class="hint">${escapeHtml(fill(t[{ "": "editorSettlementHintFixed", net_billing: "editorSettlementHintBilling", net_metering: "editorSettlementHintMetering" }[mode]], { ratio }))}</p>
       <div class="grid">
-        ${this._numbers(t, EDITOR_PRICES)}
+        ${number("price_import", "editorPriceImport")}
+        ${mode === "" ? number("price_export", "editorPriceExport") : ""}
+        ${mode === "net_metering" ? `
+          <label><span>${escapeHtml(t.editorMeteringRatio)}</span>
+            <select data-select="metering_ratio">${ratioOption("", fill(t.editorMeteringAuto, { ratio }))}${ratioOption("0.8", "0,8")}${ratioOption("0.7", "0,7")}</select>
+          </label>` : ""}
+        ${number("co2_factor", "editorCo2")}
         <label><span>${escapeHtml(t.editorCurrency)}</span><input data-text="currency" type="text" value="${escapeHtml(this._config.currency ?? "")}" placeholder="${escapeHtml(t.currency)}" /></label>
       </div>
-      ${priceSetting(this._config.price_export) && !priceSetting(this._config.price_import) ? `<p class="warn">${escapeHtml(t.editorNoImportPrice)}</p>` : ""}
-      <details class="box" data-box="prices" ${this._boxOpen("prices", Boolean(sensor("price_import") || sensor("price_export"))) ? "open" : ""}>
-        <summary class="title">${escapeHtml(t.editorPriceSensors)}</summary>
-        <p class="hint">${escapeHtml(t.editorPriceSensorsHint)}</p>
-        <div class="pickers">
-          ${this._picker("price_import", t.editorPriceImportSensor, sensor("price_import"), "sensor", { kind: "price" })}
-          ${this._picker("price_export", t.editorPriceExportSensor, sensor("price_export"), "sensor", { kind: "price" })}
-        </div>
-      </details>
+      <p class="hint">${escapeHtml(t.editorImportPriceHint)}</p>
+      ${mode !== "net_metering" && !priceSetting(this._config.price_import) && (mode === "net_billing" || priceSetting(this._config.price_export)) ? `<p class="warn">${escapeHtml(t.editorNoImportPrice)}</p>` : ""}
+      ${mode === "net_billing" ? `
+        ${this._picker("price_export", t.editorRcePrice, sensor("price_export"), "sensor", { kind: "price", auto: detected ? { entityId: detected, stateObj: this._hass.states[detected] } : null })}
+        ${!detected && !sensor("price_export") ? `<p class="warn">${escapeHtml(t.editorRceMissing)}</p>` : ""}` : ""}
+      ${mode === "" ? `
+        <details class="box" data-box="prices" ${this._boxOpen("prices", Boolean(sensor("price_import") || sensor("price_export"))) ? "open" : ""}>
+          <summary class="title">${escapeHtml(t.editorPriceSensors)}</summary>
+          <p class="hint">${escapeHtml(t.editorPriceSensorsHint)}</p>
+          <div class="pickers">
+            ${this._picker("price_import", t.editorPriceImportSensor, sensor("price_import"), "sensor", { kind: "price" })}
+            ${this._picker("price_export", t.editorPriceExportSensor, sensor("price_export"), "sensor", { kind: "price" })}
+          </div>
+        </details>` : ""}
       ${this._switches(t, "summary")}`;
   }
 
@@ -637,7 +660,7 @@ class SolarFlowCardEditor extends HTMLElement {
     root.querySelectorAll("[data-text]").forEach((input) => input.addEventListener("change", (e) => this._set(input.dataset.text, e.target.value.trim() || undefined)));
     root.querySelectorAll("[data-select]").forEach((select) => select.addEventListener("change", (e) => {
       this._set(select.dataset.select, e.target.value || undefined);
-      if (select.dataset.select === "language") this._render();
+      if (select.dataset.select === "language" || select.dataset.select === "settlement") this._render();
     }));
     root.querySelectorAll("[data-number]").forEach((input) => input.addEventListener("change", (e) => {
       const number = Number.parseFloat(e.target.value);
