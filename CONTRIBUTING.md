@@ -49,3 +49,7 @@ Home Assistant picks the language automatically from the user's profile; it can 
 The card is written in `src/*.js` and built into `solar-flow-card.js` with `node scripts/build.mjs`. You don't have to commit the built file: after a merge into `main` it is rebuilt automatically.
 
 `demo/index.html` runs the card against a stand-in Home Assistant (`demo/mock-hass.js`), with every theme, several scenarios and both PV and battery-only setups.
+
+## License of contributions
+
+Code you contribute is licensed under the project's [GPL-3.0-or-later](LICENSE). Translations (`translations/*.json`) are licensed under the [MIT License](translations/LICENSE), like the existing ones.

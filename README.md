@@ -6,7 +6,7 @@
 
 [![HACS Default](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://hacs.xyz/)
 [![Release](https://img.shields.io/github/v/release/gratak/solar-flow-card?label=version)](https://github.com/gratak/solar-flow-card/releases)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
 
 [![Open your Home Assistant instance and open this repository in the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=gratak&repository=solar-flow-card&category=plugin)
 
@@ -381,4 +381,8 @@ node scripts/build.mjs
 
 ## License
 
-MIT. The data layer started from the Energy Flow card of [hass-deyecloud](https://github.com/heavenknows1978/hass-deyecloud) by Trần Công Tuấn Anh, also MIT.
+[GPL-3.0-or-later](LICENSE). You may use, share and change the card, also commercially, as long as what you distribute stays under the same license with its source code and keeps the copyright notices: nobody can turn it into a closed, paid product.
+
+- Versions up to 1.8.0-beta.9 were released under the MIT License and stay available under it.
+- The translations (`translations/*.json`) remain under the [MIT License](translations/LICENSE), the terms their translators contributed under.
+- The data layer started from the Energy Flow card of [hass-deyecloud](https://github.com/heavenknows1978/hass-deyecloud) by Trần Công Tuấn Anh (MIT); its notice is kept in the source.

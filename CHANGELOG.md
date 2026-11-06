@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.8.0-beta.10
+
+- **License: GPL-3.0-or-later** (was MIT). You may still use, share and change the card, also commercially, but what you distribute must stay under the same license with its source code, so it cannot become a closed, paid product.
+  - Versions up to 1.8.0-beta.9 stay available under MIT.
+  - The translations remain MIT.
+
 ## 1.8.0-beta.9
 
 - **Energy prices chart** (`prices` in `sections:`): with a price sensor that lists its hourly prices (ProfitEMS or PSE RCE, Nord Pool, Tibber and similar), a section shows:
