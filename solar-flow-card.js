@@ -7,7 +7,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "1.8.0-beta.5";
+const CARD_VERSION = "1.8.0-beta.6";
 const CARD_TAG = "solar-flow-card";
 const EDITOR_TAG = "solar-flow-card-editor";
 const THEMES = ["diorama", "aurora", "paper", "lcars", "atlantis", "expanse", "foundation", "galaxy", "gate", "reactor"];
@@ -2406,15 +2406,19 @@ function configuredInverter(hass, config) {
 // Readings that only repeat another one:
 // - a numbered battery reading at zero (no second battery);
 // - a single numbered one equal to the total;
-// - the load side's voltage equal to the grid's on the same phase (it only
-//   differs when the inverter runs off-grid).
+// - the load side's voltages while they follow the grid's: all of them are
+//   shown only when the grid is down or a phase differs by more than 10 V
+//   (the inverter runs off-grid), so the phases never show half and half.
 function withoutEchoes(readings) {
   const near = (a, b, tolerance) => Math.abs(a - b) <= tolerance;
+  const loads = readings.filter((r) => r.kind === "loadVoltage");
+  const grids = readings.filter((r) => r.kind === "voltage");
+  const offGrid = loads.some((l) => {
+    const grid = grids.find((g) => g.phase === l.phase);
+    return !grid || grid.value < 50 || !near(l.value, grid.value, 10);
+  });
   return readings.filter((r, _, all) => {
-    if (r.kind === "loadVoltage") {
-      const grid = all.find((g) => g.kind === "voltage" && g.phase === r.phase);
-      return !grid || !near(r.value, grid.value, 3);
-    }
+    if (r.kind === "loadVoltage") return offGrid;
     if (!r.number) return true;
     const total = all.find((t) => t.kind === r.kind && !t.number);
     const numbered = all.filter((n) => n.kind === r.kind && n.number && Math.abs(n.value) > 0.05);

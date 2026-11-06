@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.0-beta.6
+
+- **Load-side voltages:** they show only while they do not follow the grid, i.e. when the grid is down or a phase differs by more than 10 V (running off-grid), and then all phases together. Before, a phase a few volts off the grid's could show on its own.
+
 ## 1.8.0-beta.5
 
 - **Inverter details, full names:** each tile is as wide as its name and the row is filled, instead of narrow tiles with truncated names and empty space next to them.
