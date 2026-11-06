@@ -507,6 +507,7 @@ class SolarFlowCardEditor extends HTMLElement {
         ${this._numbers(t, EDITOR_PRICES)}
         <label><span>${escapeHtml(t.editorCurrency)}</span><input data-text="currency" type="text" value="${escapeHtml(this._config.currency ?? "")}" placeholder="${escapeHtml(t.currency)}" /></label>
       </div>
+      ${priceSetting(this._config.price_export) && !priceSetting(this._config.price_import) ? `<p class="warn">${escapeHtml(t.editorNoImportPrice)}</p>` : ""}
       <details class="box" data-box="prices" ${this._boxOpen("prices", Boolean(sensor("price_import") || sensor("price_export"))) ? "open" : ""}>
         <summary class="title">${escapeHtml(t.editorPriceSensors)}</summary>
         <p class="hint">${escapeHtml(t.editorPriceSensorsHint)}</p>
@@ -641,7 +642,7 @@ class SolarFlowCardEditor extends HTMLElement {
     root.querySelectorAll("[data-number]").forEach((input) => input.addEventListener("change", (e) => {
       const number = Number.parseFloat(e.target.value);
       this._set(input.dataset.number, Number.isFinite(number) ? number : undefined);
-      if (NUMBER_CHECKS.some(([key]) => key === input.dataset.number)) this._render();
+      if (NUMBER_CHECKS.some(([key]) => key === input.dataset.number) || input.dataset.number.startsWith("price_")) this._render();
     }));
     root.querySelectorAll("[data-switch]").forEach((input) => input.addEventListener("change", (e) => {
       const key = input.dataset.switch;

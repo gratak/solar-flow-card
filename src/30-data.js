@@ -416,6 +416,66 @@ function pricedSavings(rows, rest, price, net) {
   return saved;
 }
 
+// Hourly prices for the price chart, from the attributes of the price
+// sensor (the export price's, else the import price's). Reads the common
+// formats: lists of { start, price } items (ProfitEMS "prices", Nord Pool
+// "raw_today", Tibber, PSE RCE…) and lists of plain numbers per day
+// ("today", "tomorrow"). Quarter-hour prices are averaged per hour.
+const PRICE_START_KEYS = ["start", "start_time", "starts_at", "startsAt", "period_start", "time", "datetime", "from"];
+const PRICE_VALUE_KEYS = ["price", "value", "price_per_kwh", "total"];
+
+function priceChartData(hass, config, now = new Date()) {
+  const setting = [priceSetting(config.price_export), priceSetting(config.price_import)].find((p) => p?.entity);
+  const stateObj = setting && hass?.states?.[setting.entity];
+  if (!stateObj) return null;
+  const scale = priceScale(stateObj);
+  const attrs = stateObj.attributes || {};
+  const byHour = new Map();
+  const put = (ms, value) => {
+    if (!Number.isFinite(ms) || !isNum(value)) return;
+    const hour = new Date(ms);
+    hour.setMinutes(0, 0, 0);
+    const slot = byHour.get(hour.getTime()) || { sum: 0, n: 0 };
+    slot.sum += value * scale;
+    slot.n += 1;
+    byHour.set(hour.getTime(), slot);
+  };
+  for (const value of Object.values(attrs)) {
+    if (!Array.isArray(value) || !value.length || typeof value[0] !== "object" || value[0] === null) continue;
+    for (const item of value) {
+      const startKey = PRICE_START_KEYS.find((k) => item?.[k] !== undefined);
+      const valueKey = PRICE_VALUE_KEYS.find((k) => isNum(Number.parseFloat(item?.[k])));
+      if (startKey && valueKey) put(Date.parse(item[startKey]), Number.parseFloat(item[valueKey]));
+    }
+  }
+  if (!byHour.size) {
+    for (const [key, offset] of [["today", 0], ["tomorrow", 1]]) {
+      const list = attrs[key];
+      if (!Array.isArray(list) || !list.length || !list.every((v) => v === null || isNum(Number.parseFloat(v)))) continue;
+      const base = startOfDay(addDays(now, offset)).getTime();
+      const step = (24 * 3600000) / list.length;
+      list.forEach((v, i) => v !== null && put(base + i * step, Number.parseFloat(v)));
+    }
+  }
+  const from = startOfDay(now).getTime();
+  const to = startOfDay(addDays(now, 2)).getTime();
+  const hours = [...byHour.entries()].filter(([at]) => at >= from && at < to).sort((a, b) => a[0] - b[0])
+    .map(([at, slot]) => ({ at, price: slot.sum / slot.n }));
+  if (hours.length < 2) return null;
+  const hourNow = new Date(now);
+  hourNow.setMinutes(0, 0, 0);
+  const ahead = hours.filter((h) => h.at >= hourNow.getTime());
+  const pick = (better) => ahead.reduce((best, h) => (!best || better(h.price, best.price) ? h : best), null);
+  return {
+    entityId: setting.entity,
+    hours,
+    nowAt: hourNow.getTime(),
+    current: currentPrice(hass.states, setting),
+    cheapest: pick((a, b) => a < b),
+    priciest: pick((a, b) => a > b),
+  };
+}
+
 // PV production forecast (#69) from forecast sensors such as Solcast or
 // Forecast.Solar: `pv_forecast: { today, remaining, days: [...] }`, where
 // `days` lists the sensors for tomorrow and the days after it.
@@ -549,7 +609,11 @@ function periodSummary(totals, config, t, locale, net = null, money = undefined)
   // Prices from sensors: worked out hour by hour by the card (money), "…"
   // while the statistics load.
   if (money !== undefined) {
-    if (show("show_savings")) items.push(["money", t.savings, isNum(money) ? `${formatNumber(money, locale, 2)} ${config.currency ?? t.currency}`.trim() : "…"]);
+    // Without an import price there is nothing to save against: the value
+    // of the energy sold instead.
+    const label = money?.kind === "exportValue" ? t.exportValue : t.savings;
+    const value = money?.value;
+    if (show("show_savings")) items.push(["money", label, isNum(value) ? `${formatNumber(value, locale, 2)} ${config.currency ?? t.currency}`.trim() : "…"]);
     return items.concat(periodSummaryRest(totals, config, t, locale));
   }
   const priceImport = positiveNumber(config.price_import);

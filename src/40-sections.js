@@ -175,6 +175,52 @@ function pvForecastHtml(m) {
     </section>`;
 }
 
+// Energy prices by the hour: today (and tomorrow once published) as bars
+// from green (cheap) to red (dear), the hour now marked, the hours gone
+// dimmed, negative prices below the line.
+function pricesHtml(m) {
+  const c = m.priceChart;
+  if (!c) return "";
+  const { t, locale } = m;
+  const unit = `${m.config.currency ?? t.currency}/kWh`;
+  const money = (v) => `${formatNumber(v, locale, 2)} ${unit}`;
+  const values = c.hours.map((h) => h.price);
+  const low = Math.min(...values);
+  const high = Math.max(...values);
+  const top = Math.max(high, 0);
+  const bottom = Math.min(low, 0);
+  const range = top - bottom || 1;
+  const zero = (-bottom / range) * 100;
+  const first = startOfDay(new Date(c.hours[0].at)).getTime();
+  const days = new Set(c.hours.map((h) => startOfDay(new Date(h.at)).getTime()));
+  const n = c.hours.length;
+  const labels = c.hours.map((h, i) => {
+    const hour = new Date(h.at).getHours();
+    if (hour % 6) return "";
+    const day = startOfDay(new Date(h.at)).getTime() !== first && hour === 0 ? t.tomorrow : formatClock(new Date(h.at), locale);
+    return `<span style="left:${((i / n) * 100).toFixed(2)}%">${escapeHtml(day)}</span>`;
+  }).join("");
+  const at = (h) => formatClock(new Date(h.at), locale);
+  return `
+    <section class="sfc-section sfc-prices" data-entity="${escapeHtml(c.entityId)}">
+      <div class="sfc-head">
+        <div><span class="sfc-kicker">${escapeHtml(unit)}</span><h3>${escapeHtml(t.pricesTitle)}</h3></div>
+        ${isNum(c.current) ? `<span class="sfc-hint">${escapeHtml(fill(t.priceNow, { price: money(c.current) }))}</span>` : ""}
+      </div>
+      <div class="sfc-prices-chart" style="--zero:${zero.toFixed(1)}%">
+        ${c.hours.map((h, i) => {
+          const share = high > low ? ((h.price - low) / (high - low)) * 100 : 50;
+          const newDay = i > 0 && days.size > 1 && new Date(h.at).getHours() === 0;
+          const cls = [h.at < c.nowAt && "past", h.at === c.nowAt && "now", h.price < 0 && "neg", newDay && "day"].filter(Boolean).join(" ");
+          // Green (cheap) through yellow to red (dear).
+          return `<i class="${cls}" style="--h:${((Math.abs(h.price) / range) * 100).toFixed(1)}%;--c:hsl(${(120 - share * 1.2).toFixed(0)} 68% 47%)" title="${escapeHtml(`${at(h)} · ${money(h.price)}`)}"><b></b></i>`;
+        }).join("")}
+      </div>
+      <div class="sfc-prices-axis">${labels}</div>
+      ${c.cheapest && c.priciest ? `<p class="sfc-panels-note">${escapeHtml(fill(t.pricesAhead, { cheap: at(c.cheapest), cheapPrice: money(c.cheapest.price), dear: at(c.priciest), dearPrice: money(c.priciest.price) }))}</p>` : ""}
+    </section>`;
+}
+
 function readingLabel(key) {
   return key.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/_/g, " ").replace(/\s+/g, " ").trim();
 }
@@ -425,6 +471,7 @@ const SECTION_HTML = {
   inverter: inverterHtml,
   forecast: forecastHtml,
   pv_forecast: pvForecastHtml,
+  prices: pricesHtml,
   virtual_storage: virtualStorageHtml,
   system: systemHtml,
   energy: energySectionHtml,
@@ -433,8 +480,8 @@ const SECTION_HTML = {
   panels: panelsHtml,
 };
 const SECTION_IDS = ["flow", "today", "sources", ...Object.keys(SECTION_HTML)];
-const SECTION_ORDER = ["inverter", "forecast", "pv_forecast", "virtual_storage", "system", "energy", "insights", "comparison", "panels"];
-const SECTION_ORDER_WIDE = ["energy", "inverter", "forecast", "pv_forecast", "virtual_storage", "insights", "comparison", "system", "panels"];
+const SECTION_ORDER = ["inverter", "forecast", "pv_forecast", "prices", "virtual_storage", "system", "energy", "insights", "comparison", "panels"];
+const SECTION_ORDER_WIDE = ["energy", "inverter", "forecast", "pv_forecast", "prices", "virtual_storage", "insights", "comparison", "system", "panels"];
 
 // The listed sections in order, or null without the option.
 function sectionList(config) {
@@ -459,6 +506,7 @@ function foldSummary(m, id) {
   }
   if (id === "forecast") return [t.batteryForecast, t.battery, formatPercent(m.forecast.soc, locale)];
   if (id === "pv_forecast") return [t.pvForecastTitle, "", pvForecastNote(m)];
+  if (id === "prices") return [t.pricesTitle, "", isNum(m.priceChart?.current) ? fill(t.priceNow, { price: `${formatNumber(m.priceChart.current, locale, 2)} ${m.config.currency ?? t.currency}/kWh` }) : ""];
   if (id === "virtual_storage") {
     const v = m.virtualStorage?.value;
     return [t.vsTitle, "", isNum(v) ? `${v > 0.0005 ? "+" : v < -0.0005 ? "−" : ""}${formatEnergy(Math.abs(v), locale)}` : "—"];

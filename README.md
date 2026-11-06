@@ -180,6 +180,7 @@ A font installed on your device is used too, with neither option.
 | `inverter` | Inverter details (opened from the inverter in the main view) |
 | `forecast` | Battery forecast |
 | `pv_forecast` | PV production forecast |
+| `prices` | Energy prices by the hour, from a price sensor |
 | `virtual_storage` | Virtual storage |
 | `system` | Installation |
 | `energy` | Energy: period tabs, chart, tiles and summary |
@@ -234,6 +235,13 @@ Either price can be a sensor instead of a number, e.g. the hourly RCE price unde
 price_import: 1.12                      # fixed tariff, e.g. G11
 price_export: sensor.ems_cena_rce       # hourly RCE price, PLN/kWh
 ```
+
+With a price sensor the card also shows an **Energy prices** section (`prices` in `sections:`), as long as the sensor lists its hourly prices in its attributes (the RCE sensors of ProfitEMS and PSE, Nord Pool, Tibber and similar do):
+- today's prices by the hour, and tomorrow's once they are published, from green (cheap) to red (dear);
+- the hour now marked, negative prices below the line;
+- the cheapest and the dearest of the coming hours.
+
+The chart uses the export price's sensor, else the import price's. Without an import price, the summary shows the value of the energy sold instead of the savings.
 
 ### Sensors
 
