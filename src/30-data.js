@@ -439,7 +439,13 @@ function meteringRatio(config) {
 }
 
 function effectivePrices(hass, config) {
-  const prices = { import: priceSetting(config.price_import), export: priceSetting(config.price_export), ratio: null, detected: null };
+  const prices = { import: priceSetting(config.price_import), export: priceSetting(config.price_export), ratio: null, detected: null, factor: 1 };
+  // Net-billing: the value of the energy sold is credited to the prosumer
+  // deposit multiplied by 1.23 (billing_factor: 1 turns that off).
+  if (config.settlement === "net_billing") {
+    const factor = Number.parseFloat(config.billing_factor);
+    prices.factor = factor > 0 ? factor : 1.23;
+  }
   if (config.settlement === "net_billing" && !prices.export) {
     prices.detected = detectRcePrice(hass);
     if (prices.detected) prices.export = { entity: prices.detected };

@@ -505,6 +505,8 @@ class SolarFlowCardEditor extends HTMLElement {
     const sensor = (key) => priceSetting(this._config[key])?.entity || "";
     const number = (key, label) => this._numbers(t, [[key, label, "0.01"]]);
     const detected = mode === "net_billing" && !priceSetting(this._config.price_export) ? detectRcePrice(this._hass) : null;
+    // With fixed prices, an RCE price sensor in Home Assistant is offered.
+    const suggested = mode === "" ? detectRcePrice(this._hass) : null;
     const ratio = formatNumber(meteringRatio({ ...this._config, metering_ratio: undefined }), t.locale, 1);
     const option = (value, label) => `<option value="${value}" ${mode === value ? "selected" : ""}>${escapeHtml(label)}</option>`;
     const ratioOption = (value, label) => `<option value="${value}" ${String(this._config.metering_ratio ?? "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`;
@@ -518,6 +520,8 @@ class SolarFlowCardEditor extends HTMLElement {
       <div class="grid">
         ${number("price_import", "editorPriceImport")}
         ${mode === "" ? number("price_export", "editorPriceExport") : ""}
+        ${mode === "net_billing" ? `
+          <label><span>${escapeHtml(t.editorBillingFactor)}</span><input data-number="billing_factor" type="number" min="0" step="0.01" inputmode="decimal" placeholder="1.23" value="${escapeHtml(this._config.billing_factor ?? "")}" /></label>` : ""}
         ${mode === "net_metering" ? `
           <label><span>${escapeHtml(t.editorMeteringRatio)}</span>
             <select data-select="metering_ratio">${ratioOption("", fill(t.editorMeteringAuto, { ratio }))}${ratioOption("0.8", "0,8")}${ratioOption("0.7", "0,7")}</select>
@@ -530,6 +534,11 @@ class SolarFlowCardEditor extends HTMLElement {
       ${mode === "net_billing" ? `
         ${this._picker("price_export", t.editorRcePrice, sensor("price_export"), "sensor", { kind: "price", auto: detected ? { entityId: detected, stateObj: this._hass.states[detected] } : null })}
         ${!detected && !sensor("price_export") ? `<p class="warn">${escapeHtml(t.editorRceMissing)}</p>` : ""}` : ""}
+      ${mode === "" && !sensor("price_export") && suggested ? `
+        <div class="suggest">
+          <p class="note">${escapeHtml(fill(t.editorRceFound, { entity: suggested, value: fieldValue(this._hass.states[suggested], "any", t.locale) }))}</p>
+          <button type="button" class="link" data-use-billing>${escapeHtml(t.editorUseBilling)}</button>
+        </div>` : ""}
       ${mode === "" ? `
         <details class="box" data-box="prices" ${this._boxOpen("prices", Boolean(sensor("price_import") || sensor("price_export"))) ? "open" : ""}>
           <summary class="title">${escapeHtml(t.editorPriceSensors)}</summary>
@@ -625,6 +634,7 @@ class SolarFlowCardEditor extends HTMLElement {
         .warn { margin: 0; padding: 4px 8px; border-radius: 6px; background: rgba(255, 152, 0, .12); color: var(--warning-color, #b26a00); font-size: 11.5px; line-height: 1.35; }
         .item { display: grid; gap: 8px; padding: 10px; border: 1px dashed var(--divider-color, rgba(127,127,127,.35)); border-radius: 10px; }
         .danger { color: var(--error-color, #db4437) !important; }
+        .suggest { display: grid; gap: 4px; padding: 8px 10px; border-radius: 10px; background: rgba(67, 160, 71, .1); }
         .link { justify-self: start; padding: 0; border: 0; background: none; color: var(--primary-color, #03a9f4); font: inherit; font-size: 13px; cursor: pointer; }
       </style>
       <datalist id="sfc-sensor">${ids("sensor").map((id) => `<option value="${escapeHtml(id)}"></option>`).join("")}</datalist>
@@ -714,6 +724,14 @@ class SolarFlowCardEditor extends HTMLElement {
     }));
     root.getElementById("vs-on")?.addEventListener("change", (e) => {
       this._set("virtual_storage", e.target.checked ? true : undefined);
+      this._render();
+    });
+    root.querySelector("[data-use-billing]")?.addEventListener("click", () => {
+      // Net-billing values the energy sold at the RCE price: a fixed export
+      // price would take its place, so it goes.
+      const next = { ...this._config, settlement: "net_billing" };
+      delete next.price_export;
+      this._emit(next);
       this._render();
     });
     root.querySelector('[data-vs="negative"]')?.addEventListener("change", (e) => this._setVirtual("negative", e.target.value || undefined));

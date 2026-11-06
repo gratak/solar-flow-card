@@ -20,7 +20,11 @@ const BASE_CSS = `
   .sfc button { font: inherit; color: inherit; }
   .sfc [data-entity], .sfc [data-action] { cursor: pointer; }
   .sfc .sfc-click { cursor: pointer; }
-  .sfc-sections { display: grid; gap: 12px; padding: 0 16px 16px; position: relative; }
+  /* One column never wider than the card: a section with a word that cannot
+     shrink (a wide theme font, a long value) wraps instead of pushing the
+     column, and with it the right margin, past the card's edge. */
+  .sfc-sections { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 0 16px 16px; position: relative; }
+  .sfc-section { min-width: 0; }
   .sfc-section {
     padding: 14px;
     border-radius: var(--sfc-section-radius, 16px);
@@ -35,14 +39,14 @@ const BASE_CSS = `
   ha-card.sfc.parts .sfc-sections > .sfc-section + .sfc-section { padding-top: 14px; border-top: 1px solid var(--sfc-border); }
   .sfc-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
   .sfc-head > div { display: flex; align-items: center; gap: 8px; min-width: 0; }
-  .sfc-head h3 { margin: 0; font-size: 16px; font-family: var(--sfc-heading-font, inherit); font-weight: var(--sfc-heading-weight, 700); }
+  .sfc-head h3 { margin: 0; min-width: 0; overflow-wrap: anywhere; font-size: 16px; font-family: var(--sfc-heading-font, inherit); font-weight: var(--sfc-heading-weight, 700); }
   .sfc-kicker {
     display: inline-grid; place-items: center; min-width: 34px; height: 24px; padding: 0 8px; box-sizing: border-box;
     border-radius: 999px; background: var(--sfc-accent-soft); color: var(--sfc-accent);
     font-size: 10px; font-weight: 800; letter-spacing: .05em;
   }
   .sfc-kicker svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; }
-  .sfc-hint { color: var(--sfc-muted); font-size: 11px; text-align: right; }
+  .sfc-hint { min-width: 0; color: var(--sfc-muted); font-size: 11px; text-align: right; }
   .sfc-link { border: 0; background: none; color: var(--sfc-accent); font-weight: 700; font-size: 12px; cursor: pointer; padding: 0; }
   .sfc-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700;
     background: var(--sfc-badge-bg, rgba(0,0,0,.08)); color: var(--sfc-badge-text, inherit); vertical-align: middle; }
@@ -83,6 +87,9 @@ const BASE_CSS = `
   .sfc-prices-chart i.day::before { content: ""; position: absolute; left: -4px; top: 0; bottom: 0; border-left: 1px dashed var(--sfc-border); }
   .sfc-prices-axis { position: relative; height: 15px; margin-top: 3px; color: var(--sfc-muted); font-size: 10px; }
   .sfc-prices-axis span { position: absolute; top: 0; white-space: nowrap; }
+  /* Narrow: the labels every 12 hours only. */
+  .sfc-prices { container-type: inline-size; }
+  @container (max-width: 440px) { .sfc-prices-axis span.minor { display: none; } }
   /* collapsible: true – a section's title folds it; folded, one line. */
   .sfc-foldable { cursor: pointer; }
   .sfc-head.sfc-foldable h3::after, small.sfc-foldable::after, .sfc-fold-head i::before {
@@ -121,6 +128,7 @@ const BASE_CSS = `
   .sfc-forecast-copy strong { display: block; font-size: 14px; margin-top: 1px; }
   .sfc-forecast-copy em { display: block; color: var(--sfc-muted); font-size: 11px; font-style: normal; }
   .sfc-forecast-stored { font-size: 14px; white-space: nowrap; font-family: var(--sfc-num-font, inherit); }
+  @container (max-width: 380px) { .sfc-forecast-stored { white-space: normal; text-align: right; } }
   .sfc-forecast-bar { grid-column: 1 / -1; position: relative; height: 7px; border-radius: 999px; background: var(--sfc-track); }
   .sfc-forecast-bar i { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--sfc-battery); }
   .sfc-forecast-bar b { position: absolute; top: -3px; bottom: -3px; width: 2px; border-radius: 1px; background: var(--sfc-load); }
@@ -202,7 +210,7 @@ const BASE_CSS = `
   .sfc-bar.pv { fill: var(--sfc-pv); } .sfc-bar.load { fill: var(--sfc-load); } .sfc-bar.grid { fill: var(--sfc-grid); }
   .sfc-ylabel { position: absolute; right: calc(100% + 6px); transform: translateY(-50%); color: var(--sfc-muted); font-size: 10px; white-space: nowrap; }
   .sfc-xaxis { position: relative; height: 18px; margin: 4px 0 0 46px; }
-  .sfc-xaxis span { position: absolute; top: 2px; transform: translateX(-50%); color: var(--sfc-muted); font-size: 10px; white-space: nowrap; }
+  .sfc-xaxis span { position: absolute; top: 2px; color: var(--sfc-muted); font-size: 10px; white-space: nowrap; }
   .sfc-cursor { position: absolute; top: 0; bottom: 0; width: 1px; background: color-mix(in srgb, var(--sfc-text) 45%, transparent); pointer-events: none; }
   .sfc-tip { position: absolute; top: 4px; z-index: 5; min-width: 150px; margin-left: 10px; padding: 8px 10px; display: grid; gap: 4px;
     border: 1px solid var(--sfc-border); border-radius: 12px; background: var(--sfc-tip-bg, var(--sfc-surface)); color: var(--sfc-text);
@@ -252,6 +260,7 @@ const BASE_CSS = `
   .sfc-compare-table td.good { color: #2bb673; font-size: 11px; } .sfc-compare-table td.bad { color: #e5534b; font-size: 11px; }
   .sfc-compare-table tr:last-child > * { border-bottom: 0; }
   .sfc-compare-table thead th { white-space: normal; vertical-align: bottom; }
+  .sfc-compare-table thead th:not(:first-child) { min-width: 4.4em; }
   .sfc-compare-scroll { overflow-x: auto; }
 
   /* Installation */
@@ -261,7 +270,9 @@ const BASE_CSS = `
   .sfc-phase small, .sfc-meter small { color: var(--sfc-muted); font-size: 11px; font-weight: 700; line-height: 1.2; overflow: hidden;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
   .sfc-meter { align-content: start; }
-  .sfc-phase strong { font-size: 16px; font-family: var(--sfc-num-font, inherit); white-space: nowrap; }
+  .sfc-phase strong { font-size: 16px; font-family: var(--sfc-num-font, inherit); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sfc-phase { grid-template-columns: minmax(0, 1fr); }
+  @container (max-width: 240px) { .sfc-phase { padding: 8px; } .sfc-phase strong { font-size: 13px; } }
   .sfc-phase span, .sfc-meter span { color: var(--sfc-muted); font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sfc-phase i, .sfc-meter i { display: block; height: 4px; margin: 3px 0 1px; border-radius: 999px;
     background: linear-gradient(90deg, var(--sfc-c, var(--sfc-load)) var(--p), var(--sfc-track) var(--p)); }
@@ -500,7 +511,7 @@ const THEME_CSS = {
     }
     .sfc button { text-transform: uppercase; }
     .lc-soc.no-battery { grid-template-columns: 1fr; }
-    .lc-frame { display: grid; grid-template-columns: 22% 1fr; grid-template-rows: auto 1fr auto; column-gap: 6px; }
+    .lc-frame { display: grid; grid-template-columns: 22% minmax(0, 1fr); grid-template-rows: auto 1fr auto; column-gap: 6px; }
     .lc-elbow { position: relative; background: var(--orange); }
     .lc-elbow.top { grid-column: 1; grid-row: 1; height: 64px; border-radius: 44px 0 0 0; }
     .lc-elbow.top span { position: absolute; right: 8px; bottom: 6px; color: #000; font-size: 11px; }
@@ -1027,6 +1038,7 @@ const THEME_CSS = {
     .rx-scan { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 4px; padding: 8px 12px;
       border: 1px solid rgba(79,216,255,.22); background: rgba(4,16,26,.7);
       clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)); }
+    .rx-scan > div { min-width: 0; }
     .rx-scan small { color: #4fd8ff; font-size: 9.5px; letter-spacing: .26em; text-transform: uppercase; }
     .rx-scan p { margin: 1px 0 0; font-size: 13px; color: #cfe8f5; }
     .rx-scan em { font-style: normal; color: #fff; }
