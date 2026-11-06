@@ -1,22 +1,8 @@
 # Changelog
 
-## 1.8.0
-
-**Solar Flow Card is now Home Energy Hub.** It has grown into a hub for the whole home's energy, with or without solar or a battery, so it got a name to match. Nothing changes for your dashboards:
-- the card type stays `custom:solar-flow-card`;
-- the repository and the file name stay the same;
-- updates keep coming through HACS as before.
-
-Everything from the 1.8.0 betas, now stable:
-- **The new visual editor:** every option without YAML, in groups.
-  - Sensors are picked from your entities, each showing its value now or what DeyeCloud found.
-  - Warnings catch likely mistakes: wrong unit, a lifetime counter set up as daily, kW entered as W, the grid sign.
-  - Sections can be ticked and reordered.
-  - Batteries, panels, virtual storage and the PV forecast can be set up there too.
-- **Unused PV inputs** are hidden.
-- **Inverter details** show each reading once, with plain names.
-
 ## 1.8.0-beta.4
+
+**Solar Flow Card is now Home Energy Hub.** It has grown into a hub for the whole home's energy, with or without solar or a battery, so it got a name to match. Nothing changes for your dashboards: the card type stays `custom:solar-flow-card`, the repository and the file name stay the same, and updates keep coming through HACS as before.
 
 - **Inverter details, clearer and without duplicates.** DeyeCloud reports some readings twice under different names (the phase voltages as ACVoltageRUA/SVB/TWC and as GridVoltageL1/L2/L3; BatteryCurrent and BatteryTotalCurrent), and the duplicates could push other readings out.
   - Each reading now shows once.
