@@ -380,5 +380,12 @@
   "editorSensor": "Czujnik",
   "editorDetailName": "Nazwa (opcjonalnie)",
   "editorFoundN": "wykryto automatycznie: {n}",
-  "editorRatedFound": "Wykryto automatycznie moc znamionową falownika: {power}. Zostaw pole puste, żeby jej użyć."
+  "editorRatedFound": "Wykryto automatycznie moc znamionową falownika: {power}. Zostaw pole puste, żeby jej użyć.",
+  "detailVoltage": "Napięcie {n}",
+  "detailLoadVoltage": "Napięcie odbiorów {n}",
+  "detailFrequency": "Częstotliwość",
+  "detailTempAc": "Falownik, strona AC",
+  "detailTempDc": "Falownik, strona DC",
+  "detailTempBattery": "Magazyn",
+  "detailBatPower": "Moc magazynu"
 }

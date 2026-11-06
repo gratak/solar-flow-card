@@ -7,7 +7,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "1.8.0-beta.3";
+const CARD_VERSION = "1.8.0-beta.4";
 const CARD_TAG = "solar-flow-card";
 const EDITOR_TAG = "solar-flow-card-editor";
 const THEMES = ["diorama", "aurora", "paper", "lcars", "atlantis", "expanse", "foundation", "galaxy", "gate", "reactor"];
@@ -399,7 +399,14 @@ const TRANSLATIONS = {
     "editorSensor": "Sensor",
     "editorDetailName": "Name (optional)",
     "editorFoundN": "{n} found automatically",
-    "editorRatedFound": "Found automatically: inverter rated power {power}. Leave the field empty to use it."
+    "editorRatedFound": "Found automatically: inverter rated power {power}. Leave the field empty to use it.",
+    "detailVoltage": "Voltage {n}",
+    "detailLoadVoltage": "Load voltage {n}",
+    "detailFrequency": "Frequency",
+    "detailTempAc": "Inverter, AC side",
+    "detailTempDc": "Inverter, DC side",
+    "detailTempBattery": "Battery",
+    "detailBatPower": "Battery power"
   },
   "de": {
     "languageName": "Deutsch",
@@ -783,7 +790,14 @@ const TRANSLATIONS = {
     "editorSensor": "Sensor",
     "editorDetailName": "Name (optional)",
     "editorFoundN": "{n} automatisch gefunden",
-    "editorRatedFound": "Automatisch gefunden: Nennleistung des Wechselrichters {power}. Feld leer lassen, um sie zu verwenden."
+    "editorRatedFound": "Automatisch gefunden: Nennleistung des Wechselrichters {power}. Feld leer lassen, um sie zu verwenden.",
+    "detailVoltage": "Spannung {n}",
+    "detailLoadVoltage": "Spannung Verbraucher {n}",
+    "detailFrequency": "Frequenz",
+    "detailTempAc": "Wechselrichter, AC-Seite",
+    "detailTempDc": "Wechselrichter, DC-Seite",
+    "detailTempBattery": "Batterie",
+    "detailBatPower": "Batterieleistung"
   },
   "nl": {
     "languageName": "Nederlands",
@@ -1167,7 +1181,14 @@ const TRANSLATIONS = {
     "editorSensor": "Sensor",
     "editorDetailName": "Naam (optioneel)",
     "editorFoundN": "{n} automatisch gevonden",
-    "editorRatedFound": "Automatisch gevonden: nominaal vermogen van de omvormer {power}. Laat het veld leeg om dat te gebruiken."
+    "editorRatedFound": "Automatisch gevonden: nominaal vermogen van de omvormer {power}. Laat het veld leeg om dat te gebruiken.",
+    "detailVoltage": "Spanning {n}",
+    "detailLoadVoltage": "Spanning verbruikers {n}",
+    "detailFrequency": "Frequentie",
+    "detailTempAc": "Omvormer, AC-zijde",
+    "detailTempDc": "Omvormer, DC-zijde",
+    "detailTempBattery": "Batterij",
+    "detailBatPower": "Batterijvermogen"
   },
   "pl": {
     "languageName": "Polski",
@@ -1551,7 +1572,14 @@ const TRANSLATIONS = {
     "editorSensor": "Czujnik",
     "editorDetailName": "Nazwa (opcjonalnie)",
     "editorFoundN": "wykryto automatycznie: {n}",
-    "editorRatedFound": "Wykryto automatycznie moc znamionową falownika: {power}. Zostaw pole puste, żeby jej użyć."
+    "editorRatedFound": "Wykryto automatycznie moc znamionową falownika: {power}. Zostaw pole puste, żeby jej użyć.",
+    "detailVoltage": "Napięcie {n}",
+    "detailLoadVoltage": "Napięcie odbiorów {n}",
+    "detailFrequency": "Częstotliwość",
+    "detailTempAc": "Falownik, strona AC",
+    "detailTempDc": "Falownik, strona DC",
+    "detailTempBattery": "Magazyn",
+    "detailBatPower": "Moc magazynu"
   }
 };
 
@@ -2375,6 +2403,24 @@ function configuredInverter(hass, config) {
   return device.strings.size || device.other.length ? device : null;
 }
 
+function batteryReadingMeaning(key, unit) {
+  const number = key.match(/(\d)$/)?.[1] || "";
+  const kind = { V: "batVoltage", A: "batCurrent", W: "batPower", "°C": "tempBattery" }[unit] || "other";
+  return { id: kind === "other" ? key : `${kind}${number}`, kind, number };
+}
+
+// What a grid-side inverter reading is: the voltage of a phase (L1–L3, also
+// as R/S/T or A/B/C), the load side's voltage, the frequency, or other.
+function gridReadingMeaning(key, unit) {
+  if (unit === "Hz") return { id: "frequency", kind: "frequency", order: 9 };
+  const tail = key.replace(/\s+/g, "");
+  const match = tail.match(/L([123])$/i) || tail.match(/(?:RUA|SVB|TWC)$/i) || tail.match(/U([ABC])$/i) || tail.match(/phase([ABC123])/i);
+  const phase = !match ? null : /RUA$/i.test(tail) ? 1 : /SVB$/i.test(tail) ? 2 : /TWC$/i.test(tail) ? 3 : "1A".includes(match[1]?.toUpperCase()) ? 1 : "2B".includes(match[1]?.toUpperCase()) ? 2 : 3;
+  if (!phase) return { id: key, kind: "other", order: 8 };
+  const load = /load/i.test(key);
+  return { id: `${load ? "load" : "grid"}-${phase}`, kind: load ? "loadVoltage" : "voltage", phase, order: (load ? 3 : 0) + phase };
+}
+
 function inverterReadings(resolved, hass, config = {}) {
   const own = configuredInverter(hass, config);
   return own ? [own, ...deyeInverterReadings(resolved)] : deyeInverterReadings(resolved);
@@ -2399,14 +2445,21 @@ function deyeInverterReadings(resolved) {
       string[unit === "kW" ? "W" : unit] = { ...reading, value: unit === "kW" ? value * 1000 : value };
       device.strings.set(index, string);
     } else if (/^(battery|bms|bat)/i.test(key) && ["V", "A", "°C", "W"].includes(unit)) {
-      device.battery.push(reading);
+      // BatteryCurrent and BatteryTotalCurrent are the same reading on a
+      // single battery; numbered ones (BatteryCurrent2) are not.
+      const meaning = batteryReadingMeaning(key, unit);
+      if (!device.battery.some((r) => r.id === meaning.id)) device.battery.push({ ...reading, ...meaning });
     } else if (unit === "°C" || /temp/i.test(key)) {
-      device.temperatures.push(reading);
-    } else if ((unit === "Hz" || (unit === "V" && /grid|ac|phase|l\d|ua|ub|uc/i.test(key))) && device.grid.length < 6) {
-      device.grid.push(reading);
+      device.temperatures.push({ ...reading, kind: /^ac/i.test(key) ? "tempAc" : /^dc/i.test(key) ? "tempDc" : /batt|bms/i.test(key) ? "tempBattery" : "other" });
+    } else if (unit === "Hz" || (unit === "V" && /grid|ac|phase|l\d|ua|ub|uc/i.test(key))) {
+      // One reading per meaning: Deye reports the phase voltages twice
+      // (ACVoltageRUA and GridVoltageL1 are both L1).
+      const meaning = gridReadingMeaning(key, unit);
+      if (!device.grid.some((r) => r.id === meaning.id)) device.grid.push({ ...reading, ...meaning });
     }
     bySerial.set(serial, device);
   }
+  for (const device of bySerial.values()) device.grid = device.grid.sort((a, b) => a.order - b.order).slice(0, 7);
   return [...bySerial.values()].filter((d) => d.strings.size || d.temperatures.length || d.battery.length || d.grid.length);
 }
 
@@ -3014,13 +3067,18 @@ function readingLabel(key) {
   return key.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/_/g, " ").replace(/\s+/g, " ").trim();
 }
 
+// Labels for inverter readings recognised by their meaning.
+const DETAIL_LABELS = { tempAc: "detailTempAc", tempDc: "detailTempDc", tempBattery: "detailTempBattery", batVoltage: "batteryVoltage", batCurrent: "batteryCurrent", batPower: "detailBatPower" };
+
 function inverterHtml(m) {
   if (!m.inverterOpen) return "";
   const { t, locale } = m;
   const devices = m.inverter || [];
   const reading = (r) => `
     <button class="sfc-reading" data-entity="${escapeHtml(r.entityId)}">
-      <small>${escapeHtml(readingLabel(r.key))}</small>
+      <small>${escapeHtml(r.kind === "voltage" ? fill(t.detailVoltage, { n: `L${r.phase}` }) : r.kind === "loadVoltage" ? fill(t.detailLoadVoltage, { n: `L${r.phase}` })
+        : r.kind === "frequency" ? t.detailFrequency
+          : DETAIL_LABELS[r.kind] ? `${t[DETAIL_LABELS[r.kind]]}${r.number ? ` ${r.number}` : ""}` : readingLabel(r.key))}</small>
       <b>${escapeHtml(r.text ?? `${formatNumber(r.value, locale, Math.abs(r.value) < 100 ? 1 : 0)} ${r.unit}`.trim())}</b>
     </button>`;
   const group = (title, items) => items.length ? `

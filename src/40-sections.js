@@ -179,13 +179,18 @@ function readingLabel(key) {
   return key.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/_/g, " ").replace(/\s+/g, " ").trim();
 }
 
+// Labels for inverter readings recognised by their meaning.
+const DETAIL_LABELS = { tempAc: "detailTempAc", tempDc: "detailTempDc", tempBattery: "detailTempBattery", batVoltage: "batteryVoltage", batCurrent: "batteryCurrent", batPower: "detailBatPower" };
+
 function inverterHtml(m) {
   if (!m.inverterOpen) return "";
   const { t, locale } = m;
   const devices = m.inverter || [];
   const reading = (r) => `
     <button class="sfc-reading" data-entity="${escapeHtml(r.entityId)}">
-      <small>${escapeHtml(readingLabel(r.key))}</small>
+      <small>${escapeHtml(r.kind === "voltage" ? fill(t.detailVoltage, { n: `L${r.phase}` }) : r.kind === "loadVoltage" ? fill(t.detailLoadVoltage, { n: `L${r.phase}` })
+        : r.kind === "frequency" ? t.detailFrequency
+          : DETAIL_LABELS[r.kind] ? `${t[DETAIL_LABELS[r.kind]]}${r.number ? ` ${r.number}` : ""}` : readingLabel(r.key))}</small>
       <b>${escapeHtml(r.text ?? `${formatNumber(r.value, locale, Math.abs(r.value) < 100 ? 1 : 0)} ${r.unit}`.trim())}</b>
     </button>`;
   const group = (title, items) => items.length ? `

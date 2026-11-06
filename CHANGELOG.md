@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.8.0-beta.4
+
+- **Inverter details, clearer and without duplicates.** DeyeCloud reports some readings twice under different names (the phase voltages as ACVoltageRUA/SVB/TWC and as GridVoltageL1/L2/L3; BatteryCurrent and BatteryTotalCurrent), and the duplicates could push other readings out.
+  - Each reading now shows once.
+  - Each reading has a plain, translated name: Voltage L1–L3, Frequency, Inverter AC/DC side, Battery.
+
 ## 1.8.0-beta.3
 
 - **Unused PV inputs are hidden.** Inverters such as Deye report every PV input, also the ones with nothing connected (0 V, 0 A).

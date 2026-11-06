@@ -380,5 +380,12 @@
   "editorSensor": "Sensor",
   "editorDetailName": "Name (optional)",
   "editorFoundN": "{n} automatisch gefunden",
-  "editorRatedFound": "Automatisch gefunden: Nennleistung des Wechselrichters {power}. Feld leer lassen, um sie zu verwenden."
+  "editorRatedFound": "Automatisch gefunden: Nennleistung des Wechselrichters {power}. Feld leer lassen, um sie zu verwenden.",
+  "detailVoltage": "Spannung {n}",
+  "detailLoadVoltage": "Spannung Verbraucher {n}",
+  "detailFrequency": "Frequenz",
+  "detailTempAc": "Wechselrichter, AC-Seite",
+  "detailTempDc": "Wechselrichter, DC-Seite",
+  "detailTempBattery": "Batterie",
+  "detailBatPower": "Batterieleistung"
 }

@@ -583,6 +583,24 @@ function configuredInverter(hass, config) {
   return device.strings.size || device.other.length ? device : null;
 }
 
+function batteryReadingMeaning(key, unit) {
+  const number = key.match(/(\d)$/)?.[1] || "";
+  const kind = { V: "batVoltage", A: "batCurrent", W: "batPower", "°C": "tempBattery" }[unit] || "other";
+  return { id: kind === "other" ? key : `${kind}${number}`, kind, number };
+}
+
+// What a grid-side inverter reading is: the voltage of a phase (L1–L3, also
+// as R/S/T or A/B/C), the load side's voltage, the frequency, or other.
+function gridReadingMeaning(key, unit) {
+  if (unit === "Hz") return { id: "frequency", kind: "frequency", order: 9 };
+  const tail = key.replace(/\s+/g, "");
+  const match = tail.match(/L([123])$/i) || tail.match(/(?:RUA|SVB|TWC)$/i) || tail.match(/U([ABC])$/i) || tail.match(/phase([ABC123])/i);
+  const phase = !match ? null : /RUA$/i.test(tail) ? 1 : /SVB$/i.test(tail) ? 2 : /TWC$/i.test(tail) ? 3 : "1A".includes(match[1]?.toUpperCase()) ? 1 : "2B".includes(match[1]?.toUpperCase()) ? 2 : 3;
+  if (!phase) return { id: key, kind: "other", order: 8 };
+  const load = /load/i.test(key);
+  return { id: `${load ? "load" : "grid"}-${phase}`, kind: load ? "loadVoltage" : "voltage", phase, order: (load ? 3 : 0) + phase };
+}
+
 function inverterReadings(resolved, hass, config = {}) {
   const own = configuredInverter(hass, config);
   return own ? [own, ...deyeInverterReadings(resolved)] : deyeInverterReadings(resolved);
@@ -607,14 +625,21 @@ function deyeInverterReadings(resolved) {
       string[unit === "kW" ? "W" : unit] = { ...reading, value: unit === "kW" ? value * 1000 : value };
       device.strings.set(index, string);
     } else if (/^(battery|bms|bat)/i.test(key) && ["V", "A", "°C", "W"].includes(unit)) {
-      device.battery.push(reading);
+      // BatteryCurrent and BatteryTotalCurrent are the same reading on a
+      // single battery; numbered ones (BatteryCurrent2) are not.
+      const meaning = batteryReadingMeaning(key, unit);
+      if (!device.battery.some((r) => r.id === meaning.id)) device.battery.push({ ...reading, ...meaning });
     } else if (unit === "°C" || /temp/i.test(key)) {
-      device.temperatures.push(reading);
-    } else if ((unit === "Hz" || (unit === "V" && /grid|ac|phase|l\d|ua|ub|uc/i.test(key))) && device.grid.length < 6) {
-      device.grid.push(reading);
+      device.temperatures.push({ ...reading, kind: /^ac/i.test(key) ? "tempAc" : /^dc/i.test(key) ? "tempDc" : /batt|bms/i.test(key) ? "tempBattery" : "other" });
+    } else if (unit === "Hz" || (unit === "V" && /grid|ac|phase|l\d|ua|ub|uc/i.test(key))) {
+      // One reading per meaning: Deye reports the phase voltages twice
+      // (ACVoltageRUA and GridVoltageL1 are both L1).
+      const meaning = gridReadingMeaning(key, unit);
+      if (!device.grid.some((r) => r.id === meaning.id)) device.grid.push({ ...reading, ...meaning });
     }
     bySerial.set(serial, device);
   }
+  for (const device of bySerial.values()) device.grid = device.grid.sort((a, b) => a.order - b.order).slice(0, 7);
   return [...bySerial.values()].filter((d) => d.strings.size || d.temperatures.length || d.battery.length || d.grid.length);
 }
 
