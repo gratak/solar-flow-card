@@ -1,5 +1,5 @@
 {
-  "name": "Solar Flow Card",
+  "name": "Home Energy Hub",
   "filename": "solar-flow-card.js",
   "render_readme": true,
   "homeassistant": "2024.11.0"

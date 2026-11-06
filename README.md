@@ -1,6 +1,8 @@
-# Solar Flow Card
+# Home Energy Hub
 
-[![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz/docs/faq/custom_repositories/)
+*Formerly **Solar Flow Card**. Nothing changes for your dashboards: the card type stays `custom:solar-flow-card`.*
+
+[![HACS Default](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://hacs.xyz/)
 [![Release](https://img.shields.io/github/v/release/gratak/solar-flow-card?label=version)](https://github.com/gratak/solar-flow-card/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -8,11 +10,18 @@
 
 **[Try it in your browser](https://gratak.github.io/solar-flow-card/demo/)**: all themes, scenarios and languages on demo data, no installation needed.
 
-![Solar Flow Card themes](docs/themes.gif)
+![Home Energy Hub themes](docs/themes.gif)
 
-A Home Assistant dashboard card for solar installations with a battery: live power flow, charts, a battery forecast, inverter details and per-panel production, in ten themes, compact or wide.
+Your home's energy in one Home Assistant card:
+- **Live power flow** between solar, battery, grid and home.
+- **Charts and history:** today, the last days, the month, all time.
+- **Forecasts:** how long the battery lasts and the PV production forecast.
+- **Virtual storage** for hourly net-balancing tariffs.
+- **Installation details:** phases, inverter details and per-panel production.
 
-DeyeCloud sensors are found automatically; any other inverter works by pointing the card at its entities, see the [configuration guide for any inverter](docs/configuration.md).
+It comes in ten themes, compact or wide, as one card or split into several. It works with or without solar panels or a battery.
+
+DeyeCloud sensors are found automatically. Any other inverter works by picking its sensors in the visual editor; see also the [configuration guide for any inverter](docs/configuration.md).
 
 | Diorama | Aurora | Paper | LCARS |
 |---|---|---|---|
@@ -67,15 +76,11 @@ History comes from Home Assistant itself (recorder history and long-term statist
 
 ### HACS
 
-Click the button to open the card in HACS on your Home Assistant (HACS must be installed):
+The card is in the default HACS store. Click the button to open it in HACS on your Home Assistant (HACS must be installed):
 
 [![Open your Home Assistant instance and open this repository in the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=gratak&repository=solar-flow-card&category=plugin)
 
-Or add it by hand:
-
-1. HACS → ⋮ → **Custom repositories** → add `https://github.com/gratak/solar-flow-card`, type **Dashboard**.
-2. Search for **Solar Flow Card**, **Download**.
-3. Reload the browser. HACS adds the dashboard resource for you.
+Or search HACS for **Home Energy Hub**, **Download**, then reload the browser. HACS adds the dashboard resource for you.
 
 ### Manual
 

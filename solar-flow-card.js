@@ -1,5 +1,5 @@
 /*!
- * Solar Flow Card for Home Assistant
+ * Home Energy Hub for Home Assistant (formerly Solar Flow Card)
  * https://github.com/gratak/solar-flow-card
  * MIT License. The data layer started from the Energy Flow card of
  * hass-deyecloud by Trần Công Tuấn Anh (MIT).
@@ -7,7 +7,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "1.8.0-beta.4";
+const CARD_VERSION = "1.8.0";
 const CARD_TAG = "solar-flow-card";
 const EDITOR_TAG = "solar-flow-card-editor";
 const THEMES = ["diorama", "aurora", "paper", "lcars", "atlantis", "expanse", "foundation", "galaxy", "gate", "reactor"];
@@ -6198,7 +6198,7 @@ class SolarFlowCard extends HTMLElement {
     loader()
       .then((data) => SHARED_CACHE.set(key, { data, at: Date.now() }))
       .catch((error) => {
-        console.warn("Solar Flow Card: history unavailable", error);
+        console.warn("Home Energy Hub: history unavailable", error);
         SHARED_CACHE.set(key, { error: true, data: cached?.data, at: Date.now() });
       })
       .finally(() => {
@@ -6519,8 +6519,8 @@ class SolarFlowCard extends HTMLElement {
       this._wire(model);
       if (wide) this._balanceWide();
     } catch (error) {
-      console.error("Solar Flow Card render error", error);
-      this._paint(BASE_CSS + THEME_CSS.diorama, "sfc", `<div class="sfc-empty"><h2>Solar Flow Card</h2><p>${escapeHtml(error?.message || error)}</p></div>`);
+      console.error("Home Energy Hub render error", error);
+      this._paint(BASE_CSS + THEME_CSS.diorama, "sfc", `<div class="sfc-empty"><h2>Home Energy Hub</h2><p>${escapeHtml(error?.message || error)}</p></div>`);
     }
   }
 
@@ -7373,15 +7373,15 @@ window.customCards = window.customCards || [];
 if (!window.customCards.some((card) => card.type === CARD_TAG)) {
   window.customCards.push({
     type: CARD_TAG,
-    name: "Solar Flow Card",
-    description: "Solar, battery, grid and home power flow with charts, forecasts and nine themes.",
+    name: "Home Energy Hub",
+    description: "Your home's energy in one card: live power flow of solar, battery, grid and home, charts, forecasts, virtual storage, phases and inverter details, in ten themes. Formerly Solar Flow Card.",
     preview: true,
     documentationURL: "https://github.com/gratak/solar-flow-card",
   });
 }
 
 console.info(
-  `%c SOLAR FLOW CARD %c v${CARD_VERSION} `,
+  `%c HOME ENERGY HUB %c v${CARD_VERSION} `,
   "color:#fff;background:#f5a400;font-weight:700;padding:3px 6px;border-radius:4px 0 0 4px",
   "color:#f5a400;background:#fff6dc;font-weight:700;padding:3px 6px;border-radius:0 4px 4px 0"
 );

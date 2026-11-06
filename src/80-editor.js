@@ -734,15 +734,15 @@ window.customCards = window.customCards || [];
 if (!window.customCards.some((card) => card.type === CARD_TAG)) {
   window.customCards.push({
     type: CARD_TAG,
-    name: "Solar Flow Card",
-    description: "Solar, battery, grid and home power flow with charts, forecasts and nine themes.",
+    name: "Home Energy Hub",
+    description: "Your home's energy in one card: live power flow of solar, battery, grid and home, charts, forecasts, virtual storage, phases and inverter details, in ten themes. Formerly Solar Flow Card.",
     preview: true,
     documentationURL: "https://github.com/gratak/solar-flow-card",
   });
 }
 
 console.info(
-  `%c SOLAR FLOW CARD %c v${CARD_VERSION} `,
+  `%c HOME ENERGY HUB %c v${CARD_VERSION} `,
   "color:#fff;background:#f5a400;font-weight:700;padding:3px 6px;border-radius:4px 0 0 4px",
   "color:#f5a400;background:#fff6dc;font-weight:700;padding:3px 6px;border-radius:0 4px 4px 0"
 );

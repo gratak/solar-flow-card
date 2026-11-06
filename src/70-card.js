@@ -189,7 +189,7 @@ class SolarFlowCard extends HTMLElement {
     loader()
       .then((data) => SHARED_CACHE.set(key, { data, at: Date.now() }))
       .catch((error) => {
-        console.warn("Solar Flow Card: history unavailable", error);
+        console.warn("Home Energy Hub: history unavailable", error);
         SHARED_CACHE.set(key, { error: true, data: cached?.data, at: Date.now() });
       })
       .finally(() => {
@@ -510,8 +510,8 @@ class SolarFlowCard extends HTMLElement {
       this._wire(model);
       if (wide) this._balanceWide();
     } catch (error) {
-      console.error("Solar Flow Card render error", error);
-      this._paint(BASE_CSS + THEME_CSS.diorama, "sfc", `<div class="sfc-empty"><h2>Solar Flow Card</h2><p>${escapeHtml(error?.message || error)}</p></div>`);
+      console.error("Home Energy Hub render error", error);
+      this._paint(BASE_CSS + THEME_CSS.diorama, "sfc", `<div class="sfc-empty"><h2>Home Energy Hub</h2><p>${escapeHtml(error?.message || error)}</p></div>`);
     }
   }
 
