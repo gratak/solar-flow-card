@@ -387,5 +387,11 @@
   "detailTempAc": "Omvormer, AC-zijde",
   "detailTempDc": "Omvormer, DC-zijde",
   "detailTempBattery": "Batterij",
-  "detailBatPower": "Batterijvermogen"
+  "detailBatPower": "Batterijvermogen",
+  "editorPriceSensors": "Prijzen uit sensoren (optioneel)",
+  "editorPriceSensorsHint": "Voor prijzen die veranderen, bijv. een uurprijs of een dynamisch tarief: de besparing wordt dan per uur berekend, elk uur tegen zijn eigen prijs. Een sensor hier vervangt de vaste prijs hierboven.",
+  "editorPriceImportSensor": "Sensor afnameprijs",
+  "editorPriceExportSensor": "Sensor terugleverprijs",
+  "editorPriceUnit": "Eenheid {unit}: verwacht een prijs per kWh of MWh (bijv. EUR/kWh).",
+  "editorPriceNoStats": "Geen state_class: Home Assistant bewaart geen uurhistorie van deze prijs, dus voor elk uur wordt de huidige prijs gebruikt."
 }

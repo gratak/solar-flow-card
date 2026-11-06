@@ -253,6 +253,57 @@ class SolarFlowCard extends HTMLElement {
     return { store, net };
   }
 
+  // Savings when a price comes from a sensor: hour by hour (month by month
+  // for all time), each with its mean price. undefined with fixed prices
+  // (the summary works them out from the totals), null while loading.
+  _savings(resolved, period, energy) {
+    const config = this._config;
+    const prices = { import: priceSetting(config.price_import), export: priceSetting(config.price_export) };
+    if (!prices.import?.entity && !prices.export?.entity) return undefined;
+    if (!prices.import || typeof this._hass.callWS !== "function") return undefined;
+    const sources = sourcesKey(resolved.energy);
+    if (!sources) return undefined;
+    const states = this._hass.states;
+    const now = { import: currentPrice(states, prices.import), export: currentPrice(states, prices.export) ?? 0 };
+    let rows;
+    let start;
+    let statPeriod = "hour";
+    if (period === "all") {
+      if (!energy.buckets) return null;
+      rows = energy.buckets.map((b) => ({ ...b, at: b.start.getTime() }));
+      start = energy.spec.start;
+      statPeriod = "month";
+    } else {
+      start = period === "today" ? startOfDay(new Date()) : statsSpec(period).start;
+      const hourly = this._fetch(`hourly-energy|${sources}|${start.getTime()}`, 15 * 60000, () => loadHourlyEnergy(this._hass, resolved.energy, start));
+      if (!hourly.data) return null;
+      const hours = new Map();
+      for (const [name, map] of Object.entries(hourly.data)) {
+        for (const [at, kwh] of map) hours.set(at, { ...(hours.get(at) || { at }), [name]: kwh });
+      }
+      // Each hour with its consumption worked out, as in the totals.
+      rows = [...hours.values()].map((row) => ({ ...deriveLoadEnergy(row), at: row.at }));
+    }
+    const ids = Object.fromEntries(Object.entries(prices).filter(([, p]) => p?.entity).map(([name, p]) => [name, p.entity]));
+    const stats = this._fetch(`prices|${JSON.stringify(ids)}|${start.getTime()}|${statPeriod}`, 15 * 60000, () => loadPriceStats(this._hass, ids, start, statPeriod));
+    if (!stats.data) return null;
+    const price = (kind, at) => {
+      const setting = prices[kind];
+      if (!setting) return 0;
+      if (!setting.entity) return setting.value;
+      const mean = at === null ? undefined : stats.data[kind]?.get(at);
+      return mean ?? now[kind] ?? 0;
+    };
+    // What the hourly statistics do not cover yet (the current hour).
+    let rest = null;
+    if (period !== "all") {
+      const total = energy.totals || {};
+      const sum = (name) => rows.reduce((acc, r) => acc + (r[name] || 0), 0);
+      rest = Object.fromEntries(ENERGY_ORDER.filter((name) => isNum(total[name])).map((name) => [name, Math.max(0, total[name] - sum(name))]));
+    }
+    return pricedSavings(rows, rest, price, Boolean(virtualStorageConfig(config)));
+  }
+
   // Recorder history of the power sensors for today or the last 3 days,
   // shared by the chart and the day's highlights.
   _powerHistory(resolved, period) {
@@ -436,6 +487,7 @@ class SolarFlowCard extends HTMLElement {
       if (bank && !ids.live.soc && !ids.live.battery) ids.live.soc = bank.items[0].entityId;
       const now = new Date();
       const vstore = this._virtualStorage(resolved, config, period, now, today);
+      const money = this._savings(resolved, period, energy);
       this._introAt ??= Date.now();
       const introElapsed = (Date.now() - this._introAt) / 1000;
       const introAt = introElapsed < 2.6 ? introElapsed : null;
@@ -446,6 +498,7 @@ class SolarFlowCard extends HTMLElement {
         inverter?.map((d) => [[...d.strings.values()].map((s) => Object.values(s).map((r) => r.value)), d.temperatures.map((r) => r.value), d.battery.map((r) => r.value), d.grid.map((r) => r.value)]),
         vstore,
         [...this._collapsed],
+        isNum(money) ? Math.round(money * 100) : money,
         pvForecast && [pvForecast.total, pvForecast.remaining, pvForecast.days.map((d) => d.value)],
         Math.floor(now.getTime() / 60000),
       ]);
@@ -478,7 +531,7 @@ class SolarFlowCard extends HTMLElement {
         period,
         totals: energy.totals || {},
         energyLoading: Boolean(energy.loading),
-        summary: periodSummary(energy.totals || {}, config, t, locale, vstore.net),
+        summary: periodSummary(energy.totals || {}, config, t, locale, vstore.net, money),
         virtualStorage: vstore.store,
         since,
         chart,

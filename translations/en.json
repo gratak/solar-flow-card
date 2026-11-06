@@ -387,5 +387,11 @@
   "detailTempAc": "Inverter, AC side",
   "detailTempDc": "Inverter, DC side",
   "detailTempBattery": "Battery",
-  "detailBatPower": "Battery power"
+  "detailBatPower": "Battery power",
+  "editorPriceSensors": "Prices from sensors (optional)",
+  "editorPriceSensorsHint": "For prices that change, e.g. the hourly RCE price or a dynamic tariff: the savings are then worked out hour by hour, each hour at its own price. A sensor here replaces the fixed price above.",
+  "editorPriceImportSensor": "Import price sensor",
+  "editorPriceExportSensor": "Export price sensor",
+  "editorPriceUnit": "Unit {unit}: expected a price per kWh or MWh (e.g. PLN/kWh).",
+  "editorPriceNoStats": "No state_class: Home Assistant keeps no hourly history of this price, so the current price is used for every hour."
 }
