@@ -151,7 +151,8 @@ function pvForecastHtml(m) {
   const f = m.pvForecast;
   if (!f || !m.config.showSolar) return "";
   const { t, locale } = m;
-  const max = Math.max(0.1, ...f.days.map((d) => d.value), isNum(f.produced) ? f.produced : 0);
+  const max = Math.max(0.1, ...f.days.map((d) => Math.max(d.value, isNum(d.high) ? d.high : 0)), isNum(f.produced) ? f.produced : 0);
+  const pct = (v) => clamp((v / max) * 100, 0, 100).toFixed(1);
   const hint = pvForecastNote(m);
   return `
     <section class="sfc-section sfc-pvf">
@@ -162,11 +163,14 @@ function pvForecastHtml(m) {
       <div class="sfc-pvf-days">
         ${f.days.map((d) => {
           const done = d.today && isNum(f.produced) ? clamp((f.produced / max) * 100, 0, 100) : 0;
+          const ranged = isNum(d.low) && isNum(d.high);
+          const range = ranged ? fill(t.pvRange, { low: formatEnergy(d.low, locale), high: formatEnergy(d.high, locale) }) : "";
+          const title = d.today && isNum(f.produced) ? fill(t.pvProducedOf, { done: formatEnergy(f.produced, locale), total: formatEnergy(d.value, locale) }) : formatEnergy(d.value, locale);
           return `
           <button class="sfc-pvf-day ${d.today ? "today" : ""}" ${d.entityId ? `data-entity="${escapeHtml(d.entityId)}"` : ""}
-            title="${escapeHtml(d.today && isNum(f.produced) ? fill(t.pvProducedOf, { done: formatEnergy(f.produced, locale), total: formatEnergy(d.value, locale) }) : formatEnergy(d.value, locale))}">
+            title="${escapeHtml(range ? `${title} · ${range}` : title)}">
             <small>${escapeHtml(d.today ? t.periodToday : d.date.toLocaleDateString(locale, { weekday: "short", day: "numeric" }))}</small>
-            <span class="sfc-pvf-bar"><i style="width:${clamp((d.value / max) * 100, 0, 100).toFixed(1)}%"></i>${done ? `<b style="width:${done.toFixed(1)}%"></b>` : ""}</span>
+            <span class="sfc-pvf-bar"><i style="width:${pct(d.value)}%"></i>${done ? `<b style="width:${done.toFixed(1)}%"></b>` : ""}${ranged ? `<u style="left:${pct(d.low)}%;width:${(pct(d.high) - pct(d.low)).toFixed(1)}%"></u>` : ""}</span>
             <strong>${escapeHtml(formatEnergy(d.value, locale))}</strong>
           </button>`;
         }).join("")}
@@ -635,11 +639,12 @@ function powerChartHtml(source, t, locale, hidden) {
     battery: show("battery", source.battery),
     grid: show("grid", source.grid),
     soc: show("soc", source.soc),
+    forecast: show("forecast", source.forecast),
   };
   const W = 1000;
   const H = 300;
   const signed = [data.battery, data.grid].filter(Boolean).flat().filter((v) => v !== null);
-  const positive = [data.solar, data.load].filter(Boolean).flat().filter((v) => v !== null);
+  const positive = [data.solar, data.load, data.forecast].filter(Boolean).flat().filter((v) => v !== null);
   const maxValue = Math.max(100, ...positive, ...signed);
   const minValue = Math.min(0, ...signed);
   const step = niceStep(maxValue - minValue, 4);
@@ -666,6 +671,7 @@ function powerChartHtml(source, t, locale, hidden) {
     ["battery", t.legendBattery, source.battery],
     ["grid", t.legendGrid, source.grid],
     ["soc", t.legendSoc, source.soc],
+    ["forecast", t.legendForecast, source.forecast],
   ].filter(([, , series]) => series);
   const svg = `
     <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
@@ -677,6 +683,7 @@ function powerChartHtml(source, t, locale, hidden) {
       ${data.grid ? `<path class="sfc-line grid" d="${linePath(data.grid, x, y)}" />` : ""}
       ${data.load ? `<path class="sfc-line load" d="${linePath(data.load, x, y)}" />` : ""}
       ${data.soc ? `<path class="sfc-line soc" d="${linePath(data.soc, x, socY)}" />` : ""}
+      ${data.forecast ? `<path class="sfc-line forecast" d="${linePath(data.forecast, x, y)}" />` : ""}
     </svg>`;
   return chartFrame(
     legend,
@@ -732,7 +739,8 @@ function energyChartHtml(data, t, locale, hidden) {
     ticks.map((v) => `<span class="sfc-ylabel" style="top:${((y(v) / H) * 100).toFixed(2)}%">${escapeHtml(formatNumber(v, locale, step < 1 ? 1 : 0))} kWh</span>`).join(""),
     buckets.map((bucket, i) => {
       const text = label(bucket.start, i);
-      return text ? `<span style="left:${(((i + 0.5) / buckets.length) * 100).toFixed(2)}%">${escapeHtml(text)}</span>` : "";
+      // Under the middle of its bars.
+      return text ? `<span style="left:${(((i + 0.5) / buckets.length) * 100).toFixed(2)}%;transform:translateX(-50%)">${escapeHtml(text)}</span>` : "";
     }).join(""),
     "",
     hidden
@@ -749,7 +757,8 @@ function chartTipHtml(data, index, t, locale, hidden) {
       ["load", t.legendLoad, data.load],
       ["battery", t.legendBattery, data.battery],
       ["grid", t.legendGrid, data.grid],
-    ].filter(([kind, , series]) => series && !hidden.has(kind) && series[index] !== null);
+      ["forecast", t.legendForecast, data.forecast],
+    ].filter(([kind, , series]) => series && !hidden.has(kind) && isNum(series[index]));
     if (!rows.length) return null;
     const time = spec.period === "today"
       ? formatClock(at, locale)
