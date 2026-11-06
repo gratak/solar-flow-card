@@ -253,5 +253,7 @@
     "windy": "Windig",
     "windy-variant": "Windig, bewölkt",
     "exceptional": "Außergewöhnlich"
-  }
+  },
+  "chartFallback": "Stundenmittel aus der Energiestatistik. Kein Leistungsverlauf für: {sensors} (vom Recorder ausgeschlossen?)",
+  "chartNoHistory": "Kein Verlauf für: {sensors}. Vom Recorder ausgeschlossen?"
 }

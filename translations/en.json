@@ -253,5 +253,7 @@
   "pvForecastTitle": "PV forecast",
   "pvLeft": "≈ {kwh} to go",
   "pvForecastNote": "forecast {kwh}",
-  "pvProducedOf": "{done} of {total} produced so far"
+  "pvProducedOf": "{done} of {total} produced so far",
+  "chartFallback": "Hourly averages from the energy statistics. No power history for: {sensors} (excluded from the recorder?)",
+  "chartNoHistory": "No history for: {sensors}. Excluded from the recorder?"
 }

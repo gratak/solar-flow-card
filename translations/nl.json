@@ -253,5 +253,7 @@
   "pvForecastTitle": "PV-prognose",
   "pvLeft": "nog ≈ {kwh}",
   "pvForecastNote": "prognose {kwh}",
-  "pvProducedOf": "{done} van {total} opgewekt"
+  "pvProducedOf": "{done} van {total} opgewekt",
+  "chartFallback": "Uurgemiddelden uit de energiestatistieken. Geen vermogenshistorie voor: {sensors} (uitgesloten van de recorder?)",
+  "chartNoHistory": "Geen historie voor: {sensors}. Uitgesloten van de recorder?"
 }

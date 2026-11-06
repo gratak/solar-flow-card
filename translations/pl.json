@@ -253,5 +253,7 @@
   "pvForecastTitle": "Prognoza PV",
   "pvLeft": "jeszcze ≈ {kwh}",
   "pvForecastNote": "prognoza {kwh}",
-  "pvProducedOf": "wyprodukowano {done} z {total}"
+  "pvProducedOf": "wyprodukowano {done} z {total}",
+  "chartFallback": "Średnie godzinowe ze statystyk energii. Brak historii mocy dla: {sensors} (wyłączone z recordera?)",
+  "chartNoHistory": "Brak historii dla: {sensors}. Czy nie są wyłączone z recordera?"
 }

@@ -7,7 +7,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "1.7.0";
+const CARD_VERSION = "1.7.1";
 const CARD_TAG = "solar-flow-card";
 const EDITOR_TAG = "solar-flow-card-editor";
 const THEMES = ["diorama", "aurora", "paper", "lcars", "atlantis", "expanse", "foundation", "galaxy", "gate", "reactor"];
@@ -272,7 +272,268 @@ const TRANSLATIONS = {
     "pvForecastTitle": "PV forecast",
     "pvLeft": "≈ {kwh} to go",
     "pvForecastNote": "forecast {kwh}",
-    "pvProducedOf": "{done} of {total} produced so far"
+    "pvProducedOf": "{done} of {total} produced so far",
+    "chartFallback": "Hourly averages from the energy statistics. No power history for: {sensors} (excluded from the recorder?)",
+    "chartNoHistory": "No history for: {sensors}. Excluded from the recorder?"
+  },
+  "de": {
+    "languageName": "Deutsch",
+    "locale": "de-DE",
+    "currency": "€",
+    "hourShort": "h",
+    "minShort": "min",
+    "dayShort": "d",
+    "defaultTitle": "Hausenergie",
+    "live": "Live",
+    "delayed": "Verzögert",
+    "offline": "Offline",
+    "solar": "Solar",
+    "battery": "Batterie",
+    "grid": "Netz",
+    "home": "Haus",
+    "inverter": "Wechselrichter",
+    "generating": "Erzeugt",
+    "idle": "Inaktiv",
+    "charging": "Lädt",
+    "discharging": "Entlädt",
+    "importing": "Bezug",
+    "exporting": "Einspeisung",
+    "balanced": "Ausgeglichen",
+    "fromRoof": "vom Dach",
+    "inHome": "im Haus",
+    "periodToday": "Heute",
+    "period3d": "Letzte 3 Tage",
+    "period7d": "Letzte 7 Tage",
+    "periodMonth": "Dieser Monat",
+    "periodAll": "Gesamt",
+    "periodMonthShort": "Monat",
+    "periodAllShort": "Gesamt",
+    "since": "seit {date}",
+    "energy": "Energie",
+    "pvProduction": "PV-Erzeugung",
+    "consumption": "Verbrauch",
+    "gridImport": "Netzbezug",
+    "gridExport": "Netzeinspeisung",
+    "batteryCharge": "Batterieladung",
+    "batteryDischarge": "Batterieentladung",
+    "autarky": "Autarkie",
+    "selfUse": "Eigenverbrauch",
+    "savings": "Ersparnis",
+    "co2": "CO₂ vermieden",
+    "specificYield": "Ertrag pro kWp",
+    "legendPv": "PV",
+    "legendLoad": "Haus",
+    "legendBattery": "Batterie",
+    "legendGrid": "Netz",
+    "legendSoc": "SOC",
+    "chartLoading": "Verlauf wird geladen …",
+    "chartEmpty": "Für diesen Zeitraum liegt noch kein Verlauf vor",
+    "chartError": "Verlauf nicht verfügbar",
+    "chartPowerHint": "Batterie: oben = Entladung · Netz: oben = Bezug",
+    "batteryForecast": "Batterieprognose",
+    "fullIn": "Voll in {d}",
+    "fullAt": "ca. {time}",
+    "lastsFor": "Reicht für {d}",
+    "lastsUntil": "bis ca. {time} (bis {soc} %)",
+    "holding": "Hält den Stand",
+    "slowCharge": "Lädt langsam",
+    "slowDischarge": "Entlädt langsam",
+    "slowDetail": "mehr als 2 Tage bei dieser Rate",
+    "storedOf": "{kwh} von {cap}",
+    "inverterDetails": "Wechselrichter-Details",
+    "pvStrings": "PV-Strings",
+    "stringN": "String {n}",
+    "temperatures": "Temperaturen",
+    "batteryDetails": "Batterie",
+    "gridDetails": "Netz",
+    "noDetails": "Der Wechselrichter meldet keine passenden Messwerte.",
+    "close": "Schließen",
+    "panelsTitle": "Module",
+    "panelsHint": "Erzeugung heute",
+    "panelAvg": "Durchschnitt {kwh} pro Modul",
+    "panelWeak": "Schwächstes: {name} mit {pct} % des Medians",
+    "panelsEven": "Alle Module liegen innerhalb von 15 % des Medians",
+    "stringModules": "String {n} · {count} Module",
+    "panelsEstimateHint": "≈ {energy} pro Modul heute",
+    "panelEach": "≈ {power} pro Modul",
+    "panelsEstimateNote": "Schätzung: Diese Module haben keine Optimierer und melden keine eigenen Daten. Die Werte pro Modul ergeben sich aus der Leistung des Strings geteilt durch seine Module, die heutige Energie wird gleichmäßig auf alle Module verteilt.",
+    "paperHeadline": "{power} ins Haus",
+    "paperMix": "Gerade jetzt: {parts}.",
+    "paperOnly": "Gerade jetzt kommt alles aus {source}.",
+    "paperSun": "der Sonne",
+    "paperBattery": "der Batterie",
+    "paperGrid": "dem Netz",
+    "sankeyFrom": "Von",
+    "sankeyTo": "Nach",
+    "losses": "Verluste",
+    "otherSource": "Sonstige",
+    "paperLasts": "Bei dieser Rate reicht die Batterie bis {time}.",
+    "paperFull": "Die Batterie ist gegen {time} voll.",
+    "paperExport": "{power} gehen ins Netz.",
+    "paperDay": "Der bisherige Tag",
+    "lcarsTitle": "Energie · {name}",
+    "lcarsPvIn": "PV ein",
+    "lcarsBatIn": "Bat. ein",
+    "lcarsBatOut": "Bat. aus",
+    "lcarsGridIn": "Netz ein",
+    "lcarsGridOut": "Netz aus",
+    "lcarsHome": "Haus",
+    "lcarsPanels": "Module",
+    "stored": "Gespeichert",
+    "autonomy": "Autonomie bis",
+    "stateOfCharge": "Ladung",
+    "autarkyToday": "Autarkie heute",
+    "statusNominal": "Status: nominal",
+    "statusWarn": "Status: Vorsicht",
+    "statusAlert": "Status: Alarm",
+    "coreTitle": "Leistungskern",
+    "sector": "Sektor",
+    "supplying": "Liefert",
+    "absorbing": "Nimmt auf",
+    "sun": "Sonne",
+    "chipRoof": "Heute vom Dach",
+    "chipLasts": "Reicht bis",
+    "chipFull": "Voll um",
+    "chipStored": "Gespeichert",
+    "chipHome": "Heute verbraucht",
+    "whereFrom": "Woher der Strom heute kam",
+    "noData": "Keine Energiesensoren gefunden",
+    "noDataHelp": "Installiere die DeyeCloud-Integration oder lege die Entitäten in der Kartenkonfiguration fest.",
+    "editorTheme": "Design",
+    "expanseTitle": "Energieverteilung",
+    "foundationTitle": "Prime Radiant",
+    "foundationForecast": "Prognose",
+    "foundationSteady": "Die Batterie hält den Stand; der Plan bleibt auf Kurs.",
+    "galaxyTitle": "Energiesysteme",
+    "galaxyQuiet": "In diesem Sektor der Galaxis ist alles ruhig.",
+    "systemTitle": "Anlage",
+    "phaseSpread": "Phasenspreizung {power}",
+    "phaseGrid": "Netz {power}",
+    "inverterLoad": "Wechselrichter-Last",
+    "inverterOf": "{power} von {rated}",
+    "batteryTemperature": "Batterietemperatur",
+    "batteryVoltage": "Batteriespannung",
+    "batteryCurrent": "Batteriestrom",
+    "batteryCold": "Die Batterie ist kalt: Das Laden kann eingeschränkt sein.",
+    "batteryHot": "Die Batterie ist heiß: Das Laden kann eingeschränkt sein.",
+    "generatorRunning": "Generator läuft",
+    "gateTitle": "Energiekommando",
+    "gateSub": "Wählcomputer · Station",
+    "gateDial": "Wählsequenz",
+    "gateLocked": "{n} / {total} eingerastet",
+    "gateChevron": "Chevron {n}",
+    "gateOfCapacity": "{pct} % von {size}",
+    "gateInbound": "Datenverbindung aktiv · Batterie eingehend",
+    "gateOutbound": "Datenverbindung aktiv · Batterie ausgehend",
+    "gateExport": "Transfer nach außen · Netzeinspeisung",
+    "gateImport": "Eingehendes Datenverbindung · Netzbezug",
+    "gateIdle": "Gate im Leerlauf · Alle Systeme startbereit (wartend auf Einspeisung)",
+    "gateReserve": "Chevron 7 rastet nicht ein · Batterie auf Reserve",
+    "gateReserveLabel": "Reserve",
+    "insightsTitle": "Heute auf einen Blick",
+    "peakSolar": "Solarspitze",
+    "peakLoad": "Verbrauchsspitze",
+    "atTime": "um {time}",
+    "socRange": "Batterie heute",
+    "batteryCycles": "Batteriezyklen",
+    "offGrid": "Kein Netzbezug",
+    "compareTitle": "Vergleich",
+    "colYesterday": "Gestern",
+    "colAvg7": "7-Tage-Ø",
+    "colMonth": "Dieser Monat",
+    "themeNames": {
+      "diorama": "Diorama",
+      "aurora": "Aurora",
+      "paper": "Papier",
+      "lcars": "LCARS",
+      "atlantis": "Atlantis",
+      "expanse": "Expanse",
+      "foundation": "Foundation",
+      "galaxy": "Ferne Galaxis",
+      "gate": "Gate-Kommando",
+      "reactor": "Reaktor"
+    },
+    "editorTitle": "Titel",
+    "editorLanguage": "Sprache",
+    "languageAuto": "Home-Assistant-Sprache",
+    "editorStation": "DeyeCloud-Station",
+    "auto": "Automatisch",
+    "editorBatteryCapacity": "Batteriekapazität (kWh)",
+    "editorBatteryMinSoc": "Batteriereserve (%)",
+    "editorPvCapacity": "PV-Größe (kWp)",
+    "editorPvPanels": "Anzahl der Module",
+    "editorPanelsPerString": "Module pro String",
+    "editorStringPanels": "PV{n} · jetzt {volts}",
+    "editorStringsHint": "Module je String. Ohne Optimierer schätzt die Karte jedes Modul aus der Leistung seines Strings; ungenutzte Strings leer lassen.",
+    "editorInverterRating": "Wechselrichter-Nennleistung (kW)",
+    "editorPriceImport": "Bezugspreis pro kWh",
+    "editorPriceExport": "Einspeisepreis pro kWh",
+    "editorCurrency": "Währung",
+    "editorCo2": "Netz-CO₂ (kg pro kWh)",
+    "editorShowEnergy": "Energie anzeigen",
+    "editorShowChart": "Diagramm anzeigen",
+    "editorShowForecast": "Batterieprognose anzeigen",
+    "editorShowSystem": "Anlage (Phasen, Wechselrichter-Last, Batterie)",
+    "editorShowPanels": "Module anzeigen (Optimierer)",
+    "editorShowWeather": "Wetter in den Designs Diorama und Reaktor",
+    "editorWide": "Breites Layout (auf einem breiten Dashboard)",
+    "editorInsights": "Heute auf einen Blick und Vergleich",
+    "editorSolar": "Die Anlage hat PV-Module",
+    "editorBattery": "Die Anlage hat eine Batterie",
+    "editorShowSelfSufficiency": "Autarkie anzeigen",
+    "autarkyHourly": "Autarkie mit Stundenbilanz",
+    "computedHint": "Aus den anderen Sensoren berechnet",
+    "editorAnimation": "Animationen",
+    "editorCollapsible": "Einklappbare Abschnitte (Titel antippen)",
+    "editorFonts": "Theme-Schriften laden (Google Fonts)",
+    "editorGlass": "Glas-Hintergrund (der Dashboard-Hintergrund scheint durch)",
+    "editorHint": "DeyeCloud-Sensoren werden automatisch gefunden. Andere Wechselrichter: Entitäten in YAML festlegen (siehe README).",
+    "editorPanelsAverage": "Moduldurchschnitt und schwächstes Modul pro String",
+    "editorShowCo2": "Vermiedenes CO₂ anzeigen",
+    "editorShowSavings": "Ersparnis anzeigen",
+    "editorShowSelfUse": "Eigenverbrauch anzeigen",
+    "editorShowYield": "Ertrag pro kWp anzeigen",
+    "otherDetails": "Weitere Messwerte",
+    "panelEachToday": "≈ {power} und heute {kwh} pro Modul",
+    "pvForecastNote": "Prognose {kwh}",
+    "pvForecastTitle": "PV-Prognose",
+    "pvLeft": "noch ≈ {kwh}",
+    "pvProducedOf": "{done} von {total} bisher erzeugt",
+    "reactorGrid": "Netzunterstützung",
+    "reactorNominal": "Nennleistung",
+    "reactorOverdrive": "Overdrive",
+    "reactorPvShare": "{pct} % Solarleistung",
+    "reactorReserve": "Reserveenergie",
+    "reactorScan": "Atmosphärenscan",
+    "reactorStandby": "Standby",
+    "reactorTelemetry": "Telemetrie",
+    "reactorTitle": "Reaktor · Energiesysteme",
+    "vsDay": "Heute: {h} h mit Überschuss · {kwh} verrechnet",
+    "vsDeficit": "Defizit in dieser Stunde",
+    "vsNone": "Kein Überschuss in dieser Stunde",
+    "vsResetsIn": "wird in {m} min zurückgesetzt",
+    "vsShort": "Virtueller Speicher",
+    "vsSurplus": "Überschuss in dieser Stunde",
+    "vsTitle": "Virtueller Speicher · Stundenbilanz",
+    "weatherNames": {
+      "sunny": "Sonnig",
+      "clear-night": "Klare Nacht",
+      "partlycloudy": "Teilweise bewölkt",
+      "cloudy": "Bewölkt",
+      "fog": "Nebel",
+      "rainy": "Regen",
+      "pouring": "Starkregen",
+      "snowy": "Schnee",
+      "snowy-rainy": "Schneeregen",
+      "hail": "Hagel",
+      "lightning": "Gewitter",
+      "lightning-rainy": "Gewitter, Regen",
+      "windy": "Windig",
+      "windy-variant": "Windig, bewölkt",
+      "exceptional": "Außergewöhnlich"
+    },
+    "chartFallback": "Stundenmittel aus der Energiestatistik. Kein Leistungsverlauf für: {sensors} (vom Recorder ausgeschlossen?)",
+    "chartNoHistory": "Kein Verlauf für: {sensors}. Vom Recorder ausgeschlossen?"
   },
   "nl": {
     "languageName": "Nederlands",
@@ -529,7 +790,9 @@ const TRANSLATIONS = {
     "pvForecastTitle": "PV-prognose",
     "pvLeft": "nog ≈ {kwh}",
     "pvForecastNote": "prognose {kwh}",
-    "pvProducedOf": "{done} van {total} opgewekt"
+    "pvProducedOf": "{done} van {total} opgewekt",
+    "chartFallback": "Uurgemiddelden uit de energiestatistieken. Geen vermogenshistorie voor: {sensors} (uitgesloten van de recorder?)",
+    "chartNoHistory": "Geen historie voor: {sensors}. Uitgesloten van de recorder?"
   },
   "pl": {
     "languageName": "Polski",
@@ -786,7 +1049,9 @@ const TRANSLATIONS = {
     "pvForecastTitle": "Prognoza PV",
     "pvLeft": "jeszcze ≈ {kwh}",
     "pvForecastNote": "prognoza {kwh}",
-    "pvProducedOf": "wyprodukowano {done} z {total}"
+    "pvProducedOf": "wyprodukowano {done} z {total}",
+    "chartFallback": "Średnie godzinowe ze statystyk energii. Brak historii mocy dla: {sensors} (wyłączone z recordera?)",
+    "chartNoHistory": "Brak historii dla: {sensors}. Czy nie są wyłączone z recordera?"
   }
 };
 
@@ -2566,12 +2831,14 @@ function chartHtml(m) {
   const chart = m.chart;
   if (!chart) return "";
   let body;
-  if (chart.data?.kind === "power" && ["solar", "load", "battery", "grid"].some((k) => chart.data[k]?.some((v) => v !== null))) {
+  if (chart.data?.kind === "power" && hasPowerSeries(chart.data)) {
     body = powerChartHtml(chart.data, m.t, m.locale, m.hiddenSeries);
+    if (chart.data.fallback) body += `<p class="sfc-chart-note">${escapeHtml(fill(m.t.chartFallback, { sensors: sensorList(chart.missing || []) }))}</p>`;
   } else if (chart.data?.kind === "energy" && chart.data.buckets?.some((b) => b.solar || b.load)) {
     body = energyChartHtml(chart.data, m.t, m.locale, m.hiddenSeries);
   } else {
-    const message = chart.loading ? m.t.chartLoading : chart.error ? m.t.chartError : m.t.chartEmpty;
+    const message = chart.loading ? m.t.chartLoading : chart.error ? m.t.chartError
+      : chart.missing?.length ? fill(m.t.chartNoHistory, { sensors: sensorList(chart.missing) }) : m.t.chartEmpty;
     body = `<div class="sfc-chart-empty">${escapeHtml(message)}</div>`;
   }
   return `<div class="sfc-chart ${chart.loading ? "loading" : ""}">${body}</div>`;
@@ -2801,7 +3068,58 @@ async function loadPowerHistory(hass, spec, live) {
     const scale = unitScale(live[name]?.stateObj, POWER_SCALE);
     series[name] = bucketHistory(historyPoints(response?.[entityId]).map(([t, v]) => [t, v * scale]), spec.start.getTime(), spec.count, spec.bucketMs, nowMs);
   }
-  return { series };
+  // Power sensors without any recorded value in the period (e.g. excluded
+  // from the recorder), named when the chart has to explain itself.
+  const missing = [...new Set(Object.entries(sources)
+    .filter(([name]) => name !== "soc" && !series[name].some((v) => v !== null))
+    .map(([, entityId]) => entityId))];
+  return { series, missing };
+}
+
+// Hourly energy statistics since `start` (kWh per hour), for drawing the
+// power chart when the power sensors have no history.
+async function loadHourlyEnergy(hass, energy, start) {
+  const sources = Object.fromEntries(ENERGY_ORDER.map((name) => [name, energy[name]?.entityId]).filter(([, id]) => id));
+  const response = await hass.callWS({
+    type: "recorder/statistics_during_period",
+    start_time: start.toISOString(),
+    end_time: new Date().toISOString(),
+    statistic_ids: [...new Set(Object.values(sources))],
+    period: "hour",
+    types: ["change"],
+    units: { energy: "kWh" },
+  });
+  const out = {};
+  for (const [name, entityId] of Object.entries(sources)) {
+    const hours = new Map();
+    for (const row of response?.[entityId] || []) hours.set(statStart(row.start), Math.max(0, Number(row.change) || 0));
+    if (hours.size) out[name] = hours;
+  }
+  return out;
+}
+
+// The hourly energy as the average power of each hour, on the chart's
+// buckets: kWh in one hour = average kW.
+function hourlyPowerSeries(hourly, spec) {
+  const series = {};
+  for (const [name, hours] of Object.entries(hourly)) {
+    series[name] = Array.from({ length: spec.count }, (_, i) => {
+      const at = new Date(spec.start.getTime() + i * spec.bucketMs);
+      at.setMinutes(0, 0, 0);
+      const kwh = hours.get(at.getTime());
+      return isNum(kwh) ? kwh * 1000 : null;
+    });
+  }
+  return series;
+}
+
+function hasPowerSeries(data) {
+  return ["solar", "load", "battery", "grid"].some((k) => data?.[k]?.some((v) => v !== null));
+}
+
+// "sensor.a, sensor.b and 2 more" for the chart's notes.
+function sensorList(ids) {
+  return ids.length > 3 ? `${ids.slice(0, 3).join(", ")} (+${ids.length - 3})` : ids.join(", ");
 }
 
 
@@ -4273,6 +4591,8 @@ const BASE_CSS = `
   .sfc-tip span { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 6px; color: var(--sfc-muted); }
   .sfc-tip b { color: var(--sfc-text); }
   .sfc-chart-hint { margin: 2px 0 0; color: var(--sfc-muted); font-size: 10px; }
+  .sfc-chart-note { margin: 6px 0 0; padding: 6px 9px; border-radius: 8px; background: var(--sfc-accent-soft, transparent); border: 1px dashed var(--sfc-border); color: var(--sfc-muted); font-size: 11px; line-height: 1.35; }
+  .sfc-chart-empty { padding: 0 14px; text-align: center; }
   .sfc-chart-empty { display: grid; place-items: center; height: 110px; border: 1px dashed var(--sfc-border); border-radius: 12px; color: var(--sfc-muted); font-size: 12px; }
 
   .sfc-wide-rest { display: grid; gap: inherit; }
@@ -5407,11 +5727,21 @@ class SolarFlowCard extends HTMLElement {
       const history = this._powerHistory(resolved, period);
       if (!history) return null;
       const { entry, spec } = history;
+      const data = entry.data ? this._powerChartData(entry.data.series, spec) : null;
+      const chart = { loading: entry.loading, error: entry.error, at: entry.at, data };
+      if (!entry.data || hasPowerSeries(data)) return chart;
+      // No power history (sensors kept out of the recorder): the average
+      // power of each hour from the energy statistics instead.
+      chart.missing = entry.data.missing;
+      const sources = sourcesKey(resolved.energy);
+      if (!sources) return chart;
+      const hourly = this._fetch(`hourly-energy|${sources}|${spec.start.getTime()}`, 15 * 60000, () => loadHourlyEnergy(this._hass, resolved.energy, spec.start));
+      const fallback = hourly.data ? this._powerChartData(hourlyPowerSeries(hourly.data, spec), spec) : null;
       return {
-        loading: entry.loading,
-        error: entry.error,
-        at: entry.at,
-        data: entry.data ? this._powerChartData(entry.data.series, spec) : null,
+        ...chart,
+        loading: entry.loading || hourly.loading,
+        at: [entry.at, hourly.at],
+        data: hasPowerSeries(fallback) ? { ...fallback, soc: null, fallback: true } : data,
       };
     }
     if (energy.error && !energy.buckets) return { error: true };
