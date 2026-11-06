@@ -583,6 +583,26 @@ function configuredInverter(hass, config) {
   return device.strings.size || device.other.length ? device : null;
 }
 
+// Readings that only repeat another one:
+// - a numbered battery reading at zero (no second battery);
+// - a single numbered one equal to the total;
+// - the load side's voltage equal to the grid's on the same phase (it only
+//   differs when the inverter runs off-grid).
+function withoutEchoes(readings) {
+  const near = (a, b, tolerance) => Math.abs(a - b) <= tolerance;
+  return readings.filter((r, _, all) => {
+    if (r.kind === "loadVoltage") {
+      const grid = all.find((g) => g.kind === "voltage" && g.phase === r.phase);
+      return !grid || !near(r.value, grid.value, 3);
+    }
+    if (!r.number) return true;
+    const total = all.find((t) => t.kind === r.kind && !t.number);
+    const numbered = all.filter((n) => n.kind === r.kind && n.number && Math.abs(n.value) > 0.05);
+    if (Math.abs(r.value) <= 0.05 && (total || numbered.length)) return false;
+    return !(total && numbered.length === 1 && near(r.value, total.value, Math.max(0.1, Math.abs(total.value) * 0.02)));
+  });
+}
+
 function batteryReadingMeaning(key, unit) {
   const number = key.match(/(\d)$/)?.[1] || "";
   const kind = { V: "batVoltage", A: "batCurrent", W: "batPower", "°C": "tempBattery" }[unit] || "other";
@@ -639,7 +659,10 @@ function deyeInverterReadings(resolved) {
     }
     bySerial.set(serial, device);
   }
-  for (const device of bySerial.values()) device.grid = device.grid.sort((a, b) => a.order - b.order).slice(0, 7);
+  for (const device of bySerial.values()) {
+    device.grid = withoutEchoes(device.grid.sort((a, b) => a.order - b.order)).slice(0, 7);
+    device.battery = withoutEchoes(device.battery);
+  }
   return [...bySerial.values()].filter((d) => d.strings.size || d.temperatures.length || d.battery.length || d.grid.length);
 }
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.8.0-beta.5
+
+- **Inverter details, full names:** each tile is as wide as its name and the row is filled, instead of narrow tiles with truncated names and empty space next to them.
+- **No more echoes:**
+  - a numbered battery reading at zero (an empty second battery input) is hidden;
+  - a single numbered one that equals the total is hidden;
+  - the load-side voltage is shown only when it differs from the grid's, for example when running off-grid.
+
 ## 1.8.0-beta.4
 
 **Solar Flow Card is now Home Energy Hub.** It has grown into a hub for the whole home's energy, with or without solar or a battery, so it got a name to match. Nothing changes for your dashboards: the card type stays `custom:solar-flow-card`, the repository and the file name stay the same, and updates keep coming through HACS as before.

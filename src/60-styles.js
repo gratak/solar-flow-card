@@ -130,8 +130,9 @@ const BASE_CSS = `
   .sfc-string span { font-size: 12px; font-weight: 700; }
   .sfc-string b { grid-row: span 2; align-self: center; font-size: 15px; font-family: var(--sfc-num-font, inherit); }
   .sfc-string small { color: var(--sfc-muted); font-size: 11px; }
-  .sfc-readings { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 7px; }
-  .sfc-reading { padding: 8px 10px; }
+  /* Each tile as wide as its name (up to a limit), the row filled. */
+  .sfc-readings { display: flex; flex-wrap: wrap; gap: 7px; }
+  .sfc-reading { flex: 1 1 auto; min-width: 96px; max-width: 260px; padding: 8px 10px; }
   .sfc-reading small { display: block; color: var(--sfc-muted); font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sfc-reading b { display: block; margin-top: 2px; font-size: 13px; font-family: var(--sfc-num-font, inherit); }
   .sfc-empty-note { margin: 0; color: var(--sfc-muted); font-size: 12px; }
@@ -208,7 +209,6 @@ const BASE_CSS = `
     .sfc-wide-rest { grid-column: 2; align-content: start; gap: 14px; padding: 0 16px 16px 4px; }
     .gt-layout.wide > .sfc-sections { display: block; columns: 320px; column-gap: 14px; }
     .gt-layout.wide > .sfc-sections > * { break-inside: avoid; margin-bottom: 14px; }
-    :is(.sfc-wide, .lc-main.wide, .gt-layout.wide) .sfc-readings { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
     :is(.sfc-wide, .lc-main.wide, .gt-layout.wide) .sfc-strings:not(.sfc-panel-strings) { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
     .sfc-wide-main > :last-child { margin-bottom: 16px; }
     .sfc-wide-fill:not(:empty) { display: grid; gap: 14px; padding: 0 4px 0 16px; }
