@@ -83,6 +83,7 @@ export function createHass({ scenario = "afternoon", language = "pl", weather, o
   inverter("BatteryVoltage", 52.8, "V");
   inverter("BatteryCurrent", -live.batteryPower / 52.8, "A");
   inverter("GridFrequency", 50.01, "Hz");
+  inverter("ACOutputFrequency", 50.0, "Hz");
   inverter("ACVoltageRUA", 231.5, "V");
   inverter("Temperature- Battery", scenario === "night" ? 7.5 : 18.5, "°C");
   inverter("BatteryTotalCurrent", Math.abs(live.batteryPower) / 52.8, "A");

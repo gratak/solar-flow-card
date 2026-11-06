@@ -380,5 +380,12 @@
   "editorSensor": "Sensor",
   "editorDetailName": "Naam (optioneel)",
   "editorFoundN": "{n} automatisch gevonden",
-  "editorRatedFound": "Automatisch gevonden: nominaal vermogen van de omvormer {power}. Laat het veld leeg om dat te gebruiken."
+  "editorRatedFound": "Automatisch gevonden: nominaal vermogen van de omvormer {power}. Laat het veld leeg om dat te gebruiken.",
+  "detailVoltage": "Spanning {n}",
+  "detailLoadVoltage": "Spanning verbruikers {n}",
+  "detailFrequency": "Frequentie",
+  "detailTempAc": "Omvormer, AC-zijde",
+  "detailTempDc": "Omvormer, DC-zijde",
+  "detailTempBattery": "Batterij",
+  "detailBatPower": "Batterijvermogen"
 }

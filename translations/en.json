@@ -380,5 +380,12 @@
   "editorSensor": "Sensor",
   "editorDetailName": "Name (optional)",
   "editorFoundN": "{n} found automatically",
-  "editorRatedFound": "Found automatically: inverter rated power {power}. Leave the field empty to use it."
+  "editorRatedFound": "Found automatically: inverter rated power {power}. Leave the field empty to use it.",
+  "detailVoltage": "Voltage {n}",
+  "detailLoadVoltage": "Load voltage {n}",
+  "detailFrequency": "Frequency",
+  "detailTempAc": "Inverter, AC side",
+  "detailTempDc": "Inverter, DC side",
+  "detailTempBattery": "Battery",
+  "detailBatPower": "Battery power"
 }
