@@ -1,5 +1,7 @@
 # Home Energy Hub
 
+**Your home's energy in one Home Assistant card:** live power flow, charts, battery and PV forecasts, virtual storage, phases and inverter details in ten themes. Any inverter, with or without solar or a battery; DeyeCloud set up automatically.
+
 *Formerly **Solar Flow Card**. Nothing changes for your dashboards: the card type stays `custom:solar-flow-card`.*
 
 [![HACS Default](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://hacs.xyz/)
