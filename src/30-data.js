@@ -749,7 +749,9 @@ function kwhOf(stateObj) {
   return value === null ? null : value * unitScale(stateObj, ENERGY_SCALE);
 }
 
-function systemData(hass, resolved, config) {
+// The installation sensors (SYSTEM_METRICS): from `entities:`, else the
+// first DeyeCloud inverter's device sensors.
+function systemEntities(hass, resolved, config) {
   const states = hass?.states || {};
   const configured = config.entities || {};
   // Device sensors of the first inverter, by normalized key.
@@ -768,6 +770,11 @@ function systemData(hass, resolved, config) {
     if (id && states[id]) found[name] = { entityId: id, stateObj: states[id] };
     else found[name] = def.deye.map((key) => byKey.get(normalizeKey(key))).find((entry) => entry && stateNumber(entry.stateObj) !== null) || null;
   }
+  return found;
+}
+
+function systemData(hass, resolved, config) {
+  const found = systemEntities(hass, resolved, config);
   const watts = (name) => (found[name] ? wattsOf(found[name].stateObj) : null);
   const number = (name) => (found[name] ? stateNumber(found[name].stateObj) : null);
   const gridSign = config.invert_grid ? -1 : 1;

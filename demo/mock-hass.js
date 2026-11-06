@@ -72,6 +72,12 @@ export function createHass({ scenario = "afternoon", language = "pl", weather, o
   inverter("DCVoltagePV2", pv2 ? 331.4 : 11.8, "V");
   inverter("DCCurrentPV2", pv2 / 331.4, "A");
   inverter("DCPowerPV2", pv2, "W");
+  // Unused inputs: Deye inverters report them as 0 V / 0 A.
+  for (const n of [3, 4]) {
+    inverter(`DCVoltagePV${n}`, 0, "V");
+    inverter(`DCCurrentPV${n}`, 0, "A");
+    inverter(`DCPowerPV${n}`, 0, "W");
+  }
   inverter("ACTemperature", 41.2, "°C");
   inverter("DCTemperature", 37.5, "°C");
   inverter("BatteryVoltage", 52.8, "V");

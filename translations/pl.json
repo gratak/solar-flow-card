@@ -378,5 +378,7 @@
   "editorPanelPower": "Moc (opcjonalnie)",
   "editorDetailsHint": "Dowolne czujniki pokazywane jako kafelki w Szczegółach falownika, np. temperatura lub status.",
   "editorSensor": "Czujnik",
-  "editorDetailName": "Nazwa (opcjonalnie)"
+  "editorDetailName": "Nazwa (opcjonalnie)",
+  "editorFoundN": "wykryto automatycznie: {n}",
+  "editorRatedFound": "Wykryto automatycznie moc znamionową falownika: {power}. Zostaw pole puste, żeby jej użyć."
 }

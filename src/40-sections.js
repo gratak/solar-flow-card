@@ -196,7 +196,7 @@ function inverterHtml(m) {
       <div class="sfc-group">
         <h4>${escapeHtml(t.pvStrings)}</h4>
         <div class="sfc-strings">
-          ${[...device.strings.entries()].sort((a, b) => a[0] - b[0]).map(([index, s]) => `
+          ${shownStrings(device, m.config).map(([index, s]) => `
             <button class="sfc-string" data-entity="${escapeHtml((s.W || s.V || s.A).entityId)}">
               <span>${escapeHtml(fill(t.stringN, { n: index }))}</span>
               <b>${escapeHtml(s.W ? formatPower(s.W.value, locale) : "—")}</b>
@@ -216,6 +216,16 @@ function inverterHtml(m) {
       </div>
       ${content}
     </section>`;
+}
+
+// The PV strings worth showing: as many as `panels_per_string` lists, else
+// the ones in use while any string produces (inverters report unused inputs
+// as 0 V / 0 A; at night all read zero and all are shown).
+function shownStrings(device, config) {
+  const strings = [...device.strings.entries()].sort((a, b) => a[0] - b[0]);
+  if (Array.isArray(config.panels_per_string) && config.panels_per_string.length) return strings.slice(0, config.panels_per_string.length);
+  const used = ([, s]) => (s.V?.value ?? 0) > 5 || (s.A?.value ?? 0) > 0.05 || (s.W?.value ?? 0) > ACTIVE_W;
+  return strings.some(used) ? strings.filter(used) : strings;
 }
 
 function panelsHtml(m) {

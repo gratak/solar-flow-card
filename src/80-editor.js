@@ -106,7 +106,9 @@ function fieldNotes(hass, config, t, kind, value, auto) {
 function fieldValue(stateObj, kind, locale) {
   if (kind === "power") return formatPower(wattsOf(stateObj), locale);
   if (kind === "energy") return formatEnergy(kwhOf(stateObj), locale);
-  return `${stateObj.state} ${stateUnit(stateObj)}`.trim();
+  const number = stateNumber(stateObj);
+  const shown = number === null ? stateObj.state : formatNumber(number, locale, Math.abs(number) < 10 ? 2 : Math.abs(number) < 1000 ? 1 : 0);
+  return `${shown} ${stateUnit(stateObj)}`.trim();
 }
 
 // Numbers that look entered in the wrong unit: [key, limit, label key, factor].
@@ -119,6 +121,8 @@ class SolarFlowCardEditor extends HTMLElement {
     this._config = {};
     this._hass = null;
     this._open = new Set(["look"]);
+    // Boxes inside the groups opened or closed by the user: id -> open.
+    this._boxes = new Map();
   }
 
   set hass(hass) {
@@ -308,6 +312,10 @@ class SolarFlowCardEditor extends HTMLElement {
       </div>`;
   }
 
+  _boxOpen(id, fallback) {
+    return this._boxes.has(id) ? this._boxes.get(id) : fallback;
+  }
+
   _group(id, t, body) {
     const open = this._open.has(id);
     return `
@@ -354,12 +362,27 @@ class SolarFlowCardEditor extends HTMLElement {
     } catch (error) {
       // No hints from the current setup.
     }
-    // What DeyeCloud (or the card) found for an empty field.
+    // What DeyeCloud (or the card) found for an empty field: live power and
+    // energy, the installation readings and the inverter's PV strings.
+    let system = {};
+    let strings = new Map();
+    try {
+      if (resolved) {
+        system = systemEntities(this._hass, resolved, this._config);
+        strings = deyeInverterReadings(resolved).find((d) => d.strings.size)?.strings || new Map();
+      }
+    } catch (error) {
+      // No hints for these.
+    }
     const autoFor = (key) => {
       if (entities[key] || !resolved) return null;
       const live = Object.entries(LIVE_METRICS).find(([, def]) => def.key === key);
       const energy = Object.entries(ENERGY_METRICS).find(([, def]) => def.key === key);
-      return (live && resolved.live[live[0]]) || (energy && resolved.energy[energy[0]]) || null;
+      const sys = Object.entries(SYSTEM_METRICS).find(([, def]) => def.key === key);
+      const pv = key.match(/^pv(\d)_(power|voltage|current)$/);
+      const reading = pv && strings.get(Number(pv[1]))?.[{ power: "W", voltage: "V", current: "A" }[pv[2]]];
+      const fromReading = reading && this._hass?.states?.[reading.entityId] ? { entityId: reading.entityId, stateObj: this._hass.states[reading.entityId] } : null;
+      return (live && resolved.live[live[0]]) || (energy && resolved.energy[energy[0]]) || (sys && system[sys[0]]) || fromReading || null;
     };
     const extra = (key) => {
       const notes = [];
@@ -378,11 +401,11 @@ class SolarFlowCardEditor extends HTMLElement {
     return `
       <p class="hint">${escapeHtml(t.editorSensorsHint)}</p>
       ${editorEntityGroups(t).map(([group, items]) => `
-        <details class="box" ${group === "live" || group === "energy" || items.some(([key]) => entities[key]) ? "open" : ""}>
-          <summary class="title">${escapeHtml(t.editorEntityGroups[group])}</summary>
+        <details class="box" data-box="entities-${group}" ${this._boxOpen(`entities-${group}`, group === "live" || group === "energy" || items.some(([key]) => entities[key])) ? "open" : ""}>
+          <summary class="title">${escapeHtml(t.editorEntityGroups[group])}${(() => { const n = items.filter(([key]) => !entities[key] && autoFor(key)).length; return n ? ` <small class="found">${escapeHtml(fill(t.editorFoundN, { n }))}</small>` : ""; })()}</summary>
           <div class="pickers">${items.map(([key, label]) => this._picker(`entities.${key}`, label, entities[key], "sensor", { auto: autoFor(key), extra: extra(key) })).join("")}</div>
         </details>`).join("")}
-      <details class="box" ${history.some((key) => entities[`${key}_history`]) ? "open" : ""}>
+      <details class="box" data-box="history" ${this._boxOpen("history", history.some((key) => entities[`${key}_history`])) ? "open" : ""}>
         <summary class="title">${escapeHtml(t.editorHistoryBox)}</summary>
         <p class="hint">${escapeHtml(t.editorHistoryHint)}</p>
         <div class="pickers">${history.map((key) => this._picker(`entities.${key}_history`, fill(t.editorHistoryLabel, { label: names[key] }), entities[`${key}_history`])).join("")}</div>
@@ -430,8 +453,16 @@ class SolarFlowCardEditor extends HTMLElement {
   }
 
   _installHtml(t) {
+    let rated = null;
+    try {
+      const entry = systemEntities(this._hass, resolveEntities(this._hass, this._config), this._config).ratedPower;
+      rated = entry && !positiveNumber(this._config.inverter_power_rating) ? wattsOf(entry.stateObj) : null;
+    } catch (error) {
+      // Nothing detected.
+    }
     return `
       <div class="grid">${this._numbers(t, EDITOR_NUMBERS)}</div>
+      ${isNum(rated) && rated > 0 ? `<p class="note">${escapeHtml(fill(t.editorRatedFound, { power: formatPower(rated, t.locale) }))}</p>` : ""}
       ${this._stringsHtml(t)}
       ${this._switches(t, "install")}
       ${this._listHtml(t, "batteries", t.editorBatteries, t.editorBatteriesHint, [
@@ -445,7 +476,7 @@ class SolarFlowCardEditor extends HTMLElement {
   _listHtml(t, group, title, hint, fields) {
     const items = this._items(group);
     return `
-      <details class="box" ${items.length ? "open" : ""}>
+      <details class="box" data-box="list-${group}" ${this._boxOpen(`list-${group}`, items.length > 0) ? "open" : ""}>
         <summary class="title">${escapeHtml(title)}${items.length ? ` (${items.length})` : ""}</summary>
         <p class="hint">${escapeHtml(hint)}</p>
         ${items.map((item, i) => `
@@ -551,6 +582,7 @@ class SolarFlowCardEditor extends HTMLElement {
         .section button:disabled { opacity: .25; cursor: default; }
         .field { display: grid; gap: 3px; min-width: 0; }
         .field .note, .body > .note { margin: 0; color: var(--secondary-text-color, #727272); font-size: 11px; overflow-wrap: anywhere; }
+        .found { font-weight: 400; color: var(--success-color, #43a047); }
         .warn { margin: 0; padding: 4px 8px; border-radius: 6px; background: rgba(255, 152, 0, .12); color: var(--warning-color, #b26a00); font-size: 11.5px; line-height: 1.35; }
         .item { display: grid; gap: 8px; padding: 10px; border: 1px dashed var(--divider-color, rgba(127,127,127,.35)); border-radius: 10px; }
         .danger { color: var(--error-color, #db4437) !important; }
@@ -581,6 +613,7 @@ class SolarFlowCardEditor extends HTMLElement {
       else this._open.delete(id);
       this._render();
     }));
+    root.querySelectorAll("details[data-box]").forEach((el) => el.addEventListener("toggle", () => this._boxes.set(el.dataset.box, el.open)));
     root.querySelectorAll("[data-theme]").forEach((button) => button.addEventListener("click", () => {
       this._set("theme", button.dataset.theme);
       this._render();
@@ -628,6 +661,7 @@ class SolarFlowCardEditor extends HTMLElement {
       this._setItem(group, Number(index), field, value);
     }));
     root.querySelectorAll("[data-add]").forEach((button) => button.addEventListener("click", () => {
+      this._boxes.set(`list-${button.dataset.add}`, true);
       this._writeItems(button.dataset.add, [...this._items(button.dataset.add), {}]);
     }));
     root.querySelectorAll("[data-remove]").forEach((button) => button.addEventListener("click", () => {
