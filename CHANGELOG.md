@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.8.0-beta.1
+
+**The new visual editor (beta).** Not everyone likes YAML, so the editor now covers almost every option, in groups that open on tap:
+
+- **Appearance:** theme, title, language, starting period, wide layout, glass, animations, fonts, collapsible sections, chart and weather.
+- **Sensors:** every `entities:` key picked from your Home Assistant entities (live power, energy, installation readings, PV strings), whether the energy sensors reset daily or never, and the grid and battery sign.
+- **Sections:** tick what the card shows and change the order with the arrows. With collapsible sections, also choose which start folded. The old `show_energy` / `show_forecast` / `show_system` / `show_panels` switches become part of this list.
+- **Installation:** battery, PV size, inverter, panels per string.
+- **Summary and prices:** prices, currency, CO₂ factor and the summary items.
+- **Virtual storage** and **PV forecast** with entity pickers.
+- **More:** extra inverter sensors, the weather entity, a self-hosted font stylesheet.
+
+Several batteries (`batteries:`) and per-panel sensors (`panels:`) stay in YAML for now. Options the editor does not show are kept as they are. Please report anything odd in the issues.
+
 ## 1.7.1
 
 - **German** translation (thanks @AndiBo62), completed with the keys added since it was started.

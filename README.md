@@ -85,7 +85,7 @@ Copy `solar-flow-card.js` to `config/www/` and add a dashboard resource `/local/
 
 For inverters other than DeyeCloud, the [configuration guide](docs/configuration.md) explains every `entities:` entry, the units and state classes the card expects, the helper sensors to create when something is missing, and has complete examples (including Huawei with a separate energy meter).
 
-The visual editor covers the theme, title, language, your installation, sections and the summary items. `period`, `panel_strings` and the sensor options are YAML only.
+The visual editor (new in 1.8.0, beta) has groups for the appearance, the **sensors** (pick each one from your Home Assistant entities), the **sections** (tick and reorder), your installation, the summary and prices, virtual storage, the PV forecast and more. Several batteries (`batteries:`) and per-panel sensors (`panels:`) are YAML only for now. Options the editor does not show stay in your YAML untouched.
 
 ```yaml
 type: custom:solar-flow-card
@@ -105,7 +105,7 @@ co2_factor: 0.7
 |---|---|---|
 | `theme` | `diorama` | `diorama`, `aurora`, `paper`, `lcars`, `atlantis`, `expanse`, `foundation`, `galaxy`, `gate` or `reactor`. |
 | `title` | station name | Card title. |
-| `language` | Home Assistant language | `en`, `pl` or `nl`; also in the visual editor. |
+| `language` | Home Assistant language | `en`, `pl`, `nl` or `de`; also in the visual editor. |
 | `background` | – | `glass`: a translucent, blurred card that lets the dashboard view's background image show through (light glass in Diorama and Paper, dark in the other themes). Also in the editor. |
 | `wide` | `false` | Wide layout for a wide dashboard (a panel view or a full-width section): the main view and the chart side by side, every section open below in columns, inverter details included. Below about 880 px of card width the card stays compact. Also in the editor. |
 | `show_insights` | with `wide` | "Today at a glance" (solar and consumption peaks with their time, the battery's range today, battery cycles, time without the grid) and a comparison of today with yesterday, the 7-day average and this month. Shown in the wide layout; `true` shows it in the compact layout too, `false` hides it. Also in the editor. |
@@ -337,14 +337,7 @@ The 3D, 7D, month and all-time totals and bars come from the long-term statistic
 
 Planned, in no particular order. Ideas and votes are welcome in [issues](https://github.com/gratak/solar-flow-card/issues).
 
-- **A visual editor for every option, rethought**: not everyone likes writing YAML. The editor covers the theme, the numbers and the switches today. It should also cover:
-  - the sensors (`entities:`) with entity pickers, the most important part for inverters other than DeyeCloud;
-  - `energy_sensors`, `invert_grid` and `invert_battery`;
-  - `sections:` (pick and drag to reorder) and `collapsed`;
-  - `virtual_storage` (entity, negative balance, count as own);
-  - `inverter_details`, `batteries`, `panels` and `weather_entity`.
-  
-  The editor itself is to be reorganized into groups (appearance, sensors, sections, summary, advanced), so that the growing number of options stays easy to find.
+- **The new visual editor out of beta** (1.8.0): feedback from the beta, plus `batteries:` and `panels:` in the editor.
 - **PV forecast, more detail** ([#69](https://github.com/gratak/solar-flow-card/issues/69)): the hourly forecast as a line in the 24H chart next to the actual production (Solcast `detailedHourly`), and the pessimistic–optimistic range of each day (Solcast `estimate10` / `estimate90`).
 - **Several inverters** (`inverters:`, like `batteries:`): power and energy summed by the card without helper sensors, for example an on-grid and an off-grid inverter of different brands, with each inverter listed separately in the Installation section. Until then, combine them with Home Assistant "Sum" helpers under `entities:`.
 
