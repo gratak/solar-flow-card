@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.8.0-beta.8
+
+- **Prices from sensors:** `price_import` and `price_export` accept a price sensor as well as a number, e.g. the hourly RCE price under net-billing or a dynamic tariff.
+  - The savings are worked out hour by hour, each hour's energy at that hour's mean price; for all time, month by month.
+  - The hour in progress uses the current price.
+  - With virtual storage, only the energy left after each hour's balancing counts.
+  - Prices per kWh and per MWh are both read correctly, and a negative export price lowers the savings as it does on the bill.
+- **Editor:** "Prices from sensors" under Summary and prices, showing the current price. Warnings when the unit is not a price per kWh or MWh, and when the sensor keeps no hourly history.
+
 ## 1.8.0-beta.7
 
 - **PV strings, even rows:** the string tiles (Inverter details and Panels) take as many columns as fit for the number of strings, so no tile is left alone in the last row.

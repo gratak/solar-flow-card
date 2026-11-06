@@ -7,7 +7,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "1.8.0-beta.7";
+const CARD_VERSION = "1.8.0-beta.8";
 const CARD_TAG = "solar-flow-card";
 const EDITOR_TAG = "solar-flow-card-editor";
 const THEMES = ["diorama", "aurora", "paper", "lcars", "atlantis", "expanse", "foundation", "galaxy", "gate", "reactor"];
@@ -406,7 +406,13 @@ const TRANSLATIONS = {
     "detailTempAc": "Inverter, AC side",
     "detailTempDc": "Inverter, DC side",
     "detailTempBattery": "Battery",
-    "detailBatPower": "Battery power"
+    "detailBatPower": "Battery power",
+    "editorPriceSensors": "Prices from sensors (optional)",
+    "editorPriceSensorsHint": "For prices that change, e.g. the hourly RCE price or a dynamic tariff: the savings are then worked out hour by hour, each hour at its own price. A sensor here replaces the fixed price above.",
+    "editorPriceImportSensor": "Import price sensor",
+    "editorPriceExportSensor": "Export price sensor",
+    "editorPriceUnit": "Unit {unit}: expected a price per kWh or MWh (e.g. PLN/kWh).",
+    "editorPriceNoStats": "No state_class: Home Assistant keeps no hourly history of this price, so the current price is used for every hour."
   },
   "de": {
     "languageName": "Deutsch",
@@ -797,7 +803,13 @@ const TRANSLATIONS = {
     "detailTempAc": "Wechselrichter, AC-Seite",
     "detailTempDc": "Wechselrichter, DC-Seite",
     "detailTempBattery": "Batterie",
-    "detailBatPower": "Batterieleistung"
+    "detailBatPower": "Batterieleistung",
+    "editorPriceSensors": "Preise aus Sensoren (optional)",
+    "editorPriceSensorsHint": "Für wechselnde Preise, z. B. einen Stundenpreis oder einen dynamischen Tarif: die Ersparnis wird dann Stunde für Stunde berechnet, jede Stunde zu ihrem eigenen Preis. Ein Sensor hier ersetzt den festen Preis oben.",
+    "editorPriceImportSensor": "Sensor Bezugspreis",
+    "editorPriceExportSensor": "Sensor Einspeisepreis",
+    "editorPriceUnit": "Einheit {unit}: erwartet wird ein Preis pro kWh oder MWh (z. B. EUR/kWh).",
+    "editorPriceNoStats": "Keine state_class: Home Assistant speichert keinen Stundenverlauf dieses Preises, daher wird für jede Stunde der aktuelle Preis verwendet."
   },
   "nl": {
     "languageName": "Nederlands",
@@ -1188,7 +1200,13 @@ const TRANSLATIONS = {
     "detailTempAc": "Omvormer, AC-zijde",
     "detailTempDc": "Omvormer, DC-zijde",
     "detailTempBattery": "Batterij",
-    "detailBatPower": "Batterijvermogen"
+    "detailBatPower": "Batterijvermogen",
+    "editorPriceSensors": "Prijzen uit sensoren (optioneel)",
+    "editorPriceSensorsHint": "Voor prijzen die veranderen, bijv. een uurprijs of een dynamisch tarief: de besparing wordt dan per uur berekend, elk uur tegen zijn eigen prijs. Een sensor hier vervangt de vaste prijs hierboven.",
+    "editorPriceImportSensor": "Sensor afnameprijs",
+    "editorPriceExportSensor": "Sensor terugleverprijs",
+    "editorPriceUnit": "Eenheid {unit}: verwacht een prijs per kWh of MWh (bijv. EUR/kWh).",
+    "editorPriceNoStats": "Geen state_class: Home Assistant bewaart geen uurhistorie van deze prijs, dus voor elk uur wordt de huidige prijs gebruikt."
   },
   "pl": {
     "languageName": "Polski",
@@ -1579,7 +1597,13 @@ const TRANSLATIONS = {
     "detailTempAc": "Falownik, strona AC",
     "detailTempDc": "Falownik, strona DC",
     "detailTempBattery": "Magazyn",
-    "detailBatPower": "Moc magazynu"
+    "detailBatPower": "Moc magazynu",
+    "editorPriceSensors": "Ceny z czujników (opcjonalnie)",
+    "editorPriceSensorsHint": "Dla cen, które się zmieniają, np. godzinowej ceny RCE albo taryfy dynamicznej: oszczędność liczy się wtedy godzina po godzinie, każda godzina po swojej cenie. Czujnik zastępuje stałą cenę powyżej.",
+    "editorPriceImportSensor": "Czujnik ceny zakupu",
+    "editorPriceExportSensor": "Czujnik ceny sprzedaży",
+    "editorPriceUnit": "Jednostka {unit}: oczekiwana cena za kWh lub MWh (np. PLN/kWh).",
+    "editorPriceNoStats": "Brak state_class: Home Assistant nie zapisuje godzinowej historii tej ceny, więc dla każdej godziny użyta będzie cena bieżąca."
   }
 };
 
@@ -2178,6 +2202,64 @@ function todayOwnShare(m) {
   return clamp(((load - fromGrid) / load) * 100, 0, 100);
 }
 
+// Prices: a number, or a sensor (e.g. the hourly RCE price) whose unit may
+// be per kWh, per MWh or per Wh.
+function priceSetting(value) {
+  if (typeof value === "string" && /^[a-z_]+\.[a-z0-9_]+$/.test(value.trim())) return { entity: value.trim() };
+  const number = Number.parseFloat(value);
+  return Number.isFinite(number) ? { value: number } : null;
+}
+
+function priceScale(stateObj) {
+  const unit = stateUnit(stateObj).toLowerCase().replace(/\s/g, "");
+  return unit.includes("mwh") ? 0.001 : /\/wh$/.test(unit) ? 1000 : 1;
+}
+
+function currentPrice(states, setting) {
+  if (!setting) return null;
+  if (!setting.entity) return setting.value;
+  const stateObj = states?.[setting.entity];
+  const value = stateNumber(stateObj);
+  return value === null ? null : value * priceScale(stateObj);
+}
+
+// The mean price of each hour (or month) from the price sensors' long-term
+// statistics: { import: Map(start ms -> price per kWh), export: … }.
+async function loadPriceStats(hass, ids, start, period) {
+  const response = await hass.callWS({
+    type: "recorder/statistics_during_period",
+    start_time: start.toISOString(),
+    end_time: new Date().toISOString(),
+    statistic_ids: [...new Set(Object.values(ids))],
+    period,
+    types: ["mean"],
+  });
+  const out = {};
+  for (const [name, entityId] of Object.entries(ids)) {
+    const scale = priceScale(hass.states?.[entityId]);
+    out[name] = new Map((response?.[entityId] || []).filter((row) => Number.isFinite(Number(row.mean))).map((row) => [statStart(row.start), Number(row.mean) * scale]));
+  }
+  return out;
+}
+
+// Savings with prices that change by the hour: for every hour, its energy at
+// its mean price. `rows` are energy per hour (or month), `rest` what the
+// statistics do not cover yet (the current hour), valued at today's price.
+function pricedSavings(rows, rest, price, net) {
+  let saved = 0;
+  const add = (values, at) => {
+    const h = deriveLoadEnergy(values);
+    const imported = h.gridImport || 0;
+    const exported = h.gridExport || 0;
+    const billedImport = net ? Math.max(0, imported - exported) : imported;
+    const billedExport = net ? Math.max(0, exported - imported) : exported;
+    saved += Math.max(0, (h.load || 0) - billedImport) * price("import", at) + billedExport * price("export", at);
+  };
+  for (const row of rows) add(row, row.at);
+  if (rest) add(rest, null);
+  return saved;
+}
+
 // PV production forecast (#69) from forecast sensors such as Solcast or
 // Forecast.Solar: `pv_forecast: { today, remaining, days: [...] }`, where
 // `days` lists the sensors for tomorrow and the days after it.
@@ -2291,7 +2373,7 @@ function migrateConfig(config) {
 
 // `net`: with virtual storage, the import and export left after hourly
 // balancing (see hourlyNet()).
-function periodSummary(totals, config, t, locale, net = null) {
+function periodSummary(totals, config, t, locale, net = null, money = undefined) {
   const { solar, load, gridImport, gridExport } = totals;
   const items = [];
   const show = (key) => config[key] !== false;
@@ -2308,6 +2390,12 @@ function periodSummary(totals, config, t, locale, net = null) {
   if (hasSolar && show("show_self_use") && isNum(solar) && isNum(gridExport) && solar > 0.05) {
     items.push(["selfuse", t.selfUse, formatPercent(clamp(((solar - gridExport) / solar) * 100, 0, 100), locale)]);
   }
+  // Prices from sensors: worked out hour by hour by the card (money), "…"
+  // while the statistics load.
+  if (money !== undefined) {
+    if (show("show_savings")) items.push(["money", t.savings, isNum(money) ? `${formatNumber(money, locale, 2)} ${config.currency ?? t.currency}`.trim() : "…"]);
+    return items.concat(periodSummaryRest(totals, config, t, locale));
+  }
   const priceImport = positiveNumber(config.price_import);
   if (show("show_savings") && priceImport !== null && isNum(load) && isNum(gridImport)) {
     const priceExport = positiveNumber(config.price_export) || 0;
@@ -2317,6 +2405,15 @@ function periodSummary(totals, config, t, locale, net = null) {
     const saved = Math.max(0, load - billedImport) * priceImport + (isNum(billedExport) ? billedExport : 0) * priceExport;
     items.push(["money", t.savings, `${formatNumber(saved, locale, 2)} ${config.currency ?? t.currency}`.trim()]);
   }
+  return items.concat(periodSummaryRest(totals, config, t, locale));
+}
+
+// The summary items after the savings: avoided CO₂ and the specific yield.
+function periodSummaryRest(totals, config, t, locale) {
+  const { solar } = totals;
+  const items = [];
+  const show = (key) => config[key] !== false;
+  const hasSolar = show("show_solar");
   if (hasSolar && show("show_co2") && isNum(solar)) {
     const factor = Number.parseFloat(config.co2_factor);
     const kg = solar * (Number.isFinite(factor) && factor >= 0 ? factor : 0.5);
@@ -6302,6 +6399,57 @@ class SolarFlowCard extends HTMLElement {
     return { store, net };
   }
 
+  // Savings when a price comes from a sensor: hour by hour (month by month
+  // for all time), each with its mean price. undefined with fixed prices
+  // (the summary works them out from the totals), null while loading.
+  _savings(resolved, period, energy) {
+    const config = this._config;
+    const prices = { import: priceSetting(config.price_import), export: priceSetting(config.price_export) };
+    if (!prices.import?.entity && !prices.export?.entity) return undefined;
+    if (!prices.import || typeof this._hass.callWS !== "function") return undefined;
+    const sources = sourcesKey(resolved.energy);
+    if (!sources) return undefined;
+    const states = this._hass.states;
+    const now = { import: currentPrice(states, prices.import), export: currentPrice(states, prices.export) ?? 0 };
+    let rows;
+    let start;
+    let statPeriod = "hour";
+    if (period === "all") {
+      if (!energy.buckets) return null;
+      rows = energy.buckets.map((b) => ({ ...b, at: b.start.getTime() }));
+      start = energy.spec.start;
+      statPeriod = "month";
+    } else {
+      start = period === "today" ? startOfDay(new Date()) : statsSpec(period).start;
+      const hourly = this._fetch(`hourly-energy|${sources}|${start.getTime()}`, 15 * 60000, () => loadHourlyEnergy(this._hass, resolved.energy, start));
+      if (!hourly.data) return null;
+      const hours = new Map();
+      for (const [name, map] of Object.entries(hourly.data)) {
+        for (const [at, kwh] of map) hours.set(at, { ...(hours.get(at) || { at }), [name]: kwh });
+      }
+      // Each hour with its consumption worked out, as in the totals.
+      rows = [...hours.values()].map((row) => ({ ...deriveLoadEnergy(row), at: row.at }));
+    }
+    const ids = Object.fromEntries(Object.entries(prices).filter(([, p]) => p?.entity).map(([name, p]) => [name, p.entity]));
+    const stats = this._fetch(`prices|${JSON.stringify(ids)}|${start.getTime()}|${statPeriod}`, 15 * 60000, () => loadPriceStats(this._hass, ids, start, statPeriod));
+    if (!stats.data) return null;
+    const price = (kind, at) => {
+      const setting = prices[kind];
+      if (!setting) return 0;
+      if (!setting.entity) return setting.value;
+      const mean = at === null ? undefined : stats.data[kind]?.get(at);
+      return mean ?? now[kind] ?? 0;
+    };
+    // What the hourly statistics do not cover yet (the current hour).
+    let rest = null;
+    if (period !== "all") {
+      const total = energy.totals || {};
+      const sum = (name) => rows.reduce((acc, r) => acc + (r[name] || 0), 0);
+      rest = Object.fromEntries(ENERGY_ORDER.filter((name) => isNum(total[name])).map((name) => [name, Math.max(0, total[name] - sum(name))]));
+    }
+    return pricedSavings(rows, rest, price, Boolean(virtualStorageConfig(config)));
+  }
+
   // Recorder history of the power sensors for today or the last 3 days,
   // shared by the chart and the day's highlights.
   _powerHistory(resolved, period) {
@@ -6485,6 +6633,7 @@ class SolarFlowCard extends HTMLElement {
       if (bank && !ids.live.soc && !ids.live.battery) ids.live.soc = bank.items[0].entityId;
       const now = new Date();
       const vstore = this._virtualStorage(resolved, config, period, now, today);
+      const money = this._savings(resolved, period, energy);
       this._introAt ??= Date.now();
       const introElapsed = (Date.now() - this._introAt) / 1000;
       const introAt = introElapsed < 2.6 ? introElapsed : null;
@@ -6495,6 +6644,7 @@ class SolarFlowCard extends HTMLElement {
         inverter?.map((d) => [[...d.strings.values()].map((s) => Object.values(s).map((r) => r.value)), d.temperatures.map((r) => r.value), d.battery.map((r) => r.value), d.grid.map((r) => r.value)]),
         vstore,
         [...this._collapsed],
+        isNum(money) ? Math.round(money * 100) : money,
         pvForecast && [pvForecast.total, pvForecast.remaining, pvForecast.days.map((d) => d.value)],
         Math.floor(now.getTime() / 60000),
       ]);
@@ -6527,7 +6677,7 @@ class SolarFlowCard extends HTMLElement {
         period,
         totals: energy.totals || {},
         energyLoading: Boolean(energy.loading),
-        summary: periodSummary(energy.totals || {}, config, t, locale, vstore.net),
+        summary: periodSummary(energy.totals || {}, config, t, locale, vstore.net, money),
         virtualStorage: vstore.store,
         since,
         chart,
@@ -6772,6 +6922,12 @@ function fieldNotes(hass, config, t, kind, value, auto) {
   if (!stateObj) return [["warn", t.editorNotFound]];
   const notes = [];
   const unit = stateUnit(stateObj).trim();
+  if (kind === "price") {
+    if (!/wh$/i.test(unit.replace(/\s/g, ""))) notes.push(["warn", fill(t.editorPriceUnit, { unit: unit || "—" })]);
+    notes.push(["note", fill(t.editorNow, { value: fieldValue(stateObj, "any", locale) })]);
+    if (!stateObj.attributes?.state_class) notes.push(["warn", t.editorPriceNoStats]);
+    return notes;
+  }
   const wrongUnit = Boolean(FIELD_UNITS[kind] && unit && !FIELD_UNITS[kind].includes(unit.toLowerCase()));
   if (wrongUnit) notes.push(["warn", fill(t.editorWrongUnit, { unit, expected: FIELD_UNIT_NAMES[kind] })]);
   notes.push(["note", stateNumber(stateObj) === null && kind !== "any" ? t.editorUnavailable : fill(t.editorNow, { value: fieldValue(stateObj, wrongUnit ? "any" : kind, locale) })]);
@@ -6967,7 +7123,7 @@ class SolarFlowCardEditor extends HTMLElement {
       const warn = check && Number.isFinite(value) && value > check[1]
         ? fill(t[check[2]], { value: formatNumber(value, t.locale, 0), suggest: formatNumber(value / check[3], t.locale, 1) }) : "";
       return `
-      <label><span>${escapeHtml(t[label])}</span><input data-number="${key}" type="number" min="0" step="${step}" inputmode="decimal" value="${escapeHtml(this._config[key] ?? "")}" />
+      <label><span>${escapeHtml(t[label])}</span><input data-number="${key}" type="number" min="0" step="${step}" inputmode="decimal" value="${escapeHtml(Number.isFinite(Number.parseFloat(this._config[key])) ? this._config[key] : "")}" />
         ${warn ? `<p class="warn">${escapeHtml(warn)}</p>` : ""}</label>`;
     }).join("");
   }
@@ -7174,11 +7330,20 @@ class SolarFlowCardEditor extends HTMLElement {
   }
 
   _summaryHtml(t) {
+    const sensor = (key) => priceSetting(this._config[key])?.entity || "";
     return `
       <div class="grid">
         ${this._numbers(t, EDITOR_PRICES)}
         <label><span>${escapeHtml(t.editorCurrency)}</span><input data-text="currency" type="text" value="${escapeHtml(this._config.currency ?? "")}" placeholder="${escapeHtml(t.currency)}" /></label>
       </div>
+      <details class="box" data-box="prices" ${this._boxOpen("prices", Boolean(sensor("price_import") || sensor("price_export"))) ? "open" : ""}>
+        <summary class="title">${escapeHtml(t.editorPriceSensors)}</summary>
+        <p class="hint">${escapeHtml(t.editorPriceSensorsHint)}</p>
+        <div class="pickers">
+          ${this._picker("price_import", t.editorPriceImportSensor, sensor("price_import"), "sensor", { kind: "price" })}
+          ${this._picker("price_export", t.editorPriceExportSensor, sensor("price_export"), "sensor", { kind: "price" })}
+        </div>
+      </details>
       ${this._switches(t, "summary")}`;
   }
 

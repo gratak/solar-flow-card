@@ -387,5 +387,11 @@
   "detailTempAc": "Wechselrichter, AC-Seite",
   "detailTempDc": "Wechselrichter, DC-Seite",
   "detailTempBattery": "Batterie",
-  "detailBatPower": "Batterieleistung"
+  "detailBatPower": "Batterieleistung",
+  "editorPriceSensors": "Preise aus Sensoren (optional)",
+  "editorPriceSensorsHint": "Für wechselnde Preise, z. B. einen Stundenpreis oder einen dynamischen Tarif: die Ersparnis wird dann Stunde für Stunde berechnet, jede Stunde zu ihrem eigenen Preis. Ein Sensor hier ersetzt den festen Preis oben.",
+  "editorPriceImportSensor": "Sensor Bezugspreis",
+  "editorPriceExportSensor": "Sensor Einspeisepreis",
+  "editorPriceUnit": "Einheit {unit}: erwartet wird ein Preis pro kWh oder MWh (z. B. EUR/kWh).",
+  "editorPriceNoStats": "Keine state_class: Home Assistant speichert keinen Stundenverlauf dieses Preises, daher wird für jede Stunde der aktuelle Preis verwendet."
 }

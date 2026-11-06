@@ -387,5 +387,11 @@
   "detailTempAc": "Falownik, strona AC",
   "detailTempDc": "Falownik, strona DC",
   "detailTempBattery": "Magazyn",
-  "detailBatPower": "Moc magazynu"
+  "detailBatPower": "Moc magazynu",
+  "editorPriceSensors": "Ceny z czujników (opcjonalnie)",
+  "editorPriceSensorsHint": "Dla cen, które się zmieniają, np. godzinowej ceny RCE albo taryfy dynamicznej: oszczędność liczy się wtedy godzina po godzinie, każda godzina po swojej cenie. Czujnik zastępuje stałą cenę powyżej.",
+  "editorPriceImportSensor": "Czujnik ceny zakupu",
+  "editorPriceExportSensor": "Czujnik ceny sprzedaży",
+  "editorPriceUnit": "Jednostka {unit}: oczekiwana cena za kWh lub MWh (np. PLN/kWh).",
+  "editorPriceNoStats": "Brak state_class: Home Assistant nie zapisuje godzinowej historii tej ceny, więc dla każdej godziny użyta będzie cena bieżąca."
 }

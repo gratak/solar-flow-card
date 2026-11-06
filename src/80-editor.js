@@ -93,6 +93,12 @@ function fieldNotes(hass, config, t, kind, value, auto) {
   if (!stateObj) return [["warn", t.editorNotFound]];
   const notes = [];
   const unit = stateUnit(stateObj).trim();
+  if (kind === "price") {
+    if (!/wh$/i.test(unit.replace(/\s/g, ""))) notes.push(["warn", fill(t.editorPriceUnit, { unit: unit || "—" })]);
+    notes.push(["note", fill(t.editorNow, { value: fieldValue(stateObj, "any", locale) })]);
+    if (!stateObj.attributes?.state_class) notes.push(["warn", t.editorPriceNoStats]);
+    return notes;
+  }
   const wrongUnit = Boolean(FIELD_UNITS[kind] && unit && !FIELD_UNITS[kind].includes(unit.toLowerCase()));
   if (wrongUnit) notes.push(["warn", fill(t.editorWrongUnit, { unit, expected: FIELD_UNIT_NAMES[kind] })]);
   notes.push(["note", stateNumber(stateObj) === null && kind !== "any" ? t.editorUnavailable : fill(t.editorNow, { value: fieldValue(stateObj, wrongUnit ? "any" : kind, locale) })]);
@@ -288,7 +294,7 @@ class SolarFlowCardEditor extends HTMLElement {
       const warn = check && Number.isFinite(value) && value > check[1]
         ? fill(t[check[2]], { value: formatNumber(value, t.locale, 0), suggest: formatNumber(value / check[3], t.locale, 1) }) : "";
       return `
-      <label><span>${escapeHtml(t[label])}</span><input data-number="${key}" type="number" min="0" step="${step}" inputmode="decimal" value="${escapeHtml(this._config[key] ?? "")}" />
+      <label><span>${escapeHtml(t[label])}</span><input data-number="${key}" type="number" min="0" step="${step}" inputmode="decimal" value="${escapeHtml(Number.isFinite(Number.parseFloat(this._config[key])) ? this._config[key] : "")}" />
         ${warn ? `<p class="warn">${escapeHtml(warn)}</p>` : ""}</label>`;
     }).join("");
   }
@@ -495,11 +501,20 @@ class SolarFlowCardEditor extends HTMLElement {
   }
 
   _summaryHtml(t) {
+    const sensor = (key) => priceSetting(this._config[key])?.entity || "";
     return `
       <div class="grid">
         ${this._numbers(t, EDITOR_PRICES)}
         <label><span>${escapeHtml(t.editorCurrency)}</span><input data-text="currency" type="text" value="${escapeHtml(this._config.currency ?? "")}" placeholder="${escapeHtml(t.currency)}" /></label>
       </div>
+      <details class="box" data-box="prices" ${this._boxOpen("prices", Boolean(sensor("price_import") || sensor("price_export"))) ? "open" : ""}>
+        <summary class="title">${escapeHtml(t.editorPriceSensors)}</summary>
+        <p class="hint">${escapeHtml(t.editorPriceSensorsHint)}</p>
+        <div class="pickers">
+          ${this._picker("price_import", t.editorPriceImportSensor, sensor("price_import"), "sensor", { kind: "price" })}
+          ${this._picker("price_export", t.editorPriceExportSensor, sensor("price_export"), "sensor", { kind: "price" })}
+        </div>
+      </details>
       ${this._switches(t, "summary")}`;
   }
 

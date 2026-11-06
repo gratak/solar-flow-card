@@ -358,6 +358,64 @@ function todayOwnShare(m) {
   return clamp(((load - fromGrid) / load) * 100, 0, 100);
 }
 
+// Prices: a number, or a sensor (e.g. the hourly RCE price) whose unit may
+// be per kWh, per MWh or per Wh.
+function priceSetting(value) {
+  if (typeof value === "string" && /^[a-z_]+\.[a-z0-9_]+$/.test(value.trim())) return { entity: value.trim() };
+  const number = Number.parseFloat(value);
+  return Number.isFinite(number) ? { value: number } : null;
+}
+
+function priceScale(stateObj) {
+  const unit = stateUnit(stateObj).toLowerCase().replace(/\s/g, "");
+  return unit.includes("mwh") ? 0.001 : /\/wh$/.test(unit) ? 1000 : 1;
+}
+
+function currentPrice(states, setting) {
+  if (!setting) return null;
+  if (!setting.entity) return setting.value;
+  const stateObj = states?.[setting.entity];
+  const value = stateNumber(stateObj);
+  return value === null ? null : value * priceScale(stateObj);
+}
+
+// The mean price of each hour (or month) from the price sensors' long-term
+// statistics: { import: Map(start ms -> price per kWh), export: … }.
+async function loadPriceStats(hass, ids, start, period) {
+  const response = await hass.callWS({
+    type: "recorder/statistics_during_period",
+    start_time: start.toISOString(),
+    end_time: new Date().toISOString(),
+    statistic_ids: [...new Set(Object.values(ids))],
+    period,
+    types: ["mean"],
+  });
+  const out = {};
+  for (const [name, entityId] of Object.entries(ids)) {
+    const scale = priceScale(hass.states?.[entityId]);
+    out[name] = new Map((response?.[entityId] || []).filter((row) => Number.isFinite(Number(row.mean))).map((row) => [statStart(row.start), Number(row.mean) * scale]));
+  }
+  return out;
+}
+
+// Savings with prices that change by the hour: for every hour, its energy at
+// its mean price. `rows` are energy per hour (or month), `rest` what the
+// statistics do not cover yet (the current hour), valued at today's price.
+function pricedSavings(rows, rest, price, net) {
+  let saved = 0;
+  const add = (values, at) => {
+    const h = deriveLoadEnergy(values);
+    const imported = h.gridImport || 0;
+    const exported = h.gridExport || 0;
+    const billedImport = net ? Math.max(0, imported - exported) : imported;
+    const billedExport = net ? Math.max(0, exported - imported) : exported;
+    saved += Math.max(0, (h.load || 0) - billedImport) * price("import", at) + billedExport * price("export", at);
+  };
+  for (const row of rows) add(row, row.at);
+  if (rest) add(rest, null);
+  return saved;
+}
+
 // PV production forecast (#69) from forecast sensors such as Solcast or
 // Forecast.Solar: `pv_forecast: { today, remaining, days: [...] }`, where
 // `days` lists the sensors for tomorrow and the days after it.
@@ -471,7 +529,7 @@ function migrateConfig(config) {
 
 // `net`: with virtual storage, the import and export left after hourly
 // balancing (see hourlyNet()).
-function periodSummary(totals, config, t, locale, net = null) {
+function periodSummary(totals, config, t, locale, net = null, money = undefined) {
   const { solar, load, gridImport, gridExport } = totals;
   const items = [];
   const show = (key) => config[key] !== false;
@@ -488,6 +546,12 @@ function periodSummary(totals, config, t, locale, net = null) {
   if (hasSolar && show("show_self_use") && isNum(solar) && isNum(gridExport) && solar > 0.05) {
     items.push(["selfuse", t.selfUse, formatPercent(clamp(((solar - gridExport) / solar) * 100, 0, 100), locale)]);
   }
+  // Prices from sensors: worked out hour by hour by the card (money), "…"
+  // while the statistics load.
+  if (money !== undefined) {
+    if (show("show_savings")) items.push(["money", t.savings, isNum(money) ? `${formatNumber(money, locale, 2)} ${config.currency ?? t.currency}`.trim() : "…"]);
+    return items.concat(periodSummaryRest(totals, config, t, locale));
+  }
   const priceImport = positiveNumber(config.price_import);
   if (show("show_savings") && priceImport !== null && isNum(load) && isNum(gridImport)) {
     const priceExport = positiveNumber(config.price_export) || 0;
@@ -497,6 +561,15 @@ function periodSummary(totals, config, t, locale, net = null) {
     const saved = Math.max(0, load - billedImport) * priceImport + (isNum(billedExport) ? billedExport : 0) * priceExport;
     items.push(["money", t.savings, `${formatNumber(saved, locale, 2)} ${config.currency ?? t.currency}`.trim()]);
   }
+  return items.concat(periodSummaryRest(totals, config, t, locale));
+}
+
+// The summary items after the savings: avoided CO₂ and the specific yield.
+function periodSummaryRest(totals, config, t, locale) {
+  const { solar } = totals;
+  const items = [];
+  const show = (key) => config[key] !== false;
+  const hasSolar = show("show_solar");
   if (hasSolar && show("show_co2") && isNum(solar)) {
     const factor = Number.parseFloat(config.co2_factor);
     const kg = solar * (Number.isFinite(factor) && factor >= 0 ? factor : 0.5);

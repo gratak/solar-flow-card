@@ -138,8 +138,8 @@ co2_factor: 0.7
 | `panels_average` | `all` | `per_string`: the average and the weakest panel for each string on its own, with a summary under each string (useful when the strings face different ways). `all`: over all panels. Also in the editor. |
 | `panels_per_string` | – | Panels on each string, a number or a list (`[11, 7]`). Groups the optimizer tiles into strings in that order, and without optimizers shows one tile per string: the string's power and an estimate per panel (≈ power and today's energy), with a note. The editor shows one field per string the inverter reports, with its current voltage. |
 | `panel_strings` | `1` (`2` above 8 panels) | Number of strings the panels are split into, in order. |
-| `price_import` | – | Price per kWh bought from the grid. Enables the savings. |
-| `price_export` | `0` | Price per kWh sold to the grid. |
+| `price_import` | – | Price per kWh bought from the grid, a number or a price sensor. Enables the savings. |
+| `price_export` | `0` | Price per kWh sold to the grid, a number or a price sensor (e.g. the hourly RCE price). |
 | `currency` | by language (`zł`, `€`) | Currency shown with the savings. |
 | `co2_factor` | `0.5` | kg of CO₂ per kWh from the grid (Poland: about `0.7`). |
 
@@ -225,6 +225,15 @@ Listing `insights` or `comparison` shows them in the compact layout too. In the 
 | `show_savings` | `true` | Savings (needs `price_import`). |
 | `show_co2` | `true` | Avoided CO₂. |
 | `show_yield` | `true` | Yield per kWp: energy produced per kW of installed panels (needs `pv_capacity`). |
+
+#### Prices that change by the hour
+
+Either price can be a sensor instead of a number, e.g. the hourly RCE price under net-billing, or a dynamic tariff. The savings are then worked out **hour by hour**: each hour's energy at that hour's mean price, from the sensor's long-term statistics (it needs a `state_class`). The hour in progress uses the current price, and with virtual storage the energy left after each hour's balancing counts. Prices per kWh and per MWh are both read correctly.
+
+```yaml
+price_import: 1.12                      # fixed tariff, e.g. G11
+price_export: sensor.ems_cena_rce       # hourly RCE price, PLN/kWh
+```
 
 ### Sensors
 
