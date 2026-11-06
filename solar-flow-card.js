@@ -7,7 +7,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "1.7.1";
+const CARD_VERSION = "1.8.0-beta.1";
 const CARD_TAG = "solar-flow-card";
 const EDITOR_TAG = "solar-flow-card-editor";
 const THEMES = ["diorama", "aurora", "paper", "lcars", "atlantis", "expanse", "foundation", "galaxy", "gate", "reactor"];
@@ -274,7 +274,95 @@ const TRANSLATIONS = {
     "pvForecastNote": "forecast {kwh}",
     "pvProducedOf": "{done} of {total} produced so far",
     "chartFallback": "Hourly averages from the energy statistics. No power history for: {sensors} (excluded from the recorder?)",
-    "chartNoHistory": "No history for: {sensors}. Excluded from the recorder?"
+    "chartNoHistory": "No history for: {sensors}. Excluded from the recorder?",
+    "editorBeta": "Beta: the new editor. Options it does not show stay in your YAML as they are.",
+    "editorGroups": {
+      "look": "Appearance",
+      "sensors": "Sensors",
+      "sections": "Sections",
+      "install": "Installation",
+      "summary": "Summary and prices",
+      "vstore": "Virtual storage",
+      "forecast": "PV forecast",
+      "more": "More"
+    },
+    "editorSensorsHint": "DeyeCloud is found automatically: leave these empty. For other inverters pick your sensors; the configuration guide in the README explains each one.",
+    "editorEntityGroups": {
+      "live": "Live power",
+      "energy": "Energy",
+      "system": "Installation readings",
+      "strings": "PV strings"
+    },
+    "editorEntities": {
+      "solar_power": "Solar power",
+      "load_power": "Home consumption (optional)",
+      "grid_power": "Grid power (+ import, − export)",
+      "grid_import_power": "Grid import power",
+      "grid_export_power": "Grid export power",
+      "battery_power": "Battery power (+ discharging)",
+      "battery_charge_power": "Battery charging power",
+      "battery_discharge_power": "Battery discharging power",
+      "battery_soc": "Battery level",
+      "solar_energy": "Solar energy",
+      "load_energy": "Home energy (optional)",
+      "grid_import_energy": "Energy from the grid",
+      "grid_export_energy": "Energy to the grid",
+      "battery_charge_energy": "Energy charged",
+      "battery_discharge_energy": "Energy discharged",
+      "inverter_power": "Inverter output power",
+      "inverter_rated_power": "Inverter rated power",
+      "battery_temperature": "Battery temperature",
+      "battery_voltage": "Battery voltage",
+      "battery_current": "Battery current",
+      "generator_power": "Generator power"
+    },
+    "editorPhaseLoad": "Home {n}",
+    "editorPhaseGrid": "Grid {n}",
+    "editorPhaseVoltage": "Voltage {n}",
+    "editorStringPower": "PV{n} power",
+    "editorStringVoltage": "PV{n} voltage",
+    "editorStringCurrent": "PV{n} current",
+    "editorEnergySensors": "Energy sensors",
+    "editorEnergyDaily": "Reset every day",
+    "editorEnergyTotal": "Lifetime counters (never reset)",
+    "editorInvertGrid": "My grid sensor is + while exporting",
+    "editorInvertBattery": "My battery sensor is + while charging",
+    "editorSectionsHint": "Tick what the card shows; the arrows change the order.",
+    "editorSectionNames": {
+      "flow": "Main view (animation)",
+      "today": "Today's tiles",
+      "sources": "Where today's power came from",
+      "inverter": "Inverter details",
+      "forecast": "Battery forecast",
+      "pv_forecast": "PV forecast",
+      "virtual_storage": "Virtual storage",
+      "system": "Installation",
+      "energy": "Energy and chart",
+      "insights": "Today at a glance",
+      "comparison": "Comparison",
+      "panels": "Panels"
+    },
+    "editorFolded": "folded",
+    "editorUp": "Move up",
+    "editorDown": "Move down",
+    "editorReset": "Restore the default sections",
+    "editorYamlOnly": "Several batteries (batteries:) and per-panel sensors (panels:) are set in YAML for now.",
+    "editorVsEnable": "Show virtual storage (hourly net balancing)",
+    "editorVsEntity": "Ready net balance sensor (optional)",
+    "editorVsNegative": "A deficit",
+    "editorVsShow": "shows in red",
+    "editorVsZero": "shows as 0 kWh",
+    "editorVsOwn": "Count the balanced energy as your own (self-sufficiency)",
+    "editorVsHint": "Without a ready sensor the card calculates the balance from the grid energy sensors.",
+    "editorPvfToday": "Forecast for today",
+    "editorPvfRemaining": "Remaining today (optional)",
+    "editorPvfDays": "Next days (tomorrow first)",
+    "editorDayN": "Day {n}",
+    "editorDetails": "Inverter details: extra sensors",
+    "editorSensorN": "Sensor {n}",
+    "editorWeather": "Weather",
+    "editorPeriod": "Starting period",
+    "editorFontUrl": "Own font stylesheet (URL)"
   },
   "de": {
     "languageName": "Deutsch",
@@ -533,7 +621,95 @@ const TRANSLATIONS = {
       "exceptional": "Außergewöhnlich"
     },
     "chartFallback": "Stundenmittel aus der Energiestatistik. Kein Leistungsverlauf für: {sensors} (vom Recorder ausgeschlossen?)",
-    "chartNoHistory": "Kein Verlauf für: {sensors}. Vom Recorder ausgeschlossen?"
+    "chartNoHistory": "Kein Verlauf für: {sensors}. Vom Recorder ausgeschlossen?",
+    "editorBeta": "Beta: der neue Editor. Optionen, die hier fehlen, bleiben unverändert in deinem YAML.",
+    "editorGroups": {
+      "look": "Darstellung",
+      "sensors": "Sensoren",
+      "sections": "Abschnitte",
+      "install": "Anlage",
+      "summary": "Übersicht und Preise",
+      "vstore": "Virtueller Speicher",
+      "forecast": "PV-Prognose",
+      "more": "Mehr"
+    },
+    "editorSensorsHint": "DeyeCloud wird automatisch erkannt: diese Felder leer lassen. Für andere Wechselrichter die eigenen Sensoren wählen; die Konfigurationsanleitung im README beschreibt jeden.",
+    "editorEntityGroups": {
+      "live": "Aktuelle Leistung",
+      "energy": "Energie",
+      "system": "Anlagenwerte",
+      "strings": "PV-Strings"
+    },
+    "editorEntities": {
+      "solar_power": "PV-Leistung",
+      "load_power": "Hausverbrauch (optional)",
+      "grid_power": "Netzleistung (+ Bezug, − Einspeisung)",
+      "grid_import_power": "Netzbezugsleistung",
+      "grid_export_power": "Einspeiseleistung",
+      "battery_power": "Batterieleistung (+ Entladen)",
+      "battery_charge_power": "Ladeleistung Batterie",
+      "battery_discharge_power": "Entladeleistung Batterie",
+      "battery_soc": "Batteriestand",
+      "solar_energy": "PV-Energie",
+      "load_energy": "Hausenergie (optional)",
+      "grid_import_energy": "Energie aus dem Netz",
+      "grid_export_energy": "Energie ins Netz",
+      "battery_charge_energy": "Geladene Energie",
+      "battery_discharge_energy": "Entladene Energie",
+      "inverter_power": "Ausgangsleistung Wechselrichter",
+      "inverter_rated_power": "Nennleistung Wechselrichter",
+      "battery_temperature": "Batterietemperatur",
+      "battery_voltage": "Batteriespannung",
+      "battery_current": "Batteriestrom",
+      "generator_power": "Generatorleistung"
+    },
+    "editorPhaseLoad": "Haus {n}",
+    "editorPhaseGrid": "Netz {n}",
+    "editorPhaseVoltage": "Spannung {n}",
+    "editorStringPower": "PV{n} Leistung",
+    "editorStringVoltage": "PV{n} Spannung",
+    "editorStringCurrent": "PV{n} Strom",
+    "editorEnergySensors": "Energiesensoren",
+    "editorEnergyDaily": "Täglich zurückgesetzt",
+    "editorEnergyTotal": "Gesamtzähler (nie zurückgesetzt)",
+    "editorInvertGrid": "Mein Netzsensor ist + bei Einspeisung",
+    "editorInvertBattery": "Mein Batteriesensor ist + beim Laden",
+    "editorSectionsHint": "Anhaken, was die Karte zeigt; die Pfeile ändern die Reihenfolge.",
+    "editorSectionNames": {
+      "flow": "Hauptansicht (Animation)",
+      "today": "Kacheln von heute",
+      "sources": "Woher der Strom heute kam",
+      "inverter": "Wechselrichterdetails",
+      "forecast": "Batterieprognose",
+      "pv_forecast": "PV-Prognose",
+      "virtual_storage": "Virtueller Speicher",
+      "system": "Anlage",
+      "energy": "Energie und Diagramm",
+      "insights": "Heute auf einen Blick",
+      "comparison": "Vergleich",
+      "panels": "Module"
+    },
+    "editorFolded": "eingeklappt",
+    "editorUp": "Nach oben",
+    "editorDown": "Nach unten",
+    "editorReset": "Standardabschnitte wiederherstellen",
+    "editorYamlOnly": "Mehrere Batterien (batteries:) und Modulsensoren (panels:) werden vorerst in YAML eingestellt.",
+    "editorVsEnable": "Virtuellen Speicher anzeigen (Stundenbilanz)",
+    "editorVsEntity": "Fertiger Bilanzsensor (optional)",
+    "editorVsNegative": "Ein Defizit",
+    "editorVsShow": "rot anzeigen",
+    "editorVsZero": "als 0 kWh anzeigen",
+    "editorVsOwn": "Verrechnete Energie als eigene zählen (Autarkie)",
+    "editorVsHint": "Ohne fertigen Sensor berechnet die Karte die Bilanz aus den Netz-Energiesensoren.",
+    "editorPvfToday": "Prognose für heute",
+    "editorPvfRemaining": "Rest von heute (optional)",
+    "editorPvfDays": "Nächste Tage (ab morgen)",
+    "editorDayN": "Tag {n}",
+    "editorDetails": "Wechselrichterdetails: weitere Sensoren",
+    "editorSensorN": "Sensor {n}",
+    "editorWeather": "Wetter",
+    "editorPeriod": "Startzeitraum",
+    "editorFontUrl": "Eigenes Schrift-Stylesheet (URL)"
   },
   "nl": {
     "languageName": "Nederlands",
@@ -792,7 +968,95 @@ const TRANSLATIONS = {
     "pvForecastNote": "prognose {kwh}",
     "pvProducedOf": "{done} van {total} opgewekt",
     "chartFallback": "Uurgemiddelden uit de energiestatistieken. Geen vermogenshistorie voor: {sensors} (uitgesloten van de recorder?)",
-    "chartNoHistory": "Geen historie voor: {sensors}. Uitgesloten van de recorder?"
+    "chartNoHistory": "Geen historie voor: {sensors}. Uitgesloten van de recorder?",
+    "editorBeta": "Bèta: de nieuwe editor. Opties die hier niet staan, blijven ongewijzigd in je YAML.",
+    "editorGroups": {
+      "look": "Weergave",
+      "sensors": "Sensoren",
+      "sections": "Secties",
+      "install": "Installatie",
+      "summary": "Overzicht en prijzen",
+      "vstore": "Virtuele opslag",
+      "forecast": "PV-prognose",
+      "more": "Meer"
+    },
+    "editorSensorsHint": "DeyeCloud wordt automatisch gevonden: laat deze leeg. Kies voor andere omvormers je sensoren; de configuratiegids in de README beschrijft ze allemaal.",
+    "editorEntityGroups": {
+      "live": "Actueel vermogen",
+      "energy": "Energie",
+      "system": "Installatiemetingen",
+      "strings": "PV-strings"
+    },
+    "editorEntities": {
+      "solar_power": "Zonnevermogen",
+      "load_power": "Verbruik huis (optioneel)",
+      "grid_power": "Netvermogen (+ afname, − teruglevering)",
+      "grid_import_power": "Vermogen netafname",
+      "grid_export_power": "Vermogen teruglevering",
+      "battery_power": "Batterijvermogen (+ ontladen)",
+      "battery_charge_power": "Laadvermogen batterij",
+      "battery_discharge_power": "Ontlaadvermogen batterij",
+      "battery_soc": "Batterijniveau",
+      "solar_energy": "Zonne-energie",
+      "load_energy": "Energie huis (optioneel)",
+      "grid_import_energy": "Energie van het net",
+      "grid_export_energy": "Energie naar het net",
+      "battery_charge_energy": "Geladen energie",
+      "battery_discharge_energy": "Ontladen energie",
+      "inverter_power": "Uitgangsvermogen omvormer",
+      "inverter_rated_power": "Nominaal vermogen omvormer",
+      "battery_temperature": "Batterijtemperatuur",
+      "battery_voltage": "Batterijspanning",
+      "battery_current": "Batterijstroom",
+      "generator_power": "Generatorvermogen"
+    },
+    "editorPhaseLoad": "Huis {n}",
+    "editorPhaseGrid": "Net {n}",
+    "editorPhaseVoltage": "Spanning {n}",
+    "editorStringPower": "PV{n} vermogen",
+    "editorStringVoltage": "PV{n} spanning",
+    "editorStringCurrent": "PV{n} stroom",
+    "editorEnergySensors": "Energiesensoren",
+    "editorEnergyDaily": "Elke dag op nul",
+    "editorEnergyTotal": "Totaaltellers (nooit op nul)",
+    "editorInvertGrid": "Mijn netsensor is + bij teruglevering",
+    "editorInvertBattery": "Mijn batterijsensor is + bij laden",
+    "editorSectionsHint": "Vink aan wat de kaart toont; de pijlen veranderen de volgorde.",
+    "editorSectionNames": {
+      "flow": "Hoofdweergave (animatie)",
+      "today": "Tegels van vandaag",
+      "sources": "Waar de stroom vandaag vandaan kwam",
+      "inverter": "Omvormerdetails",
+      "forecast": "Batterijprognose",
+      "pv_forecast": "PV-prognose",
+      "virtual_storage": "Virtuele opslag",
+      "system": "Installatie",
+      "energy": "Energie en grafiek",
+      "insights": "Vandaag in het kort",
+      "comparison": "Vergelijking",
+      "panels": "Panelen"
+    },
+    "editorFolded": "ingeklapt",
+    "editorUp": "Omhoog",
+    "editorDown": "Omlaag",
+    "editorReset": "Standaardsecties herstellen",
+    "editorYamlOnly": "Meerdere batterijen (batteries:) en paneelsensoren (panels:) stel je voorlopig in YAML in.",
+    "editorVsEnable": "Virtuele opslag tonen (uurbalans)",
+    "editorVsEntity": "Kant-en-klare balanssensor (optioneel)",
+    "editorVsNegative": "Een tekort",
+    "editorVsShow": "in rood tonen",
+    "editorVsZero": "als 0 kWh tonen",
+    "editorVsOwn": "Verrekende energie als eigen energie tellen (zelfvoorziening)",
+    "editorVsHint": "Zonder kant-en-klare sensor berekent de kaart de balans uit de energiesensoren van het net.",
+    "editorPvfToday": "Prognose voor vandaag",
+    "editorPvfRemaining": "Rest van vandaag (optioneel)",
+    "editorPvfDays": "Volgende dagen (vanaf morgen)",
+    "editorDayN": "Dag {n}",
+    "editorDetails": "Omvormerdetails: extra sensoren",
+    "editorSensorN": "Sensor {n}",
+    "editorWeather": "Weer",
+    "editorPeriod": "Startperiode",
+    "editorFontUrl": "Eigen lettertype-stylesheet (URL)"
   },
   "pl": {
     "languageName": "Polski",
@@ -1051,7 +1315,95 @@ const TRANSLATIONS = {
     "pvForecastNote": "prognoza {kwh}",
     "pvProducedOf": "wyprodukowano {done} z {total}",
     "chartFallback": "Średnie godzinowe ze statystyk energii. Brak historii mocy dla: {sensors} (wyłączone z recordera?)",
-    "chartNoHistory": "Brak historii dla: {sensors}. Czy nie są wyłączone z recordera?"
+    "chartNoHistory": "Brak historii dla: {sensors}. Czy nie są wyłączone z recordera?",
+    "editorBeta": "Beta: nowy edytor. Opcje, których tu nie ma, zostają w YAML-u bez zmian.",
+    "editorGroups": {
+      "look": "Wygląd",
+      "sensors": "Czujniki",
+      "sections": "Sekcje",
+      "install": "Instalacja",
+      "summary": "Podsumowanie i ceny",
+      "vstore": "Wirtualny magazyn",
+      "forecast": "Prognoza PV",
+      "more": "Więcej"
+    },
+    "editorSensorsHint": "DeyeCloud jest wykrywany automatycznie – zostaw te pola puste. Dla innych falowników wybierz swoje czujniki; każdy jest opisany w przewodniku konfiguracji w README.",
+    "editorEntityGroups": {
+      "live": "Moc na żywo",
+      "energy": "Energia",
+      "system": "Odczyty instalacji",
+      "strings": "Stringi PV"
+    },
+    "editorEntities": {
+      "solar_power": "Moc PV",
+      "load_power": "Zużycie domu (opcjonalnie)",
+      "grid_power": "Moc sieci (+ pobór, − oddanie)",
+      "grid_import_power": "Moc poboru z sieci",
+      "grid_export_power": "Moc oddawania do sieci",
+      "battery_power": "Moc magazynu (+ rozładowanie)",
+      "battery_charge_power": "Moc ładowania magazynu",
+      "battery_discharge_power": "Moc rozładowania magazynu",
+      "battery_soc": "Poziom naładowania magazynu",
+      "solar_energy": "Energia z PV",
+      "load_energy": "Energia zużyta w domu (opcjonalnie)",
+      "grid_import_energy": "Energia pobrana z sieci",
+      "grid_export_energy": "Energia oddana do sieci",
+      "battery_charge_energy": "Energia naładowana",
+      "battery_discharge_energy": "Energia rozładowana",
+      "inverter_power": "Moc wyjściowa falownika",
+      "inverter_rated_power": "Moc znamionowa falownika",
+      "battery_temperature": "Temperatura magazynu",
+      "battery_voltage": "Napięcie magazynu",
+      "battery_current": "Prąd magazynu",
+      "generator_power": "Moc generatora"
+    },
+    "editorPhaseLoad": "Dom {n}",
+    "editorPhaseGrid": "Sieć {n}",
+    "editorPhaseVoltage": "Napięcie {n}",
+    "editorStringPower": "Moc PV{n}",
+    "editorStringVoltage": "Napięcie PV{n}",
+    "editorStringCurrent": "Prąd PV{n}",
+    "editorEnergySensors": "Czujniki energii",
+    "editorEnergyDaily": "Zerują się codziennie",
+    "editorEnergyTotal": "Liczniki całkowite (nie zerują się)",
+    "editorInvertGrid": "Mój czujnik sieci ma + przy oddawaniu",
+    "editorInvertBattery": "Mój czujnik magazynu ma + przy ładowaniu",
+    "editorSectionsHint": "Zaznacz, co karta pokazuje; strzałki zmieniają kolejność.",
+    "editorSectionNames": {
+      "flow": "Widok główny (animacja)",
+      "today": "Kafelki dnia",
+      "sources": "Skąd dziś prąd w domu",
+      "inverter": "Szczegóły falownika",
+      "forecast": "Prognoza magazynu",
+      "pv_forecast": "Prognoza PV",
+      "virtual_storage": "Wirtualny magazyn",
+      "system": "Instalacja",
+      "energy": "Energia i wykres",
+      "insights": "Dziś w skrócie",
+      "comparison": "Porównanie",
+      "panels": "Panele"
+    },
+    "editorFolded": "zwinięta",
+    "editorUp": "W górę",
+    "editorDown": "W dół",
+    "editorReset": "Przywróć domyślne sekcje",
+    "editorYamlOnly": "Kilka magazynów (batteries:) i czujniki paneli (panels:) ustawia się na razie w YAML-u.",
+    "editorVsEnable": "Pokaż wirtualny magazyn (bilans godzinowy)",
+    "editorVsEntity": "Gotowy czujnik bilansu (opcjonalnie)",
+    "editorVsNegative": "Niedobór",
+    "editorVsShow": "pokazuj na czerwono",
+    "editorVsZero": "pokazuj jako 0 kWh",
+    "editorVsOwn": "Wliczaj zbilansowaną energię jako własną (samowystarczalność)",
+    "editorVsHint": "Bez gotowego czujnika karta liczy bilans z czujników energii sieci.",
+    "editorPvfToday": "Prognoza na dziś",
+    "editorPvfRemaining": "Pozostało dziś (opcjonalnie)",
+    "editorPvfDays": "Kolejne dni (od jutra)",
+    "editorDayN": "Dzień {n}",
+    "editorDetails": "Szczegóły falownika: dodatkowe czujniki",
+    "editorSensorN": "Czujnik {n}",
+    "editorWeather": "Pogoda",
+    "editorPeriod": "Okres na start",
+    "editorFontUrl": "Własny arkusz czcionek (URL)"
   }
 };
 
@@ -6069,6 +6421,8 @@ const EDITOR_NUMBERS = [
   ["pv_capacity", "editorPvCapacity", "0.1"],
   ["pv_panels", "editorPvPanels", "1"],
   ["inverter_power_rating", "editorInverterRating", "0.1"],
+];
+const EDITOR_PRICES = [
   ["price_import", "editorPriceImport", "0.01"],
   ["price_export", "editorPriceExport", "0.01"],
   ["co2_factor", "editorCo2", "0.01"],
@@ -6089,24 +6443,39 @@ function editorStrings(hass, config) {
   }
 }
 
-// Switches that are off unless set: [config key, label key, value when on].
-const EDITOR_OPTIN = [["wide", "editorWide"], ["show_insights", "editorInsights"], ["panels_average", "editorPanelsAverage", "per_string"], ["background", "editorGlass", "glass"], ["load_fonts", "editorFonts"], ["collapsible", "editorCollapsible"]];
-const EDITOR_SWITCHES = [
-  ["show_solar", "editorSolar"],
-  ["show_battery", "editorBattery"],
-  ["show_energy", "editorShowEnergy"],
-  ["show_chart", "editorShowChart"],
-  ["show_forecast", "editorShowForecast"],
-  ["show_system", "editorShowSystem"],
-  ["show_panels", "editorShowPanels"],
-  ["show_weather", "editorShowWeather"],
-  ["show_self_sufficiency", "editorShowSelfSufficiency"],
-  ["show_self_use", "editorShowSelfUse"],
-  ["show_savings", "editorShowSavings"],
-  ["show_co2", "editorShowCo2"],
-  ["show_yield", "editorShowYield"],
-  ["animation", "editorAnimation"],
-];
+// Switches: [config key, label key, value when on]; on unless set to false
+// (EDITOR_DEFAULT_ON) or off unless set (the rest).
+const EDITOR_DEFAULT_ON = ["show_solar", "show_battery", "show_chart", "show_weather", "show_self_sufficiency", "show_self_use", "show_savings", "show_co2", "show_yield", "animation"];
+const EDITOR_SWITCH_GROUPS = {
+  look: [["wide", "editorWide"], ["background", "editorGlass", "glass"], ["animation", "editorAnimation"], ["load_fonts", "editorFonts"], ["collapsible", "editorCollapsible"], ["show_chart", "editorShowChart"], ["show_weather", "editorShowWeather"]],
+  install: [["show_solar", "editorSolar"], ["show_battery", "editorBattery"], ["panels_average", "editorPanelsAverage", "per_string"]],
+  summary: [["show_self_sufficiency", "editorShowSelfSufficiency"], ["show_self_use", "editorShowSelfUse"], ["show_savings", "editorShowSavings"], ["show_co2", "editorShowCo2"], ["show_yield", "editorShowYield"], ["show_insights", "editorInsights"]],
+  sensors: [["invert_grid", "editorInvertGrid"], ["invert_battery", "editorInvertBattery"]],
+};
+
+// The sensors under `entities:`, in groups: [config key, label].
+function editorEntityGroups(t) {
+  const phases = (key, label) => [1, 2, 3].map((n) => [`${key}_l${n}`, fill(label, { n: `L${n}` })]);
+  const strings = [1, 2, 3, 4].flatMap((n) => [[`pv${n}_power`, fill(t.editorStringPower, { n })], [`pv${n}_voltage`, fill(t.editorStringVoltage, { n })], [`pv${n}_current`, fill(t.editorStringCurrent, { n })]]);
+  const named = (keys) => keys.map((key) => [key, t.editorEntities[key]]);
+  return [
+    ["live", named(["solar_power", "load_power", "grid_power", "grid_import_power", "grid_export_power", "battery_power", "battery_charge_power", "battery_discharge_power", "battery_soc"])],
+    ["energy", named(["solar_energy", "load_energy", "grid_import_energy", "grid_export_energy", "battery_charge_energy", "battery_discharge_energy"])],
+    ["system", [...phases("load_power", t.editorPhaseLoad), ...phases("grid_power", t.editorPhaseGrid), ...phases("grid_voltage", t.editorPhaseVoltage),
+      ...named(["inverter_power", "inverter_rated_power", "battery_temperature", "battery_voltage", "battery_current", "generator_power"])]],
+    ["strings", strings],
+  ];
+}
+
+// The sections in the editor: the configured list, or every section in the
+// default order without the ones a `show_…: false` hides.
+const SECTION_SHOW_KEYS = { energy: "show_energy", forecast: "show_forecast", system: "show_system", panels: "show_panels" };
+function editorSections(config) {
+  const order = ["flow", "today", "sources", ...SECTION_ORDER];
+  const listed = sectionList(config);
+  const on = listed || order.filter((id) => config[SECTION_SHOW_KEYS[id]] !== false && (id !== "insights" && id !== "comparison" || insightsShown(config)));
+  return [...on.map((id) => ({ id, on: true })), ...order.filter((id) => !on.includes(id)).map((id) => ({ id, on: false }))];
+}
 
 class SolarFlowCardEditor extends HTMLElement {
   constructor() {
@@ -6114,27 +6483,138 @@ class SolarFlowCardEditor extends HTMLElement {
     this.attachShadow({ mode: "open" });
     this._config = {};
     this._hass = null;
+    this._open = new Set(["look"]);
   }
 
   set hass(hass) {
     const first = !this._hass;
     this._hass = hass;
-    if (first) this._render();
+    if (first) {
+      this._render();
+      this._loadPicker();
+    } else {
+      this.shadowRoot.querySelectorAll("ha-selector").forEach((el) => { el.hass = hass; });
+    }
   }
 
   setConfig(config) {
     // The editor writes the current option names; an old name is replaced on
-    // the next change.
-    this._config = migrateConfig(config || {});
+    // the next change. Options it does not show are kept as they are.
+    const next = migrateConfig(config || {});
+    // Home Assistant hands every change back: nothing to redraw then, so the
+    // field being edited keeps its focus.
+    if (JSON.stringify(next) === JSON.stringify(this._config) && this.shadowRoot.childElementCount) return;
+    this._config = next;
     this._render();
+  }
+
+  // Home Assistant loads its entity picker only when a built-in editor needs
+  // it: open one in the background, then draw the pickers again.
+  async _loadPicker() {
+    if (customElements.get("ha-selector") || typeof window.loadCardHelpers !== "function") return;
+    try {
+      const helpers = await window.loadCardHelpers();
+      const card = await helpers.createCardElement({ type: "entities", entities: [] });
+      await card.constructor.getConfigElement?.();
+      await customElements.whenDefined("ha-selector");
+      this._render();
+    } catch (error) {
+      // The text fields with suggestions stay.
+    }
+  }
+
+  _emit(next) {
+    this._config = next;
+    this.dispatchEvent(new CustomEvent("config-changed", { detail: { config: next }, bubbles: true, composed: true }));
   }
 
   _set(key, value) {
     const next = { ...this._config };
     if (value === undefined || value === null || value === "") delete next[key];
     else next[key] = value;
-    this._config = next;
-    this.dispatchEvent(new CustomEvent("config-changed", { detail: { config: next }, bubbles: true, composed: true }));
+    this._emit(next);
+  }
+
+  // A key inside an object option (entities, virtual_storage, pv_forecast);
+  // the object goes away when it is left empty.
+  _setIn(group, key, value) {
+    const inner = { ...(typeof this._config[group] === "object" && this._config[group] ? this._config[group] : {}) };
+    if (value === undefined || value === null || value === "" || (Array.isArray(value) && !value.length)) delete inner[key];
+    else inner[key] = value;
+    this._set(group, Object.keys(inner).length ? inner : undefined);
+  }
+
+  _setVirtual(key, value) {
+    const vs = this._config.virtual_storage;
+    const inner = { ...(vs && typeof vs === "object" ? vs : {}) };
+    if (value === undefined || value === "" || value === false) delete inner[key];
+    else inner[key] = value;
+    this._set("virtual_storage", Object.keys(inner).length ? inner : true);
+  }
+
+  // An entity field: Home Assistant's picker when it is available, else a
+  // text field with the sensors as suggestions.
+  _picker(path, label, value, domain = "sensor") {
+    return `<div class="picker" data-path="${escapeHtml(path)}" data-label="${escapeHtml(label)}" data-domain="${domain}" data-value="${escapeHtml(value || "")}"></div>`;
+  }
+
+  _mountPickers(root) {
+    const selector = customElements.get("ha-selector");
+    for (const el of root.querySelectorAll(".picker")) {
+      const { path, label, domain, value } = el.dataset;
+      const changed = (v) => this._pick(path, typeof v === "string" ? v.trim() : v);
+      if (selector) {
+        const picker = document.createElement("ha-selector");
+        picker.hass = this._hass;
+        picker.selector = { entity: { domain } };
+        picker.label = label;
+        picker.value = value || undefined;
+        picker.required = false;
+        picker.addEventListener("value-changed", (e) => changed(e.detail?.value));
+        el.append(picker);
+      } else {
+        el.innerHTML = `<label><span>${escapeHtml(label)}</span><input type="text" list="sfc-${domain}" value="${escapeHtml(value)}" placeholder="${domain}.…" /></label>`;
+        el.querySelector("input").addEventListener("change", (e) => changed(e.target.value));
+      }
+    }
+  }
+
+  _pick(path, value) {
+    const [group, key, index] = path.split(".");
+    if (group === "entities") this._setIn("entities", key, value);
+    else if (group === "virtual_storage") this._setVirtual(key, value);
+    else if (group === "pv_forecast" && key === "days") this._setList(["pv_forecast", "days"], Number(index), value);
+    else if (group === "pv_forecast") this._setIn("pv_forecast", key, value);
+    else if (group === "inverter_details") this._setList(["inverter_details"], Number(key), value);
+    else this._set(group, value);
+  }
+
+  // One item of a list option; an emptied item is removed.
+  _setList([group, key], index, value) {
+    const current = key ? this._config[group]?.[key] : this._config[group];
+    const list = Array.isArray(current) ? [...current] : [];
+    if (value) list[index] = value;
+    else list.splice(index, 1);
+    const clean = list.filter(Boolean);
+    if (key) this._setIn(group, key, clean);
+    else this._set(group, clean.length ? clean : undefined);
+    this._render();
+  }
+
+  _switchOn(key, value) {
+    if (key === "show_insights") return insightsShown(this._config);
+    return EDITOR_DEFAULT_ON.includes(key) ? this._config[key] !== false : this._config[key] === (value ?? true);
+  }
+
+  _switches(t, group) {
+    return EDITOR_SWITCH_GROUPS[group].map(([key, label, value]) => `
+      <div class="switch"><label for="sw-${key}">${escapeHtml(t[label])}</label>
+        <input id="sw-${key}" data-switch="${key}" data-on="${escapeHtml(String(value ?? true))}" type="checkbox" ${this._switchOn(key, value) ? "checked" : ""} /></div>`).join("");
+  }
+
+  _numbers(t, list) {
+    return list.map(([key, label, step]) => `
+      <label><span>${escapeHtml(t[label])}</span><input data-number="${key}" type="number" min="0" step="${step}" inputmode="decimal" value="${escapeHtml(this._config[key] ?? "")}" /></label>`).join("");
   }
 
   // Panels on each PV string the inverter reports (or one field when it
@@ -6149,86 +6629,240 @@ class SolarFlowCardEditor extends HTMLElement {
             <input data-string="${i}" type="number" min="0" step="1" inputmode="numeric" value="${escapeHtml(String(valueAt(i)))}" /></label>`).join("")
       : `<label><span>${escapeHtml(t.editorPanelsPerString)}</span><input id="panels_per_string" type="number" min="0" step="1" inputmode="numeric" value="${escapeHtml(String(Array.isArray(setting) ? setting[0] ?? "" : setting ?? ""))}" /></label>`;
     return `
-      <div class="strings">
+      <div class="box">
         <span class="title">${escapeHtml(t.editorPanelsPerString)}</span>
         <div class="grid">${fields}</div>
         <p class="hint">${escapeHtml(t.editorStringsHint)}</p>
       </div>`;
   }
 
+  _group(id, t, body) {
+    const open = this._open.has(id);
+    return `
+      <details data-group="${id}" ${open ? "open" : ""}>
+        <summary>${escapeHtml(t.editorGroups[id])}</summary>
+        <div class="body">${open ? body() : ""}</div>
+      </details>`;
+  }
+
+  _lookHtml(t) {
+    const stations = deyeStations(this._hass);
+    const labels = periodLabels(t);
+    return `
+      <div class="themes">${THEMES.map((theme) => `
+        <button type="button" data-theme="${theme}" class="${(this._config.theme || "diorama") === theme ? "on" : ""}">${escapeHtml(t.themeNames[theme])}</button>`).join("")}
+      </div>
+      <div class="grid">
+        <label><span>${escapeHtml(t.editorTitle)}</span><input data-text="title" type="text" value="${escapeHtml(this._config.title ?? "")}" /></label>
+        <label><span>${escapeHtml(t.editorLanguage)}</span>
+          <select data-select="language">
+            <option value="">${escapeHtml(t.languageAuto)}</option>
+            ${Object.entries(LANGUAGE_NAMES).map(([code, name]) => `<option value="${code}" ${this._config.language === code ? "selected" : ""}>${escapeHtml(name)}</option>`).join("")}
+          </select>
+        </label>
+        <label><span>${escapeHtml(t.editorPeriod)}</span>
+          <select data-select="period">${PERIODS.map((p) => `<option value="${p === "today" ? "" : p}" ${(this._config.period || "today") === p ? "selected" : ""}>${escapeHtml(labels[p][1])}</option>`).join("")}</select>
+        </label>
+        ${stations.length > 1 ? `
+          <label><span>${escapeHtml(t.editorStation)}</span>
+            <select data-select="station_id"><option value="">${escapeHtml(t.auto)}</option>
+              ${stations.map((id) => `<option value="${escapeHtml(id)}" ${String(this._config.station_id) === id ? "selected" : ""}>${escapeHtml(id)}</option>`).join("")}
+            </select>
+          </label>` : ""}
+      </div>
+      ${this._switches(t, "look")}`;
+  }
+
+  _sensorsHtml(t) {
+    const entities = this._config.entities || {};
+    return `
+      <p class="hint">${escapeHtml(t.editorSensorsHint)}</p>
+      ${editorEntityGroups(t).map(([group, items]) => `
+        <details class="box" ${group === "live" || group === "energy" || items.some(([key]) => entities[key]) ? "open" : ""}>
+          <summary class="title">${escapeHtml(t.editorEntityGroups[group])}</summary>
+          <div class="pickers">${items.map(([key, label]) => this._picker(`entities.${key}`, label, entities[key])).join("")}</div>
+        </details>`).join("")}
+      <label><span>${escapeHtml(t.editorEnergySensors)}</span>
+        <select data-select="energy_sensors">
+          <option value="">${escapeHtml(t.editorEnergyDaily)}</option>
+          <option value="total" ${this._config.energy_sensors === "total" ? "selected" : ""}>${escapeHtml(t.editorEnergyTotal)}</option>
+        </select>
+      </label>
+      ${this._switches(t, "sensors")}`;
+  }
+
+  _sectionsHtml(t) {
+    const rows = editorSections(this._config);
+    const collapsible = this._config.collapsible === true;
+    const collapsed = Array.isArray(this._config.collapsed) ? this._config.collapsed : [];
+    return `
+      <p class="hint">${escapeHtml(t.editorSectionsHint)}</p>
+      <div class="sections">${rows.map(({ id, on }, i) => `
+        <div class="section ${on ? "" : "off"}">
+          <input type="checkbox" data-section="${id}" ${on ? "checked" : ""} aria-label="${escapeHtml(t.editorSectionNames[id])}" />
+          <span>${escapeHtml(t.editorSectionNames[id])}${id === "today" || id === "sources" ? ` <small>(Diorama)</small>` : ""}</span>
+          ${collapsible && on && SECTION_HTML[id] && id !== "inverter" ? `<label class="fold"><input type="checkbox" data-fold="${id}" ${collapsed.includes(id) ? "checked" : ""} /> ${escapeHtml(t.editorFolded)}</label>` : ""}
+          ${on ? `<button type="button" data-move="${i}" data-dir="-1" title="${escapeHtml(t.editorUp)}" ${i === 0 ? "disabled" : ""}>↑</button>
+          <button type="button" data-move="${i}" data-dir="1" title="${escapeHtml(t.editorDown)}" ${!rows[i + 1]?.on ? "disabled" : ""}>↓</button>` : ""}
+        </div>`).join("")}
+      </div>
+      ${sectionList(this._config) ? `<button type="button" class="link" data-reset-sections>${escapeHtml(t.editorReset)}</button>` : ""}`;
+  }
+
+  _installHtml(t) {
+    return `
+      <div class="grid">${this._numbers(t, EDITOR_NUMBERS)}</div>
+      ${this._stringsHtml(t)}
+      ${this._switches(t, "install")}
+      <p class="hint">${escapeHtml(t.editorYamlOnly)}</p>`;
+  }
+
+  _summaryHtml(t) {
+    return `
+      <div class="grid">
+        ${this._numbers(t, EDITOR_PRICES)}
+        <label><span>${escapeHtml(t.editorCurrency)}</span><input data-text="currency" type="text" value="${escapeHtml(this._config.currency ?? "")}" placeholder="${escapeHtml(t.currency)}" /></label>
+      </div>
+      ${this._switches(t, "summary")}`;
+  }
+
+  _vstoreHtml(t) {
+    const config = virtualStorageConfig(this._config);
+    return `
+      <div class="switch"><label for="vs-on">${escapeHtml(t.editorVsEnable)}</label><input id="vs-on" type="checkbox" ${config ? "checked" : ""} /></div>
+      ${config ? `
+        ${this._picker("virtual_storage.entity", t.editorVsEntity, config.entity)}
+        <label><span>${escapeHtml(t.editorVsNegative)}</span>
+          <select data-vs="negative">
+            <option value="">${escapeHtml(t.editorVsShow)}</option>
+            <option value="zero" ${config.negative === "zero" ? "selected" : ""}>${escapeHtml(t.editorVsZero)}</option>
+          </select>
+        </label>
+        <div class="switch"><label for="vs-own">${escapeHtml(t.editorVsOwn)}</label><input id="vs-own" type="checkbox" ${config.countAsOwn ? "checked" : ""} /></div>
+        <p class="hint">${escapeHtml(t.editorVsHint)}</p>` : ""}`;
+  }
+
+  _forecastHtml(t) {
+    const f = this._config.pv_forecast && typeof this._config.pv_forecast === "object" ? this._config.pv_forecast : {};
+    const days = Array.isArray(f.days) ? f.days : [];
+    return `
+      ${this._picker("pv_forecast.today", t.editorPvfToday, f.today)}
+      ${this._picker("pv_forecast.remaining", t.editorPvfRemaining, f.remaining)}
+      <div class="box">
+        <span class="title">${escapeHtml(t.editorPvfDays)}</span>
+        <div class="pickers">${[...days, ""].slice(0, 13).map((id, i) => this._picker(`pv_forecast.days.${i}`, fill(t.editorDayN, { n: i + 1 }), id)).join("")}</div>
+      </div>`;
+  }
+
+  _moreHtml(t) {
+    const details = Array.isArray(this._config.inverter_details) ? this._config.inverter_details : [];
+    return `
+      <div class="box">
+        <span class="title">${escapeHtml(t.editorDetails)}</span>
+        <div class="pickers">${[...details, ""].map((item, i) => (typeof item === "object" && item
+          ? `<p class="hint">${escapeHtml(item.name || item.entity || "")} (YAML)</p>`
+          : this._picker(`inverter_details.${i}`, fill(t.editorSensorN, { n: i + 1 }), item))).join("")}</div>
+      </div>
+      ${this._picker("weather_entity", t.editorWeather, this._config.weather_entity, "weather")}
+      <label><span>${escapeHtml(t.editorFontUrl)}</span><input data-text="font_url" type="text" value="${escapeHtml(this._config.font_url ?? "")}" placeholder="/local/fonts/solar-flow-card.css" /></label>`;
+  }
+
   _render() {
     if (!this.shadowRoot) return;
     const t = stringsFor(languageOf(this._hass, this._config));
-    const stations = deyeStations(this._hass);
-    const value = (key) => escapeHtml(this._config[key] ?? "");
+    const ids = (domain) => Object.keys(this._hass?.states || {}).filter((id) => id.startsWith(`${domain}.`)).sort();
     this.shadowRoot.innerHTML = `
       <style>
         :host { display: block; color: var(--primary-text-color); }
-        .editor { display: grid; gap: 14px; padding: 8px 0; }
-        label { display: grid; gap: 6px; font-size: 13px; color: var(--secondary-text-color); }
+        .editor { display: grid; gap: 8px; padding: 8px 0; }
+        .beta { margin: 0 0 4px; padding: 8px 11px; border-radius: 10px; background: var(--secondary-background-color, rgba(127,127,127,.08)); color: var(--secondary-text-color, #727272); font-size: 12px; }
+        details { border: 1px solid var(--divider-color, rgba(127,127,127,.35)); border-radius: 12px; }
+        summary { padding: 12px 14px; cursor: pointer; font-weight: 600; font-size: 15px; }
+        .body { display: grid; gap: 12px; padding: 4px 14px 14px; }
+        label { display: grid; gap: 6px; font-size: 13px; color: var(--secondary-text-color, #727272); }
         input[type="text"], input[type="number"], select {
           width: 100%; min-height: 40px; box-sizing: border-box; padding: 8px 11px; font: inherit;
-          color: var(--primary-text-color); background: var(--card-background-color);
-          border: 1px solid var(--divider-color); border-radius: 10px;
+          color: var(--primary-text-color); background: var(--card-background-color, transparent);
+          border: 1px solid var(--divider-color, rgba(127,127,127,.35)); border-radius: 10px;
         }
         .themes { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 6px; }
-        .themes button { padding: 10px 4px; border-radius: 10px; border: 1px solid var(--divider-color); background: var(--card-background-color);
+        .themes button { padding: 10px 4px; border-radius: 10px; border: 1px solid var(--divider-color, rgba(127,127,127,.35)); background: var(--card-background-color, transparent);
           color: var(--primary-text-color); font: inherit; font-size: 12px; cursor: pointer; }
-        .themes button.on { border-color: var(--primary-color); box-shadow: inset 0 0 0 1px var(--primary-color); font-weight: 700; }
+        .themes button.on { border-color: var(--primary-color, #03a9f4); box-shadow: inset 0 0 0 1px var(--primary-color, #03a9f4); font-weight: 700; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+        .pickers { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
         .switch { display: flex; justify-content: space-between; align-items: center; gap: 12px; color: var(--primary-text-color); font-size: 14px; }
-        input[type="checkbox"] { width: 19px; height: 19px; accent-color: var(--primary-color); }
-        .hint { margin: 0; color: var(--secondary-text-color); font-size: 12px; }
-        .strings { display: grid; gap: 8px; padding: 10px 12px; border: 1px solid var(--divider-color); border-radius: 10px; }
-        .strings .title { font-size: 13px; font-weight: 600; color: var(--primary-text-color); }
+        .switch label { color: inherit; font-size: inherit; }
+        input[type="checkbox"] { width: 19px; height: 19px; flex: none; accent-color: var(--primary-color, #03a9f4); }
+        .hint { margin: 0; color: var(--secondary-text-color, #727272); font-size: 12px; }
+        .box { display: grid; gap: 8px; padding: 10px 12px; border: 1px solid var(--divider-color, rgba(127,127,127,.35)); border-radius: 10px; }
+        .box .title { font-size: 13px; font-weight: 600; color: var(--primary-text-color); }
+        details.box { border-radius: 10px; }
+        details.box > summary { padding: 0; cursor: pointer; }
+        details.box[open] > summary { margin-bottom: 4px; }
+        .sections { display: grid; gap: 4px; }
+        .section { display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 6px 0 10px; border: 1px solid var(--divider-color, rgba(127,127,127,.35)); border-radius: 10px; font-size: 14px; }
+        .section.off { opacity: .6; }
+        .section > span { flex: 1; min-width: 0; }
+        .section small { color: var(--secondary-text-color, #727272); }
+        .section .fold { display: flex; align-items: center; gap: 4px; font-size: 12px; }
+        .section .fold input { width: 15px; height: 15px; }
+        .section button { width: 32px; height: 32px; border: 0; border-radius: 8px; background: none; color: var(--primary-text-color); font: inherit; font-size: 16px; cursor: pointer; }
+        .section button:disabled { opacity: .25; cursor: default; }
+        .link { justify-self: start; padding: 0; border: 0; background: none; color: var(--primary-color, #03a9f4); font: inherit; font-size: 13px; cursor: pointer; }
       </style>
+      <datalist id="sfc-sensor">${ids("sensor").map((id) => `<option value="${escapeHtml(id)}"></option>`).join("")}</datalist>
+      <datalist id="sfc-weather">${ids("weather").map((id) => `<option value="${escapeHtml(id)}"></option>`).join("")}</datalist>
       <div class="editor">
-        <label><span>${escapeHtml(t.editorTheme)}</span>
-          <div class="themes">${THEMES.map((theme) => `
-            <button type="button" data-theme="${theme}" class="${(this._config.theme || "diorama") === theme ? "on" : ""}">${escapeHtml(t.themeNames[theme])}</button>`).join("")}
-          </div>
-        </label>
-        <div class="grid">
-          <label><span>${escapeHtml(t.editorTitle)}</span><input id="title" type="text" value="${value("title")}" /></label>
-          <label><span>${escapeHtml(t.editorLanguage)}</span>
-            <select id="language">
-              <option value="">${escapeHtml(t.languageAuto)}</option>
-              ${Object.entries(LANGUAGE_NAMES).map(([code, name]) => `<option value="${code}" ${this._config.language === code ? "selected" : ""}>${escapeHtml(name)}</option>`).join("")}
-            </select>
-          </label>
-          ${stations.length > 1 ? `
-            <label><span>${escapeHtml(t.editorStation)}</span>
-              <select id="station_id"><option value="">${escapeHtml(t.auto)}</option>
-                ${stations.map((id) => `<option value="${escapeHtml(id)}" ${String(this._config.station_id) === id ? "selected" : ""}>${escapeHtml(id)}</option>`).join("")}
-              </select>
-            </label>` : ""}
-        </div>
-        <div class="grid">
-          ${EDITOR_NUMBERS.map(([key, label, step]) => `
-            <label><span>${escapeHtml(t[label])}</span><input id="${key}" type="number" min="0" step="${step}" inputmode="decimal" value="${value(key)}" /></label>`).join("")}
-          <label><span>${escapeHtml(t.editorCurrency)}</span><input id="currency" type="text" value="${value("currency")}" placeholder="${escapeHtml(t.currency)}" /></label>
-        </div>
-        ${this._stringsHtml(t)}
-        ${EDITOR_SWITCHES.map(([key, label]) => `
-          <div class="switch"><label for="${key}" style="color:inherit">${escapeHtml(t[label])}</label>
-            <input id="${key}" type="checkbox" ${this._config[key] === false ? "" : "checked"} /></div>`).join("")}
-        ${EDITOR_OPTIN.map(([key, label, value]) => `
-          <div class="switch"><label for="${key}" style="color:inherit">${escapeHtml(t[label])}</label>
-            <input id="${key}" type="checkbox" ${(key === "show_insights" ? insightsShown(this._config) : this._config[key] === (value ?? true)) ? "checked" : ""} /></div>`).join("")}
-        <p class="hint">${escapeHtml(t.editorHint)}</p>
+        <p class="beta">${escapeHtml(t.editorBeta)}</p>
+        ${this._group("look", t, () => this._lookHtml(t))}
+        ${this._group("sensors", t, () => this._sensorsHtml(t))}
+        ${this._group("sections", t, () => this._sectionsHtml(t))}
+        ${this._group("install", t, () => this._installHtml(t))}
+        ${this._group("summary", t, () => this._summaryHtml(t))}
+        ${this._group("vstore", t, () => this._vstoreHtml(t))}
+        ${this._group("forecast", t, () => this._forecastHtml(t))}
+        ${this._group("more", t, () => this._moreHtml(t))}
       </div>`;
-    const root = this.shadowRoot;
+    this._wire(this.shadowRoot);
+  }
+
+  _wire(root) {
+    this._mountPickers(root);
+    root.querySelectorAll("details[data-group]").forEach((el) => el.addEventListener("toggle", () => {
+      const id = el.dataset.group;
+      if (el.open === this._open.has(id)) return;
+      if (el.open) this._open.add(id);
+      else this._open.delete(id);
+      this._render();
+    }));
     root.querySelectorAll("[data-theme]").forEach((button) => button.addEventListener("click", () => {
       this._set("theme", button.dataset.theme);
       this._render();
     }));
-    root.getElementById("language")?.addEventListener("change", (e) => {
-      this._set("language", e.target.value || undefined);
-      this._render();
-    });
-    root.getElementById("title")?.addEventListener("change", (e) => this._set("title", e.target.value.trim() || undefined));
-    root.getElementById("currency")?.addEventListener("change", (e) => this._set("currency", e.target.value.trim() || undefined));
-    root.getElementById("station_id")?.addEventListener("change", (e) => this._set("station_id", e.target.value || undefined));
+    root.querySelectorAll("[data-text]").forEach((input) => input.addEventListener("change", (e) => this._set(input.dataset.text, e.target.value.trim() || undefined)));
+    root.querySelectorAll("[data-select]").forEach((select) => select.addEventListener("change", (e) => {
+      this._set(select.dataset.select, e.target.value || undefined);
+      if (select.dataset.select === "language") this._render();
+    }));
+    root.querySelectorAll("[data-number]").forEach((input) => input.addEventListener("change", (e) => {
+      const number = Number.parseFloat(e.target.value);
+      this._set(input.dataset.number, Number.isFinite(number) ? number : undefined);
+    }));
+    root.querySelectorAll("[data-switch]").forEach((input) => input.addEventListener("change", (e) => {
+      const key = input.dataset.switch;
+      if (key === "show_insights") {
+        // Shown by default in the wide layout: store only a change from that.
+        this._set(key, e.target.checked === (this._config.wide === true) ? undefined : e.target.checked);
+      } else if (EDITOR_DEFAULT_ON.includes(key)) {
+        this._set(key, e.target.checked ? undefined : false);
+      } else {
+        const on = input.dataset.on === "true" ? true : input.dataset.on;
+        this._set(key, e.target.checked ? on : undefined);
+      }
+      // These change what else the editor offers.
+      if (key === "wide" || key === "collapsible") this._render();
+    }));
     // Panels per string: one field per string gives a list, the single field a number.
     root.querySelectorAll("[data-string]").forEach((input) => input.addEventListener("change", () => {
       const counts = [...root.querySelectorAll("[data-string]")].map((el) => Math.max(0, Math.round(Number.parseFloat(el.value)) || 0));
@@ -6239,23 +6873,53 @@ class SolarFlowCardEditor extends HTMLElement {
       const number = Math.round(Number.parseFloat(e.target.value));
       this._set("panels_per_string", number > 0 ? number : undefined);
     });
-    EDITOR_NUMBERS.forEach(([key]) => root.getElementById(key)?.addEventListener("change", (e) => {
-      const number = Number.parseFloat(e.target.value);
-      this._set(key, Number.isFinite(number) ? number : undefined);
+    this._wireSections(root);
+    root.getElementById("vs-on")?.addEventListener("change", (e) => {
+      this._set("virtual_storage", e.target.checked ? true : undefined);
+      this._render();
+    });
+    root.querySelector('[data-vs="negative"]')?.addEventListener("change", (e) => this._setVirtual("negative", e.target.value || undefined));
+    root.getElementById("vs-own")?.addEventListener("change", (e) => this._setVirtual("count_as_own", e.target.checked));
+  }
+
+  // Sections: a change writes the whole `sections:` list; the old
+  // show_… switches it replaces are removed so they do not hide a section
+  // that is ticked here.
+  _writeSections(rows) {
+    const next = { ...this._config, sections: rows.filter((r) => r.on).map((r) => r.id) };
+    for (const key of Object.values(SECTION_SHOW_KEYS)) delete next[key];
+    delete next.show_insights;
+    this._emit(next);
+    this._render();
+  }
+
+  _wireSections(root) {
+    root.querySelectorAll("[data-section]").forEach((input) => input.addEventListener("change", (e) => {
+      const rows = editorSections(this._config);
+      const row = rows.find((r) => r.id === input.dataset.section);
+      row.on = e.target.checked;
+      // A newly ticked section goes after the other ticked ones.
+      const ordered = [...rows.filter((r) => r.on && r !== row), ...(row.on ? [row] : []), ...rows.filter((r) => !r.on)];
+      this._writeSections(ordered);
     }));
-    EDITOR_OPTIN.forEach(([key, , value]) => root.getElementById(key)?.addEventListener("change", (e) => {
-      if (key === "show_insights") {
-        // Shown by default in the wide layout: store only a change from that.
-        this._set(key, e.target.checked === (this._config.wide === true) ? undefined : e.target.checked);
-        return;
-      }
-      this._set(key, e.target.checked ? value ?? true : undefined);
-      // The insights switch follows the layout's default.
-      if (key === "wide") this._render();
+    root.querySelectorAll("[data-move]").forEach((button) => button.addEventListener("click", () => {
+      const rows = editorSections(this._config);
+      const i = Number(button.dataset.move);
+      const j = i + Number(button.dataset.dir);
+      if (!rows[j]?.on) return;
+      [rows[i], rows[j]] = [rows[j], rows[i]];
+      this._writeSections(rows);
     }));
-    EDITOR_SWITCHES.forEach(([key]) => root.getElementById(key)?.addEventListener("change", (e) =>
-      this._set(key, e.target.checked ? undefined : false)
-    ));
+    root.querySelectorAll("[data-fold]").forEach((input) => input.addEventListener("change", (e) => {
+      const set = new Set(Array.isArray(this._config.collapsed) ? this._config.collapsed : []);
+      if (e.target.checked) set.add(input.dataset.fold);
+      else set.delete(input.dataset.fold);
+      this._set("collapsed", set.size ? [...set] : undefined);
+    }));
+    root.querySelector("[data-reset-sections]")?.addEventListener("click", () => {
+      this._set("sections", undefined);
+      this._render();
+    });
   }
 }
 
