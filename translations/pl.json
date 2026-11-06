@@ -415,5 +415,12 @@
   "editorImportPriceHint": "Cena zakupu: koszt każdej kWh, czyli energia i opłaty dystrybucyjne naliczane za kWh, bez stałych opłat miesięcznych.",
   "editorRceFound": "Znaleziono czujnik ceny RCE: {entity} · {value}.",
   "editorUseBilling": "Rozliczam się w net-billingu: wyceniaj oddaną energię po cenie RCE",
-  "editorBillingFactor": "Mnożnik depozytu (1,23)"
+  "editorBillingFactor": "Mnożnik depozytu (1,23)",
+  "invToday": "dziś {kwh}",
+  "editorInverters": "Kilka falowników",
+  "editorInvertersHint": "Ich moc i energia z PV są sumowane dla całej karty (bez helperów); każdy jest osobno w sekcji Instalacja.",
+  "editorInvSolarPower": "Moc PV",
+  "editorInvSolarEnergy": "Energia z PV",
+  "editorInvPower": "Moc wyjściowa (opcjonalnie)",
+  "editorInvRated": "Moc znamionowa (kW, opcjonalnie)"
 }

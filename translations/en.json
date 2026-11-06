@@ -415,5 +415,12 @@
   "editorImportPriceHint": "Import price: what each kWh costs, energy plus the distribution charges billed per kWh, without monthly fixed fees.",
   "editorRceFound": "RCE price sensor found: {entity} · {value}.",
   "editorUseBilling": "I'm on net-billing: value the energy sold at the RCE price",
-  "editorBillingFactor": "Deposit factor (1.23)"
+  "editorBillingFactor": "Deposit factor (1.23)",
+  "invToday": "{kwh} today",
+  "editorInverters": "Several inverters",
+  "editorInvertersHint": "Their solar power and energy are added up for the whole card (no helper sensors needed); each one is listed in the Installation section.",
+  "editorInvSolarPower": "Solar power",
+  "editorInvSolarEnergy": "Solar energy",
+  "editorInvPower": "Output power (optional)",
+  "editorInvRated": "Rated power (kW, optional)"
 }
