@@ -140,6 +140,8 @@ co2_factor: 0.7
 | `panel_strings` | `1` (`2` above 8 panels) | Number of strings the panels are split into, in order. |
 | `price_import` | – | Price per kWh bought from the grid, a number or a price sensor. Enables the savings. |
 | `price_export` | `0` | Price per kWh sold to the grid, a number or a price sensor (e.g. the hourly RCE price). |
+| `settlement` | – | `net_billing` or `net_metering`: how the energy sent to the grid is settled, see [below](#settlement-net-billing-or-net-metering). Also in the editor. |
+| `metering_ratio` | `0.8` / `0.7` | With `net_metering`: what a kWh sent back is worth in kWh bought. |
 | `currency` | by language (`zł`, `€`) | Currency shown with the savings. |
 | `co2_factor` | `0.5` | kg of CO₂ per kWh from the grid (Poland: about `0.7`). |
 
@@ -226,6 +228,23 @@ Listing `insights` or `comparison` shows them in the compact layout too. In the 
 | `show_savings` | `true` | Savings (needs `price_import`). |
 | `show_co2` | `true` | Avoided CO₂. |
 | `show_yield` | `true` | Yield per kWp: energy produced per kW of installed panels (needs `pv_capacity`). |
+
+#### Settlement: net-billing or net-metering
+
+`settlement` says how the energy sent to the grid is paid for. Then you only enter the import price:
+
+| `settlement` | The energy sent to the grid… |
+|---|---|
+| `net_billing` | is sold at the hourly RCE price. Without `price_export` the card finds an RCE price sensor itself (e.g. from ProfitEMS or the PSE integration), and the Energy prices chart appears. |
+| `net_metering` | is worth `metering_ratio` of a kWh bought: 0.8, or 0.7 above 10 kWp (worked out from `pv_capacity` unless you set it). |
+| not set | uses `price_export` as given. |
+
+```yaml
+settlement: net_billing
+price_import: 1.02                      # per kWh: energy and the per-kWh distribution charges
+```
+
+The import price is what each kWh costs: energy plus the distribution charges billed per kWh. Monthly fixed fees don't change with what you use, so leave them out.
 
 #### Prices that change by the hour
 

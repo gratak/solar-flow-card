@@ -400,5 +400,16 @@
   "pricesAhead": "Kolejne godziny – najtaniej: {cheap} ({cheapPrice}) · najdrożej: {dear} ({dearPrice})",
   "tomorrow": "jutro",
   "exportValue": "Wartość oddanej energii",
-  "editorNoImportPrice": "Oszczędność wymaga ceny zakupu: dopóki jej nie podasz, karta pokazuje wartość oddanej energii."
+  "editorNoImportPrice": "Oszczędność wymaga ceny zakupu: dopóki jej nie podasz, karta pokazuje wartość oddanej energii.",
+  "editorSettlement": "Rozliczenie z zakładem energetycznym",
+  "editorSettlementFixed": "Stałe ceny",
+  "editorSettlementBilling": "Net-billing (sprzedaż po cenie RCE)",
+  "editorSettlementMetering": "Net-metering (opusty 0,8 / 0,7)",
+  "editorSettlementHintFixed": "Ceny wpisane poniżej albo czujniki cen.",
+  "editorSettlementHintBilling": "Oddana energia jest sprzedawana po godzinowej cenie RCE: wpisz tylko cenę zakupu. Czujnik ceny RCE karta znajdzie sama, możesz też wybrać go poniżej.",
+  "editorSettlementHintMetering": "Każda oddana kWh jest warta {ratio} kWh pobranej: wpisz tylko cenę zakupu.",
+  "editorMeteringRatio": "Opust za oddaną kWh",
+  "editorMeteringAuto": "automatycznie ({ratio}; 0,7 powyżej 10 kWp)",
+  "editorRcePrice": "Czujnik ceny RCE",
+  "editorRceMissing": "Nie znaleziono czujnika ceny RCE: wybierz go (np. z integracji PSE albo z EMS), inaczej oddana energia nie zostanie wyceniona."
 }

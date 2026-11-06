@@ -38,7 +38,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "1.8.0-beta.10";
+const CARD_VERSION = "1.8.0-beta.11";
 const CARD_TAG = "solar-flow-card";
 const EDITOR_TAG = "solar-flow-card-editor";
 const THEMES = ["diorama", "aurora", "paper", "lcars", "atlantis", "expanse", "foundation", "galaxy", "gate", "reactor"];
@@ -450,7 +450,18 @@ const TRANSLATIONS = {
     "pricesAhead": "Coming up – cheapest: {cheap} ({cheapPrice}) · dearest: {dear} ({dearPrice})",
     "tomorrow": "tomorrow",
     "exportValue": "Value of energy sold",
-    "editorNoImportPrice": "Savings need an import price: until you set one, the card shows the value of the energy sold."
+    "editorNoImportPrice": "Savings need an import price: until you set one, the card shows the value of the energy sold.",
+    "editorSettlement": "Settlement with your utility",
+    "editorSettlementFixed": "Fixed prices",
+    "editorSettlementBilling": "Net-billing (energy sold at the RCE price)",
+    "editorSettlementMetering": "Net-metering (each kWh sent back worth 0.8 / 0.7 kWh)",
+    "editorSettlementHintFixed": "The prices below, or price sensors.",
+    "editorSettlementHintBilling": "The energy sent to the grid is sold at the hourly RCE price: enter only the import price. The card finds an RCE price sensor itself, or pick one below.",
+    "editorSettlementHintMetering": "Each kWh sent to the grid is worth {ratio} of a kWh bought: enter only the import price.",
+    "editorMeteringRatio": "Credit per kWh sent back",
+    "editorMeteringAuto": "automatic ({ratio}; 0.7 above 10 kWp)",
+    "editorRcePrice": "RCE price sensor",
+    "editorRceMissing": "No RCE price sensor found: pick one (e.g. from the PSE integration or your EMS), otherwise the energy sold has no price."
   },
   "de": {
     "languageName": "Deutsch",
@@ -854,7 +865,18 @@ const TRANSLATIONS = {
     "pricesAhead": "Nächste Stunden – am günstigsten: {cheap} ({cheapPrice}) · am teuersten: {dear} ({dearPrice})",
     "tomorrow": "morgen",
     "exportValue": "Wert der eingespeisten Energie",
-    "editorNoImportPrice": "Die Ersparnis braucht einen Bezugspreis: bis er gesetzt ist, zeigt die Karte den Wert der eingespeisten Energie."
+    "editorNoImportPrice": "Die Ersparnis braucht einen Bezugspreis: bis er gesetzt ist, zeigt die Karte den Wert der eingespeisten Energie.",
+    "editorSettlement": "Abrechnung mit dem Energieversorger",
+    "editorSettlementFixed": "Feste Preise",
+    "editorSettlementBilling": "Net-Billing (Verkauf zum RCE-Stundenpreis)",
+    "editorSettlementMetering": "Net-Metering (jede eingespeiste kWh zählt 0,8 / 0,7 kWh)",
+    "editorSettlementHintFixed": "Die Preise unten oder Preissensoren.",
+    "editorSettlementHintBilling": "Eingespeiste Energie wird zum RCE-Stundenpreis verkauft: nur den Bezugspreis eingeben. Die Karte findet einen RCE-Preissensor selbst, oder unten einen wählen.",
+    "editorSettlementHintMetering": "Jede eingespeiste kWh ist {ratio} einer bezogenen kWh wert: nur den Bezugspreis eingeben.",
+    "editorMeteringRatio": "Gutschrift je eingespeister kWh",
+    "editorMeteringAuto": "automatisch ({ratio}; 0,7 über 10 kWp)",
+    "editorRcePrice": "RCE-Preissensor",
+    "editorRceMissing": "Kein RCE-Preissensor gefunden: einen wählen, sonst bleibt die eingespeiste Energie ohne Preis."
   },
   "nl": {
     "languageName": "Nederlands",
@@ -1258,7 +1280,18 @@ const TRANSLATIONS = {
     "pricesAhead": "Komende uren – goedkoopst: {cheap} ({cheapPrice}) · duurst: {dear} ({dearPrice})",
     "tomorrow": "morgen",
     "exportValue": "Waarde teruggeleverde energie",
-    "editorNoImportPrice": "Besparing vraagt een afnameprijs: zolang die ontbreekt, toont de kaart de waarde van de teruggeleverde energie."
+    "editorNoImportPrice": "Besparing vraagt een afnameprijs: zolang die ontbreekt, toont de kaart de waarde van de teruggeleverde energie.",
+    "editorSettlement": "Verrekening met je energieleverancier",
+    "editorSettlementFixed": "Vaste prijzen",
+    "editorSettlementBilling": "Net-billing (teruglevering tegen de uurprijs)",
+    "editorSettlementMetering": "Salderen (elke teruggeleverde kWh telt voor 0,8 / 0,7 kWh)",
+    "editorSettlementHintFixed": "De prijzen hieronder, of prijssensoren.",
+    "editorSettlementHintBilling": "Teruggeleverde energie wordt verkocht tegen de uurprijs (RCE): vul alleen de afnameprijs in. De kaart zoekt zelf een RCE-prijssensor, of kies er hieronder een.",
+    "editorSettlementHintMetering": "Elke teruggeleverde kWh is {ratio} van een afgenomen kWh waard: vul alleen de afnameprijs in.",
+    "editorMeteringRatio": "Verrekening per teruggeleverde kWh",
+    "editorMeteringAuto": "automatisch ({ratio}; 0,7 boven 10 kWp)",
+    "editorRcePrice": "RCE-prijssensor",
+    "editorRceMissing": "Geen RCE-prijssensor gevonden: kies er een, anders heeft de teruggeleverde energie geen prijs."
   },
   "pl": {
     "languageName": "Polski",
@@ -1662,7 +1695,18 @@ const TRANSLATIONS = {
     "pricesAhead": "Kolejne godziny – najtaniej: {cheap} ({cheapPrice}) · najdrożej: {dear} ({dearPrice})",
     "tomorrow": "jutro",
     "exportValue": "Wartość oddanej energii",
-    "editorNoImportPrice": "Oszczędność wymaga ceny zakupu: dopóki jej nie podasz, karta pokazuje wartość oddanej energii."
+    "editorNoImportPrice": "Oszczędność wymaga ceny zakupu: dopóki jej nie podasz, karta pokazuje wartość oddanej energii.",
+    "editorSettlement": "Rozliczenie z zakładem energetycznym",
+    "editorSettlementFixed": "Stałe ceny",
+    "editorSettlementBilling": "Net-billing (sprzedaż po cenie RCE)",
+    "editorSettlementMetering": "Net-metering (opusty 0,8 / 0,7)",
+    "editorSettlementHintFixed": "Ceny wpisane poniżej albo czujniki cen.",
+    "editorSettlementHintBilling": "Oddana energia jest sprzedawana po godzinowej cenie RCE: wpisz tylko cenę zakupu. Czujnik ceny RCE karta znajdzie sama, możesz też wybrać go poniżej.",
+    "editorSettlementHintMetering": "Każda oddana kWh jest warta {ratio} kWh pobranej: wpisz tylko cenę zakupu.",
+    "editorMeteringRatio": "Opust za oddaną kWh",
+    "editorMeteringAuto": "automatycznie ({ratio}; 0,7 powyżej 10 kWp)",
+    "editorRcePrice": "Czujnik ceny RCE",
+    "editorRceMissing": "Nie znaleziono czujnika ceny RCE: wybierz go (np. z integracji PSE albo z EMS), inaczej oddana energia nie zostanie wyceniona."
   }
 };
 
@@ -2319,6 +2363,41 @@ function pricedSavings(rows, rest, price, net) {
   return saved;
 }
 
+// How the energy sent to the grid is settled (`settlement`):
+// - net_billing: sold at the hourly RCE price; without `price_export` the
+//   card uses an RCE price sensor it finds (e.g. ProfitEMS, the PSE
+//   integration);
+// - net_metering: each kWh sent back is worth `metering_ratio` of a kWh
+//   bought: 0.8, or 0.7 above 10 kWp;
+// - unset: the fixed prices or price sensors as given.
+function detectRcePrice(hass) {
+  const candidates = Object.values(hass?.states || {}).filter((s) => s.entity_id.startsWith("sensor.")
+    && /(^|[^a-z])rce([^a-z]|$)/i.test(`${s.entity_id} ${s.attributes?.friendly_name || ""}`)
+    && /\/\s*[km]?wh$/i.test(stateUnit(s)) && stateNumber(s) !== null);
+  // One with the hours listed (for the chart) first.
+  const hourly = (s) => Object.values(s.attributes || {}).some((v) => Array.isArray(v) && v.length >= 12);
+  return (candidates.find(hourly) || candidates[0])?.entity_id || null;
+}
+
+function meteringRatio(config) {
+  const ratio = Number.parseFloat(config.metering_ratio);
+  if (ratio > 0 && ratio <= 1) return ratio;
+  return (positiveNumber(config.pv_capacity) || 0) > 10 ? 0.7 : 0.8;
+}
+
+function effectivePrices(hass, config) {
+  const prices = { import: priceSetting(config.price_import), export: priceSetting(config.price_export), ratio: null, detected: null };
+  if (config.settlement === "net_billing" && !prices.export) {
+    prices.detected = detectRcePrice(hass);
+    if (prices.detected) prices.export = { entity: prices.detected };
+  }
+  if (config.settlement === "net_metering") {
+    prices.ratio = meteringRatio(config);
+    prices.export = null;
+  }
+  return prices;
+}
+
 // Hourly prices for the price chart, from the attributes of the price
 // sensor (the export price's, else the import price's). Reads the common
 // formats: lists of { start, price } items (ProfitEMS "prices", Nord Pool
@@ -2328,7 +2407,8 @@ const PRICE_START_KEYS = ["start", "start_time", "starts_at", "startsAt", "perio
 const PRICE_VALUE_KEYS = ["price", "value", "price_per_kwh", "total"];
 
 function priceChartData(hass, config, now = new Date()) {
-  const setting = [priceSetting(config.price_export), priceSetting(config.price_import)].find((p) => p?.entity);
+  const effective = effectivePrices(hass, config);
+  const setting = [effective.export, effective.import].find((p) => p?.entity);
   const stateObj = setting && hass?.states?.[setting.entity];
   if (!stateObj) return null;
   const scale = priceScale(stateObj);
@@ -6585,23 +6665,30 @@ class SolarFlowCard extends HTMLElement {
   // Savings when a price comes from a sensor: hour by hour (month by month
   // for all time), each with its mean price. undefined with fixed prices
   // (the summary works them out from the totals), null while loading.
-  _savings(resolved, period, energy) {
+  _savings(resolved, period, energy, net) {
     const config = this._config;
-    const prices = { import: priceSetting(config.price_import), export: priceSetting(config.price_export) };
+    const prices = effectivePrices(this._hass, config);
+    // Net-metering: a kWh sent back is worth `ratio` of a kWh bought.
+    if (prices.ratio && prices.import) prices.export = prices.import.entity ? { entity: prices.import.entity, ratio: prices.ratio } : { value: prices.import.value * prices.ratio };
     // Only an export price: the value of the energy sold.
     const kind = prices.import ? "savings" : "exportValue";
     if (!prices.import && !prices.export) return undefined;
     if (!prices.import?.entity && !prices.export?.entity) {
-      if (prices.import) return undefined;
-      const exported = energy.totals?.gridExport;
-      return isNum(exported) ? { kind, value: exported * prices.export.value } : undefined;
+      const totals = energy.totals || {};
+      if (!prices.import) return isNum(totals.gridExport) ? { kind, value: totals.gridExport * prices.export.value } : undefined;
+      // Fixed prices as given: the summary works them out from the totals.
+      if (!config.settlement) return undefined;
+      if (!isNum(totals.load) || !isNum(totals.gridImport)) return undefined;
+      const billedImport = net ? net.gridImport : totals.gridImport;
+      const billedExport = net ? net.gridExport : totals.gridExport || 0;
+      return { kind, value: Math.max(0, totals.load - billedImport) * prices.import.value + billedExport * (prices.export?.value || 0) };
     }
     if (!prices.import) prices.import = { value: 0 };
     if (typeof this._hass.callWS !== "function") return undefined;
     const sources = sourcesKey(resolved.energy);
     if (!sources) return undefined;
     const states = this._hass.states;
-    const now = { import: currentPrice(states, prices.import), export: currentPrice(states, prices.export) ?? 0 };
+    const now = { import: currentPrice(states, prices.import), export: prices.export?.ratio ? null : currentPrice(states, prices.export) ?? 0 };
     let rows;
     let start;
     let statPeriod = "hour";
@@ -6621,12 +6708,13 @@ class SolarFlowCard extends HTMLElement {
       // Each hour with its consumption worked out, as in the totals.
       rows = [...hours.values()].map((row) => ({ ...deriveLoadEnergy(row), at: row.at }));
     }
-    const ids = Object.fromEntries(Object.entries(prices).filter(([, p]) => p?.entity).map(([name, p]) => [name, p.entity]));
+    const ids = Object.fromEntries(["import", "export"].filter((name) => prices[name]?.entity && !prices[name].ratio).map((name) => [name, prices[name].entity]));
     const stats = this._fetch(`prices|${JSON.stringify(ids)}|${start.getTime()}|${statPeriod}`, 15 * 60000, () => loadPriceStats(this._hass, ids, start, statPeriod));
     if (!stats.data) return { kind, value: null };
     const price = (kind, at) => {
       const setting = prices[kind];
       if (!setting) return 0;
+      if (setting.ratio) return setting.ratio * price("import", at);
       if (!setting.entity) return setting.value;
       const mean = at === null ? undefined : stats.data[kind]?.get(at);
       return mean ?? now[kind] ?? 0;
@@ -6828,7 +6916,7 @@ class SolarFlowCard extends HTMLElement {
       if (bank && !ids.live.soc && !ids.live.battery) ids.live.soc = bank.items[0].entityId;
       const now = new Date();
       const vstore = this._virtualStorage(resolved, config, period, now, today);
-      const money = this._savings(resolved, period, energy);
+      const money = this._savings(resolved, period, energy, vstore.net);
       this._introAt ??= Date.now();
       const introElapsed = (Date.now() - this._introAt) / 1000;
       const introAt = introElapsed < 2.6 ? introElapsed : null;
@@ -7114,7 +7202,7 @@ const FIELD_UNIT_NAMES = { power: "W / kW", energy: "kWh", soc: "%", voltage: "V
 // The notes under a sensor field: its value now, or what is wrong with it.
 function fieldNotes(hass, config, t, kind, value, auto) {
   const locale = t.locale;
-  if (!value) return auto ? [["note", fill(t.editorAuto, { entity: auto.entityId, value: fieldValue(auto.stateObj, kind, locale) })]] : [];
+  if (!value) return auto ? [["note", fill(t.editorAuto, { entity: auto.entityId, value: fieldValue(auto.stateObj, kind === "price" ? "any" : kind, locale) })]] : [];
   const stateObj = hass?.states?.[value];
   if (!stateObj) return [["warn", t.editorNotFound]];
   const notes = [];
@@ -7527,21 +7615,43 @@ class SolarFlowCardEditor extends HTMLElement {
   }
 
   _summaryHtml(t) {
+    const mode = this._config.settlement || "";
     const sensor = (key) => priceSetting(this._config[key])?.entity || "";
+    const number = (key, label) => this._numbers(t, [[key, label, "0.01"]]);
+    const detected = mode === "net_billing" && !priceSetting(this._config.price_export) ? detectRcePrice(this._hass) : null;
+    const ratio = formatNumber(meteringRatio({ ...this._config, metering_ratio: undefined }), t.locale, 1);
+    const option = (value, label) => `<option value="${value}" ${mode === value ? "selected" : ""}>${escapeHtml(label)}</option>`;
+    const ratioOption = (value, label) => `<option value="${value}" ${String(this._config.metering_ratio ?? "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`;
     return `
+      <label><span>${escapeHtml(t.editorSettlement)}</span>
+        <select data-select="settlement">
+          ${option("", t.editorSettlementFixed)}${option("net_billing", t.editorSettlementBilling)}${option("net_metering", t.editorSettlementMetering)}
+        </select>
+      </label>
+      <p class="hint">${escapeHtml(fill(t[{ "": "editorSettlementHintFixed", net_billing: "editorSettlementHintBilling", net_metering: "editorSettlementHintMetering" }[mode]], { ratio }))}</p>
       <div class="grid">
-        ${this._numbers(t, EDITOR_PRICES)}
+        ${number("price_import", "editorPriceImport")}
+        ${mode === "" ? number("price_export", "editorPriceExport") : ""}
+        ${mode === "net_metering" ? `
+          <label><span>${escapeHtml(t.editorMeteringRatio)}</span>
+            <select data-select="metering_ratio">${ratioOption("", fill(t.editorMeteringAuto, { ratio }))}${ratioOption("0.8", "0,8")}${ratioOption("0.7", "0,7")}</select>
+          </label>` : ""}
+        ${number("co2_factor", "editorCo2")}
         <label><span>${escapeHtml(t.editorCurrency)}</span><input data-text="currency" type="text" value="${escapeHtml(this._config.currency ?? "")}" placeholder="${escapeHtml(t.currency)}" /></label>
       </div>
-      ${priceSetting(this._config.price_export) && !priceSetting(this._config.price_import) ? `<p class="warn">${escapeHtml(t.editorNoImportPrice)}</p>` : ""}
-      <details class="box" data-box="prices" ${this._boxOpen("prices", Boolean(sensor("price_import") || sensor("price_export"))) ? "open" : ""}>
-        <summary class="title">${escapeHtml(t.editorPriceSensors)}</summary>
-        <p class="hint">${escapeHtml(t.editorPriceSensorsHint)}</p>
-        <div class="pickers">
-          ${this._picker("price_import", t.editorPriceImportSensor, sensor("price_import"), "sensor", { kind: "price" })}
-          ${this._picker("price_export", t.editorPriceExportSensor, sensor("price_export"), "sensor", { kind: "price" })}
-        </div>
-      </details>
+      ${mode !== "net_metering" && !priceSetting(this._config.price_import) && (mode === "net_billing" || priceSetting(this._config.price_export)) ? `<p class="warn">${escapeHtml(t.editorNoImportPrice)}</p>` : ""}
+      ${mode === "net_billing" ? `
+        ${this._picker("price_export", t.editorRcePrice, sensor("price_export"), "sensor", { kind: "price", auto: detected ? { entityId: detected, stateObj: this._hass.states[detected] } : null })}
+        ${!detected && !sensor("price_export") ? `<p class="warn">${escapeHtml(t.editorRceMissing)}</p>` : ""}` : ""}
+      ${mode === "" ? `
+        <details class="box" data-box="prices" ${this._boxOpen("prices", Boolean(sensor("price_import") || sensor("price_export"))) ? "open" : ""}>
+          <summary class="title">${escapeHtml(t.editorPriceSensors)}</summary>
+          <p class="hint">${escapeHtml(t.editorPriceSensorsHint)}</p>
+          <div class="pickers">
+            ${this._picker("price_import", t.editorPriceImportSensor, sensor("price_import"), "sensor", { kind: "price" })}
+            ${this._picker("price_export", t.editorPriceExportSensor, sensor("price_export"), "sensor", { kind: "price" })}
+          </div>
+        </details>` : ""}
       ${this._switches(t, "summary")}`;
   }
 
@@ -7663,7 +7773,7 @@ class SolarFlowCardEditor extends HTMLElement {
     root.querySelectorAll("[data-text]").forEach((input) => input.addEventListener("change", (e) => this._set(input.dataset.text, e.target.value.trim() || undefined)));
     root.querySelectorAll("[data-select]").forEach((select) => select.addEventListener("change", (e) => {
       this._set(select.dataset.select, e.target.value || undefined);
-      if (select.dataset.select === "language") this._render();
+      if (select.dataset.select === "language" || select.dataset.select === "settlement") this._render();
     }));
     root.querySelectorAll("[data-number]").forEach((input) => input.addEventListener("change", (e) => {
       const number = Number.parseFloat(e.target.value);

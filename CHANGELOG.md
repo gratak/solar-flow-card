@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.8.0-beta.11
+
+- **Settlement: net-billing or net-metering** (`settlement`, also in the editor under Summary and prices). You enter only the import price.
+  - **Net-billing:** the energy sold is valued at the hourly RCE price. The card finds an RCE price sensor in Home Assistant itself (e.g. ProfitEMS, the PSE integration), so the savings and the Energy prices chart work without picking a sensor.
+  - **Net-metering:** each kWh sent back is worth 0.8 of a kWh bought, or 0.7 above 10 kWp (`metering_ratio`).
+- **Editor:** a hint explains what the import price includes (energy and the per-kWh distribution charges, without monthly fixed fees).
+
 ## 1.8.0-beta.10
 
 - **License: GPL-3.0-or-later** (was MIT). You may still use, share and change the card, also commercially, but what you distribute must stay under the same license with its source code, so it cannot become a closed, paid product.
