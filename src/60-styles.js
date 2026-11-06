@@ -124,6 +124,7 @@ const BASE_CSS = `
   .sfc-group + .sfc-group { margin-top: 12px; }
   .sfc-group h4, .sfc-serial { margin: 0 0 7px; color: var(--sfc-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
   .sfc-strings { display: grid; gap: 7px; }
+  .sfc-panel-strings { grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); }
   .sfc-string, .sfc-reading { min-width: 0; border: 1px solid var(--sfc-border); border-radius: var(--sfc-tile-radius, 11px); background: var(--sfc-tile-bg); text-align: left; }
   .sfc-string { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 9px 12px; border-left: 3px solid var(--sfc-pv); }
   .sfc-string span { font-size: 12px; font-weight: 700; }
@@ -208,7 +209,7 @@ const BASE_CSS = `
     .gt-layout.wide > .sfc-sections { display: block; columns: 320px; column-gap: 14px; }
     .gt-layout.wide > .sfc-sections > * { break-inside: avoid; margin-bottom: 14px; }
     :is(.sfc-wide, .lc-main.wide, .gt-layout.wide) .sfc-readings { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
-    :is(.sfc-wide, .lc-main.wide, .gt-layout.wide) .sfc-strings { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    :is(.sfc-wide, .lc-main.wide, .gt-layout.wide) .sfc-strings:not(.sfc-panel-strings) { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
     .sfc-wide-main > :last-child { margin-bottom: 16px; }
     .sfc-wide-fill:not(:empty) { display: grid; gap: 14px; padding: 0 4px 0 16px; }
     .lc-main.wide { display: grid; grid-template-columns: minmax(340px, 40%) minmax(0, 1fr); column-gap: 18px; align-items: start; }

@@ -378,5 +378,7 @@
   "editorPanelPower": "Leistung (optional)",
   "editorDetailsHint": "Beliebige Sensoren als Kacheln in den Wechselrichterdetails, z. B. Temperatur oder Status.",
   "editorSensor": "Sensor",
-  "editorDetailName": "Name (optional)"
+  "editorDetailName": "Name (optional)",
+  "editorFoundN": "{n} automatisch gefunden",
+  "editorRatedFound": "Automatisch gefunden: Nennleistung des Wechselrichters {power}. Feld leer lassen, um sie zu verwenden."
 }

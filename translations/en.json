@@ -378,5 +378,7 @@
   "editorPanelPower": "Power (optional)",
   "editorDetailsHint": "Any sensors shown as tiles in the Inverter details, e.g. temperature or status.",
   "editorSensor": "Sensor",
-  "editorDetailName": "Name (optional)"
+  "editorDetailName": "Name (optional)",
+  "editorFoundN": "{n} found automatically",
+  "editorRatedFound": "Found automatically: inverter rated power {power}. Leave the field empty to use it."
 }

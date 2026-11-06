@@ -7,7 +7,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "1.8.0-beta.2";
+const CARD_VERSION = "1.8.0-beta.3";
 const CARD_TAG = "solar-flow-card";
 const EDITOR_TAG = "solar-flow-card-editor";
 const THEMES = ["diorama", "aurora", "paper", "lcars", "atlantis", "expanse", "foundation", "galaxy", "gate", "reactor"];
@@ -397,7 +397,9 @@ const TRANSLATIONS = {
     "editorPanelPower": "Power (optional)",
     "editorDetailsHint": "Any sensors shown as tiles in the Inverter details, e.g. temperature or status.",
     "editorSensor": "Sensor",
-    "editorDetailName": "Name (optional)"
+    "editorDetailName": "Name (optional)",
+    "editorFoundN": "{n} found automatically",
+    "editorRatedFound": "Found automatically: inverter rated power {power}. Leave the field empty to use it."
   },
   "de": {
     "languageName": "Deutsch",
@@ -779,7 +781,9 @@ const TRANSLATIONS = {
     "editorPanelPower": "Leistung (optional)",
     "editorDetailsHint": "Beliebige Sensoren als Kacheln in den Wechselrichterdetails, z. B. Temperatur oder Status.",
     "editorSensor": "Sensor",
-    "editorDetailName": "Name (optional)"
+    "editorDetailName": "Name (optional)",
+    "editorFoundN": "{n} automatisch gefunden",
+    "editorRatedFound": "Automatisch gefunden: Nennleistung des Wechselrichters {power}. Feld leer lassen, um sie zu verwenden."
   },
   "nl": {
     "languageName": "Nederlands",
@@ -1161,7 +1165,9 @@ const TRANSLATIONS = {
     "editorPanelPower": "Vermogen (optioneel)",
     "editorDetailsHint": "Willekeurige sensoren als tegels in de omvormerdetails, bijv. temperatuur of status.",
     "editorSensor": "Sensor",
-    "editorDetailName": "Naam (optioneel)"
+    "editorDetailName": "Naam (optioneel)",
+    "editorFoundN": "{n} automatisch gevonden",
+    "editorRatedFound": "Automatisch gevonden: nominaal vermogen van de omvormer {power}. Laat het veld leeg om dat te gebruiken."
   },
   "pl": {
     "languageName": "Polski",
@@ -1543,7 +1549,9 @@ const TRANSLATIONS = {
     "editorPanelPower": "Moc (opcjonalnie)",
     "editorDetailsHint": "Dowolne czujniki pokazywane jako kafelki w Szczegółach falownika, np. temperatura lub status.",
     "editorSensor": "Czujnik",
-    "editorDetailName": "Nazwa (opcjonalnie)"
+    "editorDetailName": "Nazwa (opcjonalnie)",
+    "editorFoundN": "wykryto automatycznie: {n}",
+    "editorRatedFound": "Wykryto automatycznie moc znamionową falownika: {power}. Zostaw pole puste, żeby jej użyć."
   }
 };
 
@@ -2533,7 +2541,9 @@ function kwhOf(stateObj) {
   return value === null ? null : value * unitScale(stateObj, ENERGY_SCALE);
 }
 
-function systemData(hass, resolved, config) {
+// The installation sensors (SYSTEM_METRICS): from `entities:`, else the
+// first DeyeCloud inverter's device sensors.
+function systemEntities(hass, resolved, config) {
   const states = hass?.states || {};
   const configured = config.entities || {};
   // Device sensors of the first inverter, by normalized key.
@@ -2552,6 +2562,11 @@ function systemData(hass, resolved, config) {
     if (id && states[id]) found[name] = { entityId: id, stateObj: states[id] };
     else found[name] = def.deye.map((key) => byKey.get(normalizeKey(key))).find((entry) => entry && stateNumber(entry.stateObj) !== null) || null;
   }
+  return found;
+}
+
+function systemData(hass, resolved, config) {
+  const found = systemEntities(hass, resolved, config);
   const watts = (name) => (found[name] ? wattsOf(found[name].stateObj) : null);
   const number = (name) => (found[name] ? stateNumber(found[name].stateObj) : null);
   const gridSign = config.invert_grid ? -1 : 1;
@@ -3016,7 +3031,7 @@ function inverterHtml(m) {
       <div class="sfc-group">
         <h4>${escapeHtml(t.pvStrings)}</h4>
         <div class="sfc-strings">
-          ${[...device.strings.entries()].sort((a, b) => a[0] - b[0]).map(([index, s]) => `
+          ${shownStrings(device, m.config).map(([index, s]) => `
             <button class="sfc-string" data-entity="${escapeHtml((s.W || s.V || s.A).entityId)}">
               <span>${escapeHtml(fill(t.stringN, { n: index }))}</span>
               <b>${escapeHtml(s.W ? formatPower(s.W.value, locale) : "—")}</b>
@@ -3036,6 +3051,16 @@ function inverterHtml(m) {
       </div>
       ${content}
     </section>`;
+}
+
+// The PV strings worth showing: as many as `panels_per_string` lists, else
+// the ones in use while any string produces (inverters report unused inputs
+// as 0 V / 0 A; at night all read zero and all are shown).
+function shownStrings(device, config) {
+  const strings = [...device.strings.entries()].sort((a, b) => a[0] - b[0]);
+  if (Array.isArray(config.panels_per_string) && config.panels_per_string.length) return strings.slice(0, config.panels_per_string.length);
+  const used = ([, s]) => (s.V?.value ?? 0) > 5 || (s.A?.value ?? 0) > 0.05 || (s.W?.value ?? 0) > ACTIVE_W;
+  return strings.some(used) ? strings.filter(used) : strings;
 }
 
 function panelsHtml(m) {
@@ -5017,6 +5042,7 @@ const BASE_CSS = `
   .sfc-group + .sfc-group { margin-top: 12px; }
   .sfc-group h4, .sfc-serial { margin: 0 0 7px; color: var(--sfc-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
   .sfc-strings { display: grid; gap: 7px; }
+  .sfc-panel-strings { grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); }
   .sfc-string, .sfc-reading { min-width: 0; border: 1px solid var(--sfc-border); border-radius: var(--sfc-tile-radius, 11px); background: var(--sfc-tile-bg); text-align: left; }
   .sfc-string { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 9px 12px; border-left: 3px solid var(--sfc-pv); }
   .sfc-string span { font-size: 12px; font-weight: 700; }
@@ -5101,7 +5127,7 @@ const BASE_CSS = `
     .gt-layout.wide > .sfc-sections { display: block; columns: 320px; column-gap: 14px; }
     .gt-layout.wide > .sfc-sections > * { break-inside: avoid; margin-bottom: 14px; }
     :is(.sfc-wide, .lc-main.wide, .gt-layout.wide) .sfc-readings { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
-    :is(.sfc-wide, .lc-main.wide, .gt-layout.wide) .sfc-strings { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    :is(.sfc-wide, .lc-main.wide, .gt-layout.wide) .sfc-strings:not(.sfc-panel-strings) { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
     .sfc-wide-main > :last-child { margin-bottom: 16px; }
     .sfc-wide-fill:not(:empty) { display: grid; gap: 14px; padding: 0 4px 0 16px; }
     .lc-main.wide { display: grid; grid-template-columns: minmax(340px, 40%) minmax(0, 1fr); column-gap: 18px; align-items: start; }
@@ -6661,7 +6687,9 @@ function fieldNotes(hass, config, t, kind, value, auto) {
 function fieldValue(stateObj, kind, locale) {
   if (kind === "power") return formatPower(wattsOf(stateObj), locale);
   if (kind === "energy") return formatEnergy(kwhOf(stateObj), locale);
-  return `${stateObj.state} ${stateUnit(stateObj)}`.trim();
+  const number = stateNumber(stateObj);
+  const shown = number === null ? stateObj.state : formatNumber(number, locale, Math.abs(number) < 10 ? 2 : Math.abs(number) < 1000 ? 1 : 0);
+  return `${shown} ${stateUnit(stateObj)}`.trim();
 }
 
 // Numbers that look entered in the wrong unit: [key, limit, label key, factor].
@@ -6674,6 +6702,8 @@ class SolarFlowCardEditor extends HTMLElement {
     this._config = {};
     this._hass = null;
     this._open = new Set(["look"]);
+    // Boxes inside the groups opened or closed by the user: id -> open.
+    this._boxes = new Map();
   }
 
   set hass(hass) {
@@ -6863,6 +6893,10 @@ class SolarFlowCardEditor extends HTMLElement {
       </div>`;
   }
 
+  _boxOpen(id, fallback) {
+    return this._boxes.has(id) ? this._boxes.get(id) : fallback;
+  }
+
   _group(id, t, body) {
     const open = this._open.has(id);
     return `
@@ -6909,12 +6943,27 @@ class SolarFlowCardEditor extends HTMLElement {
     } catch (error) {
       // No hints from the current setup.
     }
-    // What DeyeCloud (or the card) found for an empty field.
+    // What DeyeCloud (or the card) found for an empty field: live power and
+    // energy, the installation readings and the inverter's PV strings.
+    let system = {};
+    let strings = new Map();
+    try {
+      if (resolved) {
+        system = systemEntities(this._hass, resolved, this._config);
+        strings = deyeInverterReadings(resolved).find((d) => d.strings.size)?.strings || new Map();
+      }
+    } catch (error) {
+      // No hints for these.
+    }
     const autoFor = (key) => {
       if (entities[key] || !resolved) return null;
       const live = Object.entries(LIVE_METRICS).find(([, def]) => def.key === key);
       const energy = Object.entries(ENERGY_METRICS).find(([, def]) => def.key === key);
-      return (live && resolved.live[live[0]]) || (energy && resolved.energy[energy[0]]) || null;
+      const sys = Object.entries(SYSTEM_METRICS).find(([, def]) => def.key === key);
+      const pv = key.match(/^pv(\d)_(power|voltage|current)$/);
+      const reading = pv && strings.get(Number(pv[1]))?.[{ power: "W", voltage: "V", current: "A" }[pv[2]]];
+      const fromReading = reading && this._hass?.states?.[reading.entityId] ? { entityId: reading.entityId, stateObj: this._hass.states[reading.entityId] } : null;
+      return (live && resolved.live[live[0]]) || (energy && resolved.energy[energy[0]]) || (sys && system[sys[0]]) || fromReading || null;
     };
     const extra = (key) => {
       const notes = [];
@@ -6933,11 +6982,11 @@ class SolarFlowCardEditor extends HTMLElement {
     return `
       <p class="hint">${escapeHtml(t.editorSensorsHint)}</p>
       ${editorEntityGroups(t).map(([group, items]) => `
-        <details class="box" ${group === "live" || group === "energy" || items.some(([key]) => entities[key]) ? "open" : ""}>
-          <summary class="title">${escapeHtml(t.editorEntityGroups[group])}</summary>
+        <details class="box" data-box="entities-${group}" ${this._boxOpen(`entities-${group}`, group === "live" || group === "energy" || items.some(([key]) => entities[key])) ? "open" : ""}>
+          <summary class="title">${escapeHtml(t.editorEntityGroups[group])}${(() => { const n = items.filter(([key]) => !entities[key] && autoFor(key)).length; return n ? ` <small class="found">${escapeHtml(fill(t.editorFoundN, { n }))}</small>` : ""; })()}</summary>
           <div class="pickers">${items.map(([key, label]) => this._picker(`entities.${key}`, label, entities[key], "sensor", { auto: autoFor(key), extra: extra(key) })).join("")}</div>
         </details>`).join("")}
-      <details class="box" ${history.some((key) => entities[`${key}_history`]) ? "open" : ""}>
+      <details class="box" data-box="history" ${this._boxOpen("history", history.some((key) => entities[`${key}_history`])) ? "open" : ""}>
         <summary class="title">${escapeHtml(t.editorHistoryBox)}</summary>
         <p class="hint">${escapeHtml(t.editorHistoryHint)}</p>
         <div class="pickers">${history.map((key) => this._picker(`entities.${key}_history`, fill(t.editorHistoryLabel, { label: names[key] }), entities[`${key}_history`])).join("")}</div>
@@ -6985,8 +7034,16 @@ class SolarFlowCardEditor extends HTMLElement {
   }
 
   _installHtml(t) {
+    let rated = null;
+    try {
+      const entry = systemEntities(this._hass, resolveEntities(this._hass, this._config), this._config).ratedPower;
+      rated = entry && !positiveNumber(this._config.inverter_power_rating) ? wattsOf(entry.stateObj) : null;
+    } catch (error) {
+      // Nothing detected.
+    }
     return `
       <div class="grid">${this._numbers(t, EDITOR_NUMBERS)}</div>
+      ${isNum(rated) && rated > 0 ? `<p class="note">${escapeHtml(fill(t.editorRatedFound, { power: formatPower(rated, t.locale) }))}</p>` : ""}
       ${this._stringsHtml(t)}
       ${this._switches(t, "install")}
       ${this._listHtml(t, "batteries", t.editorBatteries, t.editorBatteriesHint, [
@@ -7000,7 +7057,7 @@ class SolarFlowCardEditor extends HTMLElement {
   _listHtml(t, group, title, hint, fields) {
     const items = this._items(group);
     return `
-      <details class="box" ${items.length ? "open" : ""}>
+      <details class="box" data-box="list-${group}" ${this._boxOpen(`list-${group}`, items.length > 0) ? "open" : ""}>
         <summary class="title">${escapeHtml(title)}${items.length ? ` (${items.length})` : ""}</summary>
         <p class="hint">${escapeHtml(hint)}</p>
         ${items.map((item, i) => `
@@ -7106,6 +7163,7 @@ class SolarFlowCardEditor extends HTMLElement {
         .section button:disabled { opacity: .25; cursor: default; }
         .field { display: grid; gap: 3px; min-width: 0; }
         .field .note, .body > .note { margin: 0; color: var(--secondary-text-color, #727272); font-size: 11px; overflow-wrap: anywhere; }
+        .found { font-weight: 400; color: var(--success-color, #43a047); }
         .warn { margin: 0; padding: 4px 8px; border-radius: 6px; background: rgba(255, 152, 0, .12); color: var(--warning-color, #b26a00); font-size: 11.5px; line-height: 1.35; }
         .item { display: grid; gap: 8px; padding: 10px; border: 1px dashed var(--divider-color, rgba(127,127,127,.35)); border-radius: 10px; }
         .danger { color: var(--error-color, #db4437) !important; }
@@ -7136,6 +7194,7 @@ class SolarFlowCardEditor extends HTMLElement {
       else this._open.delete(id);
       this._render();
     }));
+    root.querySelectorAll("details[data-box]").forEach((el) => el.addEventListener("toggle", () => this._boxes.set(el.dataset.box, el.open)));
     root.querySelectorAll("[data-theme]").forEach((button) => button.addEventListener("click", () => {
       this._set("theme", button.dataset.theme);
       this._render();
@@ -7183,6 +7242,7 @@ class SolarFlowCardEditor extends HTMLElement {
       this._setItem(group, Number(index), field, value);
     }));
     root.querySelectorAll("[data-add]").forEach((button) => button.addEventListener("click", () => {
+      this._boxes.set(`list-${button.dataset.add}`, true);
       this._writeItems(button.dataset.add, [...this._items(button.dataset.add), {}]);
     }));
     root.querySelectorAll("[data-remove]").forEach((button) => button.addEventListener("click", () => {

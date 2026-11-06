@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.8.0-beta.3
+
+- **Unused PV inputs are hidden.** Inverters such as Deye report every PV input, also the ones with nothing connected (0 V, 0 A).
+  - With `panels_per_string` the Inverter details show as many strings as the list has.
+  - Without it, they hide the strings at zero while another one produces.
+- **Panels without optimizers:** the string tiles are wider, so their text no longer wraps over several lines in the wide layout.
+- **Editor, DeyeCloud:** the installation readings (phases, voltages, battery temperature and so on) and the PV strings show what was found automatically, like the power and energy sensors. Each group says how many sensors were found. The Installation group shows the inverter's rated power when DeyeCloud reports it.
+- **Editor:** boxes you open inside a group stay open while you edit. Raw values are rounded.
+
 ## 1.8.0-beta.2
 
 The editor now covers every option and helps avoid the usual mistakes:

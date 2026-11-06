@@ -378,5 +378,7 @@
   "editorPanelPower": "Vermogen (optioneel)",
   "editorDetailsHint": "Willekeurige sensoren als tegels in de omvormerdetails, bijv. temperatuur of status.",
   "editorSensor": "Sensor",
-  "editorDetailName": "Naam (optioneel)"
+  "editorDetailName": "Naam (optioneel)",
+  "editorFoundN": "{n} automatisch gevonden",
+  "editorRatedFound": "Automatisch gevonden: nominaal vermogen van de omvormer {power}. Laat het veld leeg om dat te gebruiken."
 }
