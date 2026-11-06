@@ -198,8 +198,7 @@ function pricesHtml(m) {
     const hour = new Date(h.at).getHours();
     if (hour % 6) return "";
     const day = startOfDay(new Date(h.at)).getTime() !== first && hour === 0 ? t.tomorrow : formatClock(new Date(h.at), locale);
-    // A label near the right edge ends at its tick instead of running past.
-    return `<span class="${i / n > 0.93 ? "end" : ""}" style="left:${((i / n) * 100).toFixed(2)}%">${escapeHtml(day)}</span>`;
+    return axisLabel(i / n, day, hour % 12 ? "minor" : "");
   }).join("");
   const at = (h) => formatClock(new Date(h.at), locale);
   return `
@@ -587,6 +586,14 @@ function chartHtml(m) {
 }
 
 // Legend entries are buttons: a click hides or shows that series.
+// An axis label slides along its tick by as much of its width as it is far
+// along the axis: the first starts at its tick, the last ends at it, so none
+// runs past the chart however narrow the card.
+function axisLabel(pos, text, cls = "") {
+  const pct = (pos * 100).toFixed(2);
+  return `<span class="${cls}" style="left:${pct}%;transform:translateX(-${pct}%)">${escapeHtml(text)}</span>`;
+}
+
 function chartFrame(legend, svg, yLabels, xLabels, hint, hidden) {
   return `
     <div class="sfc-legend">${legend.map(([kind, label]) => `
@@ -658,7 +665,7 @@ function powerChartHtml(source, t, locale, hidden) {
     legend,
     svg,
     ticks.map((v) => `<span class="sfc-ylabel" style="top:${((y(v) / H) * 100).toFixed(2)}%">${escapeHtml(formatPower(v, locale))}</span>`).join(""),
-    xLabels.map(([pos, label]) => `<span style="left:${(pos * 100).toFixed(2)}%">${escapeHtml(label)}</span>`).join(""),
+    xLabels.map(([pos, label]) => axisLabel(pos, label)).join(""),
     t.chartPowerHint,
     hidden
   );

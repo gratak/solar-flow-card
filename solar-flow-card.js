@@ -3435,8 +3435,7 @@ function pricesHtml(m) {
     const hour = new Date(h.at).getHours();
     if (hour % 6) return "";
     const day = startOfDay(new Date(h.at)).getTime() !== first && hour === 0 ? t.tomorrow : formatClock(new Date(h.at), locale);
-    // A label near the right edge ends at its tick instead of running past.
-    return `<span class="${i / n > 0.93 ? "end" : ""}" style="left:${((i / n) * 100).toFixed(2)}%">${escapeHtml(day)}</span>`;
+    return axisLabel(i / n, day, hour % 12 ? "minor" : "");
   }).join("");
   const at = (h) => formatClock(new Date(h.at), locale);
   return `
@@ -3824,6 +3823,14 @@ function chartHtml(m) {
 }
 
 // Legend entries are buttons: a click hides or shows that series.
+// An axis label slides along its tick by as much of its width as it is far
+// along the axis: the first starts at its tick, the last ends at it, so none
+// runs past the chart however narrow the card.
+function axisLabel(pos, text, cls = "") {
+  const pct = (pos * 100).toFixed(2);
+  return `<span class="${cls}" style="left:${pct}%;transform:translateX(-${pct}%)">${escapeHtml(text)}</span>`;
+}
+
 function chartFrame(legend, svg, yLabels, xLabels, hint, hidden) {
   return `
     <div class="sfc-legend">${legend.map(([kind, label]) => `
@@ -3895,7 +3902,7 @@ function powerChartHtml(source, t, locale, hidden) {
     legend,
     svg,
     ticks.map((v) => `<span class="sfc-ylabel" style="top:${((y(v) / H) * 100).toFixed(2)}%">${escapeHtml(formatPower(v, locale))}</span>`).join(""),
-    xLabels.map(([pos, label]) => `<span style="left:${(pos * 100).toFixed(2)}%">${escapeHtml(label)}</span>`).join(""),
+    xLabels.map(([pos, label]) => axisLabel(pos, label)).join(""),
     t.chartPowerHint,
     hidden
   );
@@ -5467,7 +5474,9 @@ const BASE_CSS = `
   .sfc-prices-chart i.day::before { content: ""; position: absolute; left: -4px; top: 0; bottom: 0; border-left: 1px dashed var(--sfc-border); }
   .sfc-prices-axis { position: relative; height: 15px; margin-top: 3px; color: var(--sfc-muted); font-size: 10px; }
   .sfc-prices-axis span { position: absolute; top: 0; white-space: nowrap; }
-  .sfc-prices-axis span.end { transform: translateX(-100%); }
+  /* Narrow: the labels every 12 hours only. */
+  .sfc-prices { container-type: inline-size; }
+  @container (max-width: 440px) { .sfc-prices-axis span.minor { display: none; } }
   /* collapsible: true – a section's title folds it; folded, one line. */
   .sfc-foldable { cursor: pointer; }
   .sfc-head.sfc-foldable h3::after, small.sfc-foldable::after, .sfc-fold-head i::before {
@@ -5588,7 +5597,7 @@ const BASE_CSS = `
   .sfc-bar.pv { fill: var(--sfc-pv); } .sfc-bar.load { fill: var(--sfc-load); } .sfc-bar.grid { fill: var(--sfc-grid); }
   .sfc-ylabel { position: absolute; right: calc(100% + 6px); transform: translateY(-50%); color: var(--sfc-muted); font-size: 10px; white-space: nowrap; }
   .sfc-xaxis { position: relative; height: 18px; margin: 4px 0 0 46px; }
-  .sfc-xaxis span { position: absolute; top: 2px; transform: translateX(-50%); color: var(--sfc-muted); font-size: 10px; white-space: nowrap; }
+  .sfc-xaxis span { position: absolute; top: 2px; color: var(--sfc-muted); font-size: 10px; white-space: nowrap; }
   .sfc-cursor { position: absolute; top: 0; bottom: 0; width: 1px; background: color-mix(in srgb, var(--sfc-text) 45%, transparent); pointer-events: none; }
   .sfc-tip { position: absolute; top: 4px; z-index: 5; min-width: 150px; margin-left: 10px; padding: 8px 10px; display: grid; gap: 4px;
     border: 1px solid var(--sfc-border); border-radius: 12px; background: var(--sfc-tip-bg, var(--sfc-surface)); color: var(--sfc-text);
@@ -5648,7 +5657,9 @@ const BASE_CSS = `
   .sfc-phase small, .sfc-meter small { color: var(--sfc-muted); font-size: 11px; font-weight: 700; line-height: 1.2; overflow: hidden;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
   .sfc-meter { align-content: start; }
-  .sfc-phase strong { font-size: 16px; font-family: var(--sfc-num-font, inherit); white-space: nowrap; }
+  .sfc-phase strong { font-size: 16px; font-family: var(--sfc-num-font, inherit); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sfc-phase { grid-template-columns: minmax(0, 1fr); }
+  @container (max-width: 240px) { .sfc-phase { padding: 8px; } .sfc-phase strong { font-size: 13px; } }
   .sfc-phase span, .sfc-meter span { color: var(--sfc-muted); font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sfc-phase i, .sfc-meter i { display: block; height: 4px; margin: 3px 0 1px; border-radius: 999px;
     background: linear-gradient(90deg, var(--sfc-c, var(--sfc-load)) var(--p), var(--sfc-track) var(--p)); }
