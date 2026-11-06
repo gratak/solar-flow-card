@@ -87,6 +87,7 @@ const BASE_CSS = `
   .sfc-prices-chart i.day::before { content: ""; position: absolute; left: -4px; top: 0; bottom: 0; border-left: 1px dashed var(--sfc-border); }
   .sfc-prices-axis { position: relative; height: 15px; margin-top: 3px; color: var(--sfc-muted); font-size: 10px; }
   .sfc-prices-axis span { position: absolute; top: 0; white-space: nowrap; }
+  .sfc-prices-axis span.end { transform: translateX(-100%); }
   /* collapsible: true – a section's title folds it; folded, one line. */
   .sfc-foldable { cursor: pointer; }
   .sfc-head.sfc-foldable h3::after, small.sfc-foldable::after, .sfc-fold-head i::before {
@@ -506,7 +507,7 @@ const THEME_CSS = {
     }
     .sfc button { text-transform: uppercase; }
     .lc-soc.no-battery { grid-template-columns: 1fr; }
-    .lc-frame { display: grid; grid-template-columns: 22% 1fr; grid-template-rows: auto 1fr auto; column-gap: 6px; }
+    .lc-frame { display: grid; grid-template-columns: 22% minmax(0, 1fr); grid-template-rows: auto 1fr auto; column-gap: 6px; }
     .lc-elbow { position: relative; background: var(--orange); }
     .lc-elbow.top { grid-column: 1; grid-row: 1; height: 64px; border-radius: 44px 0 0 0; }
     .lc-elbow.top span { position: absolute; right: 8px; bottom: 6px; color: #000; font-size: 11px; }

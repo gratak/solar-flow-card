@@ -198,7 +198,8 @@ function pricesHtml(m) {
     const hour = new Date(h.at).getHours();
     if (hour % 6) return "";
     const day = startOfDay(new Date(h.at)).getTime() !== first && hour === 0 ? t.tomorrow : formatClock(new Date(h.at), locale);
-    return `<span style="left:${((i / n) * 100).toFixed(2)}%">${escapeHtml(day)}</span>`;
+    // A label near the right edge ends at its tick instead of running past.
+    return `<span class="${i / n > 0.85 ? "end" : ""}" style="left:${((i / n) * 100).toFixed(2)}%">${escapeHtml(day)}</span>`;
   }).join("");
   const at = (h) => formatClock(new Date(h.at), locale);
   return `

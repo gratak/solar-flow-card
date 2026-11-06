@@ -141,6 +141,7 @@ co2_factor: 0.7
 | `price_import` | – | Price per kWh bought from the grid, a number or a price sensor. Enables the savings. |
 | `price_export` | `0` | Price per kWh sold to the grid, a number or a price sensor (e.g. the hourly RCE price). |
 | `settlement` | – | `net_billing` or `net_metering`: how the energy sent to the grid is settled, see [below](#settlement-net-billing-or-net-metering). Also in the editor. |
+| `billing_factor` | `1.23` | With `net_billing`: what the value of the energy sold is multiplied by for the deposit. |
 | `metering_ratio` | `0.8` / `0.7` | With `net_metering`: what a kWh sent back is worth in kWh bought. |
 | `currency` | by language (`zł`, `€`) | Currency shown with the savings. |
 | `co2_factor` | `0.5` | kg of CO₂ per kWh from the grid (Poland: about `0.7`). |
@@ -235,7 +236,7 @@ Listing `insights` or `comparison` shows them in the compact layout too. In the 
 
 | `settlement` | The energy sent to the grid… |
 |---|---|
-| `net_billing` | is sold at the hourly RCE price. Without `price_export` the card finds an RCE price sensor itself (e.g. from ProfitEMS or the PSE integration), and the Energy prices chart appears. |
+| `net_billing` | is sold at the hourly RCE price, and its value goes to the prosumer deposit multiplied by 1.23 (`billing_factor`, set `1` to turn it off). Without `price_export` the card finds an RCE price sensor itself (e.g. from ProfitEMS or the PSE integration), and the Energy prices chart appears. |
 | `net_metering` | is worth `metering_ratio` of a kWh bought: 0.8, or 0.7 above 10 kWp (worked out from `pv_capacity` unless you set it). |
 | not set | uses `price_export` as given. |
 
