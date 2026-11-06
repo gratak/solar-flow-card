@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.8.0-beta.7
+
+- **PV strings, even rows:** the string tiles (Inverter details and Panels) take as many columns as fit for the number of strings, so no tile is left alone in the last row.
+  - 2 strings: side by side or stacked.
+  - 3: three in a row or stacked.
+  - 4: four in a row, 2 × 2 or stacked.
+  - 5 or more: three or two per row.
+  
+  On a phone the Inverter details show two strings per row instead of one.
+
 ## 1.8.0-beta.6
 
 - **Load-side voltages:** they show only while they do not follow the grid, i.e. when the grid is down or a phase differs by more than 10 V (running off-grid), and then all phases together. Before, a phase a few volts off the grid's could show on its own.

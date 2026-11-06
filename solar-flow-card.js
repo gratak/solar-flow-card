@@ -7,7 +7,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "1.8.0-beta.6";
+const CARD_VERSION = "1.8.0-beta.7";
 const CARD_TAG = "solar-flow-card";
 const EDITOR_TAG = "solar-flow-card-editor";
 const THEMES = ["diorama", "aurora", "paper", "lcars", "atlantis", "expanse", "foundation", "galaxy", "gate", "reactor"];
@@ -3115,7 +3115,7 @@ function inverterHtml(m) {
     ${device.strings.size ? `
       <div class="sfc-group">
         <h4>${escapeHtml(t.pvStrings)}</h4>
-        <div class="sfc-strings">
+        <div class="sfc-strings ${stringsClass(shownStrings(device, m.config).length)}">
           ${shownStrings(device, m.config).map(([index, s]) => `
             <button class="sfc-string" data-entity="${escapeHtml((s.W || s.V || s.A).entityId)}">
               <span>${escapeHtml(fill(t.stringN, { n: index }))}</span>
@@ -3148,6 +3148,12 @@ function shownStrings(device, config) {
   return strings.some(used) ? strings.filter(used) : strings;
 }
 
+// The number of string tiles, for the column counts that keep the rows even
+// (no lone tile in the last row): s2, s3, s4, or s5 for five and more.
+function stringsClass(count) {
+  return `s${Math.min(Math.max(count, 1), 5)}`;
+}
+
 function panelsHtml(m) {
   const data = m.panels;
   if (!m.config.showPanels || !m.config.showSolar || !data) return "";
@@ -3167,7 +3173,7 @@ function panelsHtml(m) {
         <div><span class="sfc-kicker">${data.panels.length}×</span><h3>${escapeHtml(t.panelsTitle)}</h3></div>
         <span class="sfc-hint">${escapeHtml(fill(t.panelsEstimateHint, { energy: formatEnergy(data.average, locale) }))}</span>
       </div>
-      <div class="sfc-strings sfc-panel-strings">
+      <div class="sfc-strings sfc-panel-strings ${stringsClass(data.strings.length)}">
         ${data.strings.map((string, i) => {
           const each = data.stringPower[i];
           return `
@@ -5127,7 +5133,15 @@ const BASE_CSS = `
   .sfc-group + .sfc-group { margin-top: 12px; }
   .sfc-group h4, .sfc-serial { margin: 0 0 7px; color: var(--sfc-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
   .sfc-strings { display: grid; gap: 7px; }
-  .sfc-panel-strings { grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); }
+  /* String tiles: columns from the space and the number of strings, so the
+     rows stay even. Inverter tiles need about 170 px, estimate tiles 250 px. */
+  .sfc-inverter, .sfc-panels { container-type: inline-size; }
+  @container (min-width: 340px) { .sfc-inverter .sfc-strings:is(.s2, .s4, .s5) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @container (min-width: 520px) { .sfc-inverter .sfc-strings:is(.s3, .s5) { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @container (min-width: 700px) { .sfc-inverter .sfc-strings.s4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  @container (min-width: 500px) { .sfc-panel-strings:is(.s2, .s4, .s5) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @container (min-width: 760px) { .sfc-panel-strings:is(.s3, .s5) { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @container (min-width: 1000px) { .sfc-panel-strings.s4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
   .sfc-string, .sfc-reading { min-width: 0; border: 1px solid var(--sfc-border); border-radius: var(--sfc-tile-radius, 11px); background: var(--sfc-tile-bg); text-align: left; }
   .sfc-string { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 9px 12px; border-left: 3px solid var(--sfc-pv); }
   .sfc-string span { font-size: 12px; font-weight: 700; }
@@ -5212,7 +5226,6 @@ const BASE_CSS = `
     .sfc-wide-rest { grid-column: 2; align-content: start; gap: 14px; padding: 0 16px 16px 4px; }
     .gt-layout.wide > .sfc-sections { display: block; columns: 320px; column-gap: 14px; }
     .gt-layout.wide > .sfc-sections > * { break-inside: avoid; margin-bottom: 14px; }
-    :is(.sfc-wide, .lc-main.wide, .gt-layout.wide) .sfc-strings:not(.sfc-panel-strings) { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
     .sfc-wide-main > :last-child { margin-bottom: 16px; }
     .sfc-wide-fill:not(:empty) { display: grid; gap: 14px; padding: 0 4px 0 16px; }
     .lc-main.wide { display: grid; grid-template-columns: minmax(340px, 40%) minmax(0, 1fr); column-gap: 18px; align-items: start; }

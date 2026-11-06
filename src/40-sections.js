@@ -200,7 +200,7 @@ function inverterHtml(m) {
     ${device.strings.size ? `
       <div class="sfc-group">
         <h4>${escapeHtml(t.pvStrings)}</h4>
-        <div class="sfc-strings">
+        <div class="sfc-strings ${stringsClass(shownStrings(device, m.config).length)}">
           ${shownStrings(device, m.config).map(([index, s]) => `
             <button class="sfc-string" data-entity="${escapeHtml((s.W || s.V || s.A).entityId)}">
               <span>${escapeHtml(fill(t.stringN, { n: index }))}</span>
@@ -233,6 +233,12 @@ function shownStrings(device, config) {
   return strings.some(used) ? strings.filter(used) : strings;
 }
 
+// The number of string tiles, for the column counts that keep the rows even
+// (no lone tile in the last row): s2, s3, s4, or s5 for five and more.
+function stringsClass(count) {
+  return `s${Math.min(Math.max(count, 1), 5)}`;
+}
+
 function panelsHtml(m) {
   const data = m.panels;
   if (!m.config.showPanels || !m.config.showSolar || !data) return "";
@@ -252,7 +258,7 @@ function panelsHtml(m) {
         <div><span class="sfc-kicker">${data.panels.length}×</span><h3>${escapeHtml(t.panelsTitle)}</h3></div>
         <span class="sfc-hint">${escapeHtml(fill(t.panelsEstimateHint, { energy: formatEnergy(data.average, locale) }))}</span>
       </div>
-      <div class="sfc-strings sfc-panel-strings">
+      <div class="sfc-strings sfc-panel-strings ${stringsClass(data.strings.length)}">
         ${data.strings.map((string, i) => {
           const each = data.stringPower[i];
           return `
