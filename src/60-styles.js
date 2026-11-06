@@ -75,6 +75,9 @@ const BASE_CSS = `
   .sfc-pvf-bar { position: relative; height: 10px; border-radius: 999px; background: var(--sfc-track); overflow: hidden; }
   .sfc-pvf-bar i { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: color-mix(in srgb, var(--sfc-pv) 45%, transparent); }
   .sfc-pvf-bar b { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--sfc-pv); }
+  /* Solcast's 10–90% range: a bracket over the bar. */
+  .sfc-pvf-bar u { position: absolute; top: 2px; bottom: 2px; box-sizing: border-box; min-width: 3px; border: 1.5px solid color-mix(in srgb, var(--sfc-text) 55%, transparent);
+    border-width: 0 1.5px; background: color-mix(in srgb, var(--sfc-text) 10%, transparent); }
   .sfc-prices-chart { position: relative; display: flex; align-items: stretch; gap: 2px; height: 96px; margin-top: 2px; }
   .sfc-prices-chart::after { content: ""; position: absolute; left: 0; right: 0; bottom: var(--zero); border-top: 1px solid var(--sfc-border); pointer-events: none; }
   .sfc-prices-chart i { position: relative; flex: 1; min-width: 0; }
@@ -206,6 +209,9 @@ const BASE_CSS = `
   .sfc-line.battery { stroke: var(--sfc-battery); stroke-width: 1.5; } .sfc-line.grid { stroke: var(--sfc-grid); stroke-width: 1.5; }
   .sfc-line.soc { stroke: color-mix(in srgb, var(--sfc-battery) 55%, var(--sfc-muted)); stroke-dasharray: 4 4; stroke-width: 1.5; }
   .sfc-area.pv { fill: color-mix(in srgb, var(--sfc-pv) 22%, transparent); }
+  /* The PV forecast: a dashed line in the PV colour. */
+  .sfc-line.forecast { stroke: color-mix(in srgb, var(--sfc-pv) 75%, var(--sfc-text)); stroke-dasharray: 7 5; stroke-width: 1.6; opacity: .9; }
+  .forecast > i { color: var(--sfc-pv); height: 0; border-radius: 0; border-top: 2px dashed currentColor; background: none; }
   .sfc-area.battery { fill: color-mix(in srgb, var(--sfc-battery) 20%, transparent); }
   .sfc-bar.pv { fill: var(--sfc-pv); } .sfc-bar.load { fill: var(--sfc-load); } .sfc-bar.grid { fill: var(--sfc-grid); }
   .sfc-ylabel { position: absolute; right: calc(100% + 6px); transform: translateY(-50%); color: var(--sfc-muted); font-size: 10px; white-space: nowrap; }

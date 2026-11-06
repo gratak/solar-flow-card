@@ -360,6 +360,28 @@ class SolarFlowCard extends HTMLElement {
   }
 
   _chartState(resolved, period, energy) {
+    const chart = this._chartStateBase(resolved, period, energy);
+    if (period !== "today" || chart?.data?.kind !== "power" || this._config.show_solar === false) return chart;
+    // The hourly PV forecast as a line next to the production.
+    const forecast = this._forecastHours();
+    const series = forecastSeries(forecast.hours, chart.data.spec);
+    if (!series) return forecast.loading ? { ...chart, at: [chart.at, "forecast"] } : chart;
+    return { ...chart, at: [chart.at, forecast.at], data: { ...chart.data, forecast: series } };
+  }
+
+  // Solcast's hourly attributes, or else Home Assistant's energy forecast
+  // (Forecast.Solar and the like), only with pv_forecast configured.
+  _forecastHours() {
+    const config = this._config;
+    const fromStates = forecastHoursFromStates(this._hass, config);
+    if (fromStates) return { hours: fromStates, at: [...fromStates].slice(0, 30).map(([, w]) => Math.round(w)).join(",") };
+    const f = config.pv_forecast;
+    if (!f || typeof f !== "object" || f.hourly === false || typeof this._hass.callWS !== "function") return {};
+    const entry = this._fetch(`solar-forecast|${startOfDay(new Date()).getTime()}`, 30 * 60000, () => loadEnergyForecastHours(this._hass));
+    return { hours: entry.data, at: entry.at, loading: entry.loading };
+  }
+
+  _chartStateBase(resolved, period, energy) {
     if (this._config.show_chart === false) return null;
     if (period === "today" || period === "3d") {
       const history = this._powerHistory(resolved, period);

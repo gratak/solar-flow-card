@@ -521,6 +521,69 @@ function priceChartData(hass, config, now = new Date()) {
 // PV production forecast (#69) from forecast sensors such as Solcast or
 // Forecast.Solar: `pv_forecast: { today, remaining, days: [...] }`, where
 // `days` lists the sensors for tomorrow and the days after it.
+// The hourly PV forecast as average watts per hour, keyed by the hour's
+// start (ms). Solcast keeps it in the forecast sensors' attributes:
+// detailedHourly, or detailedForecast by the half hour (pv_estimate in kW).
+function forecastHoursFromStates(hass, config) {
+  const f = config.pv_forecast;
+  if (!f || typeof f !== "object" || Array.isArray(f) || f.hourly === false) return null;
+  const hours = new Map();
+  const counts = new Map();
+  for (const id of [f.today, ...(Array.isArray(f.days) ? f.days.slice(0, 1) : [])]) {
+    const a = typeof id === "string" ? hass?.states?.[id]?.attributes : null;
+    const list = Array.isArray(a?.detailedHourly) ? a.detailedHourly : Array.isArray(a?.detailedForecast) ? a.detailedForecast : null;
+    for (const item of list || []) {
+      const at = Date.parse(item?.period_start);
+      const kw = Number.parseFloat(item?.pv_estimate);
+      if (!Number.isFinite(at) || !Number.isFinite(kw)) continue;
+      const hour = new Date(at);
+      hour.setMinutes(0, 0, 0);
+      const key = hour.getTime();
+      hours.set(key, (hours.get(key) || 0) + kw * 1000);
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+  }
+  for (const [key, sum] of hours) hours.set(key, sum / counts.get(key));
+  return hours.size ? hours : null;
+}
+
+// The same from Home Assistant's energy forecast (Forecast.Solar, Solcast or
+// any integration chosen in the Energy dashboard): watt-hours per hour,
+// summed over the forecast entries (e.g. Forecast.Solar's roof planes).
+async function loadEnergyForecastHours(hass) {
+  const response = await hass.callWS({ type: "energy/solar_forecast" });
+  const hours = new Map();
+  for (const entry of Object.values(response || {})) {
+    for (const [at, wh] of Object.entries(entry?.wh_hours || {})) {
+      const ms = Date.parse(at);
+      const value = Number(wh);
+      if (Number.isFinite(ms) && Number.isFinite(value)) hours.set(ms, (hours.get(ms) || 0) + value);
+    }
+  }
+  return hours.size ? hours : null;
+}
+
+// The hourly forecast on the chart's buckets: each hour's average power at
+// the middle of the hour, straight lines in between; nothing outside the
+// forecast's hours.
+function forecastSeries(hours, spec) {
+  if (!hours?.size) return null;
+  const HOUR = 3600000;
+  const series = Array.from({ length: spec.count }, (_, i) => {
+    const t = spec.start.getTime() + (i + 0.5) * spec.bucketMs;
+    const base = new Date(t - HOUR / 2);
+    base.setMinutes(0, 0, 0);
+    const a = base.getTime();
+    const before = hours.get(a);
+    const after = hours.get(a + HOUR);
+    if (!isNum(before) && !isNum(after)) return null;
+    if (!isNum(before) || !isNum(after)) return isNum(before) ? (t - a - HOUR / 2 <= HOUR / 2 ? before : null) : (a + HOUR + HOUR / 2 - t <= HOUR / 2 ? after : null);
+    const share = (t - (a + HOUR / 2)) / HOUR;
+    return Math.max(0, before + (after - before) * share);
+  });
+  return series.some((v) => isNum(v) && v > 0) ? series : null;
+}
+
 function pvForecastData(hass, config, today, now = new Date()) {
   const f = config.pv_forecast;
   if (!f || typeof f !== "object" || Array.isArray(f)) return null;
@@ -529,10 +592,18 @@ function pvForecastData(hass, config, today, now = new Date()) {
   const total = read(f.today);
   const remaining = read(f.remaining);
   const ids = Array.isArray(f.days) ? f.days : [];
-  const days = [{ date: startOfDay(now), value: total, entityId: f.today, today: true }, ...ids.map((id, i) => ({
+  // Solcast: the pessimistic (10%) and optimistic (90%) estimate of a day.
+  const range = (id) => {
+    const a = typeof id === "string" ? states[id]?.attributes : null;
+    const low = Number.parseFloat(a?.estimate10);
+    const high = Number.parseFloat(a?.estimate90);
+    return Number.isFinite(low) && Number.isFinite(high) && high >= low ? { low, high } : {};
+  };
+  const days = [{ date: startOfDay(now), value: total, entityId: f.today, today: true, ...range(f.today) }, ...ids.map((id, i) => ({
     date: startOfDay(addDays(now, i + 1)),
     value: read(id),
     entityId: id,
+    ...range(id),
   }))].filter((d) => isNum(d.value));
   if (!days.length && !isNum(remaining)) return null;
   return { total, remaining, produced: isNum(today.solar) ? today.solar : null, days, entityId: f.remaining || f.today };

@@ -98,6 +98,7 @@ const TRANSLATIONS = {
     "legendBattery": "Battery",
     "legendGrid": "Grid",
     "legendSoc": "SOC",
+    "legendForecast": "Forecast",
     "chartLoading": "Loading history…",
     "chartEmpty": "No history for this period yet",
     "chartError": "History is not available",
@@ -304,6 +305,7 @@ const TRANSLATIONS = {
     "pvLeft": "≈ {kwh} to go",
     "pvForecastNote": "forecast {kwh}",
     "pvProducedOf": "{done} of {total} produced so far",
+    "pvRange": "range {low}–{high}",
     "chartFallback": "Hourly averages from the energy statistics. No power history for: {sensors} (excluded from the recorder?)",
     "chartNoHistory": "No history for: {sensors}. Excluded from the recorder?",
     "editorBeta": "Beta: the new editor. Options it does not show stay in your YAML as they are.",
@@ -517,6 +519,7 @@ const TRANSLATIONS = {
     "legendBattery": "Batterie",
     "legendGrid": "Netz",
     "legendSoc": "SOC",
+    "legendForecast": "Prognose",
     "chartLoading": "Verlauf wird geladen …",
     "chartEmpty": "Für diesen Zeitraum liegt noch kein Verlauf vor",
     "chartError": "Verlauf nicht verfügbar",
@@ -690,6 +693,7 @@ const TRANSLATIONS = {
     "pvForecastTitle": "PV-Prognose",
     "pvLeft": "noch ≈ {kwh}",
     "pvProducedOf": "{done} von {total} bisher erzeugt",
+    "pvRange": "Spanne {low}–{high}",
     "reactorGrid": "Netzunterstützung",
     "reactorNominal": "Nennleistung",
     "reactorOverdrive": "Overdrive",
@@ -936,6 +940,7 @@ const TRANSLATIONS = {
     "legendBattery": "Batterij",
     "legendGrid": "Net",
     "legendSoc": "SOC",
+    "legendForecast": "Verwachting",
     "chartLoading": "Geschiedenis laden…",
     "chartEmpty": "Nog geen geschiedenis voor deze periode",
     "chartError": "Geschiedenis is niet beschikbaar",
@@ -1142,6 +1147,7 @@ const TRANSLATIONS = {
     "pvLeft": "nog ≈ {kwh}",
     "pvForecastNote": "prognose {kwh}",
     "pvProducedOf": "{done} van {total} opgewekt",
+    "pvRange": "bereik {low}–{high}",
     "chartFallback": "Uurgemiddelden uit de energiestatistieken. Geen vermogenshistorie voor: {sensors} (uitgesloten van de recorder?)",
     "chartNoHistory": "Geen historie voor: {sensors}. Uitgesloten van de recorder?",
     "editorBeta": "Bèta: de nieuwe editor. Opties die hier niet staan, blijven ongewijzigd in je YAML.",
@@ -1355,6 +1361,7 @@ const TRANSLATIONS = {
     "legendBattery": "Magazyn",
     "legendGrid": "Sieć",
     "legendSoc": "SOC",
+    "legendForecast": "Prognoza",
     "chartLoading": "Wczytywanie historii…",
     "chartEmpty": "Brak historii dla tego okresu",
     "chartError": "Historia jest niedostępna",
@@ -1561,6 +1568,7 @@ const TRANSLATIONS = {
     "pvLeft": "jeszcze ≈ {kwh}",
     "pvForecastNote": "prognoza {kwh}",
     "pvProducedOf": "wyprodukowano {done} z {total}",
+    "pvRange": "zakres {low}–{high}",
     "chartFallback": "Średnie godzinowe ze statystyk energii. Brak historii mocy dla: {sensors} (wyłączone z recordera?)",
     "chartNoHistory": "Brak historii dla: {sensors}. Czy nie są wyłączone z recordera?",
     "editorBeta": "Beta: nowy edytor. Opcje, których tu nie ma, zostają w YAML-u bez zmian.",
@@ -2484,6 +2492,69 @@ function priceChartData(hass, config, now = new Date()) {
 // PV production forecast (#69) from forecast sensors such as Solcast or
 // Forecast.Solar: `pv_forecast: { today, remaining, days: [...] }`, where
 // `days` lists the sensors for tomorrow and the days after it.
+// The hourly PV forecast as average watts per hour, keyed by the hour's
+// start (ms). Solcast keeps it in the forecast sensors' attributes:
+// detailedHourly, or detailedForecast by the half hour (pv_estimate in kW).
+function forecastHoursFromStates(hass, config) {
+  const f = config.pv_forecast;
+  if (!f || typeof f !== "object" || Array.isArray(f) || f.hourly === false) return null;
+  const hours = new Map();
+  const counts = new Map();
+  for (const id of [f.today, ...(Array.isArray(f.days) ? f.days.slice(0, 1) : [])]) {
+    const a = typeof id === "string" ? hass?.states?.[id]?.attributes : null;
+    const list = Array.isArray(a?.detailedHourly) ? a.detailedHourly : Array.isArray(a?.detailedForecast) ? a.detailedForecast : null;
+    for (const item of list || []) {
+      const at = Date.parse(item?.period_start);
+      const kw = Number.parseFloat(item?.pv_estimate);
+      if (!Number.isFinite(at) || !Number.isFinite(kw)) continue;
+      const hour = new Date(at);
+      hour.setMinutes(0, 0, 0);
+      const key = hour.getTime();
+      hours.set(key, (hours.get(key) || 0) + kw * 1000);
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+  }
+  for (const [key, sum] of hours) hours.set(key, sum / counts.get(key));
+  return hours.size ? hours : null;
+}
+
+// The same from Home Assistant's energy forecast (Forecast.Solar, Solcast or
+// any integration chosen in the Energy dashboard): watt-hours per hour,
+// summed over the forecast entries (e.g. Forecast.Solar's roof planes).
+async function loadEnergyForecastHours(hass) {
+  const response = await hass.callWS({ type: "energy/solar_forecast" });
+  const hours = new Map();
+  for (const entry of Object.values(response || {})) {
+    for (const [at, wh] of Object.entries(entry?.wh_hours || {})) {
+      const ms = Date.parse(at);
+      const value = Number(wh);
+      if (Number.isFinite(ms) && Number.isFinite(value)) hours.set(ms, (hours.get(ms) || 0) + value);
+    }
+  }
+  return hours.size ? hours : null;
+}
+
+// The hourly forecast on the chart's buckets: each hour's average power at
+// the middle of the hour, straight lines in between; nothing outside the
+// forecast's hours.
+function forecastSeries(hours, spec) {
+  if (!hours?.size) return null;
+  const HOUR = 3600000;
+  const series = Array.from({ length: spec.count }, (_, i) => {
+    const t = spec.start.getTime() + (i + 0.5) * spec.bucketMs;
+    const base = new Date(t - HOUR / 2);
+    base.setMinutes(0, 0, 0);
+    const a = base.getTime();
+    const before = hours.get(a);
+    const after = hours.get(a + HOUR);
+    if (!isNum(before) && !isNum(after)) return null;
+    if (!isNum(before) || !isNum(after)) return isNum(before) ? (t - a - HOUR / 2 <= HOUR / 2 ? before : null) : (a + HOUR + HOUR / 2 - t <= HOUR / 2 ? after : null);
+    const share = (t - (a + HOUR / 2)) / HOUR;
+    return Math.max(0, before + (after - before) * share);
+  });
+  return series.some((v) => isNum(v) && v > 0) ? series : null;
+}
+
 function pvForecastData(hass, config, today, now = new Date()) {
   const f = config.pv_forecast;
   if (!f || typeof f !== "object" || Array.isArray(f)) return null;
@@ -2492,10 +2563,18 @@ function pvForecastData(hass, config, today, now = new Date()) {
   const total = read(f.today);
   const remaining = read(f.remaining);
   const ids = Array.isArray(f.days) ? f.days : [];
-  const days = [{ date: startOfDay(now), value: total, entityId: f.today, today: true }, ...ids.map((id, i) => ({
+  // Solcast: the pessimistic (10%) and optimistic (90%) estimate of a day.
+  const range = (id) => {
+    const a = typeof id === "string" ? states[id]?.attributes : null;
+    const low = Number.parseFloat(a?.estimate10);
+    const high = Number.parseFloat(a?.estimate90);
+    return Number.isFinite(low) && Number.isFinite(high) && high >= low ? { low, high } : {};
+  };
+  const days = [{ date: startOfDay(now), value: total, entityId: f.today, today: true, ...range(f.today) }, ...ids.map((id, i) => ({
     date: startOfDay(addDays(now, i + 1)),
     value: read(id),
     entityId: id,
+    ...range(id),
   }))].filter((d) => isNum(d.value));
   if (!days.length && !isNum(remaining)) return null;
   return { total, remaining, produced: isNum(today.solar) ? today.solar : null, days, entityId: f.remaining || f.today };
@@ -3388,7 +3467,8 @@ function pvForecastHtml(m) {
   const f = m.pvForecast;
   if (!f || !m.config.showSolar) return "";
   const { t, locale } = m;
-  const max = Math.max(0.1, ...f.days.map((d) => d.value), isNum(f.produced) ? f.produced : 0);
+  const max = Math.max(0.1, ...f.days.map((d) => Math.max(d.value, isNum(d.high) ? d.high : 0)), isNum(f.produced) ? f.produced : 0);
+  const pct = (v) => clamp((v / max) * 100, 0, 100).toFixed(1);
   const hint = pvForecastNote(m);
   return `
     <section class="sfc-section sfc-pvf">
@@ -3399,11 +3479,14 @@ function pvForecastHtml(m) {
       <div class="sfc-pvf-days">
         ${f.days.map((d) => {
           const done = d.today && isNum(f.produced) ? clamp((f.produced / max) * 100, 0, 100) : 0;
+          const ranged = isNum(d.low) && isNum(d.high);
+          const range = ranged ? fill(t.pvRange, { low: formatEnergy(d.low, locale), high: formatEnergy(d.high, locale) }) : "";
+          const title = d.today && isNum(f.produced) ? fill(t.pvProducedOf, { done: formatEnergy(f.produced, locale), total: formatEnergy(d.value, locale) }) : formatEnergy(d.value, locale);
           return `
           <button class="sfc-pvf-day ${d.today ? "today" : ""}" ${d.entityId ? `data-entity="${escapeHtml(d.entityId)}"` : ""}
-            title="${escapeHtml(d.today && isNum(f.produced) ? fill(t.pvProducedOf, { done: formatEnergy(f.produced, locale), total: formatEnergy(d.value, locale) }) : formatEnergy(d.value, locale))}">
+            title="${escapeHtml(range ? `${title} · ${range}` : title)}">
             <small>${escapeHtml(d.today ? t.periodToday : d.date.toLocaleDateString(locale, { weekday: "short", day: "numeric" }))}</small>
-            <span class="sfc-pvf-bar"><i style="width:${clamp((d.value / max) * 100, 0, 100).toFixed(1)}%"></i>${done ? `<b style="width:${done.toFixed(1)}%"></b>` : ""}</span>
+            <span class="sfc-pvf-bar"><i style="width:${pct(d.value)}%"></i>${done ? `<b style="width:${done.toFixed(1)}%"></b>` : ""}${ranged ? `<u style="left:${pct(d.low)}%;width:${(pct(d.high) - pct(d.low)).toFixed(1)}%"></u>` : ""}</span>
             <strong>${escapeHtml(formatEnergy(d.value, locale))}</strong>
           </button>`;
         }).join("")}
@@ -3855,11 +3938,12 @@ function powerChartHtml(source, t, locale, hidden) {
     battery: show("battery", source.battery),
     grid: show("grid", source.grid),
     soc: show("soc", source.soc),
+    forecast: show("forecast", source.forecast),
   };
   const W = 1000;
   const H = 300;
   const signed = [data.battery, data.grid].filter(Boolean).flat().filter((v) => v !== null);
-  const positive = [data.solar, data.load].filter(Boolean).flat().filter((v) => v !== null);
+  const positive = [data.solar, data.load, data.forecast].filter(Boolean).flat().filter((v) => v !== null);
   const maxValue = Math.max(100, ...positive, ...signed);
   const minValue = Math.min(0, ...signed);
   const step = niceStep(maxValue - minValue, 4);
@@ -3886,6 +3970,7 @@ function powerChartHtml(source, t, locale, hidden) {
     ["battery", t.legendBattery, source.battery],
     ["grid", t.legendGrid, source.grid],
     ["soc", t.legendSoc, source.soc],
+    ["forecast", t.legendForecast, source.forecast],
   ].filter(([, , series]) => series);
   const svg = `
     <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
@@ -3897,6 +3982,7 @@ function powerChartHtml(source, t, locale, hidden) {
       ${data.grid ? `<path class="sfc-line grid" d="${linePath(data.grid, x, y)}" />` : ""}
       ${data.load ? `<path class="sfc-line load" d="${linePath(data.load, x, y)}" />` : ""}
       ${data.soc ? `<path class="sfc-line soc" d="${linePath(data.soc, x, socY)}" />` : ""}
+      ${data.forecast ? `<path class="sfc-line forecast" d="${linePath(data.forecast, x, y)}" />` : ""}
     </svg>`;
   return chartFrame(
     legend,
@@ -3952,7 +4038,8 @@ function energyChartHtml(data, t, locale, hidden) {
     ticks.map((v) => `<span class="sfc-ylabel" style="top:${((y(v) / H) * 100).toFixed(2)}%">${escapeHtml(formatNumber(v, locale, step < 1 ? 1 : 0))} kWh</span>`).join(""),
     buckets.map((bucket, i) => {
       const text = label(bucket.start, i);
-      return text ? `<span style="left:${(((i + 0.5) / buckets.length) * 100).toFixed(2)}%">${escapeHtml(text)}</span>` : "";
+      // Under the middle of its bars.
+      return text ? `<span style="left:${(((i + 0.5) / buckets.length) * 100).toFixed(2)}%;transform:translateX(-50%)">${escapeHtml(text)}</span>` : "";
     }).join(""),
     "",
     hidden
@@ -3969,7 +4056,8 @@ function chartTipHtml(data, index, t, locale, hidden) {
       ["load", t.legendLoad, data.load],
       ["battery", t.legendBattery, data.battery],
       ["grid", t.legendGrid, data.grid],
-    ].filter(([kind, , series]) => series && !hidden.has(kind) && series[index] !== null);
+      ["forecast", t.legendForecast, data.forecast],
+    ].filter(([kind, , series]) => series && !hidden.has(kind) && isNum(series[index]));
     if (!rows.length) return null;
     const time = spec.period === "today"
       ? formatClock(at, locale)
@@ -5462,6 +5550,9 @@ const BASE_CSS = `
   .sfc-pvf-bar { position: relative; height: 10px; border-radius: 999px; background: var(--sfc-track); overflow: hidden; }
   .sfc-pvf-bar i { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: color-mix(in srgb, var(--sfc-pv) 45%, transparent); }
   .sfc-pvf-bar b { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--sfc-pv); }
+  /* Solcast's 10–90% range: a bracket over the bar. */
+  .sfc-pvf-bar u { position: absolute; top: 2px; bottom: 2px; box-sizing: border-box; min-width: 3px; border: 1.5px solid color-mix(in srgb, var(--sfc-text) 55%, transparent);
+    border-width: 0 1.5px; background: color-mix(in srgb, var(--sfc-text) 10%, transparent); }
   .sfc-prices-chart { position: relative; display: flex; align-items: stretch; gap: 2px; height: 96px; margin-top: 2px; }
   .sfc-prices-chart::after { content: ""; position: absolute; left: 0; right: 0; bottom: var(--zero); border-top: 1px solid var(--sfc-border); pointer-events: none; }
   .sfc-prices-chart i { position: relative; flex: 1; min-width: 0; }
@@ -5593,6 +5684,9 @@ const BASE_CSS = `
   .sfc-line.battery { stroke: var(--sfc-battery); stroke-width: 1.5; } .sfc-line.grid { stroke: var(--sfc-grid); stroke-width: 1.5; }
   .sfc-line.soc { stroke: color-mix(in srgb, var(--sfc-battery) 55%, var(--sfc-muted)); stroke-dasharray: 4 4; stroke-width: 1.5; }
   .sfc-area.pv { fill: color-mix(in srgb, var(--sfc-pv) 22%, transparent); }
+  /* The PV forecast: a dashed line in the PV colour. */
+  .sfc-line.forecast { stroke: color-mix(in srgb, var(--sfc-pv) 75%, var(--sfc-text)); stroke-dasharray: 7 5; stroke-width: 1.6; opacity: .9; }
+  .forecast > i { color: var(--sfc-pv); height: 0; border-radius: 0; border-top: 2px dashed currentColor; background: none; }
   .sfc-area.battery { fill: color-mix(in srgb, var(--sfc-battery) 20%, transparent); }
   .sfc-bar.pv { fill: var(--sfc-pv); } .sfc-bar.load { fill: var(--sfc-load); } .sfc-bar.grid { fill: var(--sfc-grid); }
   .sfc-ylabel { position: absolute; right: calc(100% + 6px); transform: translateY(-50%); color: var(--sfc-muted); font-size: 10px; white-space: nowrap; }
@@ -6811,6 +6905,28 @@ class SolarFlowCard extends HTMLElement {
   }
 
   _chartState(resolved, period, energy) {
+    const chart = this._chartStateBase(resolved, period, energy);
+    if (period !== "today" || chart?.data?.kind !== "power" || this._config.show_solar === false) return chart;
+    // The hourly PV forecast as a line next to the production.
+    const forecast = this._forecastHours();
+    const series = forecastSeries(forecast.hours, chart.data.spec);
+    if (!series) return forecast.loading ? { ...chart, at: [chart.at, "forecast"] } : chart;
+    return { ...chart, at: [chart.at, forecast.at], data: { ...chart.data, forecast: series } };
+  }
+
+  // Solcast's hourly attributes, or else Home Assistant's energy forecast
+  // (Forecast.Solar and the like), only with pv_forecast configured.
+  _forecastHours() {
+    const config = this._config;
+    const fromStates = forecastHoursFromStates(this._hass, config);
+    if (fromStates) return { hours: fromStates, at: [...fromStates].slice(0, 30).map(([, w]) => Math.round(w)).join(",") };
+    const f = config.pv_forecast;
+    if (!f || typeof f !== "object" || f.hourly === false || typeof this._hass.callWS !== "function") return {};
+    const entry = this._fetch(`solar-forecast|${startOfDay(new Date()).getTime()}`, 30 * 60000, () => loadEnergyForecastHours(this._hass));
+    return { hours: entry.data, at: entry.at, loading: entry.loading };
+  }
+
+  _chartStateBase(resolved, period, energy) {
     if (this._config.show_chart === false) return null;
     if (period === "today" || period === "3d") {
       const history = this._powerHistory(resolved, period);
