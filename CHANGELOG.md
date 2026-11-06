@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.8.0-beta.2
+
+The editor now covers every option and helps avoid the usual mistakes:
+
+- **Each sensor field shows its value right now**, or, when left empty, what DeyeCloud found by itself.
+- **Warnings** where a setting would break the card:
+  - a sensor that does not exist;
+  - a unit that does not fit, e.g. a voltage sensor in a power field;
+  - an energy sensor without the statistics the longer periods need;
+  - a lifetime counter set up as a daily sensor;
+  - a single grid or battery sensor together with the import/export (charge/discharge) pair;
+  - a PV size, inverter rating or battery capacity entered in W/Wh instead of kW/kWh;
+  - importing more than the panels produce, a hint at the grid sign.
+  
+  Under the sign switches, the current solar, grid and battery power with the settings as they are.
+- **Several batteries** (`batteries:`), **panel sensors** (`panels:`) and **inverter details with names** are edited in the editor too.
+- **History for the charts** (`…_history`), for sensors kept out of the recorder, in an advanced box under Sensors.
+- **Confirmation** before removing a filled battery, panel or detail, or unticking the last section. A note about privacy when Google Fonts are switched on.
+
 ## 1.8.0-beta.1
 
 **The new visual editor (beta).** Not everyone likes YAML, so the editor now covers almost every option, in groups that open on tap:

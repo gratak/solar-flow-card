@@ -62,6 +62,56 @@ function editorSections(config) {
   return [...on.map((id) => ({ id, on: true })), ...order.filter((id) => !on.includes(id)).map((id) => ({ id, on: false }))];
 }
 
+// What a sensor field expects, from its config key.
+function fieldKind(key) {
+  if (/^\d+$/.test(key)) return "energy";
+  const base = key.replace(/_history$/, "");
+  if (base === "battery_soc" || base === "soc") return "soc";
+  if (/energy$/.test(base) || base === "today" || base === "remaining" || base === "days" || base === "entity_vs") return "energy";
+  if (/(^|_)power(_l\d)?$/.test(base) || base === "power") return "power";
+  if (/voltage(_l\d)?$/.test(base)) return "voltage";
+  if (/current$/.test(base)) return "current";
+  if (/temperature$/.test(base)) return "temperature";
+  return "any";
+}
+
+const FIELD_UNITS = {
+  power: ["w", "kw", "mw"],
+  energy: ["wh", "kwh", "mwh"],
+  soc: ["%"],
+  voltage: ["v", "mv", "kv"],
+  current: ["a", "ma"],
+  temperature: ["°c", "°f", "k"],
+};
+const FIELD_UNIT_NAMES = { power: "W / kW", energy: "kWh", soc: "%", voltage: "V", current: "A", temperature: "°C" };
+
+// The notes under a sensor field: its value now, or what is wrong with it.
+function fieldNotes(hass, config, t, kind, value, auto) {
+  const locale = t.locale;
+  if (!value) return auto ? [["note", fill(t.editorAuto, { entity: auto.entityId, value: fieldValue(auto.stateObj, kind, locale) })]] : [];
+  const stateObj = hass?.states?.[value];
+  if (!stateObj) return [["warn", t.editorNotFound]];
+  const notes = [];
+  const unit = stateUnit(stateObj).trim();
+  const wrongUnit = Boolean(FIELD_UNITS[kind] && unit && !FIELD_UNITS[kind].includes(unit.toLowerCase()));
+  if (wrongUnit) notes.push(["warn", fill(t.editorWrongUnit, { unit, expected: FIELD_UNIT_NAMES[kind] })]);
+  notes.push(["note", stateNumber(stateObj) === null && kind !== "any" ? t.editorUnavailable : fill(t.editorNow, { value: fieldValue(stateObj, wrongUnit ? "any" : kind, locale) })]);
+  if (kind === "energy") {
+    const stateClass = stateObj.attributes?.state_class;
+    if (stateClass !== "total" && stateClass !== "total_increasing") notes.push(["warn", t.editorNoStats]);
+  }
+  return notes;
+}
+
+function fieldValue(stateObj, kind, locale) {
+  if (kind === "power") return formatPower(wattsOf(stateObj), locale);
+  if (kind === "energy") return formatEnergy(kwhOf(stateObj), locale);
+  return `${stateObj.state} ${stateUnit(stateObj)}`.trim();
+}
+
+// Numbers that look entered in the wrong unit: [key, limit, label key, factor].
+const NUMBER_CHECKS = [["pv_capacity", 100, "editorLooksWatts", 1000], ["inverter_power_rating", 100, "editorLooksWatts", 1000], ["battery_capacity", 300, "editorLooksWh", 1000]];
+
 class SolarFlowCardEditor extends HTMLElement {
   constructor() {
     super();
@@ -139,8 +189,14 @@ class SolarFlowCardEditor extends HTMLElement {
 
   // An entity field: Home Assistant's picker when it is available, else a
   // text field with the sensors as suggestions.
-  _picker(path, label, value, domain = "sensor") {
-    return `<div class="picker" data-path="${escapeHtml(path)}" data-label="${escapeHtml(label)}" data-domain="${domain}" data-value="${escapeHtml(value || "")}"></div>`;
+  _picker(path, label, value, domain = "sensor", { kind = fieldKind(path.split(".").at(-1)), auto = null, extra = [] } = {}) {
+    const t = stringsFor(languageOf(this._hass, this._config));
+    const notes = domain === "sensor" ? [...fieldNotes(this._hass, this._config, t, kind, value, auto), ...extra] : extra;
+    return `
+      <div class="field">
+        <div class="picker" data-path="${escapeHtml(path)}" data-label="${escapeHtml(label)}" data-domain="${domain}" data-value="${escapeHtml(value || "")}"></div>
+        ${notes.map(([cls, text]) => `<p class="${cls}">${escapeHtml(text)}</p>`).join("")}
+      </div>`;
   }
 
   _mountPickers(root) {
@@ -168,10 +224,34 @@ class SolarFlowCardEditor extends HTMLElement {
     const [group, key, index] = path.split(".");
     if (group === "entities") this._setIn("entities", key, value);
     else if (group === "virtual_storage") this._setVirtual(key, value);
-    else if (group === "pv_forecast" && key === "days") this._setList(["pv_forecast", "days"], Number(index), value);
+    else if (group === "pv_forecast" && key === "days") return this._setList(["pv_forecast", "days"], Number(index), value);
     else if (group === "pv_forecast") this._setIn("pv_forecast", key, value);
-    else if (group === "inverter_details") this._setList(["inverter_details"], Number(key), value);
+    else if (group === "list") return this._setItem(key, Number(index), path.split(".")[3], value);
     else this._set(group, value);
+    // The notes under the field follow the new sensor.
+    this._render();
+  }
+
+  // Lists of objects: batteries, panels, inverter details. `field` of item
+  // `index`; a panel or detail with only its sensor is stored as a string.
+  _items(group) {
+    const list = Array.isArray(this._config[group]) ? this._config[group] : [];
+    return list.map((item) => (typeof item === "string" ? { entity: item } : item && typeof item === "object" ? { ...item } : {}));
+  }
+
+  _writeItems(group, items) {
+    const compact = items.map((item) => {
+      const clean = Object.fromEntries(Object.entries(item).filter(([, v]) => v !== undefined && v !== "" && v !== false && v !== null));
+      return group !== "batteries" && Object.keys(clean).length === 1 && clean.entity ? clean.entity : clean;
+    });
+    this._set(group, compact.length ? compact : undefined);
+    this._render();
+  }
+
+  _setItem(group, index, field, value) {
+    const items = this._items(group);
+    items[index] = { ...(items[index] || {}), [field]: value };
+    this._writeItems(group, items);
   }
 
   // One item of a list option; an emptied item is removed.
@@ -198,8 +278,15 @@ class SolarFlowCardEditor extends HTMLElement {
   }
 
   _numbers(t, list) {
-    return list.map(([key, label, step]) => `
-      <label><span>${escapeHtml(t[label])}</span><input data-number="${key}" type="number" min="0" step="${step}" inputmode="decimal" value="${escapeHtml(this._config[key] ?? "")}" /></label>`).join("");
+    return list.map(([key, label, step]) => {
+      const check = NUMBER_CHECKS.find(([k]) => k === key);
+      const value = Number.parseFloat(this._config[key]);
+      const warn = check && Number.isFinite(value) && value > check[1]
+        ? fill(t[check[2]], { value: formatNumber(value, t.locale, 0), suggest: formatNumber(value / check[3], t.locale, 1) }) : "";
+      return `
+      <label><span>${escapeHtml(t[label])}</span><input data-number="${key}" type="number" min="0" step="${step}" inputmode="decimal" value="${escapeHtml(this._config[key] ?? "")}" />
+        ${warn ? `<p class="warn">${escapeHtml(warn)}</p>` : ""}</label>`;
+    }).join("");
   }
 
   // Panels on each PV string the inverter reports (or one field when it
@@ -255,25 +342,73 @@ class SolarFlowCardEditor extends HTMLElement {
             </select>
           </label>` : ""}
       </div>
-      ${this._switches(t, "look")}`;
+      ${this._switches(t, "look")}
+      ${this._config.load_fonts === true ? `<p class="warn">${escapeHtml(t.editorFontsHint)}</p>` : ""}`;
   }
 
   _sensorsHtml(t) {
     const entities = this._config.entities || {};
+    let resolved = null;
+    try {
+      resolved = resolveEntities(this._hass, this._config);
+    } catch (error) {
+      // No hints from the current setup.
+    }
+    // What DeyeCloud (or the card) found for an empty field.
+    const autoFor = (key) => {
+      if (entities[key] || !resolved) return null;
+      const live = Object.entries(LIVE_METRICS).find(([, def]) => def.key === key);
+      const energy = Object.entries(ENERGY_METRICS).find(([, def]) => def.key === key);
+      return (live && resolved.live[live[0]]) || (energy && resolved.energy[energy[0]]) || null;
+    };
+    const extra = (key) => {
+      const notes = [];
+      if (key === "grid_power" && entities.grid_power && (entities.grid_import_power || entities.grid_export_power)) notes.push(["warn", t.editorPairConflict]);
+      if (key === "battery_power" && entities.battery_power && (entities.battery_charge_power || entities.battery_discharge_power)) notes.push(["warn", t.editorBatteryPairConflict]);
+      // A lifetime counter set up as a daily sensor shows its total as today.
+      if (/_energy$/.test(key) && this._config.energy_sensors !== "total") {
+        const stateObj = this._hass?.states?.[entities[key]] || autoFor(key)?.stateObj;
+        const kwh = stateObj ? kwhOf(stateObj) : null;
+        if (isNum(kwh) && kwh > 500) notes.push(["warn", fill(t.editorLooksTotal, { value: formatEnergy(kwh, t.locale) })]);
+      }
+      return notes;
+    };
+    const history = Object.values(LIVE_METRICS).map((def) => def.key);
+    const names = Object.fromEntries(editorEntityGroups(t).flatMap(([, items]) => items));
     return `
       <p class="hint">${escapeHtml(t.editorSensorsHint)}</p>
       ${editorEntityGroups(t).map(([group, items]) => `
         <details class="box" ${group === "live" || group === "energy" || items.some(([key]) => entities[key]) ? "open" : ""}>
           <summary class="title">${escapeHtml(t.editorEntityGroups[group])}</summary>
-          <div class="pickers">${items.map(([key, label]) => this._picker(`entities.${key}`, label, entities[key])).join("")}</div>
+          <div class="pickers">${items.map(([key, label]) => this._picker(`entities.${key}`, label, entities[key], "sensor", { auto: autoFor(key), extra: extra(key) })).join("")}</div>
         </details>`).join("")}
+      <details class="box" ${history.some((key) => entities[`${key}_history`]) ? "open" : ""}>
+        <summary class="title">${escapeHtml(t.editorHistoryBox)}</summary>
+        <p class="hint">${escapeHtml(t.editorHistoryHint)}</p>
+        <div class="pickers">${history.map((key) => this._picker(`entities.${key}_history`, fill(t.editorHistoryLabel, { label: names[key] }), entities[`${key}_history`])).join("")}</div>
+      </details>
       <label><span>${escapeHtml(t.editorEnergySensors)}</span>
         <select data-select="energy_sensors">
           <option value="">${escapeHtml(t.editorEnergyDaily)}</option>
           <option value="total" ${this._config.energy_sensors === "total" ? "selected" : ""}>${escapeHtml(t.editorEnergyTotal)}</option>
         </select>
       </label>
-      ${this._switches(t, "sensors")}`;
+      ${this._switches(t, "sensors")}
+      ${this._liveCheck(t, resolved)}`;
+  }
+
+  // The power right now with the current settings, so a wrong sign shows.
+  _liveCheck(t, resolved) {
+    if (!resolved) return "";
+    const live = liveValues(resolved, this._config);
+    const locale = t.locale;
+    const grid = isNum(live.grid) ? `${formatPower(Math.abs(live.grid), locale)} ${live.grid > ACTIVE_W ? t.importing.toLowerCase() : live.grid < -ACTIVE_W ? t.exporting.toLowerCase() : ""}`.trim() : "—";
+    const battery = isNum(live.battery) ? `${formatPower(Math.abs(live.battery), locale)} ${live.battery > ACTIVE_W ? t.discharging.toLowerCase() : live.battery < -ACTIVE_W ? t.charging.toLowerCase() : ""}`.trim() : "—";
+    const notes = [["note", fill(t.editorLive, { solar: formatPower(live.solar, locale), grid, battery })]];
+    // Importing more than the panels make while they run at full tilt is
+    // unusual: often a grid sensor with the other sign.
+    if (isNum(live.solar) && isNum(live.grid) && live.solar > 1000 && live.grid > live.solar) notes.push(["warn", t.editorGridSignCheck]);
+    return notes.map(([cls, text]) => `<p class="${cls}">${escapeHtml(text)}</p>`).join("");
   }
 
   _sectionsHtml(t) {
@@ -299,7 +434,33 @@ class SolarFlowCardEditor extends HTMLElement {
       <div class="grid">${this._numbers(t, EDITOR_NUMBERS)}</div>
       ${this._stringsHtml(t)}
       ${this._switches(t, "install")}
-      <p class="hint">${escapeHtml(t.editorYamlOnly)}</p>`;
+      ${this._listHtml(t, "batteries", t.editorBatteries, t.editorBatteriesHint, [
+        ["name", "text", t.editorItemName], ["soc", "soc", t.editorBatSoc], ["power", "power", t.editorBatPower], ["capacity", "number", t.editorBatCapacity],
+        ["voltage", "voltage", t.editorBatVoltage], ["temperature", "temperature", t.editorBatTemp], ["invert", "switch", t.editorBatInvert],
+      ])}
+      ${this._listHtml(t, "panels", t.editorPanels, t.editorPanelsHint, [["entity", "energy", t.editorPanelEnergy], ["power", "power", t.editorPanelPower], ["name", "text", t.editorItemName]])}`;
+  }
+
+  // A list of objects: one box per item with its fields, Add and Remove.
+  _listHtml(t, group, title, hint, fields) {
+    const items = this._items(group);
+    return `
+      <details class="box" ${items.length ? "open" : ""}>
+        <summary class="title">${escapeHtml(title)}${items.length ? ` (${items.length})` : ""}</summary>
+        <p class="hint">${escapeHtml(hint)}</p>
+        ${items.map((item, i) => `
+          <div class="item">
+            <div class="pickers">${fields.map(([key, type, label]) => {
+              const path = `list.${group}.${i}.${key}`;
+              if (type === "text") return `<label><span>${escapeHtml(label)}</span><input type="text" data-item="${path}" value="${escapeHtml(item[key] ?? "")}" /></label>`;
+              if (type === "number") return `<label><span>${escapeHtml(label)}</span><input type="number" min="0" step="0.1" inputmode="decimal" data-item="${path}" value="${escapeHtml(item[key] ?? "")}" /></label>`;
+              if (type === "switch") return `<div class="switch"><label for="${escapeHtml(path)}">${escapeHtml(label)}</label><input id="${escapeHtml(path)}" type="checkbox" data-item="${path}" ${item[key] ? "checked" : ""} /></div>`;
+              return this._picker(path, label, item[key], "sensor", { kind: type });
+            }).join("")}</div>
+            <button type="button" class="link danger" data-remove="${group}.${i}">${escapeHtml(t.editorRemove)}</button>
+          </div>`).join("")}
+        <button type="button" class="link" data-add="${group}">+ ${escapeHtml(t.editorAdd)}</button>
+      </details>`;
   }
 
   _summaryHtml(t) {
@@ -316,7 +477,7 @@ class SolarFlowCardEditor extends HTMLElement {
     return `
       <div class="switch"><label for="vs-on">${escapeHtml(t.editorVsEnable)}</label><input id="vs-on" type="checkbox" ${config ? "checked" : ""} /></div>
       ${config ? `
-        ${this._picker("virtual_storage.entity", t.editorVsEntity, config.entity)}
+        ${this._picker("virtual_storage.entity", t.editorVsEntity, config.entity, "sensor", { kind: "energy" })}
         <label><span>${escapeHtml(t.editorVsNegative)}</span>
           <select data-vs="negative">
             <option value="">${escapeHtml(t.editorVsShow)}</option>
@@ -340,14 +501,8 @@ class SolarFlowCardEditor extends HTMLElement {
   }
 
   _moreHtml(t) {
-    const details = Array.isArray(this._config.inverter_details) ? this._config.inverter_details : [];
     return `
-      <div class="box">
-        <span class="title">${escapeHtml(t.editorDetails)}</span>
-        <div class="pickers">${[...details, ""].map((item, i) => (typeof item === "object" && item
-          ? `<p class="hint">${escapeHtml(item.name || item.entity || "")} (YAML)</p>`
-          : this._picker(`inverter_details.${i}`, fill(t.editorSensorN, { n: i + 1 }), item))).join("")}</div>
-      </div>
+      ${this._listHtml(t, "inverter_details", t.editorDetails, t.editorDetailsHint, [["entity", "any", t.editorSensor], ["name", "text", t.editorDetailName]])}
       ${this._picker("weather_entity", t.editorWeather, this._config.weather_entity, "weather")}
       <label><span>${escapeHtml(t.editorFontUrl)}</span><input data-text="font_url" type="text" value="${escapeHtml(this._config.font_url ?? "")}" placeholder="/local/fonts/solar-flow-card.css" /></label>`;
   }
@@ -394,6 +549,11 @@ class SolarFlowCardEditor extends HTMLElement {
         .section .fold input { width: 15px; height: 15px; }
         .section button { width: 32px; height: 32px; border: 0; border-radius: 8px; background: none; color: var(--primary-text-color); font: inherit; font-size: 16px; cursor: pointer; }
         .section button:disabled { opacity: .25; cursor: default; }
+        .field { display: grid; gap: 3px; min-width: 0; }
+        .field .note, .body > .note { margin: 0; color: var(--secondary-text-color, #727272); font-size: 11px; overflow-wrap: anywhere; }
+        .warn { margin: 0; padding: 4px 8px; border-radius: 6px; background: rgba(255, 152, 0, .12); color: var(--warning-color, #b26a00); font-size: 11.5px; line-height: 1.35; }
+        .item { display: grid; gap: 8px; padding: 10px; border: 1px dashed var(--divider-color, rgba(127,127,127,.35)); border-radius: 10px; }
+        .danger { color: var(--error-color, #db4437) !important; }
         .link { justify-self: start; padding: 0; border: 0; background: none; color: var(--primary-color, #03a9f4); font: inherit; font-size: 13px; cursor: pointer; }
       </style>
       <datalist id="sfc-sensor">${ids("sensor").map((id) => `<option value="${escapeHtml(id)}"></option>`).join("")}</datalist>
@@ -433,6 +593,7 @@ class SolarFlowCardEditor extends HTMLElement {
     root.querySelectorAll("[data-number]").forEach((input) => input.addEventListener("change", (e) => {
       const number = Number.parseFloat(e.target.value);
       this._set(input.dataset.number, Number.isFinite(number) ? number : undefined);
+      if (NUMBER_CHECKS.some(([key]) => key === input.dataset.number)) this._render();
     }));
     root.querySelectorAll("[data-switch]").forEach((input) => input.addEventListener("change", (e) => {
       const key = input.dataset.switch;
@@ -446,7 +607,7 @@ class SolarFlowCardEditor extends HTMLElement {
         this._set(key, e.target.checked ? on : undefined);
       }
       // These change what else the editor offers.
-      if (key === "wide" || key === "collapsible") this._render();
+      if (key === "wide" || key === "collapsible" || key === "load_fonts" || key === "invert_grid" || key === "invert_battery") this._render();
     }));
     // Panels per string: one field per string gives a list, the single field a number.
     root.querySelectorAll("[data-string]").forEach((input) => input.addEventListener("change", () => {
@@ -459,6 +620,25 @@ class SolarFlowCardEditor extends HTMLElement {
       this._set("panels_per_string", number > 0 ? number : undefined);
     });
     this._wireSections(root);
+    root.querySelectorAll("[data-item]").forEach((input) => input.addEventListener("change", (e) => {
+      const [, group, index, field] = input.dataset.item.split(".");
+      const value = input.type === "checkbox" ? e.target.checked
+        : input.type === "number" ? (Number.isFinite(Number.parseFloat(e.target.value)) ? Number.parseFloat(e.target.value) : undefined)
+          : e.target.value.trim();
+      this._setItem(group, Number(index), field, value);
+    }));
+    root.querySelectorAll("[data-add]").forEach((button) => button.addEventListener("click", () => {
+      this._writeItems(button.dataset.add, [...this._items(button.dataset.add), {}]);
+    }));
+    root.querySelectorAll("[data-remove]").forEach((button) => button.addEventListener("click", () => {
+      const [group, index] = button.dataset.remove.split(".");
+      const items = this._items(group);
+      const filled = Object.values(items[Number(index)] || {}).some(Boolean);
+      // Removing a filled item loses its settings: ask first.
+      if (filled && !window.confirm(stringsFor(languageOf(this._hass, this._config)).editorConfirmRemove)) return;
+      items.splice(Number(index), 1);
+      this._writeItems(group, items);
+    }));
     root.getElementById("vs-on")?.addEventListener("change", (e) => {
       this._set("virtual_storage", e.target.checked ? true : undefined);
       this._render();
@@ -483,6 +663,11 @@ class SolarFlowCardEditor extends HTMLElement {
       const rows = editorSections(this._config);
       const row = rows.find((r) => r.id === input.dataset.section);
       row.on = e.target.checked;
+      // Nothing ticked leaves an empty card: ask first.
+      if (!rows.some((r) => r.on) && !window.confirm(stringsFor(languageOf(this._hass, this._config)).editorConfirmNoSections)) {
+        e.target.checked = true;
+        return;
+      }
       // A newly ticked section goes after the other ticked ones.
       const ordered = [...rows.filter((r) => r.on && r !== row), ...(row.on ? [row] : []), ...rows.filter((r) => !r.on)];
       this._writeSections(ordered);
