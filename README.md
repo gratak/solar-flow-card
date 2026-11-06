@@ -92,7 +92,7 @@ Copy `solar-flow-card.js` to `config/www/` and add a dashboard resource `/local/
 
 For inverters other than DeyeCloud, the [configuration guide](docs/configuration.md) explains every `entities:` entry, the units and state classes the card expects, the helper sensors to create when something is missing, and has complete examples (including Huawei with a separate energy meter).
 
-The visual editor (new in 1.8.0, beta) has groups for the appearance, the **sensors** (pick each one from your Home Assistant entities), the **sections** (tick and reorder), your installation, the summary and prices, virtual storage, the PV forecast and more. Every sensor field shows its value right now (or what DeyeCloud found by itself) and warns about likely mistakes: a sensor that does not exist or has the wrong unit, a lifetime counter set up as a daily one, a size entered in W instead of kW, a grid sensor with the other sign. Options the editor does not show stay in your YAML untouched.
+The visual editor (new in 2.0, beta) has groups for the appearance, the **sensors** (pick each one from your Home Assistant entities), the **sections** (tick and reorder), your installation, the summary and prices, virtual storage, the PV forecast and more. Every sensor field shows its value right now (or what DeyeCloud found by itself) and warns about likely mistakes: a sensor that does not exist or has the wrong unit, a lifetime counter set up as a daily one, a size entered in W instead of kW, a grid sensor with the other sign. Options the editor does not show stay in your YAML untouched.
 
 ```yaml
 type: custom:solar-flow-card
@@ -407,8 +407,7 @@ The 3D, 7D, month and all-time totals and bars come from the long-term statistic
 
 Planned, in no particular order. Ideas and votes are welcome in [issues](https://github.com/gratak/solar-flow-card/issues).
 
-- **The new visual editor out of beta** (1.8.0), after the feedback from the betas.
-- **PV forecast, more detail** ([#69](https://github.com/gratak/solar-flow-card/issues/69)): the hourly forecast as a line in the 24H chart next to the actual production (Solcast `detailedHourly`), and the pessimistic–optimistic range of each day (Solcast `estimate10` / `estimate90`).
+- **The new visual editor out of beta** (2.0.0), after the feedback from the 2.0 betas.
 
 ## Translations
 
@@ -428,6 +427,6 @@ node scripts/build.mjs
 
 [GPL-3.0-or-later](LICENSE). You may use, share and change the card, also commercially, as long as what you distribute stays under the same license with its source code and keeps the copyright notices: nobody can turn it into a closed, paid product.
 
-- Versions up to 1.8.0-beta.9 were released under the MIT License and stay available under it.
+- Versions up to 1.8.0-beta.8 were released under the MIT License and stay available under it.
 - The translations (`translations/*.json`) remain under the [MIT License](translations/LICENSE), the terms their translators contributed under.
 - The data layer started from the Energy Flow card of [hass-deyecloud](https://github.com/heavenknows1978/hass-deyecloud) by Trần Công Tuấn Anh (MIT); its notice is kept in the source.
