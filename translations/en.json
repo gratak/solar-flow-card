@@ -321,7 +321,8 @@
     "energy": "Energy and chart",
     "insights": "Today at a glance",
     "comparison": "Comparison",
-    "panels": "Panels"
+    "panels": "Panels",
+    "prices": "Energy prices"
   },
   "editorFolded": "folded",
   "editorUp": "Move up",
@@ -393,5 +394,11 @@
   "editorPriceImportSensor": "Import price sensor",
   "editorPriceExportSensor": "Export price sensor",
   "editorPriceUnit": "Unit {unit}: expected a price per kWh or MWh (e.g. PLN/kWh).",
-  "editorPriceNoStats": "No state_class: Home Assistant keeps no hourly history of this price, so the current price is used for every hour."
+  "editorPriceNoStats": "No state_class: Home Assistant keeps no hourly history of this price, so the current price is used for every hour.",
+  "pricesTitle": "Energy prices",
+  "priceNow": "now {price}",
+  "pricesAhead": "Coming up – cheapest: {cheap} ({cheapPrice}) · dearest: {dear} ({dearPrice})",
+  "tomorrow": "tomorrow",
+  "exportValue": "Value of energy sold",
+  "editorNoImportPrice": "Savings need an import price: until you set one, the card shows the value of the energy sold."
 }

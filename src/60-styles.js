@@ -71,6 +71,18 @@ const BASE_CSS = `
   .sfc-pvf-bar { position: relative; height: 10px; border-radius: 999px; background: var(--sfc-track); overflow: hidden; }
   .sfc-pvf-bar i { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: color-mix(in srgb, var(--sfc-pv) 45%, transparent); }
   .sfc-pvf-bar b { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--sfc-pv); }
+  .sfc-prices-chart { position: relative; display: flex; align-items: stretch; gap: 2px; height: 96px; margin-top: 2px; }
+  .sfc-prices-chart::after { content: ""; position: absolute; left: 0; right: 0; bottom: var(--zero); border-top: 1px solid var(--sfc-border); pointer-events: none; }
+  .sfc-prices-chart i { position: relative; flex: 1; min-width: 0; }
+  .sfc-prices-chart i b { position: absolute; left: 0; right: 0; bottom: var(--zero); height: max(var(--h), 2px); border-radius: 3px 3px 0 0;
+    background: var(--c); }
+  .sfc-prices-chart i.neg b { bottom: auto; top: calc(100% - var(--zero)); border-radius: 0 0 3px 3px; background: var(--sfc-grid); }
+  .sfc-prices-chart i.past b { opacity: .38; }
+  .sfc-prices-chart i.now b { box-shadow: 0 0 0 2px var(--sfc-text); }
+  .sfc-prices-chart i.day { margin-left: 5px; }
+  .sfc-prices-chart i.day::before { content: ""; position: absolute; left: -4px; top: 0; bottom: 0; border-left: 1px dashed var(--sfc-border); }
+  .sfc-prices-axis { position: relative; height: 15px; margin-top: 3px; color: var(--sfc-muted); font-size: 10px; }
+  .sfc-prices-axis span { position: absolute; top: 0; white-space: nowrap; }
   /* collapsible: true – a section's title folds it; folded, one line. */
   .sfc-foldable { cursor: pointer; }
   .sfc-head.sfc-foldable h3::after, small.sfc-foldable::after, .sfc-fold-head i::before {

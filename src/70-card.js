@@ -259,8 +259,16 @@ class SolarFlowCard extends HTMLElement {
   _savings(resolved, period, energy) {
     const config = this._config;
     const prices = { import: priceSetting(config.price_import), export: priceSetting(config.price_export) };
-    if (!prices.import?.entity && !prices.export?.entity) return undefined;
-    if (!prices.import || typeof this._hass.callWS !== "function") return undefined;
+    // Only an export price: the value of the energy sold.
+    const kind = prices.import ? "savings" : "exportValue";
+    if (!prices.import && !prices.export) return undefined;
+    if (!prices.import?.entity && !prices.export?.entity) {
+      if (prices.import) return undefined;
+      const exported = energy.totals?.gridExport;
+      return isNum(exported) ? { kind, value: exported * prices.export.value } : undefined;
+    }
+    if (!prices.import) prices.import = { value: 0 };
+    if (typeof this._hass.callWS !== "function") return undefined;
     const sources = sourcesKey(resolved.energy);
     if (!sources) return undefined;
     const states = this._hass.states;
@@ -269,14 +277,14 @@ class SolarFlowCard extends HTMLElement {
     let start;
     let statPeriod = "hour";
     if (period === "all") {
-      if (!energy.buckets) return null;
+      if (!energy.buckets) return { kind, value: null };
       rows = energy.buckets.map((b) => ({ ...b, at: b.start.getTime() }));
       start = energy.spec.start;
       statPeriod = "month";
     } else {
       start = period === "today" ? startOfDay(new Date()) : statsSpec(period).start;
       const hourly = this._fetch(`hourly-energy|${sources}|${start.getTime()}`, 15 * 60000, () => loadHourlyEnergy(this._hass, resolved.energy, start));
-      if (!hourly.data) return null;
+      if (!hourly.data) return { kind, value: null };
       const hours = new Map();
       for (const [name, map] of Object.entries(hourly.data)) {
         for (const [at, kwh] of map) hours.set(at, { ...(hours.get(at) || { at }), [name]: kwh });
@@ -286,7 +294,7 @@ class SolarFlowCard extends HTMLElement {
     }
     const ids = Object.fromEntries(Object.entries(prices).filter(([, p]) => p?.entity).map(([name, p]) => [name, p.entity]));
     const stats = this._fetch(`prices|${JSON.stringify(ids)}|${start.getTime()}|${statPeriod}`, 15 * 60000, () => loadPriceStats(this._hass, ids, start, statPeriod));
-    if (!stats.data) return null;
+    if (!stats.data) return { kind, value: null };
     const price = (kind, at) => {
       const setting = prices[kind];
       if (!setting) return 0;
@@ -301,7 +309,10 @@ class SolarFlowCard extends HTMLElement {
       const sum = (name) => rows.reduce((acc, r) => acc + (r[name] || 0), 0);
       rest = Object.fromEntries(ENERGY_ORDER.filter((name) => isNum(total[name])).map((name) => [name, Math.max(0, total[name] - sum(name))]));
     }
-    return pricedSavings(rows, rest, price, Boolean(virtualStorageConfig(config)));
+    // Without an import price, only what was sold counts.
+    const counted = kind === "exportValue" ? rows.map((r) => ({ ...r, load: 0, gridImport: 0 })) : rows;
+    const left = kind === "exportValue" && rest ? { ...rest, load: 0, gridImport: 0 } : rest;
+    return { kind, value: pricedSavings(counted, left, price, Boolean(virtualStorageConfig(config))) };
   }
 
   // Recorder history of the power sensors for today or the last 3 days,
@@ -464,6 +475,7 @@ class SolarFlowCard extends HTMLElement {
       const readings = inverterReadings(resolved, this._hass, config);
       const panels = showSolar ? panelData(this._hass, resolved, config) || estimatePanels(readings, config, today) : null;
       const pvForecast = showSolar ? pvForecastData(this._hass, config, today) : null;
+      const priceChart = priceChartData(this._hass, config);
       const insights = this._insights(resolved, today, forecast);
       const weather = theme === "diorama" || theme === "reactor" ? weatherData(this._hass, config) : null;
       // The wide layout has room for everything: inverter details stay open.
@@ -498,8 +510,9 @@ class SolarFlowCard extends HTMLElement {
         inverter?.map((d) => [[...d.strings.values()].map((s) => Object.values(s).map((r) => r.value)), d.temperatures.map((r) => r.value), d.battery.map((r) => r.value), d.grid.map((r) => r.value)]),
         vstore,
         [...this._collapsed],
-        isNum(money) ? Math.round(money * 100) : money,
+        money && [money.kind, isNum(money.value) ? Math.round(money.value * 100) : null],
         pvForecast && [pvForecast.total, pvForecast.remaining, pvForecast.days.map((d) => d.value)],
+        priceChart && [priceChart.nowAt, priceChart.current, priceChart.hours.length],
         Math.floor(now.getTime() / 60000),
       ]);
       if (signature === this._signature) return;
@@ -538,6 +551,7 @@ class SolarFlowCard extends HTMLElement {
         forecast,
         panels,
         pvForecast,
+        priceChart,
         inverter,
         system,
         bank,

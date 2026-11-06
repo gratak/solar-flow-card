@@ -7,7 +7,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "1.8.0-beta.8";
+const CARD_VERSION = "1.8.0-beta.9";
 const CARD_TAG = "solar-flow-card";
 const EDITOR_TAG = "solar-flow-card-editor";
 const THEMES = ["diorama", "aurora", "paper", "lcars", "atlantis", "expanse", "foundation", "galaxy", "gate", "reactor"];
@@ -340,7 +340,8 @@ const TRANSLATIONS = {
       "energy": "Energy and chart",
       "insights": "Today at a glance",
       "comparison": "Comparison",
-      "panels": "Panels"
+      "panels": "Panels",
+      "prices": "Energy prices"
     },
     "editorFolded": "folded",
     "editorUp": "Move up",
@@ -412,7 +413,13 @@ const TRANSLATIONS = {
     "editorPriceImportSensor": "Import price sensor",
     "editorPriceExportSensor": "Export price sensor",
     "editorPriceUnit": "Unit {unit}: expected a price per kWh or MWh (e.g. PLN/kWh).",
-    "editorPriceNoStats": "No state_class: Home Assistant keeps no hourly history of this price, so the current price is used for every hour."
+    "editorPriceNoStats": "No state_class: Home Assistant keeps no hourly history of this price, so the current price is used for every hour.",
+    "pricesTitle": "Energy prices",
+    "priceNow": "now {price}",
+    "pricesAhead": "Coming up – cheapest: {cheap} ({cheapPrice}) · dearest: {dear} ({dearPrice})",
+    "tomorrow": "tomorrow",
+    "exportValue": "Value of energy sold",
+    "editorNoImportPrice": "Savings need an import price: until you set one, the card shows the value of the energy sold."
   },
   "de": {
     "languageName": "Deutsch",
@@ -737,7 +744,8 @@ const TRANSLATIONS = {
       "energy": "Energie und Diagramm",
       "insights": "Heute auf einen Blick",
       "comparison": "Vergleich",
-      "panels": "Module"
+      "panels": "Module",
+      "prices": "Energiepreise"
     },
     "editorFolded": "eingeklappt",
     "editorUp": "Nach oben",
@@ -809,7 +817,13 @@ const TRANSLATIONS = {
     "editorPriceImportSensor": "Sensor Bezugspreis",
     "editorPriceExportSensor": "Sensor Einspeisepreis",
     "editorPriceUnit": "Einheit {unit}: erwartet wird ein Preis pro kWh oder MWh (z. B. EUR/kWh).",
-    "editorPriceNoStats": "Keine state_class: Home Assistant speichert keinen Stundenverlauf dieses Preises, daher wird für jede Stunde der aktuelle Preis verwendet."
+    "editorPriceNoStats": "Keine state_class: Home Assistant speichert keinen Stundenverlauf dieses Preises, daher wird für jede Stunde der aktuelle Preis verwendet.",
+    "pricesTitle": "Energiepreise",
+    "priceNow": "jetzt {price}",
+    "pricesAhead": "Nächste Stunden – am günstigsten: {cheap} ({cheapPrice}) · am teuersten: {dear} ({dearPrice})",
+    "tomorrow": "morgen",
+    "exportValue": "Wert der eingespeisten Energie",
+    "editorNoImportPrice": "Die Ersparnis braucht einen Bezugspreis: bis er gesetzt ist, zeigt die Karte den Wert der eingespeisten Energie."
   },
   "nl": {
     "languageName": "Nederlands",
@@ -1134,7 +1148,8 @@ const TRANSLATIONS = {
       "energy": "Energie en grafiek",
       "insights": "Vandaag in het kort",
       "comparison": "Vergelijking",
-      "panels": "Panelen"
+      "panels": "Panelen",
+      "prices": "Energieprijzen"
     },
     "editorFolded": "ingeklapt",
     "editorUp": "Omhoog",
@@ -1206,7 +1221,13 @@ const TRANSLATIONS = {
     "editorPriceImportSensor": "Sensor afnameprijs",
     "editorPriceExportSensor": "Sensor terugleverprijs",
     "editorPriceUnit": "Eenheid {unit}: verwacht een prijs per kWh of MWh (bijv. EUR/kWh).",
-    "editorPriceNoStats": "Geen state_class: Home Assistant bewaart geen uurhistorie van deze prijs, dus voor elk uur wordt de huidige prijs gebruikt."
+    "editorPriceNoStats": "Geen state_class: Home Assistant bewaart geen uurhistorie van deze prijs, dus voor elk uur wordt de huidige prijs gebruikt.",
+    "pricesTitle": "Energieprijzen",
+    "priceNow": "nu {price}",
+    "pricesAhead": "Komende uren – goedkoopst: {cheap} ({cheapPrice}) · duurst: {dear} ({dearPrice})",
+    "tomorrow": "morgen",
+    "exportValue": "Waarde teruggeleverde energie",
+    "editorNoImportPrice": "Besparing vraagt een afnameprijs: zolang die ontbreekt, toont de kaart de waarde van de teruggeleverde energie."
   },
   "pl": {
     "languageName": "Polski",
@@ -1531,7 +1552,8 @@ const TRANSLATIONS = {
       "energy": "Energia i wykres",
       "insights": "Dziś w skrócie",
       "comparison": "Porównanie",
-      "panels": "Panele"
+      "panels": "Panele",
+      "prices": "Ceny energii"
     },
     "editorFolded": "zwinięta",
     "editorUp": "W górę",
@@ -1603,7 +1625,13 @@ const TRANSLATIONS = {
     "editorPriceImportSensor": "Czujnik ceny zakupu",
     "editorPriceExportSensor": "Czujnik ceny sprzedaży",
     "editorPriceUnit": "Jednostka {unit}: oczekiwana cena za kWh lub MWh (np. PLN/kWh).",
-    "editorPriceNoStats": "Brak state_class: Home Assistant nie zapisuje godzinowej historii tej ceny, więc dla każdej godziny użyta będzie cena bieżąca."
+    "editorPriceNoStats": "Brak state_class: Home Assistant nie zapisuje godzinowej historii tej ceny, więc dla każdej godziny użyta będzie cena bieżąca.",
+    "pricesTitle": "Ceny energii",
+    "priceNow": "teraz {price}",
+    "pricesAhead": "Kolejne godziny – najtaniej: {cheap} ({cheapPrice}) · najdrożej: {dear} ({dearPrice})",
+    "tomorrow": "jutro",
+    "exportValue": "Wartość oddanej energii",
+    "editorNoImportPrice": "Oszczędność wymaga ceny zakupu: dopóki jej nie podasz, karta pokazuje wartość oddanej energii."
   }
 };
 
@@ -2260,6 +2288,66 @@ function pricedSavings(rows, rest, price, net) {
   return saved;
 }
 
+// Hourly prices for the price chart, from the attributes of the price
+// sensor (the export price's, else the import price's). Reads the common
+// formats: lists of { start, price } items (ProfitEMS "prices", Nord Pool
+// "raw_today", Tibber, PSE RCE…) and lists of plain numbers per day
+// ("today", "tomorrow"). Quarter-hour prices are averaged per hour.
+const PRICE_START_KEYS = ["start", "start_time", "starts_at", "startsAt", "period_start", "time", "datetime", "from"];
+const PRICE_VALUE_KEYS = ["price", "value", "price_per_kwh", "total"];
+
+function priceChartData(hass, config, now = new Date()) {
+  const setting = [priceSetting(config.price_export), priceSetting(config.price_import)].find((p) => p?.entity);
+  const stateObj = setting && hass?.states?.[setting.entity];
+  if (!stateObj) return null;
+  const scale = priceScale(stateObj);
+  const attrs = stateObj.attributes || {};
+  const byHour = new Map();
+  const put = (ms, value) => {
+    if (!Number.isFinite(ms) || !isNum(value)) return;
+    const hour = new Date(ms);
+    hour.setMinutes(0, 0, 0);
+    const slot = byHour.get(hour.getTime()) || { sum: 0, n: 0 };
+    slot.sum += value * scale;
+    slot.n += 1;
+    byHour.set(hour.getTime(), slot);
+  };
+  for (const value of Object.values(attrs)) {
+    if (!Array.isArray(value) || !value.length || typeof value[0] !== "object" || value[0] === null) continue;
+    for (const item of value) {
+      const startKey = PRICE_START_KEYS.find((k) => item?.[k] !== undefined);
+      const valueKey = PRICE_VALUE_KEYS.find((k) => isNum(Number.parseFloat(item?.[k])));
+      if (startKey && valueKey) put(Date.parse(item[startKey]), Number.parseFloat(item[valueKey]));
+    }
+  }
+  if (!byHour.size) {
+    for (const [key, offset] of [["today", 0], ["tomorrow", 1]]) {
+      const list = attrs[key];
+      if (!Array.isArray(list) || !list.length || !list.every((v) => v === null || isNum(Number.parseFloat(v)))) continue;
+      const base = startOfDay(addDays(now, offset)).getTime();
+      const step = (24 * 3600000) / list.length;
+      list.forEach((v, i) => v !== null && put(base + i * step, Number.parseFloat(v)));
+    }
+  }
+  const from = startOfDay(now).getTime();
+  const to = startOfDay(addDays(now, 2)).getTime();
+  const hours = [...byHour.entries()].filter(([at]) => at >= from && at < to).sort((a, b) => a[0] - b[0])
+    .map(([at, slot]) => ({ at, price: slot.sum / slot.n }));
+  if (hours.length < 2) return null;
+  const hourNow = new Date(now);
+  hourNow.setMinutes(0, 0, 0);
+  const ahead = hours.filter((h) => h.at >= hourNow.getTime());
+  const pick = (better) => ahead.reduce((best, h) => (!best || better(h.price, best.price) ? h : best), null);
+  return {
+    entityId: setting.entity,
+    hours,
+    nowAt: hourNow.getTime(),
+    current: currentPrice(hass.states, setting),
+    cheapest: pick((a, b) => a < b),
+    priciest: pick((a, b) => a > b),
+  };
+}
+
 // PV production forecast (#69) from forecast sensors such as Solcast or
 // Forecast.Solar: `pv_forecast: { today, remaining, days: [...] }`, where
 // `days` lists the sensors for tomorrow and the days after it.
@@ -2393,7 +2481,11 @@ function periodSummary(totals, config, t, locale, net = null, money = undefined)
   // Prices from sensors: worked out hour by hour by the card (money), "…"
   // while the statistics load.
   if (money !== undefined) {
-    if (show("show_savings")) items.push(["money", t.savings, isNum(money) ? `${formatNumber(money, locale, 2)} ${config.currency ?? t.currency}`.trim() : "…"]);
+    // Without an import price there is nothing to save against: the value
+    // of the energy sold instead.
+    const label = money?.kind === "exportValue" ? t.exportValue : t.savings;
+    const value = money?.value;
+    if (show("show_savings")) items.push(["money", label, isNum(value) ? `${formatNumber(value, locale, 2)} ${config.currency ?? t.currency}`.trim() : "…"]);
     return items.concat(periodSummaryRest(totals, config, t, locale));
   }
   const priceImport = positiveNumber(config.price_import);
@@ -3187,6 +3279,52 @@ function pvForecastHtml(m) {
     </section>`;
 }
 
+// Energy prices by the hour: today (and tomorrow once published) as bars
+// from green (cheap) to red (dear), the hour now marked, the hours gone
+// dimmed, negative prices below the line.
+function pricesHtml(m) {
+  const c = m.priceChart;
+  if (!c) return "";
+  const { t, locale } = m;
+  const unit = `${m.config.currency ?? t.currency}/kWh`;
+  const money = (v) => `${formatNumber(v, locale, 2)} ${unit}`;
+  const values = c.hours.map((h) => h.price);
+  const low = Math.min(...values);
+  const high = Math.max(...values);
+  const top = Math.max(high, 0);
+  const bottom = Math.min(low, 0);
+  const range = top - bottom || 1;
+  const zero = (-bottom / range) * 100;
+  const first = startOfDay(new Date(c.hours[0].at)).getTime();
+  const days = new Set(c.hours.map((h) => startOfDay(new Date(h.at)).getTime()));
+  const n = c.hours.length;
+  const labels = c.hours.map((h, i) => {
+    const hour = new Date(h.at).getHours();
+    if (hour % 6) return "";
+    const day = startOfDay(new Date(h.at)).getTime() !== first && hour === 0 ? t.tomorrow : formatClock(new Date(h.at), locale);
+    return `<span style="left:${((i / n) * 100).toFixed(2)}%">${escapeHtml(day)}</span>`;
+  }).join("");
+  const at = (h) => formatClock(new Date(h.at), locale);
+  return `
+    <section class="sfc-section sfc-prices" data-entity="${escapeHtml(c.entityId)}">
+      <div class="sfc-head">
+        <div><span class="sfc-kicker">${escapeHtml(unit)}</span><h3>${escapeHtml(t.pricesTitle)}</h3></div>
+        ${isNum(c.current) ? `<span class="sfc-hint">${escapeHtml(fill(t.priceNow, { price: money(c.current) }))}</span>` : ""}
+      </div>
+      <div class="sfc-prices-chart" style="--zero:${zero.toFixed(1)}%">
+        ${c.hours.map((h, i) => {
+          const share = high > low ? ((h.price - low) / (high - low)) * 100 : 50;
+          const newDay = i > 0 && days.size > 1 && new Date(h.at).getHours() === 0;
+          const cls = [h.at < c.nowAt && "past", h.at === c.nowAt && "now", h.price < 0 && "neg", newDay && "day"].filter(Boolean).join(" ");
+          // Green (cheap) through yellow to red (dear).
+          return `<i class="${cls}" style="--h:${((Math.abs(h.price) / range) * 100).toFixed(1)}%;--c:hsl(${(120 - share * 1.2).toFixed(0)} 68% 47%)" title="${escapeHtml(`${at(h)} · ${money(h.price)}`)}"><b></b></i>`;
+        }).join("")}
+      </div>
+      <div class="sfc-prices-axis">${labels}</div>
+      ${c.cheapest && c.priciest ? `<p class="sfc-panels-note">${escapeHtml(fill(t.pricesAhead, { cheap: at(c.cheapest), cheapPrice: money(c.cheapest.price), dear: at(c.priciest), dearPrice: money(c.priciest.price) }))}</p>` : ""}
+    </section>`;
+}
+
 function readingLabel(key) {
   return key.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/_/g, " ").replace(/\s+/g, " ").trim();
 }
@@ -3437,6 +3575,7 @@ const SECTION_HTML = {
   inverter: inverterHtml,
   forecast: forecastHtml,
   pv_forecast: pvForecastHtml,
+  prices: pricesHtml,
   virtual_storage: virtualStorageHtml,
   system: systemHtml,
   energy: energySectionHtml,
@@ -3445,8 +3584,8 @@ const SECTION_HTML = {
   panels: panelsHtml,
 };
 const SECTION_IDS = ["flow", "today", "sources", ...Object.keys(SECTION_HTML)];
-const SECTION_ORDER = ["inverter", "forecast", "pv_forecast", "virtual_storage", "system", "energy", "insights", "comparison", "panels"];
-const SECTION_ORDER_WIDE = ["energy", "inverter", "forecast", "pv_forecast", "virtual_storage", "insights", "comparison", "system", "panels"];
+const SECTION_ORDER = ["inverter", "forecast", "pv_forecast", "prices", "virtual_storage", "system", "energy", "insights", "comparison", "panels"];
+const SECTION_ORDER_WIDE = ["energy", "inverter", "forecast", "pv_forecast", "prices", "virtual_storage", "insights", "comparison", "system", "panels"];
 
 // The listed sections in order, or null without the option.
 function sectionList(config) {
@@ -3471,6 +3610,7 @@ function foldSummary(m, id) {
   }
   if (id === "forecast") return [t.batteryForecast, t.battery, formatPercent(m.forecast.soc, locale)];
   if (id === "pv_forecast") return [t.pvForecastTitle, "", pvForecastNote(m)];
+  if (id === "prices") return [t.pricesTitle, "", isNum(m.priceChart?.current) ? fill(t.priceNow, { price: `${formatNumber(m.priceChart.current, locale, 2)} ${m.config.currency ?? t.currency}/kWh` }) : ""];
   if (id === "virtual_storage") {
     const v = m.virtualStorage?.value;
     return [t.vsTitle, "", isNum(v) ? `${v > 0.0005 ? "+" : v < -0.0005 ? "−" : ""}${formatEnergy(Math.abs(v), locale)}` : "—"];
@@ -4892,7 +5032,7 @@ function renderGate(m) {
         </div>
       </div>
       <div class="gt-energy">${sectionShown(m, "energy") ? sectionHtml(m, "energy") : ""}</div>
-      <div class="sfc-sections">${standardSections(m, ["inverter", "pv_forecast", "virtual_storage", "insights", "comparison", "system", "panels"], ["energy"])}</div>
+      <div class="sfc-sections">${standardSections(m, ["inverter", "pv_forecast", "prices", "virtual_storage", "insights", "comparison", "system", "panels"], ["energy"])}</div>
     </div>`;
 }
 
@@ -5177,6 +5317,18 @@ const BASE_CSS = `
   .sfc-pvf-bar { position: relative; height: 10px; border-radius: 999px; background: var(--sfc-track); overflow: hidden; }
   .sfc-pvf-bar i { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: color-mix(in srgb, var(--sfc-pv) 45%, transparent); }
   .sfc-pvf-bar b { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--sfc-pv); }
+  .sfc-prices-chart { position: relative; display: flex; align-items: stretch; gap: 2px; height: 96px; margin-top: 2px; }
+  .sfc-prices-chart::after { content: ""; position: absolute; left: 0; right: 0; bottom: var(--zero); border-top: 1px solid var(--sfc-border); pointer-events: none; }
+  .sfc-prices-chart i { position: relative; flex: 1; min-width: 0; }
+  .sfc-prices-chart i b { position: absolute; left: 0; right: 0; bottom: var(--zero); height: max(var(--h), 2px); border-radius: 3px 3px 0 0;
+    background: var(--c); }
+  .sfc-prices-chart i.neg b { bottom: auto; top: calc(100% - var(--zero)); border-radius: 0 0 3px 3px; background: var(--sfc-grid); }
+  .sfc-prices-chart i.past b { opacity: .38; }
+  .sfc-prices-chart i.now b { box-shadow: 0 0 0 2px var(--sfc-text); }
+  .sfc-prices-chart i.day { margin-left: 5px; }
+  .sfc-prices-chart i.day::before { content: ""; position: absolute; left: -4px; top: 0; bottom: 0; border-left: 1px dashed var(--sfc-border); }
+  .sfc-prices-axis { position: relative; height: 15px; margin-top: 3px; color: var(--sfc-muted); font-size: 10px; }
+  .sfc-prices-axis span { position: absolute; top: 0; white-space: nowrap; }
   /* collapsible: true – a section's title folds it; folded, one line. */
   .sfc-foldable { cursor: pointer; }
   .sfc-head.sfc-foldable h3::after, small.sfc-foldable::after, .sfc-fold-head i::before {
@@ -6405,8 +6557,16 @@ class SolarFlowCard extends HTMLElement {
   _savings(resolved, period, energy) {
     const config = this._config;
     const prices = { import: priceSetting(config.price_import), export: priceSetting(config.price_export) };
-    if (!prices.import?.entity && !prices.export?.entity) return undefined;
-    if (!prices.import || typeof this._hass.callWS !== "function") return undefined;
+    // Only an export price: the value of the energy sold.
+    const kind = prices.import ? "savings" : "exportValue";
+    if (!prices.import && !prices.export) return undefined;
+    if (!prices.import?.entity && !prices.export?.entity) {
+      if (prices.import) return undefined;
+      const exported = energy.totals?.gridExport;
+      return isNum(exported) ? { kind, value: exported * prices.export.value } : undefined;
+    }
+    if (!prices.import) prices.import = { value: 0 };
+    if (typeof this._hass.callWS !== "function") return undefined;
     const sources = sourcesKey(resolved.energy);
     if (!sources) return undefined;
     const states = this._hass.states;
@@ -6415,14 +6575,14 @@ class SolarFlowCard extends HTMLElement {
     let start;
     let statPeriod = "hour";
     if (period === "all") {
-      if (!energy.buckets) return null;
+      if (!energy.buckets) return { kind, value: null };
       rows = energy.buckets.map((b) => ({ ...b, at: b.start.getTime() }));
       start = energy.spec.start;
       statPeriod = "month";
     } else {
       start = period === "today" ? startOfDay(new Date()) : statsSpec(period).start;
       const hourly = this._fetch(`hourly-energy|${sources}|${start.getTime()}`, 15 * 60000, () => loadHourlyEnergy(this._hass, resolved.energy, start));
-      if (!hourly.data) return null;
+      if (!hourly.data) return { kind, value: null };
       const hours = new Map();
       for (const [name, map] of Object.entries(hourly.data)) {
         for (const [at, kwh] of map) hours.set(at, { ...(hours.get(at) || { at }), [name]: kwh });
@@ -6432,7 +6592,7 @@ class SolarFlowCard extends HTMLElement {
     }
     const ids = Object.fromEntries(Object.entries(prices).filter(([, p]) => p?.entity).map(([name, p]) => [name, p.entity]));
     const stats = this._fetch(`prices|${JSON.stringify(ids)}|${start.getTime()}|${statPeriod}`, 15 * 60000, () => loadPriceStats(this._hass, ids, start, statPeriod));
-    if (!stats.data) return null;
+    if (!stats.data) return { kind, value: null };
     const price = (kind, at) => {
       const setting = prices[kind];
       if (!setting) return 0;
@@ -6447,7 +6607,10 @@ class SolarFlowCard extends HTMLElement {
       const sum = (name) => rows.reduce((acc, r) => acc + (r[name] || 0), 0);
       rest = Object.fromEntries(ENERGY_ORDER.filter((name) => isNum(total[name])).map((name) => [name, Math.max(0, total[name] - sum(name))]));
     }
-    return pricedSavings(rows, rest, price, Boolean(virtualStorageConfig(config)));
+    // Without an import price, only what was sold counts.
+    const counted = kind === "exportValue" ? rows.map((r) => ({ ...r, load: 0, gridImport: 0 })) : rows;
+    const left = kind === "exportValue" && rest ? { ...rest, load: 0, gridImport: 0 } : rest;
+    return { kind, value: pricedSavings(counted, left, price, Boolean(virtualStorageConfig(config))) };
   }
 
   // Recorder history of the power sensors for today or the last 3 days,
@@ -6610,6 +6773,7 @@ class SolarFlowCard extends HTMLElement {
       const readings = inverterReadings(resolved, this._hass, config);
       const panels = showSolar ? panelData(this._hass, resolved, config) || estimatePanels(readings, config, today) : null;
       const pvForecast = showSolar ? pvForecastData(this._hass, config, today) : null;
+      const priceChart = priceChartData(this._hass, config);
       const insights = this._insights(resolved, today, forecast);
       const weather = theme === "diorama" || theme === "reactor" ? weatherData(this._hass, config) : null;
       // The wide layout has room for everything: inverter details stay open.
@@ -6644,8 +6808,9 @@ class SolarFlowCard extends HTMLElement {
         inverter?.map((d) => [[...d.strings.values()].map((s) => Object.values(s).map((r) => r.value)), d.temperatures.map((r) => r.value), d.battery.map((r) => r.value), d.grid.map((r) => r.value)]),
         vstore,
         [...this._collapsed],
-        isNum(money) ? Math.round(money * 100) : money,
+        money && [money.kind, isNum(money.value) ? Math.round(money.value * 100) : null],
         pvForecast && [pvForecast.total, pvForecast.remaining, pvForecast.days.map((d) => d.value)],
+        priceChart && [priceChart.nowAt, priceChart.current, priceChart.hours.length],
         Math.floor(now.getTime() / 60000),
       ]);
       if (signature === this._signature) return;
@@ -6684,6 +6849,7 @@ class SolarFlowCard extends HTMLElement {
         forecast,
         panels,
         pvForecast,
+        priceChart,
         inverter,
         system,
         bank,
@@ -7336,6 +7502,7 @@ class SolarFlowCardEditor extends HTMLElement {
         ${this._numbers(t, EDITOR_PRICES)}
         <label><span>${escapeHtml(t.editorCurrency)}</span><input data-text="currency" type="text" value="${escapeHtml(this._config.currency ?? "")}" placeholder="${escapeHtml(t.currency)}" /></label>
       </div>
+      ${priceSetting(this._config.price_export) && !priceSetting(this._config.price_import) ? `<p class="warn">${escapeHtml(t.editorNoImportPrice)}</p>` : ""}
       <details class="box" data-box="prices" ${this._boxOpen("prices", Boolean(sensor("price_import") || sensor("price_export"))) ? "open" : ""}>
         <summary class="title">${escapeHtml(t.editorPriceSensors)}</summary>
         <p class="hint">${escapeHtml(t.editorPriceSensorsHint)}</p>
@@ -7470,7 +7637,7 @@ class SolarFlowCardEditor extends HTMLElement {
     root.querySelectorAll("[data-number]").forEach((input) => input.addEventListener("change", (e) => {
       const number = Number.parseFloat(e.target.value);
       this._set(input.dataset.number, Number.isFinite(number) ? number : undefined);
-      if (NUMBER_CHECKS.some(([key]) => key === input.dataset.number)) this._render();
+      if (NUMBER_CHECKS.some(([key]) => key === input.dataset.number) || input.dataset.number.startsWith("price_")) this._render();
     }));
     root.querySelectorAll("[data-switch]").forEach((input) => input.addEventListener("change", (e) => {
       const key = input.dataset.switch;

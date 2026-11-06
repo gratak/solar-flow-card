@@ -1063,7 +1063,7 @@ function renderGate(m) {
         </div>
       </div>
       <div class="gt-energy">${sectionShown(m, "energy") ? sectionHtml(m, "energy") : ""}</div>
-      <div class="sfc-sections">${standardSections(m, ["inverter", "pv_forecast", "virtual_storage", "insights", "comparison", "system", "panels"], ["energy"])}</div>
+      <div class="sfc-sections">${standardSections(m, ["inverter", "pv_forecast", "prices", "virtual_storage", "insights", "comparison", "system", "panels"], ["energy"])}</div>
     </div>`;
 }
 

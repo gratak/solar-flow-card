@@ -321,7 +321,8 @@
     "energy": "Energie und Diagramm",
     "insights": "Heute auf einen Blick",
     "comparison": "Vergleich",
-    "panels": "Module"
+    "panels": "Module",
+    "prices": "Energiepreise"
   },
   "editorFolded": "eingeklappt",
   "editorUp": "Nach oben",
@@ -393,5 +394,11 @@
   "editorPriceImportSensor": "Sensor Bezugspreis",
   "editorPriceExportSensor": "Sensor Einspeisepreis",
   "editorPriceUnit": "Einheit {unit}: erwartet wird ein Preis pro kWh oder MWh (z. B. EUR/kWh).",
-  "editorPriceNoStats": "Keine state_class: Home Assistant speichert keinen Stundenverlauf dieses Preises, daher wird für jede Stunde der aktuelle Preis verwendet."
+  "editorPriceNoStats": "Keine state_class: Home Assistant speichert keinen Stundenverlauf dieses Preises, daher wird für jede Stunde der aktuelle Preis verwendet.",
+  "pricesTitle": "Energiepreise",
+  "priceNow": "jetzt {price}",
+  "pricesAhead": "Nächste Stunden – am günstigsten: {cheap} ({cheapPrice}) · am teuersten: {dear} ({dearPrice})",
+  "tomorrow": "morgen",
+  "exportValue": "Wert der eingespeisten Energie",
+  "editorNoImportPrice": "Die Ersparnis braucht einen Bezugspreis: bis er gesetzt ist, zeigt die Karte den Wert der eingespeisten Energie."
 }

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.8.0-beta.9
+
+- **Energy prices chart** (`prices` in `sections:`): with a price sensor that lists its hourly prices (ProfitEMS or PSE RCE, Nord Pool, Tibber and similar), a section shows:
+  - today's prices by the hour, and tomorrow's once they are published, from green to red;
+  - the current price, with the hour now marked and negative prices below the line;
+  - the cheapest and the dearest of the coming hours.
+- **Export price only:** the summary shows the value of the energy sold (hour by hour with a price sensor), instead of no money value at all. The editor notes that savings need an import price.
+
 ## 1.8.0-beta.8
 
 - **Prices from sensors:** `price_import` and `price_export` accept a price sensor as well as a number, e.g. the hourly RCE price under net-billing or a dynamic tariff.

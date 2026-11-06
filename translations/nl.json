@@ -321,7 +321,8 @@
     "energy": "Energie en grafiek",
     "insights": "Vandaag in het kort",
     "comparison": "Vergelijking",
-    "panels": "Panelen"
+    "panels": "Panelen",
+    "prices": "Energieprijzen"
   },
   "editorFolded": "ingeklapt",
   "editorUp": "Omhoog",
@@ -393,5 +394,11 @@
   "editorPriceImportSensor": "Sensor afnameprijs",
   "editorPriceExportSensor": "Sensor terugleverprijs",
   "editorPriceUnit": "Eenheid {unit}: verwacht een prijs per kWh of MWh (bijv. EUR/kWh).",
-  "editorPriceNoStats": "Geen state_class: Home Assistant bewaart geen uurhistorie van deze prijs, dus voor elk uur wordt de huidige prijs gebruikt."
+  "editorPriceNoStats": "Geen state_class: Home Assistant bewaart geen uurhistorie van deze prijs, dus voor elk uur wordt de huidige prijs gebruikt.",
+  "pricesTitle": "Energieprijzen",
+  "priceNow": "nu {price}",
+  "pricesAhead": "Komende uren – goedkoopst: {cheap} ({cheapPrice}) · duurst: {dear} ({dearPrice})",
+  "tomorrow": "morgen",
+  "exportValue": "Waarde teruggeleverde energie",
+  "editorNoImportPrice": "Besparing vraagt een afnameprijs: zolang die ontbreekt, toont de kaart de waarde van de teruggeleverde energie."
 }
