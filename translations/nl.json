@@ -411,5 +411,6 @@
   "editorMeteringRatio": "Verrekening per teruggeleverde kWh",
   "editorMeteringAuto": "automatisch ({ratio}; 0,7 boven 10 kWp)",
   "editorRcePrice": "RCE-prijssensor",
-  "editorRceMissing": "Geen RCE-prijssensor gevonden: kies er een, anders heeft de teruggeleverde energie geen prijs."
+  "editorRceMissing": "Geen RCE-prijssensor gevonden: kies er een, anders heeft de teruggeleverde energie geen prijs.",
+  "editorImportPriceHint": "Afnameprijs: wat elke kWh kost, energie plus de netkosten per kWh, zonder vaste maandkosten."
 }

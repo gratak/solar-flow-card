@@ -411,5 +411,6 @@
   "editorMeteringRatio": "Gutschrift je eingespeister kWh",
   "editorMeteringAuto": "automatisch ({ratio}; 0,7 über 10 kWp)",
   "editorRcePrice": "RCE-Preissensor",
-  "editorRceMissing": "Kein RCE-Preissensor gefunden: einen wählen, sonst bleibt die eingespeiste Energie ohne Preis."
+  "editorRceMissing": "Kein RCE-Preissensor gefunden: einen wählen, sonst bleibt die eingespeiste Energie ohne Preis.",
+  "editorImportPriceHint": "Bezugspreis: was jede kWh kostet, Energie plus die Netzentgelte je kWh, ohne monatliche Grundgebühren."
 }

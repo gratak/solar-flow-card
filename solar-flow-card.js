@@ -461,7 +461,8 @@ const TRANSLATIONS = {
     "editorMeteringRatio": "Credit per kWh sent back",
     "editorMeteringAuto": "automatic ({ratio}; 0.7 above 10 kWp)",
     "editorRcePrice": "RCE price sensor",
-    "editorRceMissing": "No RCE price sensor found: pick one (e.g. from the PSE integration or your EMS), otherwise the energy sold has no price."
+    "editorRceMissing": "No RCE price sensor found: pick one (e.g. from the PSE integration or your EMS), otherwise the energy sold has no price.",
+    "editorImportPriceHint": "Import price: what each kWh costs, energy plus the distribution charges billed per kWh, without monthly fixed fees."
   },
   "de": {
     "languageName": "Deutsch",
@@ -876,7 +877,8 @@ const TRANSLATIONS = {
     "editorMeteringRatio": "Gutschrift je eingespeister kWh",
     "editorMeteringAuto": "automatisch ({ratio}; 0,7 über 10 kWp)",
     "editorRcePrice": "RCE-Preissensor",
-    "editorRceMissing": "Kein RCE-Preissensor gefunden: einen wählen, sonst bleibt die eingespeiste Energie ohne Preis."
+    "editorRceMissing": "Kein RCE-Preissensor gefunden: einen wählen, sonst bleibt die eingespeiste Energie ohne Preis.",
+    "editorImportPriceHint": "Bezugspreis: was jede kWh kostet, Energie plus die Netzentgelte je kWh, ohne monatliche Grundgebühren."
   },
   "nl": {
     "languageName": "Nederlands",
@@ -1291,7 +1293,8 @@ const TRANSLATIONS = {
     "editorMeteringRatio": "Verrekening per teruggeleverde kWh",
     "editorMeteringAuto": "automatisch ({ratio}; 0,7 boven 10 kWp)",
     "editorRcePrice": "RCE-prijssensor",
-    "editorRceMissing": "Geen RCE-prijssensor gevonden: kies er een, anders heeft de teruggeleverde energie geen prijs."
+    "editorRceMissing": "Geen RCE-prijssensor gevonden: kies er een, anders heeft de teruggeleverde energie geen prijs.",
+    "editorImportPriceHint": "Afnameprijs: wat elke kWh kost, energie plus de netkosten per kWh, zonder vaste maandkosten."
   },
   "pl": {
     "languageName": "Polski",
@@ -1706,7 +1709,8 @@ const TRANSLATIONS = {
     "editorMeteringRatio": "Opust za oddaną kWh",
     "editorMeteringAuto": "automatycznie ({ratio}; 0,7 powyżej 10 kWp)",
     "editorRcePrice": "Czujnik ceny RCE",
-    "editorRceMissing": "Nie znaleziono czujnika ceny RCE: wybierz go (np. z integracji PSE albo z EMS), inaczej oddana energia nie zostanie wyceniona."
+    "editorRceMissing": "Nie znaleziono czujnika ceny RCE: wybierz go (np. z integracji PSE albo z EMS), inaczej oddana energia nie zostanie wyceniona.",
+    "editorImportPriceHint": "Cena zakupu: koszt każdej kWh, czyli energia i opłaty dystrybucyjne naliczane za kWh, bez stałych opłat miesięcznych."
   }
 };
 
@@ -7639,6 +7643,7 @@ class SolarFlowCardEditor extends HTMLElement {
         ${number("co2_factor", "editorCo2")}
         <label><span>${escapeHtml(t.editorCurrency)}</span><input data-text="currency" type="text" value="${escapeHtml(this._config.currency ?? "")}" placeholder="${escapeHtml(t.currency)}" /></label>
       </div>
+      <p class="hint">${escapeHtml(t.editorImportPriceHint)}</p>
       ${mode !== "net_metering" && !priceSetting(this._config.price_import) && (mode === "net_billing" || priceSetting(this._config.price_export)) ? `<p class="warn">${escapeHtml(t.editorNoImportPrice)}</p>` : ""}
       ${mode === "net_billing" ? `
         ${this._picker("price_export", t.editorRcePrice, sensor("price_export"), "sensor", { kind: "price", auto: detected ? { entityId: detected, stateObj: this._hass.states[detected] } : null })}

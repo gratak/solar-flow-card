@@ -411,5 +411,6 @@
   "editorMeteringRatio": "Credit per kWh sent back",
   "editorMeteringAuto": "automatic ({ratio}; 0.7 above 10 kWp)",
   "editorRcePrice": "RCE price sensor",
-  "editorRceMissing": "No RCE price sensor found: pick one (e.g. from the PSE integration or your EMS), otherwise the energy sold has no price."
+  "editorRceMissing": "No RCE price sensor found: pick one (e.g. from the PSE integration or your EMS), otherwise the energy sold has no price.",
+  "editorImportPriceHint": "Import price: what each kWh costs, energy plus the distribution charges billed per kWh, without monthly fixed fees."
 }

@@ -411,5 +411,6 @@
   "editorMeteringRatio": "Opust za oddaną kWh",
   "editorMeteringAuto": "automatycznie ({ratio}; 0,7 powyżej 10 kWp)",
   "editorRcePrice": "Czujnik ceny RCE",
-  "editorRceMissing": "Nie znaleziono czujnika ceny RCE: wybierz go (np. z integracji PSE albo z EMS), inaczej oddana energia nie zostanie wyceniona."
+  "editorRceMissing": "Nie znaleziono czujnika ceny RCE: wybierz go (np. z integracji PSE albo z EMS), inaczej oddana energia nie zostanie wyceniona.",
+  "editorImportPriceHint": "Cena zakupu: koszt każdej kWh, czyli energia i opłaty dystrybucyjne naliczane za kWh, bez stałych opłat miesięcznych."
 }
