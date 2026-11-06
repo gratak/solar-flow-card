@@ -20,7 +20,11 @@ const BASE_CSS = `
   .sfc button { font: inherit; color: inherit; }
   .sfc [data-entity], .sfc [data-action] { cursor: pointer; }
   .sfc .sfc-click { cursor: pointer; }
-  .sfc-sections { display: grid; gap: 12px; padding: 0 16px 16px; position: relative; }
+  /* One column never wider than the card: a section with a word that cannot
+     shrink (a wide theme font, a long value) wraps instead of pushing the
+     column, and with it the right margin, past the card's edge. */
+  .sfc-sections { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 0 16px 16px; position: relative; }
+  .sfc-section { min-width: 0; }
   .sfc-section {
     padding: 14px;
     border-radius: var(--sfc-section-radius, 16px);
@@ -35,14 +39,14 @@ const BASE_CSS = `
   ha-card.sfc.parts .sfc-sections > .sfc-section + .sfc-section { padding-top: 14px; border-top: 1px solid var(--sfc-border); }
   .sfc-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
   .sfc-head > div { display: flex; align-items: center; gap: 8px; min-width: 0; }
-  .sfc-head h3 { margin: 0; font-size: 16px; font-family: var(--sfc-heading-font, inherit); font-weight: var(--sfc-heading-weight, 700); }
+  .sfc-head h3 { margin: 0; min-width: 0; overflow-wrap: anywhere; font-size: 16px; font-family: var(--sfc-heading-font, inherit); font-weight: var(--sfc-heading-weight, 700); }
   .sfc-kicker {
     display: inline-grid; place-items: center; min-width: 34px; height: 24px; padding: 0 8px; box-sizing: border-box;
     border-radius: 999px; background: var(--sfc-accent-soft); color: var(--sfc-accent);
     font-size: 10px; font-weight: 800; letter-spacing: .05em;
   }
   .sfc-kicker svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; }
-  .sfc-hint { color: var(--sfc-muted); font-size: 11px; text-align: right; }
+  .sfc-hint { min-width: 0; color: var(--sfc-muted); font-size: 11px; text-align: right; }
   .sfc-link { border: 0; background: none; color: var(--sfc-accent); font-weight: 700; font-size: 12px; cursor: pointer; padding: 0; }
   .sfc-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700;
     background: var(--sfc-badge-bg, rgba(0,0,0,.08)); color: var(--sfc-badge-text, inherit); vertical-align: middle; }
@@ -121,6 +125,7 @@ const BASE_CSS = `
   .sfc-forecast-copy strong { display: block; font-size: 14px; margin-top: 1px; }
   .sfc-forecast-copy em { display: block; color: var(--sfc-muted); font-size: 11px; font-style: normal; }
   .sfc-forecast-stored { font-size: 14px; white-space: nowrap; font-family: var(--sfc-num-font, inherit); }
+  @container (max-width: 380px) { .sfc-forecast-stored { white-space: normal; text-align: right; } }
   .sfc-forecast-bar { grid-column: 1 / -1; position: relative; height: 7px; border-radius: 999px; background: var(--sfc-track); }
   .sfc-forecast-bar i { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--sfc-battery); }
   .sfc-forecast-bar b { position: absolute; top: -3px; bottom: -3px; width: 2px; border-radius: 1px; background: var(--sfc-load); }
@@ -252,6 +257,7 @@ const BASE_CSS = `
   .sfc-compare-table td.good { color: #2bb673; font-size: 11px; } .sfc-compare-table td.bad { color: #e5534b; font-size: 11px; }
   .sfc-compare-table tr:last-child > * { border-bottom: 0; }
   .sfc-compare-table thead th { white-space: normal; vertical-align: bottom; }
+  .sfc-compare-table thead th:not(:first-child) { min-width: 4.4em; }
   .sfc-compare-scroll { overflow-x: auto; }
 
   /* Installation */
@@ -1027,6 +1033,7 @@ const THEME_CSS = {
     .rx-scan { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 4px; padding: 8px 12px;
       border: 1px solid rgba(79,216,255,.22); background: rgba(4,16,26,.7);
       clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)); }
+    .rx-scan > div { min-width: 0; }
     .rx-scan small { color: #4fd8ff; font-size: 9.5px; letter-spacing: .26em; text-transform: uppercase; }
     .rx-scan p { margin: 1px 0 0; font-size: 13px; color: #cfe8f5; }
     .rx-scan em { font-style: normal; color: #fff; }

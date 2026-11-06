@@ -266,13 +266,13 @@ class SolarFlowCard extends HTMLElement {
     if (!prices.import && !prices.export) return undefined;
     if (!prices.import?.entity && !prices.export?.entity) {
       const totals = energy.totals || {};
-      if (!prices.import) return isNum(totals.gridExport) ? { kind, value: totals.gridExport * prices.export.value } : undefined;
+      if (!prices.import) return isNum(totals.gridExport) ? { kind, value: totals.gridExport * prices.export.value * prices.factor } : undefined;
       // Fixed prices as given: the summary works them out from the totals.
       if (!config.settlement) return undefined;
       if (!isNum(totals.load) || !isNum(totals.gridImport)) return undefined;
       const billedImport = net ? net.gridImport : totals.gridImport;
       const billedExport = net ? net.gridExport : totals.gridExport || 0;
-      return { kind, value: Math.max(0, totals.load - billedImport) * prices.import.value + billedExport * (prices.export?.value || 0) };
+      return { kind, value: Math.max(0, totals.load - billedImport) * prices.import.value + billedExport * (prices.export?.value || 0) * prices.factor };
     }
     if (!prices.import) prices.import = { value: 0 };
     if (typeof this._hass.callWS !== "function") return undefined;
@@ -302,10 +302,11 @@ class SolarFlowCard extends HTMLElement {
     const ids = Object.fromEntries(["import", "export"].filter((name) => prices[name]?.entity && !prices[name].ratio).map((name) => [name, prices[name].entity]));
     const stats = this._fetch(`prices|${JSON.stringify(ids)}|${start.getTime()}|${statPeriod}`, 15 * 60000, () => loadPriceStats(this._hass, ids, start, statPeriod));
     if (!stats.data) return { kind, value: null };
-    const price = (kind, at) => {
+    const price = (kind, at) => (kind === "export" ? prices.factor : 1) * basePrice(kind, at);
+    const basePrice = (kind, at) => {
       const setting = prices[kind];
       if (!setting) return 0;
-      if (setting.ratio) return setting.ratio * price("import", at);
+      if (setting.ratio) return setting.ratio * basePrice("import", at);
       if (!setting.entity) return setting.value;
       const mean = at === null ? undefined : stats.data[kind]?.get(at);
       return mean ?? now[kind] ?? 0;

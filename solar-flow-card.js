@@ -456,13 +456,16 @@ const TRANSLATIONS = {
     "editorSettlementBilling": "Net-billing (energy sold at the RCE price)",
     "editorSettlementMetering": "Net-metering (each kWh sent back worth 0.8 / 0.7 kWh)",
     "editorSettlementHintFixed": "The prices below, or price sensors.",
-    "editorSettlementHintBilling": "The energy sent to the grid is sold at the hourly RCE price: enter only the import price. The card finds an RCE price sensor itself, or pick one below.",
+    "editorSettlementHintBilling": "The energy sent to the grid is sold at the hourly RCE price, and its value goes to your deposit multiplied by 1.23: enter only the import price. The card finds an RCE price sensor itself, or pick one below.",
     "editorSettlementHintMetering": "Each kWh sent to the grid is worth {ratio} of a kWh bought: enter only the import price.",
     "editorMeteringRatio": "Credit per kWh sent back",
     "editorMeteringAuto": "automatic ({ratio}; 0.7 above 10 kWp)",
     "editorRcePrice": "RCE price sensor",
     "editorRceMissing": "No RCE price sensor found: pick one (e.g. from the PSE integration or your EMS), otherwise the energy sold has no price.",
-    "editorImportPriceHint": "Import price: what each kWh costs, energy plus the distribution charges billed per kWh, without monthly fixed fees."
+    "editorImportPriceHint": "Import price: what each kWh costs, energy plus the distribution charges billed per kWh, without monthly fixed fees.",
+    "editorRceFound": "RCE price sensor found: {entity} · {value}.",
+    "editorUseBilling": "I'm on net-billing: value the energy sold at the RCE price",
+    "editorBillingFactor": "Deposit factor (1.23)"
   },
   "de": {
     "languageName": "Deutsch",
@@ -872,13 +875,16 @@ const TRANSLATIONS = {
     "editorSettlementBilling": "Net-Billing (Verkauf zum RCE-Stundenpreis)",
     "editorSettlementMetering": "Net-Metering (jede eingespeiste kWh zählt 0,8 / 0,7 kWh)",
     "editorSettlementHintFixed": "Die Preise unten oder Preissensoren.",
-    "editorSettlementHintBilling": "Eingespeiste Energie wird zum RCE-Stundenpreis verkauft: nur den Bezugspreis eingeben. Die Karte findet einen RCE-Preissensor selbst, oder unten einen wählen.",
+    "editorSettlementHintBilling": "Eingespeiste Energie wird zum RCE-Stundenpreis verkauft, ihr Wert geht mal 1,23 ins Depot: nur den Bezugspreis eingeben. Die Karte findet einen RCE-Preissensor selbst, oder unten einen wählen.",
     "editorSettlementHintMetering": "Jede eingespeiste kWh ist {ratio} einer bezogenen kWh wert: nur den Bezugspreis eingeben.",
     "editorMeteringRatio": "Gutschrift je eingespeister kWh",
     "editorMeteringAuto": "automatisch ({ratio}; 0,7 über 10 kWp)",
     "editorRcePrice": "RCE-Preissensor",
     "editorRceMissing": "Kein RCE-Preissensor gefunden: einen wählen, sonst bleibt die eingespeiste Energie ohne Preis.",
-    "editorImportPriceHint": "Bezugspreis: was jede kWh kostet, Energie plus die Netzentgelte je kWh, ohne monatliche Grundgebühren."
+    "editorImportPriceHint": "Bezugspreis: was jede kWh kostet, Energie plus die Netzentgelte je kWh, ohne monatliche Grundgebühren.",
+    "editorRceFound": "RCE-Preissensor gefunden: {entity} · {value}.",
+    "editorUseBilling": "Ich rechne per Net-Billing ab: Einspeisung zum RCE-Preis bewerten",
+    "editorBillingFactor": "Depotfaktor (1,23)"
   },
   "nl": {
     "languageName": "Nederlands",
@@ -1288,13 +1294,16 @@ const TRANSLATIONS = {
     "editorSettlementBilling": "Net-billing (teruglevering tegen de uurprijs)",
     "editorSettlementMetering": "Salderen (elke teruggeleverde kWh telt voor 0,8 / 0,7 kWh)",
     "editorSettlementHintFixed": "De prijzen hieronder, of prijssensoren.",
-    "editorSettlementHintBilling": "Teruggeleverde energie wordt verkocht tegen de uurprijs (RCE): vul alleen de afnameprijs in. De kaart zoekt zelf een RCE-prijssensor, of kies er hieronder een.",
+    "editorSettlementHintBilling": "Teruggeleverde energie wordt verkocht tegen de uurprijs (RCE) en de waarde gaat maal 1,23 naar je deposito: vul alleen de afnameprijs in. De kaart zoekt zelf een RCE-prijssensor, of kies er hieronder een.",
     "editorSettlementHintMetering": "Elke teruggeleverde kWh is {ratio} van een afgenomen kWh waard: vul alleen de afnameprijs in.",
     "editorMeteringRatio": "Verrekening per teruggeleverde kWh",
     "editorMeteringAuto": "automatisch ({ratio}; 0,7 boven 10 kWp)",
     "editorRcePrice": "RCE-prijssensor",
     "editorRceMissing": "Geen RCE-prijssensor gevonden: kies er een, anders heeft de teruggeleverde energie geen prijs.",
-    "editorImportPriceHint": "Afnameprijs: wat elke kWh kost, energie plus de netkosten per kWh, zonder vaste maandkosten."
+    "editorImportPriceHint": "Afnameprijs: wat elke kWh kost, energie plus de netkosten per kWh, zonder vaste maandkosten.",
+    "editorRceFound": "RCE-prijssensor gevonden: {entity} · {value}.",
+    "editorUseBilling": "Ik heb net-billing: teruglevering tegen de RCE-prijs",
+    "editorBillingFactor": "Depositofactor (1,23)"
   },
   "pl": {
     "languageName": "Polski",
@@ -1704,13 +1713,16 @@ const TRANSLATIONS = {
     "editorSettlementBilling": "Net-billing (sprzedaż po cenie RCE)",
     "editorSettlementMetering": "Net-metering (opusty 0,8 / 0,7)",
     "editorSettlementHintFixed": "Ceny wpisane poniżej albo czujniki cen.",
-    "editorSettlementHintBilling": "Oddana energia jest sprzedawana po godzinowej cenie RCE: wpisz tylko cenę zakupu. Czujnik ceny RCE karta znajdzie sama, możesz też wybrać go poniżej.",
+    "editorSettlementHintBilling": "Oddana energia jest sprzedawana po godzinowej cenie RCE, a jej wartość trafia do depozytu pomnożona przez 1,23: wpisz tylko cenę zakupu. Czujnik ceny RCE karta znajdzie sama, możesz też wybrać go poniżej.",
     "editorSettlementHintMetering": "Każda oddana kWh jest warta {ratio} kWh pobranej: wpisz tylko cenę zakupu.",
     "editorMeteringRatio": "Opust za oddaną kWh",
     "editorMeteringAuto": "automatycznie ({ratio}; 0,7 powyżej 10 kWp)",
     "editorRcePrice": "Czujnik ceny RCE",
     "editorRceMissing": "Nie znaleziono czujnika ceny RCE: wybierz go (np. z integracji PSE albo z EMS), inaczej oddana energia nie zostanie wyceniona.",
-    "editorImportPriceHint": "Cena zakupu: koszt każdej kWh, czyli energia i opłaty dystrybucyjne naliczane za kWh, bez stałych opłat miesięcznych."
+    "editorImportPriceHint": "Cena zakupu: koszt każdej kWh, czyli energia i opłaty dystrybucyjne naliczane za kWh, bez stałych opłat miesięcznych.",
+    "editorRceFound": "Znaleziono czujnik ceny RCE: {entity} · {value}.",
+    "editorUseBilling": "Rozliczam się w net-billingu: wyceniaj oddaną energię po cenie RCE",
+    "editorBillingFactor": "Mnożnik depozytu (1,23)"
   }
 };
 
@@ -2390,7 +2402,13 @@ function meteringRatio(config) {
 }
 
 function effectivePrices(hass, config) {
-  const prices = { import: priceSetting(config.price_import), export: priceSetting(config.price_export), ratio: null, detected: null };
+  const prices = { import: priceSetting(config.price_import), export: priceSetting(config.price_export), ratio: null, detected: null, factor: 1 };
+  // Net-billing: the value of the energy sold is credited to the prosumer
+  // deposit multiplied by 1.23 (billing_factor: 1 turns that off).
+  if (config.settlement === "net_billing") {
+    const factor = Number.parseFloat(config.billing_factor);
+    prices.factor = factor > 0 ? factor : 1.23;
+  }
   if (config.settlement === "net_billing" && !prices.export) {
     prices.detected = detectRcePrice(hass);
     if (prices.detected) prices.export = { entity: prices.detected };
@@ -5381,7 +5399,11 @@ const BASE_CSS = `
   .sfc button { font: inherit; color: inherit; }
   .sfc [data-entity], .sfc [data-action] { cursor: pointer; }
   .sfc .sfc-click { cursor: pointer; }
-  .sfc-sections { display: grid; gap: 12px; padding: 0 16px 16px; position: relative; }
+  /* One column never wider than the card: a section with a word that cannot
+     shrink (a wide theme font, a long value) wraps instead of pushing the
+     column, and with it the right margin, past the card's edge. */
+  .sfc-sections { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 0 16px 16px; position: relative; }
+  .sfc-section { min-width: 0; }
   .sfc-section {
     padding: 14px;
     border-radius: var(--sfc-section-radius, 16px);
@@ -5396,14 +5418,14 @@ const BASE_CSS = `
   ha-card.sfc.parts .sfc-sections > .sfc-section + .sfc-section { padding-top: 14px; border-top: 1px solid var(--sfc-border); }
   .sfc-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
   .sfc-head > div { display: flex; align-items: center; gap: 8px; min-width: 0; }
-  .sfc-head h3 { margin: 0; font-size: 16px; font-family: var(--sfc-heading-font, inherit); font-weight: var(--sfc-heading-weight, 700); }
+  .sfc-head h3 { margin: 0; min-width: 0; overflow-wrap: anywhere; font-size: 16px; font-family: var(--sfc-heading-font, inherit); font-weight: var(--sfc-heading-weight, 700); }
   .sfc-kicker {
     display: inline-grid; place-items: center; min-width: 34px; height: 24px; padding: 0 8px; box-sizing: border-box;
     border-radius: 999px; background: var(--sfc-accent-soft); color: var(--sfc-accent);
     font-size: 10px; font-weight: 800; letter-spacing: .05em;
   }
   .sfc-kicker svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; }
-  .sfc-hint { color: var(--sfc-muted); font-size: 11px; text-align: right; }
+  .sfc-hint { min-width: 0; color: var(--sfc-muted); font-size: 11px; text-align: right; }
   .sfc-link { border: 0; background: none; color: var(--sfc-accent); font-weight: 700; font-size: 12px; cursor: pointer; padding: 0; }
   .sfc-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700;
     background: var(--sfc-badge-bg, rgba(0,0,0,.08)); color: var(--sfc-badge-text, inherit); vertical-align: middle; }
@@ -5482,6 +5504,7 @@ const BASE_CSS = `
   .sfc-forecast-copy strong { display: block; font-size: 14px; margin-top: 1px; }
   .sfc-forecast-copy em { display: block; color: var(--sfc-muted); font-size: 11px; font-style: normal; }
   .sfc-forecast-stored { font-size: 14px; white-space: nowrap; font-family: var(--sfc-num-font, inherit); }
+  @container (max-width: 380px) { .sfc-forecast-stored { white-space: normal; text-align: right; } }
   .sfc-forecast-bar { grid-column: 1 / -1; position: relative; height: 7px; border-radius: 999px; background: var(--sfc-track); }
   .sfc-forecast-bar i { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--sfc-battery); }
   .sfc-forecast-bar b { position: absolute; top: -3px; bottom: -3px; width: 2px; border-radius: 1px; background: var(--sfc-load); }
@@ -5613,6 +5636,7 @@ const BASE_CSS = `
   .sfc-compare-table td.good { color: #2bb673; font-size: 11px; } .sfc-compare-table td.bad { color: #e5534b; font-size: 11px; }
   .sfc-compare-table tr:last-child > * { border-bottom: 0; }
   .sfc-compare-table thead th { white-space: normal; vertical-align: bottom; }
+  .sfc-compare-table thead th:not(:first-child) { min-width: 4.4em; }
   .sfc-compare-scroll { overflow-x: auto; }
 
   /* Installation */
@@ -6388,6 +6412,7 @@ const THEME_CSS = {
     .rx-scan { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 4px; padding: 8px 12px;
       border: 1px solid rgba(79,216,255,.22); background: rgba(4,16,26,.7);
       clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)); }
+    .rx-scan > div { min-width: 0; }
     .rx-scan small { color: #4fd8ff; font-size: 9.5px; letter-spacing: .26em; text-transform: uppercase; }
     .rx-scan p { margin: 1px 0 0; font-size: 13px; color: #cfe8f5; }
     .rx-scan em { font-style: normal; color: #fff; }
@@ -6679,13 +6704,13 @@ class SolarFlowCard extends HTMLElement {
     if (!prices.import && !prices.export) return undefined;
     if (!prices.import?.entity && !prices.export?.entity) {
       const totals = energy.totals || {};
-      if (!prices.import) return isNum(totals.gridExport) ? { kind, value: totals.gridExport * prices.export.value } : undefined;
+      if (!prices.import) return isNum(totals.gridExport) ? { kind, value: totals.gridExport * prices.export.value * prices.factor } : undefined;
       // Fixed prices as given: the summary works them out from the totals.
       if (!config.settlement) return undefined;
       if (!isNum(totals.load) || !isNum(totals.gridImport)) return undefined;
       const billedImport = net ? net.gridImport : totals.gridImport;
       const billedExport = net ? net.gridExport : totals.gridExport || 0;
-      return { kind, value: Math.max(0, totals.load - billedImport) * prices.import.value + billedExport * (prices.export?.value || 0) };
+      return { kind, value: Math.max(0, totals.load - billedImport) * prices.import.value + billedExport * (prices.export?.value || 0) * prices.factor };
     }
     if (!prices.import) prices.import = { value: 0 };
     if (typeof this._hass.callWS !== "function") return undefined;
@@ -6715,10 +6740,11 @@ class SolarFlowCard extends HTMLElement {
     const ids = Object.fromEntries(["import", "export"].filter((name) => prices[name]?.entity && !prices[name].ratio).map((name) => [name, prices[name].entity]));
     const stats = this._fetch(`prices|${JSON.stringify(ids)}|${start.getTime()}|${statPeriod}`, 15 * 60000, () => loadPriceStats(this._hass, ids, start, statPeriod));
     if (!stats.data) return { kind, value: null };
-    const price = (kind, at) => {
+    const price = (kind, at) => (kind === "export" ? prices.factor : 1) * basePrice(kind, at);
+    const basePrice = (kind, at) => {
       const setting = prices[kind];
       if (!setting) return 0;
-      if (setting.ratio) return setting.ratio * price("import", at);
+      if (setting.ratio) return setting.ratio * basePrice("import", at);
       if (!setting.entity) return setting.value;
       const mean = at === null ? undefined : stats.data[kind]?.get(at);
       return mean ?? now[kind] ?? 0;
@@ -7623,6 +7649,8 @@ class SolarFlowCardEditor extends HTMLElement {
     const sensor = (key) => priceSetting(this._config[key])?.entity || "";
     const number = (key, label) => this._numbers(t, [[key, label, "0.01"]]);
     const detected = mode === "net_billing" && !priceSetting(this._config.price_export) ? detectRcePrice(this._hass) : null;
+    // With fixed prices, an RCE price sensor in Home Assistant is offered.
+    const suggested = mode === "" ? detectRcePrice(this._hass) : null;
     const ratio = formatNumber(meteringRatio({ ...this._config, metering_ratio: undefined }), t.locale, 1);
     const option = (value, label) => `<option value="${value}" ${mode === value ? "selected" : ""}>${escapeHtml(label)}</option>`;
     const ratioOption = (value, label) => `<option value="${value}" ${String(this._config.metering_ratio ?? "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`;
@@ -7636,6 +7664,8 @@ class SolarFlowCardEditor extends HTMLElement {
       <div class="grid">
         ${number("price_import", "editorPriceImport")}
         ${mode === "" ? number("price_export", "editorPriceExport") : ""}
+        ${mode === "net_billing" ? `
+          <label><span>${escapeHtml(t.editorBillingFactor)}</span><input data-number="billing_factor" type="number" min="0" step="0.01" inputmode="decimal" placeholder="1.23" value="${escapeHtml(this._config.billing_factor ?? "")}" /></label>` : ""}
         ${mode === "net_metering" ? `
           <label><span>${escapeHtml(t.editorMeteringRatio)}</span>
             <select data-select="metering_ratio">${ratioOption("", fill(t.editorMeteringAuto, { ratio }))}${ratioOption("0.8", "0,8")}${ratioOption("0.7", "0,7")}</select>
@@ -7648,6 +7678,11 @@ class SolarFlowCardEditor extends HTMLElement {
       ${mode === "net_billing" ? `
         ${this._picker("price_export", t.editorRcePrice, sensor("price_export"), "sensor", { kind: "price", auto: detected ? { entityId: detected, stateObj: this._hass.states[detected] } : null })}
         ${!detected && !sensor("price_export") ? `<p class="warn">${escapeHtml(t.editorRceMissing)}</p>` : ""}` : ""}
+      ${mode === "" && !sensor("price_export") && suggested ? `
+        <div class="suggest">
+          <p class="note">${escapeHtml(fill(t.editorRceFound, { entity: suggested, value: fieldValue(this._hass.states[suggested], "any", t.locale) }))}</p>
+          <button type="button" class="link" data-use-billing>${escapeHtml(t.editorUseBilling)}</button>
+        </div>` : ""}
       ${mode === "" ? `
         <details class="box" data-box="prices" ${this._boxOpen("prices", Boolean(sensor("price_import") || sensor("price_export"))) ? "open" : ""}>
           <summary class="title">${escapeHtml(t.editorPriceSensors)}</summary>
@@ -7743,6 +7778,7 @@ class SolarFlowCardEditor extends HTMLElement {
         .warn { margin: 0; padding: 4px 8px; border-radius: 6px; background: rgba(255, 152, 0, .12); color: var(--warning-color, #b26a00); font-size: 11.5px; line-height: 1.35; }
         .item { display: grid; gap: 8px; padding: 10px; border: 1px dashed var(--divider-color, rgba(127,127,127,.35)); border-radius: 10px; }
         .danger { color: var(--error-color, #db4437) !important; }
+        .suggest { display: grid; gap: 4px; padding: 8px 10px; border-radius: 10px; background: rgba(67, 160, 71, .1); }
         .link { justify-self: start; padding: 0; border: 0; background: none; color: var(--primary-color, #03a9f4); font: inherit; font-size: 13px; cursor: pointer; }
       </style>
       <datalist id="sfc-sensor">${ids("sensor").map((id) => `<option value="${escapeHtml(id)}"></option>`).join("")}</datalist>
@@ -7832,6 +7868,14 @@ class SolarFlowCardEditor extends HTMLElement {
     }));
     root.getElementById("vs-on")?.addEventListener("change", (e) => {
       this._set("virtual_storage", e.target.checked ? true : undefined);
+      this._render();
+    });
+    root.querySelector("[data-use-billing]")?.addEventListener("click", () => {
+      // Net-billing values the energy sold at the RCE price: a fixed export
+      // price would take its place, so it goes.
+      const next = { ...this._config, settlement: "net_billing" };
+      delete next.price_export;
+      this._emit(next);
       this._render();
     });
     root.querySelector('[data-vs="negative"]')?.addEventListener("change", (e) => this._setVirtual("negative", e.target.value || undefined));

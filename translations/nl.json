@@ -406,11 +406,14 @@
   "editorSettlementBilling": "Net-billing (teruglevering tegen de uurprijs)",
   "editorSettlementMetering": "Salderen (elke teruggeleverde kWh telt voor 0,8 / 0,7 kWh)",
   "editorSettlementHintFixed": "De prijzen hieronder, of prijssensoren.",
-  "editorSettlementHintBilling": "Teruggeleverde energie wordt verkocht tegen de uurprijs (RCE): vul alleen de afnameprijs in. De kaart zoekt zelf een RCE-prijssensor, of kies er hieronder een.",
+  "editorSettlementHintBilling": "Teruggeleverde energie wordt verkocht tegen de uurprijs (RCE) en de waarde gaat maal 1,23 naar je deposito: vul alleen de afnameprijs in. De kaart zoekt zelf een RCE-prijssensor, of kies er hieronder een.",
   "editorSettlementHintMetering": "Elke teruggeleverde kWh is {ratio} van een afgenomen kWh waard: vul alleen de afnameprijs in.",
   "editorMeteringRatio": "Verrekening per teruggeleverde kWh",
   "editorMeteringAuto": "automatisch ({ratio}; 0,7 boven 10 kWp)",
   "editorRcePrice": "RCE-prijssensor",
   "editorRceMissing": "Geen RCE-prijssensor gevonden: kies er een, anders heeft de teruggeleverde energie geen prijs.",
-  "editorImportPriceHint": "Afnameprijs: wat elke kWh kost, energie plus de netkosten per kWh, zonder vaste maandkosten."
+  "editorImportPriceHint": "Afnameprijs: wat elke kWh kost, energie plus de netkosten per kWh, zonder vaste maandkosten.",
+  "editorRceFound": "RCE-prijssensor gevonden: {entity} · {value}.",
+  "editorUseBilling": "Ik heb net-billing: teruglevering tegen de RCE-prijs",
+  "editorBillingFactor": "Depositofactor (1,23)"
 }
