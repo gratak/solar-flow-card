@@ -294,11 +294,21 @@ class SolarFlowCard extends HTMLElement {
       const history = this._powerHistory(resolved, period);
       if (!history) return null;
       const { entry, spec } = history;
+      const data = entry.data ? this._powerChartData(entry.data.series, spec) : null;
+      const chart = { loading: entry.loading, error: entry.error, at: entry.at, data };
+      if (!entry.data || hasPowerSeries(data)) return chart;
+      // No power history (sensors kept out of the recorder): the average
+      // power of each hour from the energy statistics instead.
+      chart.missing = entry.data.missing;
+      const sources = sourcesKey(resolved.energy);
+      if (!sources) return chart;
+      const hourly = this._fetch(`hourly-energy|${sources}|${spec.start.getTime()}`, 15 * 60000, () => loadHourlyEnergy(this._hass, resolved.energy, spec.start));
+      const fallback = hourly.data ? this._powerChartData(hourlyPowerSeries(hourly.data, spec), spec) : null;
       return {
-        loading: entry.loading,
-        error: entry.error,
-        at: entry.at,
-        data: entry.data ? this._powerChartData(entry.data.series, spec) : null,
+        ...chart,
+        loading: entry.loading || hourly.loading,
+        at: [entry.at, hourly.at],
+        data: hasPowerSeries(fallback) ? { ...fallback, soc: null, fallback: true } : data,
       };
     }
     if (energy.error && !energy.buckets) return { error: true };

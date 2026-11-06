@@ -190,6 +190,8 @@ const BASE_CSS = `
   .sfc-tip span { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 6px; color: var(--sfc-muted); }
   .sfc-tip b { color: var(--sfc-text); }
   .sfc-chart-hint { margin: 2px 0 0; color: var(--sfc-muted); font-size: 10px; }
+  .sfc-chart-note { margin: 6px 0 0; padding: 6px 9px; border-radius: 8px; background: var(--sfc-accent-soft, transparent); border: 1px dashed var(--sfc-border); color: var(--sfc-muted); font-size: 11px; line-height: 1.35; }
+  .sfc-chart-empty { padding: 0 14px; text-align: center; }
   .sfc-chart-empty { display: grid; place-items: center; height: 110px; border: 1px dashed var(--sfc-border); border-radius: 12px; color: var(--sfc-muted); font-size: 12px; }
 
   .sfc-wide-rest { display: grid; gap: inherit; }

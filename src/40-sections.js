@@ -503,12 +503,14 @@ function chartHtml(m) {
   const chart = m.chart;
   if (!chart) return "";
   let body;
-  if (chart.data?.kind === "power" && ["solar", "load", "battery", "grid"].some((k) => chart.data[k]?.some((v) => v !== null))) {
+  if (chart.data?.kind === "power" && hasPowerSeries(chart.data)) {
     body = powerChartHtml(chart.data, m.t, m.locale, m.hiddenSeries);
+    if (chart.data.fallback) body += `<p class="sfc-chart-note">${escapeHtml(fill(m.t.chartFallback, { sensors: sensorList(chart.missing || []) }))}</p>`;
   } else if (chart.data?.kind === "energy" && chart.data.buckets?.some((b) => b.solar || b.load)) {
     body = energyChartHtml(chart.data, m.t, m.locale, m.hiddenSeries);
   } else {
-    const message = chart.loading ? m.t.chartLoading : chart.error ? m.t.chartError : m.t.chartEmpty;
+    const message = chart.loading ? m.t.chartLoading : chart.error ? m.t.chartError
+      : chart.missing?.length ? fill(m.t.chartNoHistory, { sensors: sensorList(chart.missing) }) : m.t.chartEmpty;
     body = `<div class="sfc-chart-empty">${escapeHtml(message)}</div>`;
   }
   return `<div class="sfc-chart ${chart.loading ? "loading" : ""}">${body}</div>`;
@@ -738,5 +740,56 @@ async function loadPowerHistory(hass, spec, live) {
     const scale = unitScale(live[name]?.stateObj, POWER_SCALE);
     series[name] = bucketHistory(historyPoints(response?.[entityId]).map(([t, v]) => [t, v * scale]), spec.start.getTime(), spec.count, spec.bucketMs, nowMs);
   }
-  return { series };
+  // Power sensors without any recorded value in the period (e.g. excluded
+  // from the recorder), named when the chart has to explain itself.
+  const missing = [...new Set(Object.entries(sources)
+    .filter(([name]) => name !== "soc" && !series[name].some((v) => v !== null))
+    .map(([, entityId]) => entityId))];
+  return { series, missing };
+}
+
+// Hourly energy statistics since `start` (kWh per hour), for drawing the
+// power chart when the power sensors have no history.
+async function loadHourlyEnergy(hass, energy, start) {
+  const sources = Object.fromEntries(ENERGY_ORDER.map((name) => [name, energy[name]?.entityId]).filter(([, id]) => id));
+  const response = await hass.callWS({
+    type: "recorder/statistics_during_period",
+    start_time: start.toISOString(),
+    end_time: new Date().toISOString(),
+    statistic_ids: [...new Set(Object.values(sources))],
+    period: "hour",
+    types: ["change"],
+    units: { energy: "kWh" },
+  });
+  const out = {};
+  for (const [name, entityId] of Object.entries(sources)) {
+    const hours = new Map();
+    for (const row of response?.[entityId] || []) hours.set(statStart(row.start), Math.max(0, Number(row.change) || 0));
+    if (hours.size) out[name] = hours;
+  }
+  return out;
+}
+
+// The hourly energy as the average power of each hour, on the chart's
+// buckets: kWh in one hour = average kW.
+function hourlyPowerSeries(hourly, spec) {
+  const series = {};
+  for (const [name, hours] of Object.entries(hourly)) {
+    series[name] = Array.from({ length: spec.count }, (_, i) => {
+      const at = new Date(spec.start.getTime() + i * spec.bucketMs);
+      at.setMinutes(0, 0, 0);
+      const kwh = hours.get(at.getTime());
+      return isNum(kwh) ? kwh * 1000 : null;
+    });
+  }
+  return series;
+}
+
+function hasPowerSeries(data) {
+  return ["solar", "load", "battery", "grid"].some((k) => data?.[k]?.some((v) => v !== null));
+}
+
+// "sensor.a, sensor.b and 2 more" for the chart's notes.
+function sensorList(ids) {
+  return ids.length > 3 ? `${ids.slice(0, 3).join(", ")} (+${ids.length - 3})` : ids.join(", ");
 }

@@ -44,7 +44,7 @@ DeyeCloud sensors are found automatically; any other inverter works by pointing 
 - **Inverter details** (tap the inverter or the house): PV strings, temperatures, battery and grid readings.
 - **Panels**: one tile per optimizer with today's production; the weakest panel is highlighted when it falls below 85% of the median. Without optimizers, `panels_per_string` shows one tile per string with its power and an estimate per panel.
 - **Wide layout** (`wide: true`) for every theme: everything visible at once on a wide dashboard, plus "Today at a glance" (peaks, battery range and cycles, time without the grid) and a comparison with yesterday, the week and the month.
-- English, Polish and Dutch, with a visual editor; [more languages welcome](CONTRIBUTING.md#add-or-improve-a-translation).
+- English, Polish, Dutch and German, with a visual editor; [more languages welcome](CONTRIBUTING.md#add-or-improve-a-translation).
 
 History comes from Home Assistant itself (recorder history and long-term statistics), so the card adds no requests to your inverter's cloud.
 
@@ -350,7 +350,7 @@ Planned, in no particular order. Ideas and votes are welcome in [issues](https:/
 
 ## Translations
 
-The card speaks English, Polish and Dutch (thanks to @furian88). Every language is one JSON file in [`translations/`](translations/); adding yours takes a copy of `en.json` and no programming. See [CONTRIBUTING.md](CONTRIBUTING.md#add-or-improve-a-translation).
+The card speaks English, Polish, Dutch (thanks to @furian88) and German (thanks to @AndiBo62). Every language is one JSON file in [`translations/`](translations/); adding yours takes a copy of `en.json` and no programming. See [CONTRIBUTING.md](CONTRIBUTING.md#add-or-improve-a-translation).
 
 ## Development
 

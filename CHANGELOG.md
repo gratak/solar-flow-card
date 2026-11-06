@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.1
+
+- **German** translation (thanks @AndiBo62), completed with the keys added since it was started.
+- **24H and 3D without power history:** when the power sensors have no recorded history (for example excluded from the recorder), the chart shows the average power of each hour from the energy statistics instead of "No history". A note under the chart names the sensors without history.
+- When there is nothing to draw at all, the message names the power sensors that have no history and asks whether they are excluded from the recorder.
+
 ## 1.7.0
 
 - **Several cards instead of one:** a card whose `sections:` leave out `flow` shows its sections as one plain card. The sections lose their own box and a line separates them, so parts of the card can sit anywhere on a dashboard. Cards on the same page share the history and statistics they load, so Home Assistant is asked once. See the README for an example.

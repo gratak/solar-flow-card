@@ -54,6 +54,8 @@ entities:
   grid_power_history: sensor.grid_power_total_history    # recorded every 5 minutes
 ```
 
+Without any power history the card still draws 24H and 3D: the average power of each hour from the energy sensors' statistics, with a note naming the sensors without history.
+
 Every live power key above accepts a `_history` twin (`solar_power_history`, `load_power_history`, `battery_power_history`, `battery_soc_history`, …). Without one the card uses the live sensor's own history.
 
 ### Energy
