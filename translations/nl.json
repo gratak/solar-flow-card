@@ -415,5 +415,12 @@
   "editorImportPriceHint": "Afnameprijs: wat elke kWh kost, energie plus de netkosten per kWh, zonder vaste maandkosten.",
   "editorRceFound": "RCE-prijssensor gevonden: {entity} · {value}.",
   "editorUseBilling": "Ik heb net-billing: teruglevering tegen de RCE-prijs",
-  "editorBillingFactor": "Depositofactor (1,23)"
+  "editorBillingFactor": "Depositofactor (1,23)",
+  "invToday": "vandaag {kwh}",
+  "editorInverters": "Meerdere omvormers",
+  "editorInvertersHint": "Hun zonnevermogen en -energie worden voor de hele kaart opgeteld (geen hulpsensoren nodig); elke omvormer staat apart bij Installatie.",
+  "editorInvSolarPower": "Zonnevermogen",
+  "editorInvSolarEnergy": "Zonne-energie",
+  "editorInvPower": "Uitgangsvermogen (optioneel)",
+  "editorInvRated": "Nominaal vermogen (kW, optioneel)"
 }

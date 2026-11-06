@@ -270,6 +270,7 @@ The chart uses the export price's sensor, else the import price's. Without an im
 | `entities` | DeyeCloud, automatic | Sensors for other inverters, see below. |
 | `panels` | DeyeCloud optimizers | Per-panel energy sensors, see below. |
 | `batteries` | – | Several batteries (e.g. a hybrid inverter's BAT1 and BAT2), see below. |
+| `inverters` | – | Several inverters (e.g. an on-grid and an off-grid one), see below. |
 | `invert_battery` | `false` | Your signed battery power is positive while charging. |
 | `invert_grid` | `false` | Your signed grid power is positive while exporting. |
 | `entities: <key>_history` | – | A recorded copy of a live power sensor for the charts, e.g. `grid_power_history`, when the live one is kept out of the recorder. See the [configuration guide](docs/configuration.md#separate-history-sensors). |
@@ -375,6 +376,29 @@ batteries:
 
 `battery_capacity` defaults to the sum of the capacities; `invert_battery` flips all of them.
 
+### Several inverters
+
+Two or more inverters, of the same or different brands, are listed under `inverters:`. The card sums their solar power and solar energy itself, without helper sensors, and the Installation section shows each inverter with its power, load and today's production.
+
+```yaml
+type: custom:solar-flow-card
+inverters:
+  - name: Huawei (on-grid)
+    solar_power: sensor.huawei_input_power     # W or kW: PV power of this inverter
+    solar_energy: sensor.huawei_daily_yield    # kWh: today's (or lifetime, see energy_sensors) PV energy
+    rated_power: 5.5                           # kW, optional: the load in %
+  - name: Off-grid
+    solar_power: sensor.offgrid_pv_power
+    solar_energy: sensor.offgrid_pv_energy
+    power: sensor.offgrid_output_power         # optional: the inverter's output, if not the PV power
+    rated_power: 3
+```
+
+- `solar_power` and `solar_energy` under `entities:` take precedence over the sums; leave them out to use the sums.
+- The total inverter load is the sum of all the inverters, unless `entities: inverter_power` is set. The rated power is the sum of their `rated_power` (or `inverter_power_rating`).
+- With `energy_sensors: total` (lifetime counters), each inverter's today comes from the long-term statistics.
+- The 24H chart, the history and the statistics use the sum of the inverters.
+
 The 3D, 7D, month and all-time totals and bars come from the long-term statistics of the daily energy sensors, so those need `state_class: total_increasing`. Statistics are compiled hourly; today's part always uses the live sensor.
 
 ## Roadmap
@@ -383,7 +407,6 @@ Planned, in no particular order. Ideas and votes are welcome in [issues](https:/
 
 - **The new visual editor out of beta** (1.8.0), after the feedback from the betas.
 - **PV forecast, more detail** ([#69](https://github.com/gratak/solar-flow-card/issues/69)): the hourly forecast as a line in the 24H chart next to the actual production (Solcast `detailedHourly`), and the pessimistic–optimistic range of each day (Solcast `estimate10` / `estimate90`).
-- **Several inverters** (`inverters:`, like `batteries:`): power and energy summed by the card without helper sensors, for example an on-grid and an off-grid inverter of different brands, with each inverter listed separately in the Installation section. Until then, combine them with Home Assistant "Sum" helpers under `entities:`.
 
 ## Translations
 

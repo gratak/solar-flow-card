@@ -35,7 +35,7 @@ const SHARED_CACHE = new Map();
 // The sensors a request reads, by role, for its cache key: two cards may use
 // the same sensor for different things.
 function sourcesKey(sources) {
-  return Object.entries(sources).filter(([, entry]) => entry?.entityId).map(([name, entry]) => `${name}=${entry.entityId}`).join(",");
+  return Object.entries(sources).filter(([, entry]) => entry?.entityId).map(([name, entry]) => `${name}=${entityIds(entry).join("+")}`).join(",");
 }
 
 // Sections the viewer collapsed (`collapsible: true`), remembered in this
@@ -496,7 +496,7 @@ class SolarFlowCard extends HTMLElement {
       const hasDetails = readings.length > 0;
       const inverterOpen = hasDetails && (wide || this._inverterOpen);
       const inverter = inverterOpen ? readings : null;
-      const system = config.show_system !== false ? systemData(this._hass, resolved, config) : null;
+      const system = config.show_system !== false ? systemData(this._hass, resolved, config, this._energyBaseline(resolved)) : null;
       if (system && !showBattery) Object.assign(system, { battery: [], batteryWarn: null });
       const since = period === "all" && energy.buckets?.length
         ? energy.buckets[0].start.toLocaleDateString(locale, { month: "short", year: "numeric" })

@@ -108,7 +108,7 @@ Home Assistant can create the missing pieces without YAML: **Settings → Device
 | You have | You need | Helper |
 |---|---|---|
 | Grid power per phase only | `grid_power` | **Combine the state of several sensors** (type *Sum*) of the three phase powers |
-| Two inverters | `solar_power`, `solar_energy` … | **Combine the state of several sensors** (*Sum*) of the matching sensors |
+| Two inverters | `solar_power`, `solar_energy` … | No helper: list them under [`inverters:`](../README.md#several-inverters). For other sums, **Combine the state of several sensors** (*Sum*) of the matching sensors |
 | Power only (W), no energy (kWh) | an `*_energy` sensor | **Integral sensor** (Riemann sum, method *left*, unit prefix *k*) of the power sensor |
 | A lifetime counter, but you want a daily one | a daily `*_energy` sensor | **Utility meter**, reset cycle *daily* |
 | A grid sensor that is + while exporting | `grid_power` with + import | `invert_grid: true` (no helper needed) |

@@ -252,7 +252,7 @@ class SolarFlowCardEditor extends HTMLElement {
   _writeItems(group, items) {
     const compact = items.map((item) => {
       const clean = Object.fromEntries(Object.entries(item).filter(([, v]) => v !== undefined && v !== "" && v !== false && v !== null));
-      return group !== "batteries" && Object.keys(clean).length === 1 && clean.entity ? clean.entity : clean;
+      return (group === "panels" || group === "inverter_details") && Object.keys(clean).length === 1 && clean.entity ? clean.entity : clean;
     });
     this._set(group, compact.length ? compact : undefined);
     this._render();
@@ -474,6 +474,10 @@ class SolarFlowCardEditor extends HTMLElement {
       ${this._listHtml(t, "batteries", t.editorBatteries, t.editorBatteriesHint, [
         ["name", "text", t.editorItemName], ["soc", "soc", t.editorBatSoc], ["power", "power", t.editorBatPower], ["capacity", "number", t.editorBatCapacity],
         ["voltage", "voltage", t.editorBatVoltage], ["temperature", "temperature", t.editorBatTemp], ["invert", "switch", t.editorBatInvert],
+      ])}
+      ${this._listHtml(t, "inverters", t.editorInverters, t.editorInvertersHint, [
+        ["name", "text", t.editorItemName], ["solar_power", "power", t.editorInvSolarPower], ["solar_energy", "energy", t.editorInvSolarEnergy],
+        ["power", "power", t.editorInvPower], ["rated_power", "number", t.editorInvRated],
       ])}
       ${this._listHtml(t, "panels", t.editorPanels, t.editorPanelsHint, [["entity", "energy", t.editorPanelEnergy], ["power", "power", t.editorPanelPower], ["name", "text", t.editorItemName]])}`;
   }

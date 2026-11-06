@@ -77,6 +77,13 @@ function resolveEntities(hass, config) {
     energy[name] = pick(configured[def.key])
       || find((a) => a.sensor_type === "daily" && a.metric_key === def.deye && a.relative_day === "today");
   }
+  // Several inverters: their solar power and energy added up, unless the
+  // sum is set under entities:.
+  const inverters = inverterEntries(hass, config);
+  const solarParts = inverters.map((item) => item.solar).filter(Boolean);
+  const energyParts = inverters.map((item) => item.energy).filter(Boolean);
+  if (solarParts.length && !configured.solar_power) live.solar = combinedEntry(solarParts, "W", wattsOf);
+  if (energyParts.length && !configured.solar_energy) energy.solar = combinedEntry(energyParts, "kWh", kwhOf);
   const named = candidates.find(([, s]) => s.attributes?.station_name);
   return {
     station,
@@ -184,25 +191,87 @@ function todayEnergy(resolved, stats) {
   return deriveLoadEnergy(values);
 }
 
+// Several inverters (`inverters:`, like `batteries:`): each with its solar
+// power and energy, and optionally its output power and rating (kW).
+function inverterEntries(hass, config) {
+  if (!Array.isArray(config.inverters)) return [];
+  const states = hass?.states || {};
+  const pick = (id) => (typeof id === "string" && states[id] ? { entityId: id, stateObj: states[id] } : null);
+  return config.inverters.filter((item) => item && typeof item === "object").map((item, i) => ({
+    name: item.name ? String(item.name) : `#${i + 1}`,
+    solar: pick(item.solar_power),
+    energy: pick(item.solar_energy),
+    power: pick(item.power),
+    rated: positiveNumber(item.rated_power),
+  })).filter((item) => item.solar || item.energy || item.power);
+}
+
+// One reading made of several sensors, added up: a stand-in sensor in W or
+// kWh for the live values, the sensors themselves for history and
+// statistics (entityIds, parts).
+function combinedEntry(parts, unit, read) {
+  if (parts.length === 1) return parts[0];
+  const values = parts.map((part) => read(part.stateObj)).filter(isNum);
+  const first = parts[0];
+  const latest = parts.map((part) => part.stateObj.last_updated).filter(Boolean).sort().pop();
+  return {
+    entityId: first.entityId,
+    entityIds: parts.map((part) => part.entityId),
+    parts,
+    stateObj: {
+      entity_id: first.entityId,
+      state: values.length ? String(values.reduce((a, b) => a + b, 0)) : "unavailable",
+      attributes: { ...first.stateObj.attributes, unit_of_measurement: unit },
+      last_updated: latest,
+      last_changed: latest,
+    },
+  };
+}
+
+// The sensors behind a reading: one, or several summed (`inverters:`).
+function entityIds(entry) {
+  return entry ? entry.entityIds || [entry.entityId] : [];
+}
+
+// Statistics rows of several sensors added up period by period: change and
+// state summed (a state only when every sensor has one).
+function statRows(response, ids) {
+  if (ids.length === 1) return response?.[ids[0]] || [];
+  const byStart = new Map();
+  for (const id of ids) {
+    for (const row of response?.[id] || []) {
+      const at = statStart(row.start);
+      const sum = byStart.get(at) || { start: at, end: row.end, change: 0, state: 0, n: 0 };
+      sum.change += Number(row.change) || 0;
+      if (Number.isFinite(Number(row.state))) sum.state += Number(row.state);
+      sum.n += 1;
+      byStart.set(at, sum);
+    }
+  }
+  return [...byStart.values()].sort((a, b) => a.start - b.start)
+    .map((row) => ({ start: row.start, end: row.end, change: row.change, state: row.n === ids.length ? row.state : null }));
+}
+
+function energySources(energy) {
+  return Object.fromEntries(ENERGY_ORDER.map((name) => [name, entityIds(energy[name])]).filter(([, ids]) => ids.length));
+}
+
 // Hourly statistics since midnight for lifetime energy counters. The hour
 // before midnight is included only for its closing reading (`last` when no
 // hour of today has been compiled yet).
 async function loadTodayStats(hass, energy) {
-  const sources = Object.fromEntries(ENERGY_ORDER.map((name) => [name, energy[name]?.entityId]).filter(([, id]) => id));
+  const sources = energySources(energy);
   const midnight = startOfDay(new Date()).getTime();
   const response = await hass.callWS({
     type: "recorder/statistics_during_period",
     start_time: new Date(midnight - 3600000).toISOString(),
     end_time: new Date().toISOString(),
-    statistic_ids: [...new Set(Object.values(sources))],
+    statistic_ids: [...new Set(Object.values(sources).flat())],
     period: "hour",
     types: ["change", "state"],
     units: { energy: "kWh" },
   });
-  const out = {};
-  for (const [name, entityId] of Object.entries(sources)) {
-    const rows = response?.[entityId] || [];
-    if (!rows.length) continue;
+  const sinceMidnight = (rows) => {
     let change = 0;
     let last = null;
     for (const row of rows) {
@@ -210,9 +279,27 @@ async function loadTodayStats(hass, energy) {
       const state = Number(row.state);
       if (Number.isFinite(state)) last = state;
     }
-    out[name] = { change, last };
+    return { change, last };
+  };
+  const out = {};
+  for (const [name, ids] of Object.entries(sources)) {
+    const rows = statRows(response, ids);
+    if (rows.length) out[name] = sinceMidnight(rows);
   }
+  // Each sensor of a summed reading on its own too (each inverter's today).
+  Object.defineProperty(out, "bySensor", {
+    value: Object.fromEntries(Object.values(sources).filter((ids) => ids.length > 1).flat()
+      .filter((id) => response?.[id]?.length).map((id) => [id, sinceMidnight(response[id])])),
+  });
   return out;
+}
+
+// Today's energy of one lifetime counter: from the hourly statistics, plus
+// what it added since the last full hour.
+function todayOfCounter(stats, entry) {
+  const s = stats?.bySensor?.[entry.entityId];
+  const now = kwhOf(entry.stateObj);
+  return s ? s.change + (isNum(now) && isNum(s.last) ? Math.max(0, now - s.last) : 0) : null;
 }
 
 // Virtual storage (#43): `virtual_storage: true` or an object with an
@@ -560,19 +647,19 @@ function statsSpec(period) {
 }
 
 async function loadStatistics(hass, spec, energy) {
-  const sources = Object.fromEntries(ENERGY_ORDER.map((name) => [name, energy[name]?.entityId]).filter(([, id]) => id));
+  const sources = energySources(energy);
   const response = await hass.callWS({
     type: "recorder/statistics_during_period",
     start_time: spec.start.toISOString(),
     end_time: new Date().toISOString(),
-    statistic_ids: Object.values(sources),
+    statistic_ids: [...new Set(Object.values(sources).flat())],
     period: spec.statPeriod,
     types: ["change"],
     units: { energy: "kWh" },
   });
   const byKey = new Map();
-  for (const [name, entityId] of Object.entries(sources)) {
-    for (const row of response?.[entityId] || []) {
+  for (const [name, ids] of Object.entries(sources)) {
+    for (const row of statRows(response, ids)) {
       const start = new Date(statStart(row.start));
       const key = spec.statPeriod === "month" ? `${start.getFullYear()}-${start.getMonth()}` : start.toDateString();
       const bucket = byKey.get(key) || { start };
@@ -1004,7 +1091,7 @@ function systemEntities(hass, resolved, config) {
   return found;
 }
 
-function systemData(hass, resolved, config) {
+function systemData(hass, resolved, config, baseline) {
   const found = systemEntities(hass, resolved, config);
   const watts = (name) => (found[name] ? wattsOf(found[name].stateObj) : null);
   const number = (name) => (found[name] ? stateNumber(found[name].stateObj) : null);
@@ -1052,7 +1139,29 @@ function systemData(hass, resolved, config) {
     batteryWarn: isNum(batteryTemp) ? (batteryTemp < BATTERY_COLD ? "cold" : batteryTemp > BATTERY_HOT ? "hot" : null) : null,
     generator: isNum(generator) && generator > ACTIVE_W ? { power: generator, entityId: found.generator.entityId } : null,
   };
-  return data.phases || data.inverter || data.battery.length || data.generator ? data : null;
+  // Several inverters: each on its own, and their total as the inverter load.
+  data.inverters = inverterEntries(hass, config).map((item) => {
+    const power = item.power ? wattsOf(item.power.stateObj) : item.solar ? wattsOf(item.solar.stateObj) : null;
+    const rating = item.rated ? item.rated * 1000 : null;
+    return {
+      name: item.name,
+      power,
+      solar: item.solar ? wattsOf(item.solar.stateObj) : null,
+      // Lifetime counters (energy_sensors: total): today from the statistics.
+      today: !item.energy ? null : config.energy_sensors === "total" ? todayOfCounter(baseline, item.energy) : kwhOf(item.energy.stateObj),
+      rated: rating,
+      share: rating && isNum(power) ? clamp((Math.abs(power) / rating) * 100, 0, 100) : null,
+      entityId: (item.power || item.solar || item.energy).entityId,
+    };
+  });
+  // Several inverters: the load of them all, unless inverter_power is set.
+  if ((!data.inverter || (data.inverters.length > 1 && !config.entities?.inverter_power)) && data.inverters.some((item) => isNum(item.power))) {
+    const power = data.inverters.reduce((sum, item) => sum + (isNum(item.power) ? item.power : 0), 0);
+    const total = data.inverters.every((item) => item.rated) ? data.inverters.reduce((sum, item) => sum + item.rated, 0)
+      : positiveNumber(config.inverter_power_rating) ? positiveNumber(config.inverter_power_rating) * 1000 : data.inverter?.rated ?? null;
+    data.inverter = { power, rated: total, share: total ? clamp((Math.abs(power) / total) * 100, 0, 100) : null, entityId: data.inverters[0].entityId };
+  }
+  return data.phases || data.inverter || data.battery.length || data.generator || data.inverters.length ? data : null;
 }
 
 // Several batteries (the `batteries:` option): the themes show them as one

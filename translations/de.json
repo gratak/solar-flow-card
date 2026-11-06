@@ -415,5 +415,12 @@
   "editorImportPriceHint": "Bezugspreis: was jede kWh kostet, Energie plus die Netzentgelte je kWh, ohne monatliche Grundgebühren.",
   "editorRceFound": "RCE-Preissensor gefunden: {entity} · {value}.",
   "editorUseBilling": "Ich rechne per Net-Billing ab: Einspeisung zum RCE-Preis bewerten",
-  "editorBillingFactor": "Depotfaktor (1,23)"
+  "editorBillingFactor": "Depotfaktor (1,23)",
+  "invToday": "heute {kwh}",
+  "editorInverters": "Mehrere Wechselrichter",
+  "editorInvertersHint": "Ihre PV-Leistung und -Energie werden für die ganze Karte addiert (keine Hilfssensoren nötig); jeder steht einzeln im Abschnitt Anlage.",
+  "editorInvSolarPower": "PV-Leistung",
+  "editorInvSolarEnergy": "PV-Energie",
+  "editorInvPower": "Ausgangsleistung (optional)",
+  "editorInvRated": "Nennleistung (kW, optional)"
 }

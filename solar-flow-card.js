@@ -465,7 +465,14 @@ const TRANSLATIONS = {
     "editorImportPriceHint": "Import price: what each kWh costs, energy plus the distribution charges billed per kWh, without monthly fixed fees.",
     "editorRceFound": "RCE price sensor found: {entity} · {value}.",
     "editorUseBilling": "I'm on net-billing: value the energy sold at the RCE price",
-    "editorBillingFactor": "Deposit factor (1.23)"
+    "editorBillingFactor": "Deposit factor (1.23)",
+    "invToday": "{kwh} today",
+    "editorInverters": "Several inverters",
+    "editorInvertersHint": "Their solar power and energy are added up for the whole card (no helper sensors needed); each one is listed in the Installation section.",
+    "editorInvSolarPower": "Solar power",
+    "editorInvSolarEnergy": "Solar energy",
+    "editorInvPower": "Output power (optional)",
+    "editorInvRated": "Rated power (kW, optional)"
   },
   "de": {
     "languageName": "Deutsch",
@@ -884,7 +891,14 @@ const TRANSLATIONS = {
     "editorImportPriceHint": "Bezugspreis: was jede kWh kostet, Energie plus die Netzentgelte je kWh, ohne monatliche Grundgebühren.",
     "editorRceFound": "RCE-Preissensor gefunden: {entity} · {value}.",
     "editorUseBilling": "Ich rechne per Net-Billing ab: Einspeisung zum RCE-Preis bewerten",
-    "editorBillingFactor": "Depotfaktor (1,23)"
+    "editorBillingFactor": "Depotfaktor (1,23)",
+    "invToday": "heute {kwh}",
+    "editorInverters": "Mehrere Wechselrichter",
+    "editorInvertersHint": "Ihre PV-Leistung und -Energie werden für die ganze Karte addiert (keine Hilfssensoren nötig); jeder steht einzeln im Abschnitt Anlage.",
+    "editorInvSolarPower": "PV-Leistung",
+    "editorInvSolarEnergy": "PV-Energie",
+    "editorInvPower": "Ausgangsleistung (optional)",
+    "editorInvRated": "Nennleistung (kW, optional)"
   },
   "nl": {
     "languageName": "Nederlands",
@@ -1303,7 +1317,14 @@ const TRANSLATIONS = {
     "editorImportPriceHint": "Afnameprijs: wat elke kWh kost, energie plus de netkosten per kWh, zonder vaste maandkosten.",
     "editorRceFound": "RCE-prijssensor gevonden: {entity} · {value}.",
     "editorUseBilling": "Ik heb net-billing: teruglevering tegen de RCE-prijs",
-    "editorBillingFactor": "Depositofactor (1,23)"
+    "editorBillingFactor": "Depositofactor (1,23)",
+    "invToday": "vandaag {kwh}",
+    "editorInverters": "Meerdere omvormers",
+    "editorInvertersHint": "Hun zonnevermogen en -energie worden voor de hele kaart opgeteld (geen hulpsensoren nodig); elke omvormer staat apart bij Installatie.",
+    "editorInvSolarPower": "Zonnevermogen",
+    "editorInvSolarEnergy": "Zonne-energie",
+    "editorInvPower": "Uitgangsvermogen (optioneel)",
+    "editorInvRated": "Nominaal vermogen (kW, optioneel)"
   },
   "pl": {
     "languageName": "Polski",
@@ -1722,7 +1743,14 @@ const TRANSLATIONS = {
     "editorImportPriceHint": "Cena zakupu: koszt każdej kWh, czyli energia i opłaty dystrybucyjne naliczane za kWh, bez stałych opłat miesięcznych.",
     "editorRceFound": "Znaleziono czujnik ceny RCE: {entity} · {value}.",
     "editorUseBilling": "Rozliczam się w net-billingu: wyceniaj oddaną energię po cenie RCE",
-    "editorBillingFactor": "Mnożnik depozytu (1,23)"
+    "editorBillingFactor": "Mnożnik depozytu (1,23)",
+    "invToday": "dziś {kwh}",
+    "editorInverters": "Kilka falowników",
+    "editorInvertersHint": "Ich moc i energia z PV są sumowane dla całej karty (bez helperów); każdy jest osobno w sekcji Instalacja.",
+    "editorInvSolarPower": "Moc PV",
+    "editorInvSolarEnergy": "Energia z PV",
+    "editorInvPower": "Moc wyjściowa (opcjonalnie)",
+    "editorInvRated": "Moc znamionowa (kW, opcjonalnie)"
   }
 };
 
@@ -2040,6 +2068,13 @@ function resolveEntities(hass, config) {
     energy[name] = pick(configured[def.key])
       || find((a) => a.sensor_type === "daily" && a.metric_key === def.deye && a.relative_day === "today");
   }
+  // Several inverters: their solar power and energy added up, unless the
+  // sum is set under entities:.
+  const inverters = inverterEntries(hass, config);
+  const solarParts = inverters.map((item) => item.solar).filter(Boolean);
+  const energyParts = inverters.map((item) => item.energy).filter(Boolean);
+  if (solarParts.length && !configured.solar_power) live.solar = combinedEntry(solarParts, "W", wattsOf);
+  if (energyParts.length && !configured.solar_energy) energy.solar = combinedEntry(energyParts, "kWh", kwhOf);
   const named = candidates.find(([, s]) => s.attributes?.station_name);
   return {
     station,
@@ -2147,25 +2182,87 @@ function todayEnergy(resolved, stats) {
   return deriveLoadEnergy(values);
 }
 
+// Several inverters (`inverters:`, like `batteries:`): each with its solar
+// power and energy, and optionally its output power and rating (kW).
+function inverterEntries(hass, config) {
+  if (!Array.isArray(config.inverters)) return [];
+  const states = hass?.states || {};
+  const pick = (id) => (typeof id === "string" && states[id] ? { entityId: id, stateObj: states[id] } : null);
+  return config.inverters.filter((item) => item && typeof item === "object").map((item, i) => ({
+    name: item.name ? String(item.name) : `#${i + 1}`,
+    solar: pick(item.solar_power),
+    energy: pick(item.solar_energy),
+    power: pick(item.power),
+    rated: positiveNumber(item.rated_power),
+  })).filter((item) => item.solar || item.energy || item.power);
+}
+
+// One reading made of several sensors, added up: a stand-in sensor in W or
+// kWh for the live values, the sensors themselves for history and
+// statistics (entityIds, parts).
+function combinedEntry(parts, unit, read) {
+  if (parts.length === 1) return parts[0];
+  const values = parts.map((part) => read(part.stateObj)).filter(isNum);
+  const first = parts[0];
+  const latest = parts.map((part) => part.stateObj.last_updated).filter(Boolean).sort().pop();
+  return {
+    entityId: first.entityId,
+    entityIds: parts.map((part) => part.entityId),
+    parts,
+    stateObj: {
+      entity_id: first.entityId,
+      state: values.length ? String(values.reduce((a, b) => a + b, 0)) : "unavailable",
+      attributes: { ...first.stateObj.attributes, unit_of_measurement: unit },
+      last_updated: latest,
+      last_changed: latest,
+    },
+  };
+}
+
+// The sensors behind a reading: one, or several summed (`inverters:`).
+function entityIds(entry) {
+  return entry ? entry.entityIds || [entry.entityId] : [];
+}
+
+// Statistics rows of several sensors added up period by period: change and
+// state summed (a state only when every sensor has one).
+function statRows(response, ids) {
+  if (ids.length === 1) return response?.[ids[0]] || [];
+  const byStart = new Map();
+  for (const id of ids) {
+    for (const row of response?.[id] || []) {
+      const at = statStart(row.start);
+      const sum = byStart.get(at) || { start: at, end: row.end, change: 0, state: 0, n: 0 };
+      sum.change += Number(row.change) || 0;
+      if (Number.isFinite(Number(row.state))) sum.state += Number(row.state);
+      sum.n += 1;
+      byStart.set(at, sum);
+    }
+  }
+  return [...byStart.values()].sort((a, b) => a.start - b.start)
+    .map((row) => ({ start: row.start, end: row.end, change: row.change, state: row.n === ids.length ? row.state : null }));
+}
+
+function energySources(energy) {
+  return Object.fromEntries(ENERGY_ORDER.map((name) => [name, entityIds(energy[name])]).filter(([, ids]) => ids.length));
+}
+
 // Hourly statistics since midnight for lifetime energy counters. The hour
 // before midnight is included only for its closing reading (`last` when no
 // hour of today has been compiled yet).
 async function loadTodayStats(hass, energy) {
-  const sources = Object.fromEntries(ENERGY_ORDER.map((name) => [name, energy[name]?.entityId]).filter(([, id]) => id));
+  const sources = energySources(energy);
   const midnight = startOfDay(new Date()).getTime();
   const response = await hass.callWS({
     type: "recorder/statistics_during_period",
     start_time: new Date(midnight - 3600000).toISOString(),
     end_time: new Date().toISOString(),
-    statistic_ids: [...new Set(Object.values(sources))],
+    statistic_ids: [...new Set(Object.values(sources).flat())],
     period: "hour",
     types: ["change", "state"],
     units: { energy: "kWh" },
   });
-  const out = {};
-  for (const [name, entityId] of Object.entries(sources)) {
-    const rows = response?.[entityId] || [];
-    if (!rows.length) continue;
+  const sinceMidnight = (rows) => {
     let change = 0;
     let last = null;
     for (const row of rows) {
@@ -2173,9 +2270,27 @@ async function loadTodayStats(hass, energy) {
       const state = Number(row.state);
       if (Number.isFinite(state)) last = state;
     }
-    out[name] = { change, last };
+    return { change, last };
+  };
+  const out = {};
+  for (const [name, ids] of Object.entries(sources)) {
+    const rows = statRows(response, ids);
+    if (rows.length) out[name] = sinceMidnight(rows);
   }
+  // Each sensor of a summed reading on its own too (each inverter's today).
+  Object.defineProperty(out, "bySensor", {
+    value: Object.fromEntries(Object.values(sources).filter((ids) => ids.length > 1).flat()
+      .filter((id) => response?.[id]?.length).map((id) => [id, sinceMidnight(response[id])])),
+  });
   return out;
+}
+
+// Today's energy of one lifetime counter: from the hourly statistics, plus
+// what it added since the last full hour.
+function todayOfCounter(stats, entry) {
+  const s = stats?.bySensor?.[entry.entityId];
+  const now = kwhOf(entry.stateObj);
+  return s ? s.change + (isNum(now) && isNum(s.last) ? Math.max(0, now - s.last) : 0) : null;
 }
 
 // Virtual storage (#43): `virtual_storage: true` or an object with an
@@ -2523,19 +2638,19 @@ function statsSpec(period) {
 }
 
 async function loadStatistics(hass, spec, energy) {
-  const sources = Object.fromEntries(ENERGY_ORDER.map((name) => [name, energy[name]?.entityId]).filter(([, id]) => id));
+  const sources = energySources(energy);
   const response = await hass.callWS({
     type: "recorder/statistics_during_period",
     start_time: spec.start.toISOString(),
     end_time: new Date().toISOString(),
-    statistic_ids: Object.values(sources),
+    statistic_ids: [...new Set(Object.values(sources).flat())],
     period: spec.statPeriod,
     types: ["change"],
     units: { energy: "kWh" },
   });
   const byKey = new Map();
-  for (const [name, entityId] of Object.entries(sources)) {
-    for (const row of response?.[entityId] || []) {
+  for (const [name, ids] of Object.entries(sources)) {
+    for (const row of statRows(response, ids)) {
       const start = new Date(statStart(row.start));
       const key = spec.statPeriod === "month" ? `${start.getFullYear()}-${start.getMonth()}` : start.toDateString();
       const bucket = byKey.get(key) || { start };
@@ -2967,7 +3082,7 @@ function systemEntities(hass, resolved, config) {
   return found;
 }
 
-function systemData(hass, resolved, config) {
+function systemData(hass, resolved, config, baseline) {
   const found = systemEntities(hass, resolved, config);
   const watts = (name) => (found[name] ? wattsOf(found[name].stateObj) : null);
   const number = (name) => (found[name] ? stateNumber(found[name].stateObj) : null);
@@ -3015,7 +3130,29 @@ function systemData(hass, resolved, config) {
     batteryWarn: isNum(batteryTemp) ? (batteryTemp < BATTERY_COLD ? "cold" : batteryTemp > BATTERY_HOT ? "hot" : null) : null,
     generator: isNum(generator) && generator > ACTIVE_W ? { power: generator, entityId: found.generator.entityId } : null,
   };
-  return data.phases || data.inverter || data.battery.length || data.generator ? data : null;
+  // Several inverters: each on its own, and their total as the inverter load.
+  data.inverters = inverterEntries(hass, config).map((item) => {
+    const power = item.power ? wattsOf(item.power.stateObj) : item.solar ? wattsOf(item.solar.stateObj) : null;
+    const rating = item.rated ? item.rated * 1000 : null;
+    return {
+      name: item.name,
+      power,
+      solar: item.solar ? wattsOf(item.solar.stateObj) : null,
+      // Lifetime counters (energy_sensors: total): today from the statistics.
+      today: !item.energy ? null : config.energy_sensors === "total" ? todayOfCounter(baseline, item.energy) : kwhOf(item.energy.stateObj),
+      rated: rating,
+      share: rating && isNum(power) ? clamp((Math.abs(power) / rating) * 100, 0, 100) : null,
+      entityId: (item.power || item.solar || item.energy).entityId,
+    };
+  });
+  // Several inverters: the load of them all, unless inverter_power is set.
+  if ((!data.inverter || (data.inverters.length > 1 && !config.entities?.inverter_power)) && data.inverters.some((item) => isNum(item.power))) {
+    const power = data.inverters.reduce((sum, item) => sum + (isNum(item.power) ? item.power : 0), 0);
+    const total = data.inverters.every((item) => item.rated) ? data.inverters.reduce((sum, item) => sum + item.rated, 0)
+      : positiveNumber(config.inverter_power_rating) ? positiveNumber(config.inverter_power_rating) * 1000 : data.inverter?.rated ?? null;
+    data.inverter = { power, rated: total, share: total ? clamp((Math.abs(power) / total) * 100, 0, 100) : null, entityId: data.inverters[0].entityId };
+  }
+  return data.phases || data.inverter || data.battery.length || data.generator || data.inverters.length ? data : null;
 }
 
 // Several batteries (the `batteries:` option): the themes show them as one
@@ -3609,6 +3746,22 @@ function systemHtml(m) {
           ].filter(Boolean).join(" · "))}</span>
         </button>`).join("")}
     </div>` : "";
+  // Several inverters: each with its output, load bar, solar power and
+  // energy today.
+  const inverters = data.inverters?.length ? `
+    <div class="sfc-phases sfc-bank" style="--n:${Math.min(data.inverters.length, 3)}">
+      ${data.inverters.map((inv) => `
+        <button class="sfc-phase sfc-inv" ${attr(inv.entityId)}>
+          <small>${escapeHtml(inv.name)}</small>
+          <strong>${escapeHtml(formatPower(inv.power, locale))}</strong>
+          ${isNum(inv.share) ? `<i style="--p:${inv.share.toFixed(0)}%"></i>` : ""}
+          <span>${escapeHtml([
+            isNum(inv.share) && formatPercent(inv.share, locale),
+            isNum(inv.solar) && inv.solar !== inv.power && `PV ${formatPower(inv.solar, locale)}`,
+            isNum(inv.today) && fill(t.invToday, { kwh: formatEnergy(inv.today, locale) }),
+          ].filter(Boolean).join(" · "))}</span>
+        </button>`).join("")}
+    </div>` : "";
   const phases = data.phases ? `
     <div class="sfc-phases" style="--n:${data.phases.length}">
       ${data.phases.map((p) => `
@@ -3646,6 +3799,7 @@ function systemHtml(m) {
         ${isNum(data.phaseSpread) && data.phases ? `<span class="sfc-hint">${escapeHtml(fill(t.phaseSpread, { power: formatPower(data.phaseSpread, locale) }))}</span>` : ""}
       </div>
       ${batteries}
+      ${inverters}
       ${phases}
       ${meters ? `<div class="sfc-meters">${meters}</div>` : ""}
       ${warn}
@@ -4035,50 +4189,58 @@ function powerSpec(period) {
 async function loadPowerHistory(hass, spec, live) {
   const sources = Object.fromEntries(
     ["solar", "load", "battery", "charge", "discharge", "gridImport", "gridExport", "grid", "soc", ...Object.keys(live).filter((name) => name.startsWith("bank_"))]
-      .map((name) => [name, live[name]?.entityId])
-      .filter(([, id]) => id)
+      .map((name) => [name, live[name]])
+      .filter(([, entry]) => entry?.entityId)
   );
   const nowMs = Date.now();
   const response = await hass.callWS({
     type: "history/history_during_period",
     start_time: spec.start.toISOString(),
     end_time: new Date(nowMs).toISOString(),
-    entity_ids: [...new Set(Object.values(sources))],
+    entity_ids: [...new Set(Object.values(sources).flatMap(entityIds))],
     minimal_response: true,
     no_attributes: true,
     significant_changes_only: false,
   });
   const series = {};
-  for (const [name, entityId] of Object.entries(sources)) {
-    // Power history in W, whatever unit the sensor reports (% stays as is).
-    const scale = unitScale(live[name]?.stateObj, POWER_SCALE);
-    series[name] = bucketHistory(historyPoints(response?.[entityId]).map(([t, v]) => [t, v * scale]), spec.start.getTime(), spec.count, spec.bucketMs, nowMs);
+  const missing = new Set();
+  for (const [name, entry] of Object.entries(sources)) {
+    // Each sensor in W, whatever unit it reports (% stays as is); several
+    // sensors behind one reading (inverters:) are added up.
+    const parts = (entry.parts || [entry]).map((part) => {
+      const scale = unitScale(part.stateObj, POWER_SCALE);
+      const values = bucketHistory(historyPoints(response?.[part.entityId]).map(([t, v]) => [t, v * scale]), spec.start.getTime(), spec.count, spec.bucketMs, nowMs);
+      // Power sensors without any recorded value in the period (e.g.
+      // excluded from the recorder), named when the chart has to explain
+      // itself.
+      if (name !== "soc" && !values.some((v) => v !== null)) missing.add(part.entityId);
+      return values;
+    });
+    series[name] = parts.length === 1 ? parts[0] : parts[0].map((_, i) => {
+      const present = parts.map((p) => p[i]).filter((v) => v !== null);
+      return present.length ? present.reduce((a, b) => a + b, 0) : null;
+    });
   }
-  // Power sensors without any recorded value in the period (e.g. excluded
-  // from the recorder), named when the chart has to explain itself.
-  const missing = [...new Set(Object.entries(sources)
-    .filter(([name]) => name !== "soc" && !series[name].some((v) => v !== null))
-    .map(([, entityId]) => entityId))];
-  return { series, missing };
+  return { series, missing: [...missing] };
 }
 
 // Hourly energy statistics since `start` (kWh per hour), for drawing the
 // power chart when the power sensors have no history.
 async function loadHourlyEnergy(hass, energy, start) {
-  const sources = Object.fromEntries(ENERGY_ORDER.map((name) => [name, energy[name]?.entityId]).filter(([, id]) => id));
+  const sources = energySources(energy);
   const response = await hass.callWS({
     type: "recorder/statistics_during_period",
     start_time: start.toISOString(),
     end_time: new Date().toISOString(),
-    statistic_ids: [...new Set(Object.values(sources))],
+    statistic_ids: [...new Set(Object.values(sources).flat())],
     period: "hour",
     types: ["change"],
     units: { energy: "kWh" },
   });
   const out = {};
-  for (const [name, entityId] of Object.entries(sources)) {
+  for (const [name, ids] of Object.entries(sources)) {
     const hours = new Map();
-    for (const row of response?.[entityId] || []) hours.set(statStart(row.start), Math.max(0, Number(row.change) || 0));
+    for (const row of statRows(response, ids)) hours.set(statStart(row.start), Math.max(0, Number(row.change) || 0));
     if (hours.size) out[name] = hours;
   }
   return out;
@@ -5673,6 +5835,7 @@ const BASE_CSS = `
   ha-card.grid-import :is(.aur-node, .atl-label, .exp-box, .fnd-node, .gal-readout, .rx-node).grid > :is(em, small:last-child),
   ha-card.grid-import :is(.gt-row.grid em, .dio-pill.grid small) { color: var(--sfc-bad, #f0524a); }
   .sfc-bank + .sfc-phases { margin-top: 8px; }
+  .sfc-phase.sfc-inv i { --sfc-c: var(--sfc-pv); }
   .sfc-bat { --sfc-c: var(--sfc-battery); }
   .sfc-bat strong { color: var(--sfc-battery); }
   .sfc-meters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
@@ -6486,7 +6649,7 @@ const SHARED_CACHE = new Map();
 // The sensors a request reads, by role, for its cache key: two cards may use
 // the same sensor for different things.
 function sourcesKey(sources) {
-  return Object.entries(sources).filter(([, entry]) => entry?.entityId).map(([name, entry]) => `${name}=${entry.entityId}`).join(",");
+  return Object.entries(sources).filter(([, entry]) => entry?.entityId).map(([name, entry]) => `${name}=${entityIds(entry).join("+")}`).join(",");
 }
 
 // Sections the viewer collapsed (`collapsible: true`), remembered in this
@@ -6947,7 +7110,7 @@ class SolarFlowCard extends HTMLElement {
       const hasDetails = readings.length > 0;
       const inverterOpen = hasDetails && (wide || this._inverterOpen);
       const inverter = inverterOpen ? readings : null;
-      const system = config.show_system !== false ? systemData(this._hass, resolved, config) : null;
+      const system = config.show_system !== false ? systemData(this._hass, resolved, config, this._energyBaseline(resolved)) : null;
       if (system && !showBattery) Object.assign(system, { battery: [], batteryWarn: null });
       const since = period === "all" && energy.buckets?.length
         ? energy.buckets[0].start.toLocaleDateString(locale, { month: "short", year: "numeric" })
@@ -7409,7 +7572,7 @@ class SolarFlowCardEditor extends HTMLElement {
   _writeItems(group, items) {
     const compact = items.map((item) => {
       const clean = Object.fromEntries(Object.entries(item).filter(([, v]) => v !== undefined && v !== "" && v !== false && v !== null));
-      return group !== "batteries" && Object.keys(clean).length === 1 && clean.entity ? clean.entity : clean;
+      return (group === "panels" || group === "inverter_details") && Object.keys(clean).length === 1 && clean.entity ? clean.entity : clean;
     });
     this._set(group, compact.length ? compact : undefined);
     this._render();
@@ -7631,6 +7794,10 @@ class SolarFlowCardEditor extends HTMLElement {
       ${this._listHtml(t, "batteries", t.editorBatteries, t.editorBatteriesHint, [
         ["name", "text", t.editorItemName], ["soc", "soc", t.editorBatSoc], ["power", "power", t.editorBatPower], ["capacity", "number", t.editorBatCapacity],
         ["voltage", "voltage", t.editorBatVoltage], ["temperature", "temperature", t.editorBatTemp], ["invert", "switch", t.editorBatInvert],
+      ])}
+      ${this._listHtml(t, "inverters", t.editorInverters, t.editorInvertersHint, [
+        ["name", "text", t.editorItemName], ["solar_power", "power", t.editorInvSolarPower], ["solar_energy", "energy", t.editorInvSolarEnergy],
+        ["power", "power", t.editorInvPower], ["rated_power", "number", t.editorInvRated],
       ])}
       ${this._listHtml(t, "panels", t.editorPanels, t.editorPanelsHint, [["entity", "energy", t.editorPanelEnergy], ["power", "power", t.editorPanelPower], ["name", "text", t.editorItemName]])}`;
   }
