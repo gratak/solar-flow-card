@@ -1,25 +1,42 @@
 # Changelog
 
-## 1.8.0-beta.11
+## 2.0.0-beta.1
 
-- **Settlement: net-billing or net-metering** (`settlement`, also in the editor under Summary and prices). You enter only the import price.
-  - **Net-billing:** the energy sold is valued at the hourly RCE price. The card finds an RCE price sensor in Home Assistant itself (e.g. ProfitEMS, the PSE integration), so the savings and the Energy prices chart work without picking a sensor.
-  - **Net-metering:** each kWh sent back is worth 0.8 of a kWh bought, or 0.7 above 10 kWp (`metering_ratio`).
-- **Editor:** a hint explains what the import price includes (energy and the per-kWh distribution charges, without monthly fixed fees).
+Everything since 1.8.0-beta.8. The card has grown enough for a new major version: several inverters, energy prices and settlement, the PV forecast in detail and the visual editor. Your dashboards keep working: the card type stays `custom:solar-flow-card`.
 
-## 1.8.0-beta.10
-
-- **License: GPL-3.0-or-later** (was MIT). You may still use, share and change the card, also commercially, but what you distribute must stay under the same license with its source code, so it cannot become a closed, paid product.
-  - Versions up to 1.8.0-beta.9 stay available under MIT.
+**License**
+- **GPL-3.0-or-later** (was MIT). You may still use, share and change the card, also commercially, but what you distribute must stay under the same license with its source code, so it cannot become a closed, paid product.
+  - Versions up to 1.8.0-beta.8 stay available under MIT.
   - The translations remain MIT.
 
-## 1.8.0-beta.9
+**Several inverters** (`inverters:`)
+- An on-grid and an off-grid inverter, or two of different brands, without helper sensors. The card sums their solar power and energy for the flow, the charts, the statistics and the savings.
+- The Installation section lists each inverter with its power, its load and today's production. The total load is their sum.
+- In the editor: an Inverters list under Installation.
 
-- **Energy prices chart** (`prices` in `sections:`): with a price sensor that lists its hourly prices (ProfitEMS or PSE RCE, Nord Pool, Tibber and similar), a section shows:
-  - today's prices by the hour, and tomorrow's once they are published, from green to red;
-  - the current price, with the hour now marked and negative prices below the line;
+**Energy prices and settlement**
+- **Energy prices chart** (`prices` in `sections:`). It works with a price sensor that lists its hourly prices (ProfitEMS or PSE RCE, Nord Pool, Tibber and similar). It shows:
+  - today's prices by the hour, from green to red, and tomorrow's once they are published;
+  - the hour now marked, and negative prices below the line;
   - the cheapest and the dearest of the coming hours.
-- **Export price only:** the summary shows the value of the energy sold (hour by hour with a price sensor), instead of no money value at all. The editor notes that savings need an import price.
+- **Settlement: net-billing or net-metering** (`settlement`, also in the editor). You enter only the import price.
+  - **Net-billing:** the energy sold is valued at the hourly RCE price × 1.23, the deposit value under the Polish rules (`billing_factor`; `1` turns it off). The card finds an RCE price sensor in Home Assistant by itself.
+  - **Net-metering:** each kWh sent back is worth 0.8 of a kWh bought, or 0.7 above 10 kWp (`metering_ratio`).
+- **Export price only:** the summary shows the value of the energy sold, instead of no money value at all.
+- **Editor:**
+  - With fixed prices it finds an RCE sensor and offers to switch to net-billing with one click.
+  - A hint explains what the import price includes: energy and the per-kWh distribution charges, without monthly fixed fees.
+
+**PV forecast, part 2** ([#69](https://github.com/gratak/solar-flow-card/issues/69))
+- **Hourly forecast in the 24H chart:** a dashed line next to the actual production.
+  - It comes from Solcast's `detailedHourly`, or else from Home Assistant's own energy forecast (Forecast.Solar and the other integrations chosen in the Energy dashboard).
+  - `pv_forecast.hourly: false` turns it off, and the legend hides it.
+- **The pessimistic–optimistic range** (Solcast `estimate10`–`estimate90`) as a bracket on each day's bar.
+
+**Narrow cards**
+- On a phone the sections no longer run past the card's right edge. This happened with a long heading or a wide theme font, as in Reactor and LCARS.
+- The chart axis labels stay inside the chart; on a narrow card the prices axis shows a label every 12 hours.
+- The phase tiles fit in LCARS.
 
 ## 1.8.0-beta.8
 
