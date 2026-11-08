@@ -170,6 +170,7 @@ A font installed on your device is used too, with neither option.
 | `sections` | all | Which parts the card shows and in what order, see [Choosing and ordering sections](#choosing-and-ordering-sections). |
 | `collapsible` | `false` | `true`: tap a section's title to fold it into one line with its key value (also in the editor). The browser remembers what you folded. |
 | `collapsed` | – | With `collapsible`: the sections that start folded, e.g. `[panels, system]`. |
+| `custom_sections` | – | Sections of your own with any sensors, see [Custom sections](#custom-sections). |
 
 #### Choosing and ordering sections
 
@@ -190,6 +191,7 @@ A font installed on your device is used too, with neither option.
 | `insights` | Today at a glance |
 | `comparison` | Comparison with yesterday, the week and the month |
 | `panels` | Panels |
+| `custom_1`, `custom_2`… | Your own sections from `custom_sections:`, see below |
 
 ```yaml
 sections:
@@ -200,6 +202,32 @@ sections:
 collapsible: true
 collapsed: [energy]
 ```
+
+#### Custom sections
+
+`custom_sections:` adds sections of your own, each with a title and any sensors shown as tiles: for example each phase's load and voltage, a heat pump or an EV charger. The first one is `custom_1` in `sections:` and `collapsed:`, the second `custom_2`, and so on. Without `sections:` they come after the card's own sections. In the editor: **Sections → Custom sections**.
+
+```yaml
+custom_sections:
+  - title: Phases
+    entities:
+      - entity: sensor.load_l1_power
+        name: L1 load
+        max: 5000              # optional: a bar, here 0–5000 W
+      - entity: sensor.load_l2_power
+        name: L2 load
+        max: 5000
+      - sensor.grid_voltage_l1  # just the sensor: its own name and unit
+  - title: Heat pump
+    entities:
+      - sensor.heat_pump_power
+      - entity: sensor.buffer_temperature
+        decimals: 1            # optional: digits after the decimal point
+        unit: °C               # optional: instead of the sensor's unit
+sections: [flow, custom_1, energy, system]
+```
+
+Power and energy are shown like everywhere in the card (W/kW, kWh). Other values are shown with their unit, and text states as they are. A tap on a tile opens the sensor.
 
 **Several cards instead of one.** To place parts of the card separately on a dashboard, add the card several times, each with its own `sections:`. A card without `flow` shows its sections as one plain card (no box inside a box). The cards share the history and statistics they load, so Home Assistant is asked only once:
 

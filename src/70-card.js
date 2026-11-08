@@ -507,6 +507,7 @@ class SolarFlowCard extends HTMLElement {
       const panels = showSolar ? panelData(this._hass, resolved, config) || estimatePanels(readings, config, today) : null;
       const pvForecast = showSolar ? pvForecastData(this._hass, config, today) : null;
       const priceChart = priceChartData(this._hass, config);
+      const custom = customSections(this._hass, config);
       const insights = this._insights(resolved, today, forecast);
       const weather = theme === "diorama" || theme === "reactor" ? weatherData(this._hass, config) : null;
       // The wide layout has room for everything: inverter details stay open.
@@ -544,6 +545,7 @@ class SolarFlowCard extends HTMLElement {
         money && [money.kind, isNum(money.value) ? Math.round(money.value * 100) : null],
         pvForecast && [pvForecast.total, pvForecast.remaining, pvForecast.days.map((d) => d.value)],
         priceChart && [priceChart.nowAt, priceChart.current, priceChart.hours.length],
+        custom.map((c) => c.items.map((item) => item.state)),
         Math.floor(now.getTime() / 60000),
       ]);
       if (signature === this._signature) return;
@@ -583,6 +585,7 @@ class SolarFlowCard extends HTMLElement {
         panels,
         pvForecast,
         priceChart,
+        custom,
         inverter,
         system,
         bank,
