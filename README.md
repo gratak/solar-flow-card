@@ -344,7 +344,7 @@ panels:                                        # optional, energy today per pane
 
 With forecast sensors from an integration such as [Solcast](https://github.com/BJReplay/ha-solcast-solar) or Forecast.Solar, the card shows:
 - what is still expected today at the solar reading ("≈ 3.8 kWh to go"; in Diorama under "Today from the roof");
-- a **PV forecast** section with today and the next days as bars. Today's bar also shows what is already produced. With Solcast, a bracket on each bar marks the day's pessimistic–optimistic range (`estimate10`–`estimate90`);
+- a **PV forecast** section with today and the next days as bars. Today's bar also shows what is already produced. With Solcast, a bracket on each bar marks the day's pessimistic–optimistic range (`estimate10`–`estimate90`); `range: false` hides it;
 - the hourly forecast as a dashed line in the 24H chart, next to the actual production. It comes from Solcast's `detailedHourly` (or `detailedForecast`) attributes, or else from Home Assistant's own energy forecast (Forecast.Solar and the other integrations chosen in the Energy dashboard). `hourly: false` turns it off; a click on "Forecast" in the legend hides it.
 
 ```yaml
@@ -352,6 +352,7 @@ pv_forecast:
   today: sensor.solcast_pv_forecast_forecast_today
   remaining: sensor.solcast_pv_forecast_forecast_remaining_today   # optional
   hourly: true                                                      # optional: the forecast line in the 24H chart
+  range: true                                                       # optional: the 10–90% brackets on the day bars
   days:                                                             # optional: tomorrow, then the days after
     - sensor.solcast_pv_forecast_forecast_tomorrow
     - sensor.solcast_pv_forecast_forecast_day_3

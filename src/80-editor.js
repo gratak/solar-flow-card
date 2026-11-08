@@ -659,7 +659,9 @@ class SolarFlowCardEditor extends HTMLElement {
       <div class="box">
         <span class="title">${escapeHtml(t.editorPvfDays)}</span>
         <div class="pickers">${[...days, ""].slice(0, 13).map((id, i) => this._picker(`pv_forecast.days.${i}`, fill(t.editorDayN, { n: i + 1 }), id)).join("")}</div>
-      </div>`;
+      </div>
+      ${[["hourly", t.editorPvfHourly], ["range", t.editorPvfRange]].map(([key, label]) => `
+      <div class="switch"><label for="pvf-${key}">${escapeHtml(label)}</label><input id="pvf-${key}" type="checkbox" data-pvf="${key}" ${f[key] === false ? "" : "checked"} /></div>`).join("")}`;
   }
 
   _moreHtml(t) {
@@ -817,6 +819,11 @@ class SolarFlowCardEditor extends HTMLElement {
       const index = Number(button.dataset.removeCustom);
       if (this._customList()[index]?.entities.length && !window.confirm(stringsFor(languageOf(this._hass, this._config)).editorConfirmRemove)) return;
       this._removeCustom(index);
+    }));
+    // On by default: only `false` is written.
+    root.querySelectorAll("[data-pvf]").forEach((input) => input.addEventListener("change", (e) => {
+      this._setIn("pv_forecast", input.dataset.pvf, e.target.checked ? undefined : false);
+      this._render();
     }));
     root.getElementById("vs-on")?.addEventListener("change", (e) => {
       this._set("virtual_storage", e.target.checked ? true : undefined);

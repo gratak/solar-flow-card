@@ -680,7 +680,9 @@ function pvForecastData(hass, config, today, now = new Date()) {
   const remaining = read(f.remaining);
   const ids = Array.isArray(f.days) ? f.days : [];
   // Solcast: the pessimistic (10%) and optimistic (90%) estimate of a day.
+  // `range: false` leaves it out.
   const range = (id) => {
+    if (f.range === false) return {};
     const a = typeof id === "string" ? states[id]?.attributes : null;
     const low = Number.parseFloat(a?.estimate10);
     const high = Number.parseFloat(a?.estimate90);

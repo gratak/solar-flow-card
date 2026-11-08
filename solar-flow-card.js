@@ -38,7 +38,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "2.0.0-beta.3";
+const CARD_VERSION = "2.0.0-beta.4";
 const CARD_TAG = "solar-flow-card";
 const EDITOR_TAG = "solar-flow-card-editor";
 const THEMES = ["diorama", "aurora", "paper", "lcars", "atlantis", "expanse", "foundation", "galaxy", "gate", "reactor"];
@@ -391,6 +391,8 @@ const TRANSLATIONS = {
     "editorPvfToday": "Forecast for today",
     "editorPvfRemaining": "Remaining today (optional)",
     "editorPvfDays": "Next days (tomorrow first)",
+    "editorPvfHourly": "Hourly forecast in the 24H chart",
+    "editorPvfRange": "10–90% range on the day bars (Solcast)",
     "editorDayN": "Day {n}",
     "editorDetails": "Inverter details: extra sensors",
     "editorWeather": "Weather",
@@ -825,6 +827,8 @@ const TRANSLATIONS = {
     "editorPvfToday": "Prognose für heute",
     "editorPvfRemaining": "Rest von heute (optional)",
     "editorPvfDays": "Nächste Tage (ab morgen)",
+    "editorPvfHourly": "Stundenprognose im 24H-Diagramm",
+    "editorPvfRange": "Spanne 10–90 % auf den Tagesbalken (Solcast)",
     "editorDayN": "Tag {n}",
     "editorDetails": "Wechselrichterdetails: weitere Sensoren",
     "editorWeather": "Wetter",
@@ -1259,6 +1263,8 @@ const TRANSLATIONS = {
     "editorPvfToday": "Prognose voor vandaag",
     "editorPvfRemaining": "Rest van vandaag (optioneel)",
     "editorPvfDays": "Volgende dagen (vanaf morgen)",
+    "editorPvfHourly": "Uurverwachting in de 24H-grafiek",
+    "editorPvfRange": "Bereik 10–90% op de dagbalken (Solcast)",
     "editorDayN": "Dag {n}",
     "editorDetails": "Omvormerdetails: extra sensoren",
     "editorWeather": "Weer",
@@ -1693,6 +1699,8 @@ const TRANSLATIONS = {
     "editorPvfToday": "Prognoza na dziś",
     "editorPvfRemaining": "Pozostało dziś (opcjonalnie)",
     "editorPvfDays": "Kolejne dni (od jutra)",
+    "editorPvfHourly": "Prognoza godzinowa na wykresie 24H",
+    "editorPvfRange": "Zakres 10–90% na słupkach dni (Solcast)",
     "editorDayN": "Dzień {n}",
     "editorDetails": "Szczegóły falownika: dodatkowe czujniki",
     "editorWeather": "Pogoda",
@@ -2703,7 +2711,9 @@ function pvForecastData(hass, config, today, now = new Date()) {
   const remaining = read(f.remaining);
   const ids = Array.isArray(f.days) ? f.days : [];
   // Solcast: the pessimistic (10%) and optimistic (90%) estimate of a day.
+  // `range: false` leaves it out.
   const range = (id) => {
+    if (f.range === false) return {};
     const a = typeof id === "string" ? states[id]?.attributes : null;
     const low = Number.parseFloat(a?.estimate10);
     const high = Number.parseFloat(a?.estimate90);
@@ -8204,7 +8214,9 @@ class SolarFlowCardEditor extends HTMLElement {
       <div class="box">
         <span class="title">${escapeHtml(t.editorPvfDays)}</span>
         <div class="pickers">${[...days, ""].slice(0, 13).map((id, i) => this._picker(`pv_forecast.days.${i}`, fill(t.editorDayN, { n: i + 1 }), id)).join("")}</div>
-      </div>`;
+      </div>
+      ${[["hourly", t.editorPvfHourly], ["range", t.editorPvfRange]].map(([key, label]) => `
+      <div class="switch"><label for="pvf-${key}">${escapeHtml(label)}</label><input id="pvf-${key}" type="checkbox" data-pvf="${key}" ${f[key] === false ? "" : "checked"} /></div>`).join("")}`;
   }
 
   _moreHtml(t) {
@@ -8362,6 +8374,11 @@ class SolarFlowCardEditor extends HTMLElement {
       const index = Number(button.dataset.removeCustom);
       if (this._customList()[index]?.entities.length && !window.confirm(stringsFor(languageOf(this._hass, this._config)).editorConfirmRemove)) return;
       this._removeCustom(index);
+    }));
+    // On by default: only `false` is written.
+    root.querySelectorAll("[data-pvf]").forEach((input) => input.addEventListener("change", (e) => {
+      this._setIn("pv_forecast", input.dataset.pvf, e.target.checked ? undefined : false);
+      this._render();
     }));
     root.getElementById("vs-on")?.addEventListener("change", (e) => {
       this._set("virtual_storage", e.target.checked ? true : undefined);
