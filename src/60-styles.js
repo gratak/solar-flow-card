@@ -239,7 +239,7 @@ const BASE_CSS = `
        shorter (see balanceWide), so neither ends with a big gap. */
     .sfc-wide > .sfc-sections, .lc-main.wide > .sfc-sections { display: contents; }
     .sfc-wide-main { grid-row: 1 / span 2; }
-    .sfc-wide > .sfc-sections > .sfc-energy { margin: 16px 16px 14px 4px; }
+    .sfc-wide > .sfc-sections > :is(.sfc-energy, .sfc-folded) { margin: 16px 16px 14px 4px; }
     .sfc-wide-rest { grid-column: 2; align-content: start; gap: 14px; padding: 0 16px 16px 4px; }
     .gt-layout.wide > .sfc-sections { display: block; columns: 320px; column-gap: 14px; }
     .gt-layout.wide > .sfc-sections > * { break-inside: avoid; margin-bottom: 14px; }

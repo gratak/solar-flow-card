@@ -38,7 +38,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "2.0.0-beta.2";
+const CARD_VERSION = "2.0.0-beta.3";
 const CARD_TAG = "solar-flow-card";
 const EDITOR_TAG = "solar-flow-card-editor";
 const THEMES = ["diorama", "aurora", "paper", "lcars", "atlantis", "expanse", "foundation", "galaxy", "gate", "reactor"];
@@ -3298,8 +3298,9 @@ function customValue(item, locale) {
   const unit = item.unit.trim();
   if (item.decimals === null && unit.toLowerCase() in POWER_SCALE) return formatPower(item.value * POWER_SCALE[unit.toLowerCase()], locale);
   if (item.decimals === null && unit.toLowerCase() in ENERGY_SCALE) return formatEnergy(item.value * ENERGY_SCALE[unit.toLowerCase()], locale);
-  const abs = Math.abs(item.value);
-  const digits = item.decimals ?? (Number.isInteger(item.value) || abs >= 100 ? 0 : abs >= 10 ? 1 : 2);
+  // As many decimals as the sensor reports (49.98 Hz, 231.8 V), at most 2.
+  const reported = (/\.(\d+)/.exec(item.state.trim())?.[1].length) || 0;
+  const digits = item.decimals ?? Math.min(2, reported);
   const number = formatNumber(item.value, locale, digits);
   return unit ? `${number}${unit === "%" ? "" : "\u00a0"}${unit}` : number;
 }
@@ -5981,7 +5982,7 @@ const BASE_CSS = `
        shorter (see balanceWide), so neither ends with a big gap. */
     .sfc-wide > .sfc-sections, .lc-main.wide > .sfc-sections { display: contents; }
     .sfc-wide-main { grid-row: 1 / span 2; }
-    .sfc-wide > .sfc-sections > .sfc-energy { margin: 16px 16px 14px 4px; }
+    .sfc-wide > .sfc-sections > :is(.sfc-energy, .sfc-folded) { margin: 16px 16px 14px 4px; }
     .sfc-wide-rest { grid-column: 2; align-content: start; gap: 14px; padding: 0 16px 16px 4px; }
     .gt-layout.wide > .sfc-sections { display: block; columns: 320px; column-gap: 14px; }
     .gt-layout.wide > .sfc-sections > * { break-inside: avoid; margin-bottom: 14px; }
