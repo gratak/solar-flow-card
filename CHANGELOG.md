@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.0.0-beta.2
+
+- **Custom sections** (`custom_sections:`): sections of your own with a title and any sensors, shown as tiles. Examples: each phase's load and voltage, a heat pump, an EV charger.
+  - `max` adds a bar.
+  - Power and energy are shown as everywhere in the card; other values with their unit, text states as they are.
+  - They are `custom_1`, `custom_2`… in `sections:` and `collapsed:`, so they can be placed anywhere, for example right after the main view, and stay open while the rest is folded.
+  - In the editor: **Sections → Custom sections**.
+- **Dutch:** clearer wording of the net-billing button in the editor.
+
 ## 2.0.0-beta.1
 
 Everything since 1.8.0-beta.8. The card has grown enough for a new major version: several inverters, energy prices and settlement, the PV forecast in detail and the visual editor. Your dashboards keep working: the card type stays `custom:solar-flow-card`.
