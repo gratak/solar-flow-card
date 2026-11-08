@@ -227,7 +227,7 @@ custom_sections:
 sections: [flow, custom_1, energy, system]
 ```
 
-Power and energy are shown like everywhere in the card (W/kW, kWh). Other values are shown with their unit, and text states as they are. A tap on a tile opens the sensor.
+Power and energy are shown like everywhere in the card (W/kW, kWh). Other values are shown with their unit and as many decimals as the sensor reports (at most two), and text states as they are. A tap on a tile opens the sensor.
 
 **Several cards instead of one.** To place parts of the card separately on a dashboard, add the card several times, each with its own `sections:`. A card without `flow` shows its sections as one plain card (no box inside a box). The cards share the history and statistics they load, so Home Assistant is asked only once:
 

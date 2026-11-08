@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.0-beta.3
+
+- **Custom sections:** values show as many decimals as the sensor reports, at most two (49.98 Hz, 231.8 V, −0.7 A). Before, 49.98 Hz was rounded to 50.0 Hz. `decimals:` still overrides it.
+- **Wide layout:** a folded energy section keeps its margins instead of touching the card's edge.
+
 ## 2.0.0-beta.2
 
 - **Custom sections** (`custom_sections:`): sections of your own with a title and any sensors, shown as tiles. Examples: each phase's load and voltage, a heat pump, an EV charger.
