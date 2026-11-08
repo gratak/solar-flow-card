@@ -1275,8 +1275,9 @@ function customValue(item, locale) {
   const unit = item.unit.trim();
   if (item.decimals === null && unit.toLowerCase() in POWER_SCALE) return formatPower(item.value * POWER_SCALE[unit.toLowerCase()], locale);
   if (item.decimals === null && unit.toLowerCase() in ENERGY_SCALE) return formatEnergy(item.value * ENERGY_SCALE[unit.toLowerCase()], locale);
-  const abs = Math.abs(item.value);
-  const digits = item.decimals ?? (Number.isInteger(item.value) || abs >= 100 ? 0 : abs >= 10 ? 1 : 2);
+  // As many decimals as the sensor reports (49.98 Hz, 231.8 V), at most 2.
+  const reported = (/\.(\d+)/.exec(item.state.trim())?.[1].length) || 0;
+  const digits = item.decimals ?? Math.min(2, reported);
   const number = formatNumber(item.value, locale, digits);
   return unit ? `${number}${unit === "%" ? "" : "\u00a0"}${unit}` : number;
 }
