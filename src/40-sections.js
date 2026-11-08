@@ -504,18 +504,29 @@ const SECTION_IDS = ["flow", "today", "sources", ...Object.keys(SECTION_HTML)];
 const SECTION_ORDER = ["inverter", "forecast", "pv_forecast", "prices", "virtual_storage", "system", "energy", "insights", "comparison", "panels"];
 const SECTION_ORDER_WIDE = ["energy", "inverter", "forecast", "pv_forecast", "prices", "virtual_storage", "insights", "comparison", "system", "panels"];
 
+// custom_1, custom_2… for the sections of `custom_sections:`.
+function customIds(config) {
+  return Array.isArray(config.custom_sections) ? config.custom_sections.map((_, i) => `custom_${i + 1}`) : [];
+}
+
 // The listed sections in order, or null without the option.
 function sectionList(config) {
   if (!Array.isArray(config.sections)) return null;
-  return [...new Set(config.sections.map((id) => String(id).trim().toLowerCase()).filter((id) => SECTION_IDS.includes(id)))];
+  const known = [...SECTION_IDS, ...customIds(config)];
+  return [...new Set(config.sections.map((id) => String(id).trim().toLowerCase()).filter((id) => known.includes(id)))];
 }
 
 function sectionShown(m, id) {
   return !m.sections || m.sections.includes(id);
 }
 
+// Without `sections:` the custom sections follow the theme's own ones.
 function sectionOrder(m, defaults) {
-  return m.sections ? m.sections.filter((id) => SECTION_HTML[id]) : defaults;
+  return m.sections ? m.sections.filter((id) => SECTION_HTML[id] || isCustomId(id)) : [...defaults, ...(m.custom || []).map((c) => c.id)];
+}
+
+function isCustomId(id) {
+  return /^custom_\d+$/.test(id);
 }
 
 // What a collapsed section still shows: its title and one key value.
@@ -546,6 +557,8 @@ function foldSummary(m, id) {
     return row ? [t.compareTitle, names[row.name], formatEnergy(row.today, locale)] : [t.compareTitle, "", ""];
   }
   if (id === "panels") return [t.panelsTitle, "", isNum(m.panels?.average) ? fill(t.panelAvg, { kwh: formatEnergy(m.panels.average, locale) }) : ""];
+  const custom = m.custom?.find((c) => c.id === id);
+  if (custom) return [custom.title || t.customTitle, custom.items[0].name, customValue(custom.items[0], locale)];
   return null;
 }
 
@@ -569,7 +582,29 @@ function foldable(m, id, html) {
 }
 
 function sectionHtml(m, id) {
+  if (isCustomId(id)) return foldable(m, id, customSectionHtml(m, id));
   return SECTION_HTML[id] ? foldable(m, id, SECTION_HTML[id](m)) : "";
+}
+
+// A custom section: its sensors as tiles, as many per row as fit evenly.
+function customSectionHtml(m, id) {
+  const c = m.custom?.find((section) => section.id === id);
+  if (!c) return "";
+  const { t, locale } = m;
+  const count = c.items.length;
+  const columns = count === 4 ? 2 : Math.min(count, 3);
+  return `
+    <section class="sfc-section sfc-custom">
+      <div class="sfc-head"><div><h3>${escapeHtml(c.title || t.customTitle)}</h3></div></div>
+      <div class="sfc-phases" style="--n:${columns}">
+        ${c.items.map((item) => `
+        <button class="sfc-phase" ${item.entityId ? `data-entity="${escapeHtml(item.entityId)}"` : ""} title="${escapeHtml(item.entityId)}">
+          <small>${escapeHtml(item.name)}</small>
+          <strong>${escapeHtml(customValue(item, locale))}</strong>
+          ${isNum(item.share) ? `<i style="--p:${item.share.toFixed(0)}%"></i>` : ""}
+        </button>`).join("")}
+      </div>
+    </section>`;
 }
 
 // `defaults`: a theme's own set and order, `exclude`: sections the theme

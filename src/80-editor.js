@@ -56,7 +56,7 @@ function editorEntityGroups(t) {
 // default order without the ones a `show_…: false` hides.
 const SECTION_SHOW_KEYS = { energy: "show_energy", forecast: "show_forecast", system: "show_system", panels: "show_panels" };
 function editorSections(config) {
-  const order = ["flow", "today", "sources", ...SECTION_ORDER];
+  const order = ["flow", "today", "sources", ...SECTION_ORDER, ...customIds(config)];
   const listed = sectionList(config);
   const on = listed || order.filter((id) => config[SECTION_SHOW_KEYS[id]] !== false && (id !== "insights" && id !== "comparison" || insightsShown(config)));
   return [...on.map((id) => ({ id, on: true })), ...order.filter((id) => !on.includes(id)).map((id) => ({ id, on: false }))];
@@ -201,7 +201,7 @@ class SolarFlowCardEditor extends HTMLElement {
   // text field with the sensors as suggestions.
   _picker(path, label, value, domain = "sensor", { kind = fieldKind(path.split(".").at(-1)), auto = null, extra = [] } = {}) {
     const t = stringsFor(languageOf(this._hass, this._config));
-    const notes = domain === "sensor" ? [...fieldNotes(this._hass, this._config, t, kind, value, auto), ...extra] : extra;
+    const notes = domain === "sensor" || !domain ? [...fieldNotes(this._hass, this._config, t, kind, value, auto), ...extra] : extra;
     return `
       <div class="field">
         <div class="picker" data-path="${escapeHtml(path)}" data-label="${escapeHtml(label)}" data-domain="${domain}" data-value="${escapeHtml(value || "")}"></div>
@@ -217,14 +217,14 @@ class SolarFlowCardEditor extends HTMLElement {
       if (selector) {
         const picker = document.createElement("ha-selector");
         picker.hass = this._hass;
-        picker.selector = { entity: { domain } };
+        picker.selector = { entity: domain ? { domain } : {} };
         picker.label = label;
         picker.value = value || undefined;
         picker.required = false;
         picker.addEventListener("value-changed", (e) => changed(e.detail?.value));
         el.append(picker);
       } else {
-        el.innerHTML = `<label><span>${escapeHtml(label)}</span><input type="text" list="sfc-${domain}" value="${escapeHtml(value)}" placeholder="${domain}.…" /></label>`;
+        el.innerHTML = `<label><span>${escapeHtml(label)}</span><input type="text" list="sfc-${domain || "sensor"}" value="${escapeHtml(value)}" placeholder="${domain || "sensor"}.…" /></label>`;
         el.querySelector("input").addEventListener("change", (e) => changed(e.target.value));
       }
     }
@@ -237,6 +237,7 @@ class SolarFlowCardEditor extends HTMLElement {
     else if (group === "pv_forecast" && key === "days") return this._setList(["pv_forecast", "days"], Number(index), value);
     else if (group === "pv_forecast") this._setIn("pv_forecast", key, value);
     else if (group === "list") return this._setItem(key, Number(index), path.split(".")[3], value);
+    else if (group === "custom") return this._setCustomEntity(Number(key), Number(index), value);
     else this._set(group, value);
     // The notes under the field follow the new sensor.
     this._render();
@@ -297,6 +298,83 @@ class SolarFlowCardEditor extends HTMLElement {
       <label><span>${escapeHtml(t[label])}</span><input data-number="${key}" type="number" min="0" step="${step}" inputmode="decimal" value="${escapeHtml(Number.isFinite(Number.parseFloat(this._config[key])) ? this._config[key] : "")}" />
         ${warn ? `<p class="warn">${escapeHtml(warn)}</p>` : ""}</label>`;
     }).join("");
+  }
+
+  // custom_sections: [{title, entities: [id | {entity, name, max…}]}]. The
+  // editor sets the titles and the sensors; other keys stay as they are.
+  _customList() {
+    const list = Array.isArray(this._config.custom_sections) ? this._config.custom_sections : [];
+    return list.map((c) => (c && typeof c === "object" ? { ...c, entities: Array.isArray(c.entities) ? [...c.entities] : [] } : { entities: [] }));
+  }
+
+  _writeCustom(list, next = { ...this._config }) {
+    const clean = list.map((c) => {
+      const out = { ...c };
+      if (!out.title) delete out.title;
+      return out;
+    });
+    if (clean.length) next.custom_sections = clean;
+    else delete next.custom_sections;
+    this._emit(next);
+    this._render();
+  }
+
+  _setCustomEntity(si, ei, value) {
+    const list = this._customList();
+    if (!list[si]) return;
+    const current = list[si].entities[ei];
+    if (value) list[si].entities[ei] = current && typeof current === "object" ? { ...current, entity: value } : value;
+    else list[si].entities.splice(ei, 1);
+    this._writeCustom(list);
+  }
+
+  // A section's id is its place in the list: removing one renumbers the ones
+  // after it in `sections:` and `collapsed:` too.
+  _removeCustom(index) {
+    const list = this._customList();
+    list.splice(index, 1);
+    const next = { ...this._config };
+    const renumber = (ids) => ids.flatMap((id) => {
+      const match = /^custom_(\d+)$/.exec(String(id));
+      if (!match) return [id];
+      const n = Number(match[1]) - 1;
+      return n === index ? [] : [n > index ? `custom_${n}` : id];
+    });
+    for (const key of ["sections", "collapsed"]) if (Array.isArray(next[key])) next[key] = renumber(next[key]);
+    this._writeCustom(list, next);
+  }
+
+  _addCustom() {
+    const list = this._customList();
+    list.push({ title: "", entities: [] });
+    const next = { ...this._config };
+    // With a section list, the new section is put on it.
+    if (Array.isArray(next.sections)) next.sections = [...next.sections, `custom_${list.length}`];
+    this._boxes.set("custom", true);
+    this._writeCustom(list, next);
+  }
+
+  _sectionName(t, id) {
+    const match = /^custom_(\d+)$/.exec(id);
+    if (!match) return t.editorSectionNames[id];
+    const c = this._config.custom_sections?.[Number(match[1]) - 1];
+    return c?.title ? String(c.title) : `${t.customTitle} ${match[1]}`;
+  }
+
+  _customHtml(t) {
+    const list = this._customList();
+    return `
+      <details class="box" data-box="custom" ${this._boxOpen("custom", list.length > 0) ? "open" : ""}>
+        <summary class="title">${escapeHtml(t.editorCustom)}${list.length ? ` (${list.length})` : ""}</summary>
+        <p class="hint">${escapeHtml(t.editorCustomHint)}</p>
+        ${list.map((c, i) => `
+          <div class="item">
+            <label><span>${escapeHtml(t.editorCustomTitle)}</span><input type="text" data-custom-title="${i}" value="${escapeHtml(c.title ?? "")}" placeholder="${escapeHtml(`${t.customTitle} ${i + 1}`)}" /></label>
+            <div class="pickers">${[...c.entities, ""].map((item, j) => this._picker(`custom.${i}.${j}`, fill(t.editorCustomSensor, { n: j + 1 }), typeof item === "string" ? item : item?.entity, "", { kind: "any" })).join("")}</div>
+            <button type="button" class="link" data-remove-custom="${i}">${escapeHtml(t.editorRemove)}</button>
+          </div>`).join("")}
+        <button type="button" class="link" data-add-custom>${escapeHtml(t.editorCustomAdd)}</button>
+      </details>`;
   }
 
   // Panels on each PV string the inverter reports (or one field when it
@@ -448,14 +526,15 @@ class SolarFlowCardEditor extends HTMLElement {
       <p class="hint">${escapeHtml(t.editorSectionsHint)}</p>
       <div class="sections">${rows.map(({ id, on }, i) => `
         <div class="section ${on ? "" : "off"}">
-          <input type="checkbox" data-section="${id}" ${on ? "checked" : ""} aria-label="${escapeHtml(t.editorSectionNames[id])}" />
-          <span>${escapeHtml(t.editorSectionNames[id])}${id === "today" || id === "sources" ? ` <small>(Diorama)</small>` : ""}</span>
-          ${collapsible && on && SECTION_HTML[id] && id !== "inverter" ? `<label class="fold"><input type="checkbox" data-fold="${id}" ${collapsed.includes(id) ? "checked" : ""} /> ${escapeHtml(t.editorFolded)}</label>` : ""}
+          <input type="checkbox" data-section="${id}" ${on ? "checked" : ""} aria-label="${escapeHtml(this._sectionName(t, id))}" />
+          <span>${escapeHtml(this._sectionName(t, id))}${id === "today" || id === "sources" ? ` <small>(Diorama)</small>` : ""}</span>
+          ${collapsible && on && (SECTION_HTML[id] || isCustomId(id)) && id !== "inverter" ? `<label class="fold"><input type="checkbox" data-fold="${id}" ${collapsed.includes(id) ? "checked" : ""} /> ${escapeHtml(t.editorFolded)}</label>` : ""}
           ${on ? `<button type="button" data-move="${i}" data-dir="-1" title="${escapeHtml(t.editorUp)}" ${i === 0 ? "disabled" : ""}>↑</button>
           <button type="button" data-move="${i}" data-dir="1" title="${escapeHtml(t.editorDown)}" ${!rows[i + 1]?.on ? "disabled" : ""}>↓</button>` : ""}
         </div>`).join("")}
       </div>
-      ${sectionList(this._config) ? `<button type="button" class="link" data-reset-sections>${escapeHtml(t.editorReset)}</button>` : ""}`;
+      ${sectionList(this._config) ? `<button type="button" class="link" data-reset-sections>${escapeHtml(t.editorReset)}</button>` : ""}
+      ${this._customHtml(t)}`;
   }
 
   _installHtml(t) {
@@ -725,6 +804,19 @@ class SolarFlowCardEditor extends HTMLElement {
       if (filled && !window.confirm(stringsFor(languageOf(this._hass, this._config)).editorConfirmRemove)) return;
       items.splice(Number(index), 1);
       this._writeItems(group, items);
+    }));
+    root.querySelectorAll("[data-custom-title]").forEach((input) => input.addEventListener("change", (e) => {
+      const list = this._customList();
+      const index = Number(input.dataset.customTitle);
+      if (!list[index]) return;
+      list[index].title = e.target.value.trim();
+      this._writeCustom(list);
+    }));
+    root.querySelector("[data-add-custom]")?.addEventListener("click", () => this._addCustom());
+    root.querySelectorAll("[data-remove-custom]").forEach((button) => button.addEventListener("click", () => {
+      const index = Number(button.dataset.removeCustom);
+      if (this._customList()[index]?.entities.length && !window.confirm(stringsFor(languageOf(this._hass, this._config)).editorConfirmRemove)) return;
+      this._removeCustom(index);
     }));
     root.getElementById("vs-on")?.addEventListener("change", (e) => {
       this._set("virtual_storage", e.target.checked ? true : undefined);

@@ -306,6 +306,7 @@ const TRANSLATIONS = {
     "pvForecastNote": "forecast {kwh}",
     "pvProducedOf": "{done} of {total} produced so far",
     "pvRange": "range {low}–{high}",
+    "customTitle": "My sensors",
     "chartFallback": "Hourly averages from the energy statistics. No power history for: {sensors} (excluded from the recorder?)",
     "chartNoHistory": "No history for: {sensors}. Excluded from the recorder?",
     "editorBeta": "Beta: the new editor. Options it does not show stay in your YAML as they are.",
@@ -419,6 +420,11 @@ const TRANSLATIONS = {
     "editorAdd": "Add",
     "editorRemove": "Remove",
     "editorConfirmRemove": "Remove this item and its settings?",
+    "editorCustom": "Custom sections",
+    "editorCustomHint": "Sections of your own with any sensors, e.g. each phase's power and voltage. Each one can be placed, folded or hidden under Sections like the others. A name, a max (for a bar) or a unit per sensor can be set in YAML.",
+    "editorCustomTitle": "Title",
+    "editorCustomSensor": "Sensor {n}",
+    "editorCustomAdd": "Add a section",
     "editorConfirmNoSections": "Nothing ticked: the card will be empty. Continue?",
     "editorItemName": "Name",
     "editorBatSoc": "Level (%)",
@@ -701,6 +707,7 @@ const TRANSLATIONS = {
     "pvLeft": "noch ≈ {kwh}",
     "pvProducedOf": "{done} von {total} bisher erzeugt",
     "pvRange": "Spanne {low}–{high}",
+    "customTitle": "Meine Sensoren",
     "reactorGrid": "Netzunterstützung",
     "reactorNominal": "Nennleistung",
     "reactorOverdrive": "Overdrive",
@@ -847,6 +854,11 @@ const TRANSLATIONS = {
     "editorAdd": "Hinzufügen",
     "editorRemove": "Entfernen",
     "editorConfirmRemove": "Diesen Eintrag mit seinen Einstellungen entfernen?",
+    "editorCustom": "Eigene Abschnitte",
+    "editorCustomHint": "Abschnitte mit beliebigen Sensoren, z. B. Leistung und Spannung jeder Phase. Jeder lässt sich unter Abschnitte wie die anderen anordnen, einklappen oder ausblenden. Name, max (für einen Balken) oder Einheit je Sensor lassen sich in YAML setzen.",
+    "editorCustomTitle": "Titel",
+    "editorCustomSensor": "Sensor {n}",
+    "editorCustomAdd": "Abschnitt hinzufügen",
     "editorConfirmNoSections": "Nichts angehakt: die Karte wird leer. Fortfahren?",
     "editorItemName": "Name",
     "editorBatSoc": "Ladestand (%)",
@@ -1162,6 +1174,7 @@ const TRANSLATIONS = {
     "pvForecastNote": "prognose {kwh}",
     "pvProducedOf": "{done} van {total} opgewekt",
     "pvRange": "bereik {low}–{high}",
+    "customTitle": "Mijn sensoren",
     "chartFallback": "Uurgemiddelden uit de energiestatistieken. Geen vermogenshistorie voor: {sensors} (uitgesloten van de recorder?)",
     "chartNoHistory": "Geen historie voor: {sensors}. Uitgesloten van de recorder?",
     "editorBeta": "Bèta: de nieuwe editor. Opties die hier niet staan, blijven ongewijzigd in je YAML.",
@@ -1275,6 +1288,11 @@ const TRANSLATIONS = {
     "editorAdd": "Toevoegen",
     "editorRemove": "Verwijderen",
     "editorConfirmRemove": "Dit item met zijn instellingen verwijderen?",
+    "editorCustom": "Eigen secties",
+    "editorCustomHint": "Secties met sensoren naar keuze, bijv. vermogen en spanning per fase. Elke sectie kan onder Secties net als de andere worden geplaatst, ingeklapt of verborgen. Een naam, een max (voor een balk) of een eenheid per sensor kan in YAML.",
+    "editorCustomTitle": "Titel",
+    "editorCustomSensor": "Sensor {n}",
+    "editorCustomAdd": "Sectie toevoegen",
     "editorConfirmNoSections": "Niets aangevinkt: de kaart wordt leeg. Doorgaan?",
     "editorItemName": "Naam",
     "editorBatSoc": "Niveau (%)",
@@ -1590,6 +1608,7 @@ const TRANSLATIONS = {
     "pvForecastNote": "prognoza {kwh}",
     "pvProducedOf": "wyprodukowano {done} z {total}",
     "pvRange": "zakres {low}–{high}",
+    "customTitle": "Moje czujniki",
     "chartFallback": "Średnie godzinowe ze statystyk energii. Brak historii mocy dla: {sensors} (wyłączone z recordera?)",
     "chartNoHistory": "Brak historii dla: {sensors}. Czy nie są wyłączone z recordera?",
     "editorBeta": "Beta: nowy edytor. Opcje, których tu nie ma, zostają w YAML-u bez zmian.",
@@ -1703,6 +1722,11 @@ const TRANSLATIONS = {
     "editorAdd": "Dodaj",
     "editorRemove": "Usuń",
     "editorConfirmRemove": "Usunąć ten element razem z ustawieniami?",
+    "editorCustom": "Własne sekcje",
+    "editorCustomHint": "Sekcje z dowolnymi czujnikami, np. moc i napięcie każdej fazy. Każdą można ustawić, zwinąć lub ukryć w Sekcjach, tak jak pozostałe. Nazwę, max (dla paska) lub jednostkę czujnika można ustawić w YAML.",
+    "editorCustomTitle": "Tytuł",
+    "editorCustomSensor": "Czujnik {n}",
+    "editorCustomAdd": "Dodaj sekcję",
     "editorConfirmNoSections": "Nic nie jest zaznaczone: karta będzie pusta. Kontynuować?",
     "editorItemName": "Nazwa",
     "editorBatSoc": "Poziom (%)",
@@ -3234,6 +3258,52 @@ function systemData(hass, resolved, config, baseline) {
   return data.phases || data.inverter || data.battery.length || data.generator || data.inverters.length ? data : null;
 }
 
+// `custom_sections:` sections of the user's own: a title and any sensors,
+// shown as tiles. An entity is a string or {entity, name, max, unit,
+// decimals}; `max` draws a bar. Ids custom_1, custom_2… for `sections:`.
+function customSections(hass, config) {
+  if (!Array.isArray(config.custom_sections)) return [];
+  const states = hass?.states || {};
+  return config.custom_sections.map((section, i) => {
+    if (!section || typeof section !== "object") return null;
+    const items = (Array.isArray(section.entities) ? section.entities : []).map((item) => {
+      const def = typeof item === "string" ? { entity: item } : item && typeof item === "object" ? item : null;
+      if (!def || typeof def.entity !== "string" || !def.entity) return null;
+      const stateObj = states[def.entity];
+      const raw = stateObj?.state;
+      const available = raw !== undefined && raw !== "unavailable" && raw !== "unknown";
+      const numeric = available && raw.trim() !== "" && Number.isFinite(Number(raw));
+      const value = numeric ? Number(raw) : null;
+      const max = Number.parseFloat(def.max);
+      return {
+        entityId: def.entity,
+        name: def.name ? String(def.name) : stateObj?.attributes?.friendly_name || def.entity,
+        stateObj,
+        state: available ? raw : null,
+        value,
+        unit: def.unit !== undefined ? String(def.unit) : stateObj?.attributes?.unit_of_measurement || "",
+        decimals: Number.isInteger(def.decimals) && def.decimals >= 0 && def.decimals <= 4 ? def.decimals : null,
+        share: isNum(value) && max > 0 ? clamp((Math.abs(value) / max) * 100, 0, 100) : null,
+      };
+    }).filter(Boolean);
+    return { id: `custom_${i + 1}`, title: section.title ? String(section.title) : null, items };
+  }).filter((section) => section && section.items.length);
+}
+
+// A custom tile's value: power and energy as everywhere in the card, other
+// numbers with their unit, text states as they are.
+function customValue(item, locale) {
+  if (item.state === null) return "—";
+  if (!isNum(item.value)) return item.state;
+  const unit = item.unit.trim();
+  if (item.decimals === null && unit.toLowerCase() in POWER_SCALE) return formatPower(item.value * POWER_SCALE[unit.toLowerCase()], locale);
+  if (item.decimals === null && unit.toLowerCase() in ENERGY_SCALE) return formatEnergy(item.value * ENERGY_SCALE[unit.toLowerCase()], locale);
+  const abs = Math.abs(item.value);
+  const digits = item.decimals ?? (Number.isInteger(item.value) || abs >= 100 ? 0 : abs >= 10 ? 1 : 2);
+  const number = formatNumber(item.value, locale, digits);
+  return unit ? `${number}${unit === "%" ? "" : "\u00a0"}${unit}` : number;
+}
+
 // Several batteries (the `batteries:` option): the themes show them as one
 // combined battery, the Installation section lists each. Power is signed
 // like battery_power (+ discharging); `invert: true` flips one battery.
@@ -3957,18 +4027,29 @@ const SECTION_IDS = ["flow", "today", "sources", ...Object.keys(SECTION_HTML)];
 const SECTION_ORDER = ["inverter", "forecast", "pv_forecast", "prices", "virtual_storage", "system", "energy", "insights", "comparison", "panels"];
 const SECTION_ORDER_WIDE = ["energy", "inverter", "forecast", "pv_forecast", "prices", "virtual_storage", "insights", "comparison", "system", "panels"];
 
+// custom_1, custom_2… for the sections of `custom_sections:`.
+function customIds(config) {
+  return Array.isArray(config.custom_sections) ? config.custom_sections.map((_, i) => `custom_${i + 1}`) : [];
+}
+
 // The listed sections in order, or null without the option.
 function sectionList(config) {
   if (!Array.isArray(config.sections)) return null;
-  return [...new Set(config.sections.map((id) => String(id).trim().toLowerCase()).filter((id) => SECTION_IDS.includes(id)))];
+  const known = [...SECTION_IDS, ...customIds(config)];
+  return [...new Set(config.sections.map((id) => String(id).trim().toLowerCase()).filter((id) => known.includes(id)))];
 }
 
 function sectionShown(m, id) {
   return !m.sections || m.sections.includes(id);
 }
 
+// Without `sections:` the custom sections follow the theme's own ones.
 function sectionOrder(m, defaults) {
-  return m.sections ? m.sections.filter((id) => SECTION_HTML[id]) : defaults;
+  return m.sections ? m.sections.filter((id) => SECTION_HTML[id] || isCustomId(id)) : [...defaults, ...(m.custom || []).map((c) => c.id)];
+}
+
+function isCustomId(id) {
+  return /^custom_\d+$/.test(id);
 }
 
 // What a collapsed section still shows: its title and one key value.
@@ -3999,6 +4080,8 @@ function foldSummary(m, id) {
     return row ? [t.compareTitle, names[row.name], formatEnergy(row.today, locale)] : [t.compareTitle, "", ""];
   }
   if (id === "panels") return [t.panelsTitle, "", isNum(m.panels?.average) ? fill(t.panelAvg, { kwh: formatEnergy(m.panels.average, locale) }) : ""];
+  const custom = m.custom?.find((c) => c.id === id);
+  if (custom) return [custom.title || t.customTitle, custom.items[0].name, customValue(custom.items[0], locale)];
   return null;
 }
 
@@ -4022,7 +4105,29 @@ function foldable(m, id, html) {
 }
 
 function sectionHtml(m, id) {
+  if (isCustomId(id)) return foldable(m, id, customSectionHtml(m, id));
   return SECTION_HTML[id] ? foldable(m, id, SECTION_HTML[id](m)) : "";
+}
+
+// A custom section: its sensors as tiles, as many per row as fit evenly.
+function customSectionHtml(m, id) {
+  const c = m.custom?.find((section) => section.id === id);
+  if (!c) return "";
+  const { t, locale } = m;
+  const count = c.items.length;
+  const columns = count === 4 ? 2 : Math.min(count, 3);
+  return `
+    <section class="sfc-section sfc-custom">
+      <div class="sfc-head"><div><h3>${escapeHtml(c.title || t.customTitle)}</h3></div></div>
+      <div class="sfc-phases" style="--n:${columns}">
+        ${c.items.map((item) => `
+        <button class="sfc-phase" ${item.entityId ? `data-entity="${escapeHtml(item.entityId)}"` : ""} title="${escapeHtml(item.entityId)}">
+          <small>${escapeHtml(item.name)}</small>
+          <strong>${escapeHtml(customValue(item, locale))}</strong>
+          ${isNum(item.share) ? `<i style="--p:${item.share.toFixed(0)}%"></i>` : ""}
+        </button>`).join("")}
+      </div>
+    </section>`;
 }
 
 // `defaults`: a theme's own set and order, `exclude`: sections the theme
@@ -7215,6 +7320,7 @@ class SolarFlowCard extends HTMLElement {
       const panels = showSolar ? panelData(this._hass, resolved, config) || estimatePanels(readings, config, today) : null;
       const pvForecast = showSolar ? pvForecastData(this._hass, config, today) : null;
       const priceChart = priceChartData(this._hass, config);
+      const custom = customSections(this._hass, config);
       const insights = this._insights(resolved, today, forecast);
       const weather = theme === "diorama" || theme === "reactor" ? weatherData(this._hass, config) : null;
       // The wide layout has room for everything: inverter details stay open.
@@ -7252,6 +7358,7 @@ class SolarFlowCard extends HTMLElement {
         money && [money.kind, isNum(money.value) ? Math.round(money.value * 100) : null],
         pvForecast && [pvForecast.total, pvForecast.remaining, pvForecast.days.map((d) => d.value)],
         priceChart && [priceChart.nowAt, priceChart.current, priceChart.hours.length],
+        custom.map((c) => c.items.map((item) => item.state)),
         Math.floor(now.getTime() / 60000),
       ]);
       if (signature === this._signature) return;
@@ -7291,6 +7398,7 @@ class SolarFlowCard extends HTMLElement {
         panels,
         pvForecast,
         priceChart,
+        custom,
         inverter,
         system,
         bank,
@@ -7492,7 +7600,7 @@ function editorEntityGroups(t) {
 // default order without the ones a `show_…: false` hides.
 const SECTION_SHOW_KEYS = { energy: "show_energy", forecast: "show_forecast", system: "show_system", panels: "show_panels" };
 function editorSections(config) {
-  const order = ["flow", "today", "sources", ...SECTION_ORDER];
+  const order = ["flow", "today", "sources", ...SECTION_ORDER, ...customIds(config)];
   const listed = sectionList(config);
   const on = listed || order.filter((id) => config[SECTION_SHOW_KEYS[id]] !== false && (id !== "insights" && id !== "comparison" || insightsShown(config)));
   return [...on.map((id) => ({ id, on: true })), ...order.filter((id) => !on.includes(id)).map((id) => ({ id, on: false }))];
@@ -7637,7 +7745,7 @@ class SolarFlowCardEditor extends HTMLElement {
   // text field with the sensors as suggestions.
   _picker(path, label, value, domain = "sensor", { kind = fieldKind(path.split(".").at(-1)), auto = null, extra = [] } = {}) {
     const t = stringsFor(languageOf(this._hass, this._config));
-    const notes = domain === "sensor" ? [...fieldNotes(this._hass, this._config, t, kind, value, auto), ...extra] : extra;
+    const notes = domain === "sensor" || !domain ? [...fieldNotes(this._hass, this._config, t, kind, value, auto), ...extra] : extra;
     return `
       <div class="field">
         <div class="picker" data-path="${escapeHtml(path)}" data-label="${escapeHtml(label)}" data-domain="${domain}" data-value="${escapeHtml(value || "")}"></div>
@@ -7653,14 +7761,14 @@ class SolarFlowCardEditor extends HTMLElement {
       if (selector) {
         const picker = document.createElement("ha-selector");
         picker.hass = this._hass;
-        picker.selector = { entity: { domain } };
+        picker.selector = { entity: domain ? { domain } : {} };
         picker.label = label;
         picker.value = value || undefined;
         picker.required = false;
         picker.addEventListener("value-changed", (e) => changed(e.detail?.value));
         el.append(picker);
       } else {
-        el.innerHTML = `<label><span>${escapeHtml(label)}</span><input type="text" list="sfc-${domain}" value="${escapeHtml(value)}" placeholder="${domain}.…" /></label>`;
+        el.innerHTML = `<label><span>${escapeHtml(label)}</span><input type="text" list="sfc-${domain || "sensor"}" value="${escapeHtml(value)}" placeholder="${domain || "sensor"}.…" /></label>`;
         el.querySelector("input").addEventListener("change", (e) => changed(e.target.value));
       }
     }
@@ -7673,6 +7781,7 @@ class SolarFlowCardEditor extends HTMLElement {
     else if (group === "pv_forecast" && key === "days") return this._setList(["pv_forecast", "days"], Number(index), value);
     else if (group === "pv_forecast") this._setIn("pv_forecast", key, value);
     else if (group === "list") return this._setItem(key, Number(index), path.split(".")[3], value);
+    else if (group === "custom") return this._setCustomEntity(Number(key), Number(index), value);
     else this._set(group, value);
     // The notes under the field follow the new sensor.
     this._render();
@@ -7733,6 +7842,83 @@ class SolarFlowCardEditor extends HTMLElement {
       <label><span>${escapeHtml(t[label])}</span><input data-number="${key}" type="number" min="0" step="${step}" inputmode="decimal" value="${escapeHtml(Number.isFinite(Number.parseFloat(this._config[key])) ? this._config[key] : "")}" />
         ${warn ? `<p class="warn">${escapeHtml(warn)}</p>` : ""}</label>`;
     }).join("");
+  }
+
+  // custom_sections: [{title, entities: [id | {entity, name, max…}]}]. The
+  // editor sets the titles and the sensors; other keys stay as they are.
+  _customList() {
+    const list = Array.isArray(this._config.custom_sections) ? this._config.custom_sections : [];
+    return list.map((c) => (c && typeof c === "object" ? { ...c, entities: Array.isArray(c.entities) ? [...c.entities] : [] } : { entities: [] }));
+  }
+
+  _writeCustom(list, next = { ...this._config }) {
+    const clean = list.map((c) => {
+      const out = { ...c };
+      if (!out.title) delete out.title;
+      return out;
+    });
+    if (clean.length) next.custom_sections = clean;
+    else delete next.custom_sections;
+    this._emit(next);
+    this._render();
+  }
+
+  _setCustomEntity(si, ei, value) {
+    const list = this._customList();
+    if (!list[si]) return;
+    const current = list[si].entities[ei];
+    if (value) list[si].entities[ei] = current && typeof current === "object" ? { ...current, entity: value } : value;
+    else list[si].entities.splice(ei, 1);
+    this._writeCustom(list);
+  }
+
+  // A section's id is its place in the list: removing one renumbers the ones
+  // after it in `sections:` and `collapsed:` too.
+  _removeCustom(index) {
+    const list = this._customList();
+    list.splice(index, 1);
+    const next = { ...this._config };
+    const renumber = (ids) => ids.flatMap((id) => {
+      const match = /^custom_(\d+)$/.exec(String(id));
+      if (!match) return [id];
+      const n = Number(match[1]) - 1;
+      return n === index ? [] : [n > index ? `custom_${n}` : id];
+    });
+    for (const key of ["sections", "collapsed"]) if (Array.isArray(next[key])) next[key] = renumber(next[key]);
+    this._writeCustom(list, next);
+  }
+
+  _addCustom() {
+    const list = this._customList();
+    list.push({ title: "", entities: [] });
+    const next = { ...this._config };
+    // With a section list, the new section is put on it.
+    if (Array.isArray(next.sections)) next.sections = [...next.sections, `custom_${list.length}`];
+    this._boxes.set("custom", true);
+    this._writeCustom(list, next);
+  }
+
+  _sectionName(t, id) {
+    const match = /^custom_(\d+)$/.exec(id);
+    if (!match) return t.editorSectionNames[id];
+    const c = this._config.custom_sections?.[Number(match[1]) - 1];
+    return c?.title ? String(c.title) : `${t.customTitle} ${match[1]}`;
+  }
+
+  _customHtml(t) {
+    const list = this._customList();
+    return `
+      <details class="box" data-box="custom" ${this._boxOpen("custom", list.length > 0) ? "open" : ""}>
+        <summary class="title">${escapeHtml(t.editorCustom)}${list.length ? ` (${list.length})` : ""}</summary>
+        <p class="hint">${escapeHtml(t.editorCustomHint)}</p>
+        ${list.map((c, i) => `
+          <div class="item">
+            <label><span>${escapeHtml(t.editorCustomTitle)}</span><input type="text" data-custom-title="${i}" value="${escapeHtml(c.title ?? "")}" placeholder="${escapeHtml(`${t.customTitle} ${i + 1}`)}" /></label>
+            <div class="pickers">${[...c.entities, ""].map((item, j) => this._picker(`custom.${i}.${j}`, fill(t.editorCustomSensor, { n: j + 1 }), typeof item === "string" ? item : item?.entity, "", { kind: "any" })).join("")}</div>
+            <button type="button" class="link" data-remove-custom="${i}">${escapeHtml(t.editorRemove)}</button>
+          </div>`).join("")}
+        <button type="button" class="link" data-add-custom>${escapeHtml(t.editorCustomAdd)}</button>
+      </details>`;
   }
 
   // Panels on each PV string the inverter reports (or one field when it
@@ -7884,14 +8070,15 @@ class SolarFlowCardEditor extends HTMLElement {
       <p class="hint">${escapeHtml(t.editorSectionsHint)}</p>
       <div class="sections">${rows.map(({ id, on }, i) => `
         <div class="section ${on ? "" : "off"}">
-          <input type="checkbox" data-section="${id}" ${on ? "checked" : ""} aria-label="${escapeHtml(t.editorSectionNames[id])}" />
-          <span>${escapeHtml(t.editorSectionNames[id])}${id === "today" || id === "sources" ? ` <small>(Diorama)</small>` : ""}</span>
-          ${collapsible && on && SECTION_HTML[id] && id !== "inverter" ? `<label class="fold"><input type="checkbox" data-fold="${id}" ${collapsed.includes(id) ? "checked" : ""} /> ${escapeHtml(t.editorFolded)}</label>` : ""}
+          <input type="checkbox" data-section="${id}" ${on ? "checked" : ""} aria-label="${escapeHtml(this._sectionName(t, id))}" />
+          <span>${escapeHtml(this._sectionName(t, id))}${id === "today" || id === "sources" ? ` <small>(Diorama)</small>` : ""}</span>
+          ${collapsible && on && (SECTION_HTML[id] || isCustomId(id)) && id !== "inverter" ? `<label class="fold"><input type="checkbox" data-fold="${id}" ${collapsed.includes(id) ? "checked" : ""} /> ${escapeHtml(t.editorFolded)}</label>` : ""}
           ${on ? `<button type="button" data-move="${i}" data-dir="-1" title="${escapeHtml(t.editorUp)}" ${i === 0 ? "disabled" : ""}>↑</button>
           <button type="button" data-move="${i}" data-dir="1" title="${escapeHtml(t.editorDown)}" ${!rows[i + 1]?.on ? "disabled" : ""}>↓</button>` : ""}
         </div>`).join("")}
       </div>
-      ${sectionList(this._config) ? `<button type="button" class="link" data-reset-sections>${escapeHtml(t.editorReset)}</button>` : ""}`;
+      ${sectionList(this._config) ? `<button type="button" class="link" data-reset-sections>${escapeHtml(t.editorReset)}</button>` : ""}
+      ${this._customHtml(t)}`;
   }
 
   _installHtml(t) {
@@ -8161,6 +8348,19 @@ class SolarFlowCardEditor extends HTMLElement {
       if (filled && !window.confirm(stringsFor(languageOf(this._hass, this._config)).editorConfirmRemove)) return;
       items.splice(Number(index), 1);
       this._writeItems(group, items);
+    }));
+    root.querySelectorAll("[data-custom-title]").forEach((input) => input.addEventListener("change", (e) => {
+      const list = this._customList();
+      const index = Number(input.dataset.customTitle);
+      if (!list[index]) return;
+      list[index].title = e.target.value.trim();
+      this._writeCustom(list);
+    }));
+    root.querySelector("[data-add-custom]")?.addEventListener("click", () => this._addCustom());
+    root.querySelectorAll("[data-remove-custom]").forEach((button) => button.addEventListener("click", () => {
+      const index = Number(button.dataset.removeCustom);
+      if (this._customList()[index]?.entities.length && !window.confirm(stringsFor(languageOf(this._hass, this._config)).editorConfirmRemove)) return;
+      this._removeCustom(index);
     }));
     root.getElementById("vs-on")?.addEventListener("change", (e) => {
       this._set("virtual_storage", e.target.checked ? true : undefined);

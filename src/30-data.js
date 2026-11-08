@@ -1235,6 +1235,52 @@ function systemData(hass, resolved, config, baseline) {
   return data.phases || data.inverter || data.battery.length || data.generator || data.inverters.length ? data : null;
 }
 
+// `custom_sections:` sections of the user's own: a title and any sensors,
+// shown as tiles. An entity is a string or {entity, name, max, unit,
+// decimals}; `max` draws a bar. Ids custom_1, custom_2… for `sections:`.
+function customSections(hass, config) {
+  if (!Array.isArray(config.custom_sections)) return [];
+  const states = hass?.states || {};
+  return config.custom_sections.map((section, i) => {
+    if (!section || typeof section !== "object") return null;
+    const items = (Array.isArray(section.entities) ? section.entities : []).map((item) => {
+      const def = typeof item === "string" ? { entity: item } : item && typeof item === "object" ? item : null;
+      if (!def || typeof def.entity !== "string" || !def.entity) return null;
+      const stateObj = states[def.entity];
+      const raw = stateObj?.state;
+      const available = raw !== undefined && raw !== "unavailable" && raw !== "unknown";
+      const numeric = available && raw.trim() !== "" && Number.isFinite(Number(raw));
+      const value = numeric ? Number(raw) : null;
+      const max = Number.parseFloat(def.max);
+      return {
+        entityId: def.entity,
+        name: def.name ? String(def.name) : stateObj?.attributes?.friendly_name || def.entity,
+        stateObj,
+        state: available ? raw : null,
+        value,
+        unit: def.unit !== undefined ? String(def.unit) : stateObj?.attributes?.unit_of_measurement || "",
+        decimals: Number.isInteger(def.decimals) && def.decimals >= 0 && def.decimals <= 4 ? def.decimals : null,
+        share: isNum(value) && max > 0 ? clamp((Math.abs(value) / max) * 100, 0, 100) : null,
+      };
+    }).filter(Boolean);
+    return { id: `custom_${i + 1}`, title: section.title ? String(section.title) : null, items };
+  }).filter((section) => section && section.items.length);
+}
+
+// A custom tile's value: power and energy as everywhere in the card, other
+// numbers with their unit, text states as they are.
+function customValue(item, locale) {
+  if (item.state === null) return "—";
+  if (!isNum(item.value)) return item.state;
+  const unit = item.unit.trim();
+  if (item.decimals === null && unit.toLowerCase() in POWER_SCALE) return formatPower(item.value * POWER_SCALE[unit.toLowerCase()], locale);
+  if (item.decimals === null && unit.toLowerCase() in ENERGY_SCALE) return formatEnergy(item.value * ENERGY_SCALE[unit.toLowerCase()], locale);
+  const abs = Math.abs(item.value);
+  const digits = item.decimals ?? (Number.isInteger(item.value) || abs >= 100 ? 0 : abs >= 10 ? 1 : 2);
+  const number = formatNumber(item.value, locale, digits);
+  return unit ? `${number}${unit === "%" ? "" : "\u00a0"}${unit}` : number;
+}
+
 // Several batteries (the `batteries:` option): the themes show them as one
 // combined battery, the Installation section lists each. Power is signed
 // like battery_power (+ discharging); `invert: true` flips one battery.
