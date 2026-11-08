@@ -416,7 +416,7 @@
   "editorRceMissing": "Geen RCE-prijssensor gevonden: kies er een, anders heeft de teruggeleverde energie geen prijs.",
   "editorImportPriceHint": "Afnameprijs: wat elke kWh kost, energie plus de netkosten per kWh, zonder vaste maandkosten.",
   "editorRceFound": "RCE-prijssensor gevonden: {entity} · {value}.",
-  "editorUseBilling": "Ik heb net-billing: teruglevering tegen de RCE-prijs",
+  "editorUseBilling": "Ik heb net-billing: teruglevering waarderen tegen de RCE-prijs",
   "editorBillingFactor": "Depositofactor (1,23)",
   "invToday": "vandaag {kwh}",
   "editorInverters": "Meerdere omvormers",
