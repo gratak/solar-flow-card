@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.0-beta.4
+
+- **PV forecast:** the 10–90% brackets on the day bars can be turned off with `pv_forecast.range: false` ([#69](https://github.com/gratak/solar-flow-card/issues/69)). Without the brackets, the bars are scaled to the forecasts alone.
+- **Editor:** switches for the brackets and for the hourly forecast line in the 24H chart (`hourly`) under PV forecast. Both are on by default; only a switch turned off is written to the YAML.
+
 ## 2.0.0-beta.3
 
 - **Custom sections:** values show as many decimals as the sensor reports, at most two (49.98 Hz, 231.8 V, −0.7 A). Before, 49.98 Hz was rounded to 50.0 Hz. `decimals:` still overrides it.

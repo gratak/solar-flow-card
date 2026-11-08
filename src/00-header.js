@@ -37,7 +37,7 @@
  *
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
-const CARD_VERSION = "2.0.0-beta.3";
+const CARD_VERSION = "2.0.0-beta.4";
 const CARD_TAG = "solar-flow-card";
 const EDITOR_TAG = "solar-flow-card-editor";
 const THEMES = ["diorama", "aurora", "paper", "lcars", "atlantis", "expanse", "foundation", "galaxy", "gate", "reactor"];
