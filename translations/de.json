@@ -259,7 +259,7 @@
   },
   "chartFallback": "Stundenmittel aus der Energiestatistik. Kein Leistungsverlauf für: {sensors} (vom Recorder ausgeschlossen?)",
   "chartNoHistory": "Kein Verlauf für: {sensors}. Vom Recorder ausgeschlossen?",
-  "editorBeta": "Beta: der neue Editor. Optionen, die hier fehlen, bleiben unverändert in deinem YAML.",
+  "editorRenamed": "Diese Karte heißt jetzt Home Energy Hub. Mit deiner nächsten Änderung hier wird ihr Typ von custom:solar-flow-card zu custom:home-energy-hub; der alte Typ funktioniert weiterhin.",
   "editorGroups": {
     "look": "Darstellung",
     "sensors": "Sensoren",

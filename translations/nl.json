@@ -259,7 +259,7 @@
   "customTitle": "Mijn sensoren",
   "chartFallback": "Uurgemiddelden uit de energiestatistieken. Geen vermogenshistorie voor: {sensors} (uitgesloten van de recorder?)",
   "chartNoHistory": "Geen historie voor: {sensors}. Uitgesloten van de recorder?",
-  "editorBeta": "Bèta: de nieuwe editor. Opties die hier niet staan, blijven ongewijzigd in je YAML.",
+  "editorRenamed": "Deze kaart heet nu Home Energy Hub. Bij je volgende wijziging hier verandert het type van custom:solar-flow-card naar custom:home-energy-hub; het oude type blijft ook werken.",
   "editorGroups": {
     "look": "Weergave",
     "sensors": "Sensoren",

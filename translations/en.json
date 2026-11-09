@@ -259,7 +259,7 @@
   "customTitle": "My sensors",
   "chartFallback": "Hourly averages from the energy statistics. No power history for: {sensors} (excluded from the recorder?)",
   "chartNoHistory": "No history for: {sensors}. Excluded from the recorder?",
-  "editorBeta": "Beta: the new editor. Options it does not show stay in your YAML as they are.",
+  "editorRenamed": "This card is now called Home Energy Hub. Its type changes from custom:solar-flow-card to custom:home-energy-hub with your next change here; the old type keeps working too.",
   "editorGroups": {
     "look": "Appearance",
     "sensors": "Sensors",

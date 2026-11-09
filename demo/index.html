@@ -82,7 +82,7 @@
       cards.innerHTML = "";
       for (const theme of themes) {
         const wrap = document.createElement("div");
-        const card = document.createElement("solar-flow-card");
+        const card = document.createElement("home-energy-hub");
         card.setConfig({
           theme,
           battery_capacity: 23.5,
@@ -108,7 +108,7 @@
       }
     }
     render();
-    const card = document.querySelector("solar-flow-card");
+    const card = document.querySelector("home-energy-hub");
     $("version").textContent = card?.constructor.version ? `v${card.constructor.version}` : "";
     window.demoReady = true;
   </script>

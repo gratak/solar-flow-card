@@ -259,7 +259,7 @@
   "customTitle": "Moje czujniki",
   "chartFallback": "Średnie godzinowe ze statystyk energii. Brak historii mocy dla: {sensors} (wyłączone z recordera?)",
   "chartNoHistory": "Brak historii dla: {sensors}. Czy nie są wyłączone z recordera?",
-  "editorBeta": "Beta: nowy edytor. Opcje, których tu nie ma, zostają w YAML-u bez zmian.",
+  "editorRenamed": "Ta karta nazywa się teraz Home Energy Hub. Przy następnej zmianie tutaj jej typ zmieni się z custom:solar-flow-card na custom:home-energy-hub; stary typ też dalej działa.",
   "editorGroups": {
     "look": "Wygląd",
     "sensors": "Czujniki",

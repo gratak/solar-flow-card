@@ -1,5 +1,42 @@
 # Changelog
 
+## 2.0.0
+
+**Home Energy Hub 2.0.** Everything from the 1.8 and 2.0 betas, now stable, and a new card type. The details of each change are in the beta sections below.
+
+### ⚠️ Possibly breaking: the card type is now `custom:home-energy-hub`
+- Existing cards with `type: custom:solar-flow-card` **keep working**: the old type stays registered as an alias.
+- The visual editor switches a card to the new type with the next change you make in it, and says so at the top. New cards from "Add card" use the new type.
+- **What can break:**
+  - card-mod or other CSS that selects the element by name (`solar-flow-card`), once a card's type was switched;
+  - scripts or other cards that look for the `solar-flow-card` or `solar-flow-card-editor` elements by name.
+- **Unchanged:** the repository, the file `solar-flow-card.js`, its dashboard resource, the HACS entry and every option.
+
+### New since 1.7.1
+- **Visual editor**, no longer beta:
+  - almost every option, in groups;
+  - each sensor field shows its value now, or what was found automatically (DeyeCloud);
+  - warnings for the usual mistakes: a missing sensor, a wrong unit, a lifetime counter set up as daily, W instead of kW, the grid sign;
+  - sections ticked and ordered with arrows.
+- **Energy prices and settlement:**
+  - prices from sensors, with savings worked out hour by hour;
+  - a chart of today's and tomorrow's hourly prices;
+  - net-billing (energy sold at the hourly RCE × 1.23, the RCE sensor found automatically) or net-metering (0.8 / 0.7);
+  - the value of the energy sold when only an export price is set.
+- **Several inverters** (`inverters:`): solar power and energy summed without helpers; each inverter listed in Installation.
+- **PV forecast, part 2:**
+  - the hourly forecast as a dashed line in the 24H chart (Solcast, or Home Assistant's energy forecast such as Forecast.Solar);
+  - Solcast's 10–90% range on the day bars, which can be turned off.
+- **Custom sections** (`custom_sections:`): your own sections with any sensors as tiles, placed and folded like the others.
+- **Inverter details:**
+  - no duplicate readings, with plain translated names;
+  - unused PV inputs and an empty second battery input hidden;
+  - load-side voltages only when they differ from the grid;
+  - string tiles in even rows.
+- **Narrow cards and phones:** sections and chart labels stay inside the card.
+- **Name:** Solar Flow Card is now Home Energy Hub.
+- **License:** GPL-3.0-or-later (versions up to 1.8.0-beta.8 stay MIT; translations stay MIT).
+
 ## 2.0.0-beta.4
 
 - **PV forecast:** the 10–90% brackets on the day bars can be turned off with `pv_forecast.range: false` ([#69](https://github.com/gratak/solar-flow-card/issues/69)). Without the brackets, the bars are scaled to the forecasts alone.

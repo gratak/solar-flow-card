@@ -121,7 +121,7 @@ Home Assistant can create the missing pieces without YAML: **Settings → Device
 Nothing to set: the sensors are found automatically. With several DeyeCloud stations pick one with `station_id`.
 
 ```yaml
-type: custom:solar-flow-card
+type: custom:home-energy-hub
 theme: diorama
 battery_capacity: 10
 ```
@@ -129,7 +129,7 @@ battery_capacity: 10
 ### A hybrid inverter with a battery
 
 ```yaml
-type: custom:solar-flow-card
+type: custom:home-energy-hub
 theme: reactor
 battery_capacity: 10.2        # kWh, for the battery forecast
 battery_min_soc: 15           # %, the reserve the forecast counts down to
@@ -155,7 +155,7 @@ A Huawei inverter with optimizers on two strings (11 + 7 panels) and a three-pha
 2. The meter's energy counters and the inverter's total yield never reset, so the card uses `energy_sensors: total`.
 
 ```yaml
-type: custom:solar-flow-card
+type: custom:home-energy-hub
 theme: reactor
 show_battery: false
 energy_sensors: total

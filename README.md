@@ -2,7 +2,7 @@
 
 **Your home's energy in one Home Assistant card:** live power flow, charts, battery and PV forecasts, virtual storage, phases and inverter details in ten themes. Any inverter, with or without solar or a battery; DeyeCloud set up automatically.
 
-*Formerly **Solar Flow Card**. Nothing changes for your dashboards: the card type stays `custom:solar-flow-card`.*
+*Formerly **Solar Flow Card**. Since 2.0.0 the card type is `custom:home-energy-hub`; `custom:solar-flow-card` keeps working. See [Upgrading to 2.0](#upgrading-to-20).*
 
 [![HACS Default](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://hacs.xyz/)
 [![Release](https://img.shields.io/github/v/release/gratak/solar-flow-card?label=version)](https://github.com/gratak/solar-flow-card/releases)
@@ -92,10 +92,10 @@ Copy `solar-flow-card.js` to `config/www/` and add a dashboard resource `/local/
 
 For inverters other than DeyeCloud, the [configuration guide](docs/configuration.md) explains every `entities:` entry, the units and state classes the card expects, the helper sensors to create when something is missing, and has complete examples (including Huawei with a separate energy meter).
 
-The visual editor (new in 2.0, beta) has groups for the appearance, the **sensors** (pick each one from your Home Assistant entities), the **sections** (tick and reorder), your installation, the summary and prices, virtual storage, the PV forecast and more. Every sensor field shows its value right now (or what DeyeCloud found by itself) and warns about likely mistakes: a sensor that does not exist or has the wrong unit, a lifetime counter set up as a daily one, a size entered in W instead of kW, a grid sensor with the other sign. Options the editor does not show stay in your YAML untouched.
+The visual editor (new in 2.0) has groups for the appearance, the **sensors** (pick each one from your Home Assistant entities), the **sections** (tick and reorder), your installation, the summary and prices, virtual storage, the PV forecast and more. Every sensor field shows its value right now (or what DeyeCloud found by itself) and warns about likely mistakes: a sensor that does not exist or has the wrong unit, a lifetime counter set up as a daily one, a size entered in W instead of kW, a grid sensor with the other sign. Options the editor does not show stay in your YAML untouched.
 
 ```yaml
-type: custom:solar-flow-card
+type: custom:home-energy-hub
 theme: diorama
 battery_capacity: 23.5
 battery_min_soc: 20
@@ -232,17 +232,17 @@ Power and energy are shown like everywhere in the card (W/kW, kWh). Other values
 **Several cards instead of one.** To place parts of the card separately on a dashboard, add the card several times, each with its own `sections:`. A card without `flow` shows its sections as one plain card (no box inside a box). The cards share the history and statistics they load, so Home Assistant is asked only once:
 
 ```yaml
-type: custom:solar-flow-card
+type: custom:home-energy-hub
 sections: [flow, today, sources]     # the scene with today's tiles
 ```
 
 ```yaml
-type: custom:solar-flow-card
+type: custom:home-energy-hub
 sections: [energy]                   # the chart and the energy totals
 ```
 
 ```yaml
-type: custom:solar-flow-card
+type: custom:home-energy-hub
 sections: [system, virtual_storage]  # the installation and the virtual storage
 ```
 
@@ -309,7 +309,7 @@ The chart uses the export price's sensor, else the import price's. Without an im
 Set the entities the card should use. Every key is optional; use either separate import/export (charge/discharge) sensors or one signed sensor. Without a consumption sensor (`load_power`, `load_energy`) the card calculates it: panels + grid import − grid export + battery discharge − battery charge.
 
 ```yaml
-type: custom:solar-flow-card
+type: custom:home-energy-hub
 entities:
   solar_power: sensor.pv_power                 # W
   load_power: sensor.house_power               # W
@@ -390,7 +390,7 @@ The card calculates the balance from the `grid_import_energy` and `grid_export_e
 Two or more batteries (on one inverter's two battery inputs, on two inverters, or AC-coupled) are listed under `batteries:`. The themes show them as one battery: the power is summed, the charge level is weighted by capacity (10 kWh at 80% and 5 kWh at 20% make 60%) and the forecast uses the total capacity. The Installation section shows each battery with its charge, power, voltage and temperature.
 
 ```yaml
-type: custom:solar-flow-card
+type: custom:home-energy-hub
 batteries:
   - name: LiFePO4 48 V
     soc: sensor.bat1_soc                       # %
@@ -412,7 +412,7 @@ batteries:
 Two or more inverters, of the same or different brands, are listed under `inverters:`. The card sums their solar power and solar energy itself, without helper sensors, and the Installation section shows each inverter with its power, load and today's production.
 
 ```yaml
-type: custom:solar-flow-card
+type: custom:home-energy-hub
 inverters:
   - name: Huawei (on-grid)
     solar_power: sensor.huawei_input_power     # W or kW: PV power of this inverter
@@ -432,11 +432,21 @@ inverters:
 
 The 3D, 7D, month and all-time totals and bars come from the long-term statistics of the daily energy sensors, so those need `state_class: total_increasing`. Statistics are compiled hourly; today's part always uses the live sensor.
 
+## Upgrading to 2.0
+
+2.0.0 renames the card's **type** from `custom:solar-flow-card` to `custom:home-energy-hub`.
+
+- **Your existing cards keep working** without any change: the old type stays registered as an alias.
+- **The editor switches the type for you:** open a card in the visual editor, change anything and save; its YAML then says `type: custom:home-energy-hub`.
+- **New cards** from "Add card" use the new type.
+- **What can break:**
+  - **card-mod** or other CSS that targets the element by name: a card whose type was switched is a `home-energy-hub` element, no longer `solar-flow-card`. Update the selector (or keep the old type in that card's YAML).
+  - Scripts, browser mods or other cards that look for the `solar-flow-card` element or the `solar-flow-card-editor` element by name, likewise.
+- **Unchanged:** the repository, the file name `solar-flow-card.js`, its dashboard resource and the HACS entry, and all options.
+
 ## Roadmap
 
-Planned, in no particular order. Ideas and votes are welcome in [issues](https://github.com/gratak/solar-flow-card/issues).
-
-- **The new visual editor out of beta** (2.0.0), after the feedback from the 2.0 betas.
+Nothing is planned right now. Ideas and votes are welcome in [issues](https://github.com/gratak/solar-flow-card/issues).
 
 ## Translations
 

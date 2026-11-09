@@ -37,9 +37,15 @@
  *
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
-const CARD_VERSION = "2.0.0-beta.4";
-const CARD_TAG = "solar-flow-card";
-const EDITOR_TAG = "solar-flow-card-editor";
+const CARD_VERSION = "2.0.0";
+// The card's type is custom:home-energy-hub since 2.0.0. The old name stays
+// registered so dashboards with custom:solar-flow-card keep working.
+const CARD_TAG = "home-energy-hub";
+const EDITOR_TAG = "home-energy-hub-editor";
+const LEGACY_CARD_TAG = "solar-flow-card";
+const LEGACY_EDITOR_TAG = "solar-flow-card-editor";
+const CARD_TYPE = `custom:${CARD_TAG}`;
+const LEGACY_CARD_TYPE = `custom:${LEGACY_CARD_TAG}`;
 const THEMES = ["diorama", "aurora", "paper", "lcars", "atlantis", "expanse", "foundation", "galaxy", "gate", "reactor"];
 const PERIODS = ["today", "3d", "7d", "month", "all"];
 // A flow below this many watts counts as idle.
