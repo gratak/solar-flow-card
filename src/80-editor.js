@@ -146,6 +146,9 @@ class SolarFlowCardEditor extends HTMLElement {
     // The editor writes the current option names; an old name is replaced on
     // the next change. Options it does not show are kept as they are.
     const next = migrateConfig(config || {});
+    // The old type is written as the new one with the next change.
+    this._legacyType = next.type === LEGACY_CARD_TYPE;
+    if (this._legacyType) next.type = CARD_TYPE;
     // Home Assistant hands every change back: nothing to redraw then, so the
     // field being edited keeps its focus.
     if (JSON.stringify(next) === JSON.stringify(this._config) && this.shadowRoot.childElementCount) return;
@@ -170,6 +173,11 @@ class SolarFlowCardEditor extends HTMLElement {
 
   _emit(next) {
     this._config = next;
+    // The first change writes the new type: the note about it goes.
+    if (this._legacyType) {
+      this._legacyType = false;
+      this.shadowRoot.querySelector("p.beta")?.remove();
+    }
     this.dispatchEvent(new CustomEvent("config-changed", { detail: { config: next }, bubbles: true, composed: true }));
   }
 
@@ -725,7 +733,7 @@ class SolarFlowCardEditor extends HTMLElement {
       <datalist id="sfc-sensor">${ids("sensor").map((id) => `<option value="${escapeHtml(id)}"></option>`).join("")}</datalist>
       <datalist id="sfc-weather">${ids("weather").map((id) => `<option value="${escapeHtml(id)}"></option>`).join("")}</datalist>
       <div class="editor">
-        <p class="beta">${escapeHtml(t.editorBeta)}</p>
+        ${this._legacyType ? `<p class="beta">${escapeHtml(t.editorRenamed)}</p>` : ""}
         ${this._group("look", t, () => this._lookHtml(t))}
         ${this._group("sensors", t, () => this._sensorsHtml(t))}
         ${this._group("sections", t, () => this._sectionsHtml(t))}
@@ -889,6 +897,10 @@ class SolarFlowCardEditor extends HTMLElement {
 
 if (!customElements.get(CARD_TAG)) customElements.define(CARD_TAG, SolarFlowCard);
 if (!customElements.get(EDITOR_TAG)) customElements.define(EDITOR_TAG, SolarFlowCardEditor);
+// The old names, for dashboards from before 2.0.0 (a class can be defined
+// only once, hence the subclasses).
+if (!customElements.get(LEGACY_CARD_TAG)) customElements.define(LEGACY_CARD_TAG, class extends SolarFlowCard {});
+if (!customElements.get(LEGACY_EDITOR_TAG)) customElements.define(LEGACY_EDITOR_TAG, class extends SolarFlowCardEditor {});
 
 window.customCards = window.customCards || [];
 if (!window.customCards.some((card) => card.type === CARD_TAG)) {

@@ -38,9 +38,15 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "2.0.0-beta.4";
-const CARD_TAG = "solar-flow-card";
-const EDITOR_TAG = "solar-flow-card-editor";
+const CARD_VERSION = "2.0.0";
+// The card's type is custom:home-energy-hub since 2.0.0. The old name stays
+// registered so dashboards with custom:solar-flow-card keep working.
+const CARD_TAG = "home-energy-hub";
+const EDITOR_TAG = "home-energy-hub-editor";
+const LEGACY_CARD_TAG = "solar-flow-card";
+const LEGACY_EDITOR_TAG = "solar-flow-card-editor";
+const CARD_TYPE = `custom:${CARD_TAG}`;
+const LEGACY_CARD_TYPE = `custom:${LEGACY_CARD_TAG}`;
 const THEMES = ["diorama", "aurora", "paper", "lcars", "atlantis", "expanse", "foundation", "galaxy", "gate", "reactor"];
 const PERIODS = ["today", "3d", "7d", "month", "all"];
 // A flow below this many watts counts as idle.
@@ -309,7 +315,7 @@ const TRANSLATIONS = {
     "customTitle": "My sensors",
     "chartFallback": "Hourly averages from the energy statistics. No power history for: {sensors} (excluded from the recorder?)",
     "chartNoHistory": "No history for: {sensors}. Excluded from the recorder?",
-    "editorBeta": "Beta: the new editor. Options it does not show stay in your YAML as they are.",
+    "editorRenamed": "This card is now called Home Energy Hub. Its type changes from custom:solar-flow-card to custom:home-energy-hub with your next change here; the old type keeps working too.",
     "editorGroups": {
       "look": "Appearance",
       "sensors": "Sensors",
@@ -745,7 +751,7 @@ const TRANSLATIONS = {
     },
     "chartFallback": "Stundenmittel aus der Energiestatistik. Kein Leistungsverlauf für: {sensors} (vom Recorder ausgeschlossen?)",
     "chartNoHistory": "Kein Verlauf für: {sensors}. Vom Recorder ausgeschlossen?",
-    "editorBeta": "Beta: der neue Editor. Optionen, die hier fehlen, bleiben unverändert in deinem YAML.",
+    "editorRenamed": "Diese Karte heißt jetzt Home Energy Hub. Mit deiner nächsten Änderung hier wird ihr Typ von custom:solar-flow-card zu custom:home-energy-hub; der alte Typ funktioniert weiterhin.",
     "editorGroups": {
       "look": "Darstellung",
       "sensors": "Sensoren",
@@ -1181,7 +1187,7 @@ const TRANSLATIONS = {
     "customTitle": "Mijn sensoren",
     "chartFallback": "Uurgemiddelden uit de energiestatistieken. Geen vermogenshistorie voor: {sensors} (uitgesloten van de recorder?)",
     "chartNoHistory": "Geen historie voor: {sensors}. Uitgesloten van de recorder?",
-    "editorBeta": "Bèta: de nieuwe editor. Opties die hier niet staan, blijven ongewijzigd in je YAML.",
+    "editorRenamed": "Deze kaart heet nu Home Energy Hub. Bij je volgende wijziging hier verandert het type van custom:solar-flow-card naar custom:home-energy-hub; het oude type blijft ook werken.",
     "editorGroups": {
       "look": "Weergave",
       "sensors": "Sensoren",
@@ -1617,7 +1623,7 @@ const TRANSLATIONS = {
     "customTitle": "Moje czujniki",
     "chartFallback": "Średnie godzinowe ze statystyk energii. Brak historii mocy dla: {sensors} (wyłączone z recordera?)",
     "chartNoHistory": "Brak historii dla: {sensors}. Czy nie są wyłączone z recordera?",
-    "editorBeta": "Beta: nowy edytor. Opcje, których tu nie ma, zostają w YAML-u bez zmian.",
+    "editorRenamed": "Ta karta nazywa się teraz Home Energy Hub. Przy następnej zmianie tutaj jej typ zmieni się z custom:solar-flow-card na custom:home-energy-hub; stary typ też dalej działa.",
     "editorGroups": {
       "look": "Wygląd",
       "sensors": "Czujniki",
@@ -7701,6 +7707,9 @@ class SolarFlowCardEditor extends HTMLElement {
     // The editor writes the current option names; an old name is replaced on
     // the next change. Options it does not show are kept as they are.
     const next = migrateConfig(config || {});
+    // The old type is written as the new one with the next change.
+    this._legacyType = next.type === LEGACY_CARD_TYPE;
+    if (this._legacyType) next.type = CARD_TYPE;
     // Home Assistant hands every change back: nothing to redraw then, so the
     // field being edited keeps its focus.
     if (JSON.stringify(next) === JSON.stringify(this._config) && this.shadowRoot.childElementCount) return;
@@ -7725,6 +7734,11 @@ class SolarFlowCardEditor extends HTMLElement {
 
   _emit(next) {
     this._config = next;
+    // The first change writes the new type: the note about it goes.
+    if (this._legacyType) {
+      this._legacyType = false;
+      this.shadowRoot.querySelector("p.beta")?.remove();
+    }
     this.dispatchEvent(new CustomEvent("config-changed", { detail: { config: next }, bubbles: true, composed: true }));
   }
 
@@ -8280,7 +8294,7 @@ class SolarFlowCardEditor extends HTMLElement {
       <datalist id="sfc-sensor">${ids("sensor").map((id) => `<option value="${escapeHtml(id)}"></option>`).join("")}</datalist>
       <datalist id="sfc-weather">${ids("weather").map((id) => `<option value="${escapeHtml(id)}"></option>`).join("")}</datalist>
       <div class="editor">
-        <p class="beta">${escapeHtml(t.editorBeta)}</p>
+        ${this._legacyType ? `<p class="beta">${escapeHtml(t.editorRenamed)}</p>` : ""}
         ${this._group("look", t, () => this._lookHtml(t))}
         ${this._group("sensors", t, () => this._sensorsHtml(t))}
         ${this._group("sections", t, () => this._sectionsHtml(t))}
@@ -8444,6 +8458,10 @@ class SolarFlowCardEditor extends HTMLElement {
 
 if (!customElements.get(CARD_TAG)) customElements.define(CARD_TAG, SolarFlowCard);
 if (!customElements.get(EDITOR_TAG)) customElements.define(EDITOR_TAG, SolarFlowCardEditor);
+// The old names, for dashboards from before 2.0.0 (a class can be defined
+// only once, hence the subclasses).
+if (!customElements.get(LEGACY_CARD_TAG)) customElements.define(LEGACY_CARD_TAG, class extends SolarFlowCard {});
+if (!customElements.get(LEGACY_EDITOR_TAG)) customElements.define(LEGACY_EDITOR_TAG, class extends SolarFlowCardEditor {});
 
 window.customCards = window.customCards || [];
 if (!window.customCards.some((card) => card.type === CARD_TAG)) {

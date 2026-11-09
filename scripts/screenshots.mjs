@@ -29,7 +29,7 @@ for (const theme of (process.env.THEMES || "diorama,aurora,paper,lcars,atlantis,
   await page.goto(`http://localhost:${port}/demo/index.html?theme=${theme}&scenario=${scenario}&language=${language}&period=${period}&solar=${process.env.SOLAR ?? "1"}&battery=${process.env.BATTERY ?? "1"}&weather=${process.env.WEATHER ?? ""}&wide=${process.env.WIDE ?? "0"}&panels=${process.env.PANELS ?? "opt"}&width=${process.env.WIDTH ?? "520"}`);
   await page.waitForFunction(() => window.demoReady);
   await page.waitForTimeout(1500);
-  const card = page.locator("solar-flow-card").first();
+  const card = page.locator("home-energy-hub").first();
   await card.screenshot({ path: join(out, `${theme}.png`) });
   await page.close();
 }
