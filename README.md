@@ -450,7 +450,7 @@ Nothing is planned right now. Ideas and votes are welcome in [issues](https://gi
 
 ## Translations
 
-The card speaks English, Polish, Dutch (thanks to @furian88) and German (thanks to @AndiBo62). Every language is one JSON file in [`translations/`](translations/); adding yours takes a copy of `en.json` and no programming. See [CONTRIBUTING.md](CONTRIBUTING.md#add-or-improve-a-translation).
+The card speaks English, Polish, Dutch (thanks to @furian88), German (thanks to @AndiBo62) and European Portuguese (thanks to @dresende; Home Assistant set to Brazilian Portuguese uses it too). Every language is one JSON file in [`translations/`](translations/); adding yours takes a copy of `en.json` and no programming. See [CONTRIBUTING.md](CONTRIBUTING.md#add-or-improve-a-translation).
 
 ## Development
 

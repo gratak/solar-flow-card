@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.1
+
+- **Portuguese:** a full European Portuguese (pt-PT) translation, thanks to @dresende ([#107](https://github.com/gratak/solar-flow-card/pull/107)). Home Assistant set to Brazilian Portuguese uses it too.
+
 ## 2.0.0
 
 **Home Energy Hub 2.0.** Everything from the 1.8 and 2.0 betas, now stable, and a new card type. The details of each change are in the beta sections below.
