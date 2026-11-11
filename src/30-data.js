@@ -1453,6 +1453,95 @@ function customValue(item, locale) {
   return unit ? `${number}${unit === "%" ? "" : "\u00a0"}${unit}` : number;
 }
 
+// ---------------------------------------------------------------------------
+// Consumers: where the home's power goes. `consumers:` lists devices with a
+// power and/or an energy sensor; without it the individual devices of Home
+// Assistant's Energy dashboard are used (`consumers: false` turns it off).
+// ---------------------------------------------------------------------------
+
+function consumerList(hass, config) {
+  if (config.consumers === false) return [];
+  const states = hass?.states || {};
+  const known = (id) => (typeof id === "string" && states[id] ? id : null);
+  const own = Array.isArray(config.consumers);
+  const source = own
+    ? config.consumers.filter((item) => item && typeof item === "object").map((item) => ({ name: item.name, power: item.power, energy: item.energy, parent: null }))
+    : config._energy?.devices || [];
+  return source.map((item) => {
+    const power = known(item.power);
+    const energy = known(item.energy);
+    if (!power && !energy) return null;
+    const stateObj = states[power || energy];
+    return { name: item.name ? String(item.name) : stateObj.attributes?.friendly_name || power || energy, power, energy, parent: item.parent || null };
+  }).filter(Boolean);
+}
+
+// Today's energy of each consumer's counter (kWh by sensor): the hourly
+// statistics since midnight plus what the sensor added since the last hour.
+async function loadConsumersToday(hass, list) {
+  const ids = [...new Set(list.map((item) => item.energy).filter(Boolean))];
+  if (!ids.length) return {};
+  const midnight = startOfDay(new Date()).getTime();
+  const response = await hass.callWS({
+    type: "recorder/statistics_during_period",
+    start_time: new Date(midnight - 3600000).toISOString(),
+    end_time: new Date().toISOString(),
+    statistic_ids: ids,
+    period: "hour",
+    types: ["change", "state"],
+    units: { energy: "kWh" },
+  });
+  const out = {};
+  for (const id of ids) {
+    let change = 0;
+    let last = null;
+    for (const row of response?.[id] || []) {
+      if (statStart(row.start) >= midnight) change += Math.max(0, Number(row.change) || 0);
+      if (Number.isFinite(Number(row.state))) last = Number(row.state);
+    }
+    if (response?.[id]?.length) out[id] = { change, last };
+  }
+  return out;
+}
+
+// The consumers with their power now and energy today, the biggest first,
+// and "other": what the home uses beyond the listed devices. A device that
+// is part of another listed one (Energy dashboard: "included in") is not
+// counted twice.
+function consumersData(hass, config, live, today, stats) {
+  const list = consumerList(hass, config);
+  if (!list.length) return null;
+  const states = hass.states;
+  const items = list.map((item) => {
+    const watts = item.power ? wattsOf(states[item.power]) : null;
+    const now = item.energy ? kwhOf(states[item.energy]) : null;
+    const stat = item.energy ? stats?.[item.energy] : null;
+    return {
+      name: item.name,
+      entityId: item.power || item.energy,
+      power: isNum(watts) ? Math.max(0, watts) : null,
+      today: stat ? stat.change + (isNum(now) && isNum(stat.last) ? Math.max(0, now - stat.last) : 0) : null,
+      nested: Boolean(item.parent && list.some((other) => other.energy === item.parent)),
+    };
+  });
+  const top = items.filter((item) => !item.nested);
+  const sum = (key) => top.reduce((total, item) => total + (isNum(item[key]) ? item[key] : 0), 0);
+  const powered = top.some((item) => isNum(item.power));
+  const counted = top.some((item) => isNum(item.today));
+  const otherPower = powered && isNum(live.load) ? live.load - sum("power") : null;
+  const otherToday = counted && isNum(today.load) ? today.load - sum("today") : null;
+  const scale = Math.max(isNum(live.load) ? live.load : 0, ...items.map((item) => item.power || 0), 1);
+  items.sort((a, b) => (b.power ?? -1) - (a.power ?? -1) || (b.today ?? -1) - (a.today ?? -1));
+  return {
+    items,
+    scale,
+    powered,
+    counted,
+    other: (isNum(otherPower) && otherPower > ACTIVE_W) || (isNum(otherToday) && otherToday > 0.05)
+      ? { power: isNum(otherPower) ? Math.max(0, otherPower) : null, today: isNum(otherToday) ? Math.max(0, otherToday) : null } : null,
+  };
+}
+
 // Several batteries (the `batteries:` option): the themes show them as one
 // combined battery, the Installation section lists each. Power is signed
 // like battery_power (+ discharging); `invert: true` flips one battery.

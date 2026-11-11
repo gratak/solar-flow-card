@@ -320,6 +320,9 @@ const TRANSLATIONS = {
     "pvProducedOf": "{done} of {total} produced so far",
     "pvRange": "range {low}–{high}",
     "customTitle": "My sensors",
+    "consumersTitle": "Consumers",
+    "consumersHint": "now · today",
+    "consumersOther": "Other",
     "chartFallback": "Hourly averages from the energy statistics. No power history for: {sensors} (excluded from the recorder?)",
     "chartNoHistory": "No history for: {sensors}. Excluded from the recorder?",
     "editorRenamed": "This card is now called Home Energy Hub. Its type changes from custom:solar-flow-card to custom:home-energy-hub with your next change here; the old type keeps working too.",
@@ -390,7 +393,8 @@ const TRANSLATIONS = {
       "insights": "Today at a glance",
       "comparison": "Comparison",
       "panels": "Panels",
-      "prices": "Energy prices"
+      "prices": "Energy prices",
+      "consumers": "Consumers (where the power goes)"
     },
     "editorFolded": "folded",
     "editorUp": "Move up",
@@ -434,6 +438,10 @@ const TRANSLATIONS = {
     "editorBatteriesHint": "Two or more batteries are shown as one: power summed, level weighted by capacity. Each one is listed in the Installation section.",
     "editorPanels": "Panel sensors (optimizers)",
     "editorPanelsHint": "One entry per panel with its energy today; without these the card uses DeyeCloud optimizers or the estimate from the strings.",
+    "editorConsumers": "Consumers",
+    "editorConsumersHint": "Devices with their power and/or energy sensor, e.g. a heat pump or an EV charger: a section shows where the home's power goes. Left empty, the individual devices of Home Assistant's Energy dashboard are used.",
+    "editorConsPower": "Power (optional)",
+    "editorConsEnergy": "Energy counter (optional)",
     "editorAdd": "Add",
     "editorRemove": "Remove",
     "editorConfirmRemove": "Remove this item and its settings?",
@@ -732,6 +740,9 @@ const TRANSLATIONS = {
     "pvProducedOf": "{done} von {total} bisher erzeugt",
     "pvRange": "Spanne {low}–{high}",
     "customTitle": "Meine Sensoren",
+    "consumersTitle": "Verbraucher",
+    "consumersHint": "jetzt · heute",
+    "consumersOther": "Sonstige",
     "reactorGrid": "Netzunterstützung",
     "reactorNominal": "Nennleistung",
     "reactorOverdrive": "Overdrive",
@@ -835,7 +846,8 @@ const TRANSLATIONS = {
       "insights": "Heute auf einen Blick",
       "comparison": "Vergleich",
       "panels": "Module",
-      "prices": "Energiepreise"
+      "prices": "Energiepreise",
+      "consumers": "Verbraucher (wohin der Strom geht)"
     },
     "editorFolded": "eingeklappt",
     "editorUp": "Nach oben",
@@ -879,6 +891,10 @@ const TRANSLATIONS = {
     "editorBatteriesHint": "Zwei oder mehr Batterien werden als eine gezeigt: Leistung summiert, Ladestand nach Kapazität gewichtet. Jede steht einzeln im Abschnitt Anlage.",
     "editorPanels": "Modulsensoren (Optimierer)",
     "editorPanelsHint": "Ein Eintrag pro Modul mit seiner Energie von heute; ohne sie nutzt die Karte DeyeCloud-Optimierer oder die Schätzung aus den Strings.",
+    "editorConsumers": "Verbraucher",
+    "editorConsumersHint": "Geräte mit Leistungs- und/oder Energiesensor, z. B. Wärmepumpe oder Wallbox: ein Abschnitt zeigt, wohin der Strom im Haus geht. Bleibt die Liste leer, werden die einzelnen Geräte des Energie-Dashboards von Home Assistant verwendet.",
+    "editorConsPower": "Leistung (optional)",
+    "editorConsEnergy": "Energiezähler (optional)",
     "editorAdd": "Hinzufügen",
     "editorRemove": "Entfernen",
     "editorConfirmRemove": "Diesen Eintrag mit seinen Einstellungen entfernen?",
@@ -1210,6 +1226,9 @@ const TRANSLATIONS = {
     "pvProducedOf": "{done} sur {total} produits jusqu'ici",
     "pvRange": "plage {low}–{high}",
     "customTitle": "Mes capteurs",
+    "consumersTitle": "Consommateurs",
+    "consumersHint": "maintenant · aujourd'hui",
+    "consumersOther": "Autres",
     "chartFallback": "Moyennes horaires des statistiques d'énergie. Aucun historique de puissance pour : {sensors} (exclu de l'enregistreur ?)",
     "chartNoHistory": "Aucun historique pour : {sensors}. Exclu de l'enregistreur ?",
     "editorRenamed": "Cette carte s'appelle désormais Home Energy Hub. Son type passe de custom:solar-flow-card à custom:home-energy-hub lors de votre prochaine modification ici ; l'ancien type continue aussi de fonctionner.",
@@ -1280,7 +1299,8 @@ const TRANSLATIONS = {
       "insights": "Aperçu du jour",
       "comparison": "Comparaison",
       "panels": "Panneaux",
-      "prices": "Prix de l'énergie"
+      "prices": "Prix de l'énergie",
+      "consumers": "Consommateurs (où va l'électricité)"
     },
     "editorFolded": "repliée",
     "editorUp": "Monter",
@@ -1324,6 +1344,10 @@ const TRANSLATIONS = {
     "editorBatteriesHint": "Deux batteries ou plus sont affichées comme une seule : puissance additionnée, niveau pondéré par la capacité. Chacune est listée dans la section Installation.",
     "editorPanels": "Capteurs de panneaux (optimiseurs)",
     "editorPanelsHint": "Une entrée par panneau avec son énergie du jour ; sans cela, la carte utilise les optimiseurs DeyeCloud ou l'estimation à partir des chaînes.",
+    "editorConsumers": "Consommateurs",
+    "editorConsumersHint": "Des appareils avec leur capteur de puissance et/ou d'énergie, par ex. une pompe à chaleur ou une borne de recharge : une section montre où va l'électricité de la maison. Si la liste est vide, les appareils individuels du tableau de bord Énergie de Home Assistant sont utilisés.",
+    "editorConsPower": "Puissance (optionnel)",
+    "editorConsEnergy": "Compteur d'énergie (optionnel)",
     "editorAdd": "Ajouter",
     "editorRemove": "Supprimer",
     "editorConfirmRemove": "Supprimer cet élément et ses réglages ?",
@@ -1655,6 +1679,9 @@ const TRANSLATIONS = {
     "pvProducedOf": "{done} van {total} opgewekt",
     "pvRange": "bereik {low}–{high}",
     "customTitle": "Mijn sensoren",
+    "consumersTitle": "Verbruikers",
+    "consumersHint": "nu · vandaag",
+    "consumersOther": "Overig",
     "chartFallback": "Uurgemiddelden uit de energiestatistieken. Geen vermogenshistorie voor: {sensors} (uitgesloten van de recorder?)",
     "chartNoHistory": "Geen historie voor: {sensors}. Uitgesloten van de recorder?",
     "editorRenamed": "Deze kaart heet nu Home Energy Hub. Bij je volgende wijziging hier verandert het type van custom:solar-flow-card naar custom:home-energy-hub; het oude type blijft ook werken.",
@@ -1725,7 +1752,8 @@ const TRANSLATIONS = {
       "insights": "Vandaag in het kort",
       "comparison": "Vergelijking",
       "panels": "Panelen",
-      "prices": "Energieprijzen"
+      "prices": "Energieprijzen",
+      "consumers": "Verbruikers (waar de stroom heen gaat)"
     },
     "editorFolded": "ingeklapt",
     "editorUp": "Omhoog",
@@ -1769,6 +1797,10 @@ const TRANSLATIONS = {
     "editorBatteriesHint": "Twee of meer batterijen worden als één getoond: vermogen opgeteld, niveau gewogen naar capaciteit. Elke batterij staat apart bij Installatie.",
     "editorPanels": "Paneelsensoren (optimizers)",
     "editorPanelsHint": "Eén regel per paneel met de energie van vandaag; zonder deze gebruikt de kaart DeyeCloud-optimizers of de schatting uit de strings.",
+    "editorConsumers": "Verbruikers",
+    "editorConsumersHint": "Apparaten met hun vermogens- en/of energiesensor, bijv. een warmtepomp of laadpaal: een sectie toont waar de stroom in huis heen gaat. Leeg gelaten worden de individuele apparaten van het Energie-dashboard van Home Assistant gebruikt.",
+    "editorConsPower": "Vermogen (optioneel)",
+    "editorConsEnergy": "Energieteller (optioneel)",
     "editorAdd": "Toevoegen",
     "editorRemove": "Verwijderen",
     "editorConfirmRemove": "Dit item met zijn instellingen verwijderen?",
@@ -2100,6 +2132,9 @@ const TRANSLATIONS = {
     "pvProducedOf": "wyprodukowano {done} z {total}",
     "pvRange": "zakres {low}–{high}",
     "customTitle": "Moje czujniki",
+    "consumersTitle": "Odbiorniki",
+    "consumersHint": "teraz · dziś",
+    "consumersOther": "Pozostałe",
     "chartFallback": "Średnie godzinowe ze statystyk energii. Brak historii mocy dla: {sensors} (wyłączone z recordera?)",
     "chartNoHistory": "Brak historii dla: {sensors}. Czy nie są wyłączone z recordera?",
     "editorRenamed": "Ta karta nazywa się teraz Home Energy Hub. Przy następnej zmianie tutaj jej typ zmieni się z custom:solar-flow-card na custom:home-energy-hub; stary typ też dalej działa.",
@@ -2170,7 +2205,8 @@ const TRANSLATIONS = {
       "insights": "Dziś w skrócie",
       "comparison": "Porównanie",
       "panels": "Panele",
-      "prices": "Ceny energii"
+      "prices": "Ceny energii",
+      "consumers": "Odbiorniki (na co idzie prąd)"
     },
     "editorFolded": "zwinięta",
     "editorUp": "W górę",
@@ -2214,6 +2250,10 @@ const TRANSLATIONS = {
     "editorBatteriesHint": "Dwa lub więcej magazynów karta pokazuje jako jeden: moc sumowana, poziom ważony pojemnością. Każdy jest osobno w sekcji Instalacja.",
     "editorPanels": "Czujniki paneli (optymalizatory)",
     "editorPanelsHint": "Jeden wpis na panel z jego dzisiejszą energią; bez nich karta korzysta z optymalizatorów DeyeCloud albo szacunku ze stringów.",
+    "editorConsumers": "Odbiorniki",
+    "editorConsumersHint": "Urządzenia z czujnikiem mocy i/lub energii, np. pompa ciepła albo ładowarka: sekcja pokazuje, na co idzie prąd w domu. Gdy lista jest pusta, karta bierze urządzenia z panelu Energia Home Assistant.",
+    "editorConsPower": "Moc (opcjonalnie)",
+    "editorConsEnergy": "Licznik energii (opcjonalnie)",
     "editorAdd": "Dodaj",
     "editorRemove": "Usuń",
     "editorConfirmRemove": "Usunąć ten element razem z ustawieniami?",
@@ -2545,6 +2585,9 @@ const TRANSLATIONS = {
     "pvProducedOf": "{done} de {total} produzidos até agora",
     "pvRange": "intervalo {low}–{high}",
     "customTitle": "Os meus sensores",
+    "consumersTitle": "Consumidores",
+    "consumersHint": "agora · hoje",
+    "consumersOther": "Outros",
     "chartFallback": "Médias horárias das estatísticas de energia. Sem histórico de potência para: {sensors} (excluído do gravador?)",
     "chartNoHistory": "Sem histórico para: {sensors}. Excluído do gravador?",
     "editorRenamed": "Este cartão agora chama-se Home Energy Hub. O seu tipo muda de custom:solar-flow-card para custom:home-energy-hub com a próxima alteração aqui; o tipo antigo continua a funcionar.",
@@ -2615,7 +2658,8 @@ const TRANSLATIONS = {
       "insights": "Hoje de relance",
       "comparison": "Comparação",
       "panels": "Painéis",
-      "prices": "Preços de energia"
+      "prices": "Preços de energia",
+      "consumers": "Consumidores (para onde vai a energia)"
     },
     "editorFolded": "recolhido",
     "editorUp": "Mover para cima",
@@ -2659,6 +2703,10 @@ const TRANSLATIONS = {
     "editorBatteriesHint": "Duas ou mais baterias são mostradas como uma: potência somada, nível ponderado pela capacidade. Cada uma é listada na secção de Instalação.",
     "editorPanels": "Sensores de painéis (otimizadores)",
     "editorPanelsHint": "Uma entrada por painel com a sua energia hoje; sem estes o cartão usa os otimizadores DeyeCloud ou a estimativa das strings.",
+    "editorConsumers": "Consumidores",
+    "editorConsumersHint": "Dispositivos com o seu sensor de potência e/ou de energia, p.ex. uma bomba de calor ou um carregador de VE: uma secção mostra para onde vai a energia da casa. Se a lista ficar vazia, são usados os dispositivos individuais do painel Energia do Home Assistant.",
+    "editorConsPower": "Potência (opcional)",
+    "editorConsEnergy": "Contador de energia (opcional)",
     "editorAdd": "Adicionar",
     "editorRemove": "Remover",
     "editorConfirmRemove": "Remover este item e as suas configurações?",
@@ -4416,6 +4464,95 @@ function customValue(item, locale) {
   return unit ? `${number}${unit === "%" ? "" : "\u00a0"}${unit}` : number;
 }
 
+// ---------------------------------------------------------------------------
+// Consumers: where the home's power goes. `consumers:` lists devices with a
+// power and/or an energy sensor; without it the individual devices of Home
+// Assistant's Energy dashboard are used (`consumers: false` turns it off).
+// ---------------------------------------------------------------------------
+
+function consumerList(hass, config) {
+  if (config.consumers === false) return [];
+  const states = hass?.states || {};
+  const known = (id) => (typeof id === "string" && states[id] ? id : null);
+  const own = Array.isArray(config.consumers);
+  const source = own
+    ? config.consumers.filter((item) => item && typeof item === "object").map((item) => ({ name: item.name, power: item.power, energy: item.energy, parent: null }))
+    : config._energy?.devices || [];
+  return source.map((item) => {
+    const power = known(item.power);
+    const energy = known(item.energy);
+    if (!power && !energy) return null;
+    const stateObj = states[power || energy];
+    return { name: item.name ? String(item.name) : stateObj.attributes?.friendly_name || power || energy, power, energy, parent: item.parent || null };
+  }).filter(Boolean);
+}
+
+// Today's energy of each consumer's counter (kWh by sensor): the hourly
+// statistics since midnight plus what the sensor added since the last hour.
+async function loadConsumersToday(hass, list) {
+  const ids = [...new Set(list.map((item) => item.energy).filter(Boolean))];
+  if (!ids.length) return {};
+  const midnight = startOfDay(new Date()).getTime();
+  const response = await hass.callWS({
+    type: "recorder/statistics_during_period",
+    start_time: new Date(midnight - 3600000).toISOString(),
+    end_time: new Date().toISOString(),
+    statistic_ids: ids,
+    period: "hour",
+    types: ["change", "state"],
+    units: { energy: "kWh" },
+  });
+  const out = {};
+  for (const id of ids) {
+    let change = 0;
+    let last = null;
+    for (const row of response?.[id] || []) {
+      if (statStart(row.start) >= midnight) change += Math.max(0, Number(row.change) || 0);
+      if (Number.isFinite(Number(row.state))) last = Number(row.state);
+    }
+    if (response?.[id]?.length) out[id] = { change, last };
+  }
+  return out;
+}
+
+// The consumers with their power now and energy today, the biggest first,
+// and "other": what the home uses beyond the listed devices. A device that
+// is part of another listed one (Energy dashboard: "included in") is not
+// counted twice.
+function consumersData(hass, config, live, today, stats) {
+  const list = consumerList(hass, config);
+  if (!list.length) return null;
+  const states = hass.states;
+  const items = list.map((item) => {
+    const watts = item.power ? wattsOf(states[item.power]) : null;
+    const now = item.energy ? kwhOf(states[item.energy]) : null;
+    const stat = item.energy ? stats?.[item.energy] : null;
+    return {
+      name: item.name,
+      entityId: item.power || item.energy,
+      power: isNum(watts) ? Math.max(0, watts) : null,
+      today: stat ? stat.change + (isNum(now) && isNum(stat.last) ? Math.max(0, now - stat.last) : 0) : null,
+      nested: Boolean(item.parent && list.some((other) => other.energy === item.parent)),
+    };
+  });
+  const top = items.filter((item) => !item.nested);
+  const sum = (key) => top.reduce((total, item) => total + (isNum(item[key]) ? item[key] : 0), 0);
+  const powered = top.some((item) => isNum(item.power));
+  const counted = top.some((item) => isNum(item.today));
+  const otherPower = powered && isNum(live.load) ? live.load - sum("power") : null;
+  const otherToday = counted && isNum(today.load) ? today.load - sum("today") : null;
+  const scale = Math.max(isNum(live.load) ? live.load : 0, ...items.map((item) => item.power || 0), 1);
+  items.sort((a, b) => (b.power ?? -1) - (a.power ?? -1) || (b.today ?? -1) - (a.today ?? -1));
+  return {
+    items,
+    scale,
+    powered,
+    counted,
+    other: (isNum(otherPower) && otherPower > ACTIVE_W) || (isNum(otherToday) && otherToday > 0.05)
+      ? { power: isNum(otherPower) ? Math.max(0, otherPower) : null, today: isNum(otherToday) ? Math.max(0, otherToday) : null } : null,
+  };
+}
+
 // Several batteries (the `batteries:` option): the themes show them as one
 // combined battery, the Installation section lists each. Power is signed
 // like battery_power (+ discharging); `invert: true` flips one battery.
@@ -4814,6 +4951,32 @@ function pvForecastHtml(m) {
     </section>`;
 }
 
+// Consumers: each device's power now as a bar against the home's load, its
+// energy today, and what is left as "other".
+function consumersHtml(m) {
+  const c = m.consumers;
+  if (!c) return "";
+  const { t, locale } = m;
+  const row = (item, cls = "") => `
+        <button class="sfc-cons ${cls} ${isNum(item.power) && item.power > ACTIVE_W ? "on" : ""}" ${item.entityId ? `data-entity="${escapeHtml(item.entityId)}"` : "disabled"}>
+          <small>${escapeHtml(item.name)}</small>
+          ${c.powered ? `<span class="sfc-pvf-bar"><i style="width:${isNum(item.power) ? clamp((item.power / c.scale) * 100, 0, 100).toFixed(1) : 0}%"></i></span>
+          <strong>${escapeHtml(isNum(item.power) ? formatPower(item.power, locale) : "—")}</strong>` : ""}
+          ${c.counted ? `<em>${escapeHtml(isNum(item.today) ? formatEnergy(item.today, locale) : "—")}</em>` : ""}
+        </button>`;
+  return `
+    <section class="sfc-section sfc-consumers">
+      <div class="sfc-head">
+        <div><span class="sfc-kicker">${MINI_ICONS.bolt}</span><h3>${escapeHtml(t.consumersTitle)}</h3></div>
+        ${c.counted ? `<span class="sfc-hint">${escapeHtml(t.consumersHint)}</span>` : ""}
+      </div>
+      <div class="sfc-cons-list ${c.powered ? "" : "no-power"} ${c.counted ? "" : "no-energy"}">
+        ${c.items.map((item) => row(item, item.nested ? "nested" : "")).join("")}
+        ${c.other ? row({ name: t.consumersOther, power: c.other.power, today: c.other.today }, "other") : ""}
+      </div>
+    </section>`;
+}
+
 // Energy prices by the hour: today (and tomorrow once published) as bars
 // from green (cheap) to red (dear), the hour now marked, the hours gone
 // dimmed, negative prices below the line.
@@ -5144,14 +5307,15 @@ const SECTION_HTML = {
   prices: pricesHtml,
   virtual_storage: virtualStorageHtml,
   system: systemHtml,
+  consumers: consumersHtml,
   energy: energySectionHtml,
   insights: insightsHtml,
   comparison: comparisonHtml,
   panels: panelsHtml,
 };
 const SECTION_IDS = ["flow", "today", "sources", ...Object.keys(SECTION_HTML)];
-const SECTION_ORDER = ["inverter", "forecast", "pv_forecast", "prices", "virtual_storage", "system", "energy", "insights", "comparison", "panels"];
-const SECTION_ORDER_WIDE = ["energy", "inverter", "forecast", "pv_forecast", "prices", "virtual_storage", "insights", "comparison", "system", "panels"];
+const SECTION_ORDER = ["inverter", "forecast", "pv_forecast", "prices", "virtual_storage", "system", "consumers", "energy", "insights", "comparison", "panels"];
+const SECTION_ORDER_WIDE = ["energy", "inverter", "forecast", "pv_forecast", "prices", "virtual_storage", "insights", "comparison", "system", "consumers", "panels"];
 
 // custom_1, custom_2… for the sections of `custom_sections:`.
 function customIds(config) {
@@ -5204,6 +5368,10 @@ function foldSummary(m, id) {
     const row = compareTableRows(m)[0];
     const names = { solar: t.pvProduction, load: t.consumption, gridImport: t.gridImport, gridExport: t.gridExport };
     return row ? [t.compareTitle, names[row.name], formatEnergy(row.today, locale)] : [t.compareTitle, "", ""];
+  }
+  if (id === "consumers") {
+    const first = m.consumers?.items[0];
+    return [t.consumersTitle, first?.name || "", first ? (isNum(first.power) ? formatPower(first.power, locale) : formatEnergy(first.today, locale)) : ""];
   }
   if (id === "panels") return [t.panelsTitle, "", isNum(m.panels?.average) ? fill(t.panelAvg, { kwh: formatEnergy(m.panels.average, locale) }) : ""];
   const custom = m.custom?.find((c) => c.id === id);
@@ -6662,7 +6830,7 @@ function renderGate(m) {
         </div>
       </div>
       <div class="gt-energy">${sectionShown(m, "energy") ? sectionHtml(m, "energy") : ""}</div>
-      <div class="sfc-sections">${standardSections(m, ["inverter", "pv_forecast", "prices", "virtual_storage", "insights", "comparison", "system", "panels"], ["energy"])}</div>
+      <div class="sfc-sections">${standardSections(m, ["inverter", "pv_forecast", "prices", "virtual_storage", "insights", "comparison", "system", "consumers", "panels"], ["energy"])}</div>
     </div>`;
 }
 
@@ -6948,6 +7116,19 @@ const BASE_CSS = `
   .sfc-pvf-day small { color: var(--sfc-muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sfc-pvf-day.today small { color: var(--sfc-text); font-weight: 700; }
   .sfc-pvf-day strong { min-width: 4.8em; text-align: right; font-size: 13px; font-family: var(--sfc-num-font, inherit); }
+  /* Consumers: name, bar, power now, energy today. */
+  .sfc-cons-list { display: grid; grid-template-columns: minmax(4.5em, max-content) minmax(40px, 1fr) max-content max-content; gap: 7px 10px; align-items: center; }
+  .sfc-cons-list.no-power { grid-template-columns: minmax(0, 1fr) max-content; }
+  .sfc-cons-list.no-energy { grid-template-columns: minmax(4.5em, max-content) minmax(40px, 1fr) max-content; }
+  .sfc-cons { display: grid; grid-column: 1 / -1; grid-template-columns: subgrid; align-items: center; padding: 1px 0; border: 0; background: none; text-align: left; color: inherit; }
+  .sfc-cons small { min-width: 0; max-width: 11em; color: var(--sfc-muted); font-size: 12px; line-height: 1.2; overflow-wrap: anywhere; }
+  .sfc-cons.on small { color: var(--sfc-text); font-weight: 700; }
+  .sfc-cons.nested small { padding-left: 10px; }
+  .sfc-cons strong { text-align: right; font-size: 13px; font-family: var(--sfc-num-font, inherit); white-space: nowrap; }
+  .sfc-cons em { text-align: right; font-style: normal; font-size: 12px; font-family: var(--sfc-num-font, inherit); color: var(--sfc-muted); white-space: nowrap; }
+  .sfc-cons .sfc-pvf-bar i { background: var(--sfc-load); }
+  .sfc-cons.other .sfc-pvf-bar i { background: color-mix(in srgb, var(--sfc-muted) 60%, transparent); }
+  .sfc-cons.other small { font-style: italic; }
   .sfc-pvf-bar { position: relative; height: 10px; border-radius: 999px; background: var(--sfc-track); overflow: hidden; }
   .sfc-pvf-bar i { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: color-mix(in srgb, var(--sfc-pv) 45%, transparent); }
   .sfc-pvf-bar b { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--sfc-pv); }
@@ -8518,6 +8699,11 @@ class SolarFlowCard extends HTMLElement {
       const pvForecast = showSolar ? pvForecastData(this._hass, config, today) : null;
       const priceChart = priceChartData(this._hass, config);
       const custom = customSections(this._hass, config);
+      const consumerSensors = consumerList(this._hass, config);
+      const consumerStats = consumerSensors.some((item) => item.energy) && typeof this._hass.callWS === "function"
+        ? this._fetch(`consumers|${consumerSensors.map((item) => item.energy || "").join("+")}|${new Date().toDateString()}`, 5 * 60000, () => loadConsumersToday(this._hass, consumerSensors)).data
+        : null;
+      const consumers = consumersData(this._hass, config, live, today, consumerStats);
       const insights = this._insights(resolved, today, forecast);
       const weather = theme === "diorama" || theme === "reactor" ? weatherData(this._hass, config) : null;
       // The wide layout has room for everything: inverter details stay open.
@@ -8561,6 +8747,7 @@ class SolarFlowCard extends HTMLElement {
         priceChart && [priceChart.nowAt, priceChart.current, priceChart.hours.length],
         custom.map((c) => c.items.map((item) => item.state)),
         gridGuard && [Math.round(gridGuard.max * 10), Math.round(gridGuard.minutes)],
+        consumers && [consumers.items.map((item) => [item.power, isNum(item.today) ? Math.round(item.today * 100) : null]), consumers.other],
         Math.floor(now.getTime() / 60000),
       ]);
       if (signature === this._signature) return;
@@ -8601,6 +8788,7 @@ class SolarFlowCard extends HTMLElement {
         pvForecast,
         priceChart,
         custom,
+        consumers,
         gridGuard,
         inverter,
         system,
@@ -9351,6 +9539,7 @@ class SolarFlowCardEditor extends HTMLElement {
         ["name", "text", t.editorItemName], ["solar_power", "power", t.editorInvSolarPower], ["solar_energy", "energy", t.editorInvSolarEnergy],
         ["power", "power", t.editorInvPower], ["rated_power", "number", t.editorInvRated],
       ])}
+      ${this._listHtml(t, "consumers", t.editorConsumers, t.editorConsumersHint, [["name", "text", t.editorItemName], ["power", "power", t.editorConsPower], ["energy", "energy", t.editorConsEnergy]])}
       ${this._listHtml(t, "panels", t.editorPanels, t.editorPanelsHint, [["entity", "energy", t.editorPanelEnergy], ["power", "power", t.editorPanelPower], ["name", "text", t.editorItemName]])}`;
   }
 

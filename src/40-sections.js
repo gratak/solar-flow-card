@@ -179,6 +179,32 @@ function pvForecastHtml(m) {
     </section>`;
 }
 
+// Consumers: each device's power now as a bar against the home's load, its
+// energy today, and what is left as "other".
+function consumersHtml(m) {
+  const c = m.consumers;
+  if (!c) return "";
+  const { t, locale } = m;
+  const row = (item, cls = "") => `
+        <button class="sfc-cons ${cls} ${isNum(item.power) && item.power > ACTIVE_W ? "on" : ""}" ${item.entityId ? `data-entity="${escapeHtml(item.entityId)}"` : "disabled"}>
+          <small>${escapeHtml(item.name)}</small>
+          ${c.powered ? `<span class="sfc-pvf-bar"><i style="width:${isNum(item.power) ? clamp((item.power / c.scale) * 100, 0, 100).toFixed(1) : 0}%"></i></span>
+          <strong>${escapeHtml(isNum(item.power) ? formatPower(item.power, locale) : "—")}</strong>` : ""}
+          ${c.counted ? `<em>${escapeHtml(isNum(item.today) ? formatEnergy(item.today, locale) : "—")}</em>` : ""}
+        </button>`;
+  return `
+    <section class="sfc-section sfc-consumers">
+      <div class="sfc-head">
+        <div><span class="sfc-kicker">${MINI_ICONS.bolt}</span><h3>${escapeHtml(t.consumersTitle)}</h3></div>
+        ${c.counted ? `<span class="sfc-hint">${escapeHtml(t.consumersHint)}</span>` : ""}
+      </div>
+      <div class="sfc-cons-list ${c.powered ? "" : "no-power"} ${c.counted ? "" : "no-energy"}">
+        ${c.items.map((item) => row(item, item.nested ? "nested" : "")).join("")}
+        ${c.other ? row({ name: t.consumersOther, power: c.other.power, today: c.other.today }, "other") : ""}
+      </div>
+    </section>`;
+}
+
 // Energy prices by the hour: today (and tomorrow once published) as bars
 // from green (cheap) to red (dear), the hour now marked, the hours gone
 // dimmed, negative prices below the line.
@@ -509,14 +535,15 @@ const SECTION_HTML = {
   prices: pricesHtml,
   virtual_storage: virtualStorageHtml,
   system: systemHtml,
+  consumers: consumersHtml,
   energy: energySectionHtml,
   insights: insightsHtml,
   comparison: comparisonHtml,
   panels: panelsHtml,
 };
 const SECTION_IDS = ["flow", "today", "sources", ...Object.keys(SECTION_HTML)];
-const SECTION_ORDER = ["inverter", "forecast", "pv_forecast", "prices", "virtual_storage", "system", "energy", "insights", "comparison", "panels"];
-const SECTION_ORDER_WIDE = ["energy", "inverter", "forecast", "pv_forecast", "prices", "virtual_storage", "insights", "comparison", "system", "panels"];
+const SECTION_ORDER = ["inverter", "forecast", "pv_forecast", "prices", "virtual_storage", "system", "consumers", "energy", "insights", "comparison", "panels"];
+const SECTION_ORDER_WIDE = ["energy", "inverter", "forecast", "pv_forecast", "prices", "virtual_storage", "insights", "comparison", "system", "consumers", "panels"];
 
 // custom_1, custom_2… for the sections of `custom_sections:`.
 function customIds(config) {
@@ -569,6 +596,10 @@ function foldSummary(m, id) {
     const row = compareTableRows(m)[0];
     const names = { solar: t.pvProduction, load: t.consumption, gridImport: t.gridImport, gridExport: t.gridExport };
     return row ? [t.compareTitle, names[row.name], formatEnergy(row.today, locale)] : [t.compareTitle, "", ""];
+  }
+  if (id === "consumers") {
+    const first = m.consumers?.items[0];
+    return [t.consumersTitle, first?.name || "", first ? (isNum(first.power) ? formatPower(first.power, locale) : formatEnergy(first.today, locale)) : ""];
   }
   if (id === "panels") return [t.panelsTitle, "", isNum(m.panels?.average) ? fill(t.panelAvg, { kwh: formatEnergy(m.panels.average, locale) }) : ""];
   const custom = m.custom?.find((c) => c.id === id);
