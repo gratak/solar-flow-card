@@ -37,7 +37,7 @@
  *
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
-const CARD_VERSION = "2.0.0";
+const CARD_VERSION = "2.0.1";
 // The card's type is custom:home-energy-hub since 2.0.0. The old name stays
 // registered so dashboards with custom:solar-flow-card keep working.
 const CARD_TAG = "home-energy-hub";
