@@ -990,6 +990,80 @@ function batteryForecast(live, config) {
   return forecast;
 }
 
+// ---------------------------------------------------------------------------
+// The battery over the next day: the charge level simulated hour by hour
+// from the PV forecast and the home's usual consumption at that hour.
+// ---------------------------------------------------------------------------
+
+// The usual consumption by hour of the day (W), from the hourly energy
+// statistics of the last days; the load is derived when it has no sensor.
+function loadProfile(hourly, now = new Date()) {
+  if (!hourly) return null;
+  const hours = new Set();
+  for (const map of Object.values(hourly)) for (const at of map.keys()) hours.add(at);
+  const current = startOfHour(now).getTime();
+  const sums = Array.from({ length: 24 }, () => [0, 0]);
+  for (const at of hours) {
+    if (at >= current) continue;
+    const row = deriveLoadEnergy(Object.fromEntries(Object.entries(hourly).map(([name, map]) => [name, map.get(at)]).filter(([, v]) => isNum(v))));
+    // An hour above 50 kWh is a counter glitch, not a home.
+    if (!isNum(row.load) || row.load > 50) continue;
+    const slot = sums[new Date(at).getHours()];
+    slot[0] += row.load * 1000;
+    slot[1] += 1;
+  }
+  const filled = sums.filter(([, n]) => n);
+  if (filled.length < 12) return null;
+  const mean = filled.reduce((total, [sum, n]) => total + sum / n, 0) / filled.length;
+  return sums.map(([sum, n]) => (n ? sum / n : mean));
+}
+
+function simulateBattery(forecast, pvHours, profile, now = new Date()) {
+  const { capacity, minSoc } = forecast;
+  if (!capacity || !isNum(forecast.soc) || !profile) return null;
+  const HOUR = 3600000;
+  const start = now.getTime();
+  // As far as the PV forecast reaches, a day at most; without solar, a day.
+  const reach = pvHours ? Math.max(...pvHours.keys()) + HOUR : start + 24 * HOUR;
+  const end = Math.min(start + 24 * HOUR, reach);
+  if (end - start < 3 * HOUR) return null;
+  const floor = Math.min(forecast.soc, minSoc) / 100 * capacity;
+  let energy = (forecast.soc / 100) * capacity;
+  const soc = () => (energy / capacity) * 100;
+  const out = { points: [{ at: start, soc: soc() }], fullAt: null, reserveAt: null, low: { soc: soc(), at: start }, end };
+  for (let at = start; at < end;) {
+    const hour = startOfHour(new Date(at)).getTime();
+    const until = Math.min(hour + HOUR, end);
+    const share = (until - at) / HOUR;
+    const net = ((pvHours?.get(hour) ?? 0) - profile[new Date(hour).getHours()]) / 1000 * share;
+    // Charging loses a little on the way in.
+    const delta = net > 0 ? net * 0.95 : net;
+    const before = energy;
+    energy = clamp(before + delta, floor, capacity);
+    const crossed = (level) => new Date(at + (until - at) * ((level - before) / delta));
+    if (!out.fullAt && before < capacity * 0.995 && energy >= capacity * 0.995) out.fullAt = crossed(capacity * 0.995);
+    if (!out.reserveAt && delta < 0 && before > floor && energy <= floor) out.reserveAt = crossed(floor);
+    if (soc() < out.low.soc - 0.05) out.low = { soc: soc(), at: until };
+    out.points.push({ at: until, soc: soc() });
+    at = until;
+  }
+  return out;
+}
+
+// The simulated charge level on a chart's buckets after now.
+function socAheadSeries(day, spec, now = Date.now()) {
+  if (!day) return null;
+  const series = Array.from({ length: spec.count }, (_, i) => {
+    const at = spec.start.getTime() + (i + 0.5) * spec.bucketMs;
+    if (at < now - spec.bucketMs || at > day.end) return null;
+    const next = day.points.findIndex((point) => point.at >= at);
+    if (next <= 0) return day.points[0].soc;
+    const [a, b] = [day.points[next - 1], day.points[next]];
+    return a.soc + (b.soc - a.soc) * ((at - a.at) / (b.at - a.at));
+  });
+  return series.some(isNum) ? series : null;
+}
+
 // DeyeCloud device sensors are named "<key> <serial>"; newer versions also
 // expose the key as an attribute.
 function deviceKey(stateObj) {
