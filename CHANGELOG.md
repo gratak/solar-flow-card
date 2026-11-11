@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.2
+
+- **French:** a full French translation, thanks to @lboue ([#109](https://github.com/gratak/solar-flow-card/pull/109)). Home Assistant set to French uses it automatically, including Belgian, Swiss and Canadian French.
+
 ## 2.0.1
 
 - **Portuguese:** a full European Portuguese (pt-PT) translation, thanks to @dresende ([#107](https://github.com/gratak/solar-flow-card/pull/107)). Home Assistant set to Brazilian Portuguese uses it too.
