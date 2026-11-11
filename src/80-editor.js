@@ -6,6 +6,8 @@ const EDITOR_NUMBERS = [
   ["pv_capacity", "editorPvCapacity", "0.1"],
   ["pv_panels", "editorPvPanels", "1"],
   ["inverter_power_rating", "editorInverterRating", "0.1"],
+  ["main_fuse", "editorMainFuse", "1"],
+  ["voltage_limit", "editorVoltageLimit", "1"],
 ];
 const EDITOR_PRICES = [
   ["price_import", "editorPriceImport", "0.01"],

@@ -1255,6 +1255,45 @@ function kwhOf(stateObj) {
 
 // The installation sensors (SYSTEM_METRICS): from `entities:`, else the
 // first DeyeCloud inverter's device sensors.
+// Grid guard. Above the voltage limit (230 V + 10 %) an inverter limits its
+// power or disconnects; `voltage_limit: false` turns the check off.
+// `main_fuse` (A per phase) shows each phase's share of the main fuse.
+const VOLTAGE_LIMIT = 253;
+function voltageLimit(config) {
+  if (config.voltage_limit === false || config.voltage_limit === 0) return null;
+  const limit = positiveNumber(config.voltage_limit);
+  return limit && limit > 100 ? limit : VOLTAGE_LIMIT;
+}
+
+// Today's voltage of each phase from the recorder: the highest reading and
+// the time spent above the limit (the worst phase).
+async function loadVoltageDay(hass, phases, start, limit) {
+  const ids = phases.map((p) => p.voltageId);
+  const nowMs = Date.now();
+  const response = await hass.callWS({
+    type: "history/history_during_period",
+    start_time: start.toISOString(),
+    end_time: new Date(nowMs).toISOString(),
+    entity_ids: ids,
+    minimal_response: true,
+    no_attributes: true,
+    significant_changes_only: false,
+  });
+  const out = { max: null, maxAt: null, phase: null, minutes: 0 };
+  for (const phase of phases) {
+    const points = historyPoints(response?.[phase.voltageId]).filter(([, v]) => v > 50 && v < 500);
+    let over = 0;
+    points.forEach(([at, value], i) => {
+      if (out.max === null || value > out.max) Object.assign(out, { max: value, maxAt: new Date(Math.max(at, start.getTime())), phase: phase.name });
+      // A reading holds until the next one, at most 15 minutes.
+      const until = Math.min(points[i + 1]?.[0] ?? nowMs, at + 15 * 60000);
+      if (value > limit) over += Math.max(0, until - Math.max(at, start.getTime()));
+    });
+    out.minutes = Math.max(out.minutes, over / 60000);
+  }
+  return out.max === null ? null : out;
+}
+
 function systemEntities(hass, resolved, config) {
   const states = hass?.states || {};
   const configured = config.entities || {};
@@ -1288,6 +1327,7 @@ function systemData(hass, resolved, config, baseline) {
     grid: isNum(watts(`gridL${n}`)) ? watts(`gridL${n}`) * gridSign : null,
     voltage: number(`voltL${n}`),
     entityId: found[`loadL${n}`]?.entityId || found[`gridL${n}`]?.entityId || found[`voltL${n}`]?.entityId || null,
+    voltageId: found[`voltL${n}`]?.entityId || null,
   }));
   // A single-phase inverter may still report L2/L3 as 0 W / 0 V: a phase
   // counts when it has voltage or carries power. Without voltage sensors,
@@ -1325,6 +1365,22 @@ function systemData(hass, resolved, config, baseline) {
     batteryWarn: isNum(batteryTemp) ? (batteryTemp < BATTERY_COLD ? "cold" : batteryTemp > BATTERY_HOT ? "hot" : null) : null,
     generator: isNum(generator) && generator > ACTIVE_W ? { power: generator, entityId: found.generator.entityId } : null,
   };
+  // Grid guard: phases above the voltage limit, and each phase's current
+  // against the main fuse (from its grid power and voltage).
+  const limit = voltageLimit(config);
+  const fuse = positiveNumber(config.main_fuse);
+  for (const p of present) {
+    p.over = Boolean(limit) && isNum(p.voltage) && p.voltage > limit;
+    if (fuse && isNum(p.grid)) {
+      p.amps = Math.abs(p.grid) / (isNum(p.voltage) && p.voltage > 50 ? p.voltage : 230);
+      p.fuseShare = clamp((p.amps / fuse) * 100, 0, 100);
+    }
+  }
+  data.voltageLimit = limit;
+  data.fuse = fuse || null;
+  data.voltagePhases = limit ? present.filter((p) => p.voltageId && isNum(p.voltage) && p.voltage > 50).map((p) => ({ name: p.name, voltageId: p.voltageId })) : [];
+  data.voltageOver = hasPhases || present.length ? present.filter((p) => p.over).sort((a, b) => b.voltage - a.voltage)[0] || null : null;
+  data.fuseHigh = present.filter((p) => isNum(p.fuseShare) && p.fuseShare >= 90).sort((a, b) => b.fuseShare - a.fuseShare)[0] || null;
   // Several inverters: each on its own, and their total as the inverter load.
   data.inverters = inverterEntries(hass, config).map((item) => {
     const power = item.power ? wattsOf(item.power.stateObj) : item.solar ? wattsOf(item.solar.stateObj) : null;
@@ -1610,6 +1666,6 @@ function estimatePanels(readings, config, today) {
 // a panel is underperforming or the battery is too cold or hot.
 function systemStatus(status, forecast, panels, system) {
   if (status.state === "offline" || (isNum(forecast.soc) && forecast.soc <= forecast.minSoc + 1)) return "alert";
-  if (status.state === "delayed" || (isNum(forecast.soc) && forecast.soc < forecast.minSoc + 15) || panels?.weakest || system?.batteryWarn) return "warn";
+  if (status.state === "delayed" || (isNum(forecast.soc) && forecast.soc < forecast.minSoc + 15) || panels?.weakest || system?.batteryWarn || system?.voltageOver || system?.fuseHigh) return "warn";
   return "nominal";
 }

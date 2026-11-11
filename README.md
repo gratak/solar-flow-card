@@ -140,6 +140,8 @@ co2_factor: 0.7
 | `pv_capacity` | – | PV size in kWp. Enables the yield per kWp. |
 | `pv_panels` | `8` | Modules drawn on the Diorama roof when no optimizers are found. |
 | `inverter_power_rating` | from the inverter | Inverter rated power in kW, for the inverter load. DeyeCloud reports it; set it for other inverters. |
+| `voltage_limit` | `253` | Grid guard: a phase above this voltage (V) is marked in the Installation section with a warning, and the section and "Today at a glance" show the day's highest voltage and the time spent above the limit. Above 253 V (230 V + 10 %) an inverter limits its power or switches off. `false` turns the check off. Needs the phase voltage sensors (`grid_voltage_l1`…; found automatically with DeyeCloud). |
+| `main_fuse` | – | Main fuse per phase in A, e.g. `25`: each phase tile shows its current and share of the fuse (from the phase's grid power and voltage), with a warning from 90 %. |
 | `panels_average` | `all` | `per_string`: the average and the weakest panel for each string on its own, with a summary under each string (useful when the strings face different ways). `all`: over all panels. Also in the editor. |
 | `panels_per_string` | – | Panels on each string, a number or a list (`[11, 7]`). Groups the optimizer tiles into strings in that order, and without optimizers shows one tile per string: the string's power and an estimate per panel (≈ power and today's energy), with a note. The editor shows one field per string the inverter reports, with its current voltage. |
 | `panel_strings` | `1` (`2` above 8 panels) | Number of strings the panels are split into, in order. |

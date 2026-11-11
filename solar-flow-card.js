@@ -196,6 +196,11 @@ const TRANSLATIONS = {
     "batteryCold": "The battery is cold: charging may be limited.",
     "batteryHot": "The battery is hot: charging may be limited.",
     "generatorRunning": "Generator running",
+    "voltageHigh": "{phase} is at {volts}: above {limit} an inverter limits its power or switches off.",
+    "fuseHigh": "{phase} draws {amps} of the {fuse} main fuse.",
+    "voltageToday": "Today {d} above {limit}; highest {volts} on {phase} at {time}.",
+    "voltageMax": "Highest voltage",
+    "voltageOverFor": "{d} above {limit}",
     "gateTitle": "Energy command",
     "gateSub": "Dialing computer · station",
     "gateDial": "Dialing sequence",
@@ -245,6 +250,8 @@ const TRANSLATIONS = {
     "editorStringPanels": "PV{n} · now {volts}",
     "editorStringsHint": "Panels on each string. Without optimizers the card estimates each panel from its string's power; leave unused strings empty.",
     "editorInverterRating": "Inverter rated power (kW)",
+    "editorMainFuse": "Main fuse per phase (A)",
+    "editorVoltageLimit": "Voltage limit (V, default 253)",
     "editorPriceImport": "Import price per kWh",
     "editorPriceExport": "Export price per kWh",
     "editorCurrency": "Currency",
@@ -634,6 +641,11 @@ const TRANSLATIONS = {
     "batteryCold": "Die Batterie ist kalt: Das Laden kann eingeschränkt sein.",
     "batteryHot": "Die Batterie ist heiß: Das Laden kann eingeschränkt sein.",
     "generatorRunning": "Generator läuft",
+    "voltageHigh": "{phase} liegt bei {volts}: über {limit} regelt ein Wechselrichter ab oder schaltet sich aus.",
+    "fuseHigh": "{phase} zieht {amps} von {fuse} Hauptsicherung.",
+    "voltageToday": "Heute {d} über {limit}; höchster Wert {volts} auf {phase} um {time}.",
+    "voltageMax": "Höchste Spannung",
+    "voltageOverFor": "{d} über {limit}",
     "gateTitle": "Energiekommando",
     "gateSub": "Wählcomputer · Station",
     "gateDial": "Wählsequenz",
@@ -683,6 +695,8 @@ const TRANSLATIONS = {
     "editorStringPanels": "PV{n} · jetzt {volts}",
     "editorStringsHint": "Module je String. Ohne Optimierer schätzt die Karte jedes Modul aus der Leistung seines Strings; ungenutzte Strings leer lassen.",
     "editorInverterRating": "Wechselrichter-Nennleistung (kW)",
+    "editorMainFuse": "Hauptsicherung je Phase (A)",
+    "editorVoltageLimit": "Spannungsgrenze (V, Standard 253)",
     "editorPriceImport": "Bezugspreis pro kWh",
     "editorPriceExport": "Einspeisepreis pro kWh",
     "editorCurrency": "Währung",
@@ -1072,6 +1086,11 @@ const TRANSLATIONS = {
     "batteryCold": "La batterie est froide : la charge peut être limitée.",
     "batteryHot": "La batterie est chaude : la charge peut être limitée.",
     "generatorRunning": "Groupe électrogène en marche",
+    "voltageHigh": "{phase} est à {volts} : au-delà de {limit}, un onduleur limite sa puissance ou se coupe.",
+    "fuseHigh": "{phase} tire {amps} sur un fusible principal de {fuse}.",
+    "voltageToday": "Aujourd'hui {d} au-dessus de {limit} ; maximum {volts} sur {phase} à {time}.",
+    "voltageMax": "Tension maximale",
+    "voltageOverFor": "{d} au-dessus de {limit}",
     "gateTitle": "Commandement énergie",
     "gateSub": "Ordinateur de connexion · station",
     "gateDial": "Séquence de connexion",
@@ -1121,6 +1140,8 @@ const TRANSLATIONS = {
     "editorStringPanels": "PV{n} · actuellement {volts}",
     "editorStringsHint": "Panneaux sur chaque chaîne. Sans optimiseurs, la carte estime chaque panneau à partir de la puissance de sa chaîne ; laissez les chaînes inutilisées vides.",
     "editorInverterRating": "Puissance nominale de l'onduleur (kW)",
+    "editorMainFuse": "Fusible principal par phase (A)",
+    "editorVoltageLimit": "Limite de tension (V, 253 par défaut)",
     "editorPriceImport": "Prix d'achat par kWh",
     "editorPriceExport": "Prix de vente par kWh",
     "editorCurrency": "Devise",
@@ -1510,6 +1531,11 @@ const TRANSLATIONS = {
     "batteryCold": "De batterij is koud: opladen kan beperkt zijn.",
     "batteryHot": "De batterij is heet: opladen kan beperkt zijn.",
     "generatorRunning": "Generator draait",
+    "voltageHigh": "{phase} staat op {volts}: boven {limit} begrenst een omvormer zijn vermogen of schakelt hij uit.",
+    "fuseHigh": "{phase} trekt {amps} van de hoofdzekering van {fuse}.",
+    "voltageToday": "Vandaag {d} boven {limit}; hoogste {volts} op {phase} om {time}.",
+    "voltageMax": "Hoogste spanning",
+    "voltageOverFor": "{d} boven {limit}",
     "gateTitle": "Energiecommando",
     "gateSub": "Kiescomputer · station",
     "gateDial": "Kiesreeks",
@@ -1559,6 +1585,8 @@ const TRANSLATIONS = {
     "editorStringPanels": "PV{n} · nu {volts}",
     "editorStringsHint": "Panelen per string. Zonder optimizers schat de kaart elk paneel uit het vermogen van zijn string; laat ongebruikte strings leeg.",
     "editorInverterRating": "Nominaal vermogen omvormer (kW)",
+    "editorMainFuse": "Hoofdzekering per fase (A)",
+    "editorVoltageLimit": "Spanningslimiet (V, standaard 253)",
     "editorPriceImport": "Inkoopprijs per kWh",
     "editorPriceExport": "Verkoopprijs per kWh",
     "editorCurrency": "Valuta",
@@ -1948,6 +1976,11 @@ const TRANSLATIONS = {
     "batteryCold": "Bateria jest zimna: ładowanie może być ograniczone.",
     "batteryHot": "Bateria jest gorąca: ładowanie może być ograniczone.",
     "generatorRunning": "Agregat pracuje",
+    "voltageHigh": "{phase} ma {volts}: powyżej {limit} falownik ogranicza moc albo się wyłącza.",
+    "fuseHigh": "{phase} pobiera {amps} z {fuse} zabezpieczenia głównego.",
+    "voltageToday": "Dziś {d} powyżej {limit}; najwyżej {volts} na {phase} o {time}.",
+    "voltageMax": "Najwyższe napięcie",
+    "voltageOverFor": "{d} powyżej {limit}",
     "gateTitle": "Centrum energii",
     "gateSub": "Komputer wybierania · stacja",
     "gateDial": "Sekwencja wybierania",
@@ -1997,6 +2030,8 @@ const TRANSLATIONS = {
     "editorStringPanels": "PV{n} · teraz {volts}",
     "editorStringsHint": "Liczba paneli na każdym stringu. Bez optymalizatorów karta szacuje każdy panel z mocy jego stringu; nieużywane stringi zostaw puste.",
     "editorInverterRating": "Moc znamionowa falownika (kW)",
+    "editorMainFuse": "Zabezpieczenie główne na fazę (A)",
+    "editorVoltageLimit": "Limit napięcia (V, domyślnie 253)",
     "editorPriceImport": "Cena zakupu za kWh",
     "editorPriceExport": "Cena sprzedaży za kWh",
     "editorCurrency": "Waluta",
@@ -2386,6 +2421,11 @@ const TRANSLATIONS = {
     "batteryCold": "A bateria está fria: o carregamento pode estar limitado.",
     "batteryHot": "A bateria está quente: o carregamento pode estar limitado.",
     "generatorRunning": "Gerador a funcionar",
+    "voltageHigh": "{phase} está a {volts}: acima de {limit} um inversor limita a potência ou desliga-se.",
+    "fuseHigh": "{phase} consome {amps} do fusível principal de {fuse}.",
+    "voltageToday": "Hoje {d} acima de {limit}; máximo {volts} em {phase} às {time}.",
+    "voltageMax": "Tensão máxima",
+    "voltageOverFor": "{d} acima de {limit}",
     "gateTitle": "Comando de energia",
     "gateSub": "A marcar computador · estação",
     "gateDial": "Sequência de marcação",
@@ -2435,6 +2475,8 @@ const TRANSLATIONS = {
     "editorStringPanels": "FV{n} · agora {volts}",
     "editorStringsHint": "Painéis em cada string. Sem otimizadores o cartão estima cada painel a partir da potência da string; deixe strings não utilizadas em branco.",
     "editorInverterRating": "Potência nominal do inversor (kW)",
+    "editorMainFuse": "Fusível principal por fase (A)",
+    "editorVoltageLimit": "Limite de tensão (V, 253 por omissão)",
     "editorPriceImport": "Preço de importação por kWh",
     "editorPriceExport": "Preço de exportação por kWh",
     "editorCurrency": "Moeda",
@@ -4176,6 +4218,45 @@ function kwhOf(stateObj) {
 
 // The installation sensors (SYSTEM_METRICS): from `entities:`, else the
 // first DeyeCloud inverter's device sensors.
+// Grid guard. Above the voltage limit (230 V + 10 %) an inverter limits its
+// power or disconnects; `voltage_limit: false` turns the check off.
+// `main_fuse` (A per phase) shows each phase's share of the main fuse.
+const VOLTAGE_LIMIT = 253;
+function voltageLimit(config) {
+  if (config.voltage_limit === false || config.voltage_limit === 0) return null;
+  const limit = positiveNumber(config.voltage_limit);
+  return limit && limit > 100 ? limit : VOLTAGE_LIMIT;
+}
+
+// Today's voltage of each phase from the recorder: the highest reading and
+// the time spent above the limit (the worst phase).
+async function loadVoltageDay(hass, phases, start, limit) {
+  const ids = phases.map((p) => p.voltageId);
+  const nowMs = Date.now();
+  const response = await hass.callWS({
+    type: "history/history_during_period",
+    start_time: start.toISOString(),
+    end_time: new Date(nowMs).toISOString(),
+    entity_ids: ids,
+    minimal_response: true,
+    no_attributes: true,
+    significant_changes_only: false,
+  });
+  const out = { max: null, maxAt: null, phase: null, minutes: 0 };
+  for (const phase of phases) {
+    const points = historyPoints(response?.[phase.voltageId]).filter(([, v]) => v > 50 && v < 500);
+    let over = 0;
+    points.forEach(([at, value], i) => {
+      if (out.max === null || value > out.max) Object.assign(out, { max: value, maxAt: new Date(Math.max(at, start.getTime())), phase: phase.name });
+      // A reading holds until the next one, at most 15 minutes.
+      const until = Math.min(points[i + 1]?.[0] ?? nowMs, at + 15 * 60000);
+      if (value > limit) over += Math.max(0, until - Math.max(at, start.getTime()));
+    });
+    out.minutes = Math.max(out.minutes, over / 60000);
+  }
+  return out.max === null ? null : out;
+}
+
 function systemEntities(hass, resolved, config) {
   const states = hass?.states || {};
   const configured = config.entities || {};
@@ -4209,6 +4290,7 @@ function systemData(hass, resolved, config, baseline) {
     grid: isNum(watts(`gridL${n}`)) ? watts(`gridL${n}`) * gridSign : null,
     voltage: number(`voltL${n}`),
     entityId: found[`loadL${n}`]?.entityId || found[`gridL${n}`]?.entityId || found[`voltL${n}`]?.entityId || null,
+    voltageId: found[`voltL${n}`]?.entityId || null,
   }));
   // A single-phase inverter may still report L2/L3 as 0 W / 0 V: a phase
   // counts when it has voltage or carries power. Without voltage sensors,
@@ -4246,6 +4328,22 @@ function systemData(hass, resolved, config, baseline) {
     batteryWarn: isNum(batteryTemp) ? (batteryTemp < BATTERY_COLD ? "cold" : batteryTemp > BATTERY_HOT ? "hot" : null) : null,
     generator: isNum(generator) && generator > ACTIVE_W ? { power: generator, entityId: found.generator.entityId } : null,
   };
+  // Grid guard: phases above the voltage limit, and each phase's current
+  // against the main fuse (from its grid power and voltage).
+  const limit = voltageLimit(config);
+  const fuse = positiveNumber(config.main_fuse);
+  for (const p of present) {
+    p.over = Boolean(limit) && isNum(p.voltage) && p.voltage > limit;
+    if (fuse && isNum(p.grid)) {
+      p.amps = Math.abs(p.grid) / (isNum(p.voltage) && p.voltage > 50 ? p.voltage : 230);
+      p.fuseShare = clamp((p.amps / fuse) * 100, 0, 100);
+    }
+  }
+  data.voltageLimit = limit;
+  data.fuse = fuse || null;
+  data.voltagePhases = limit ? present.filter((p) => p.voltageId && isNum(p.voltage) && p.voltage > 50).map((p) => ({ name: p.name, voltageId: p.voltageId })) : [];
+  data.voltageOver = hasPhases || present.length ? present.filter((p) => p.over).sort((a, b) => b.voltage - a.voltage)[0] || null : null;
+  data.fuseHigh = present.filter((p) => isNum(p.fuseShare) && p.fuseShare >= 90).sort((a, b) => b.fuseShare - a.fuseShare)[0] || null;
   // Several inverters: each on its own, and their total as the inverter load.
   data.inverters = inverterEntries(hass, config).map((item) => {
     const power = item.power ? wattsOf(item.power.stateObj) : item.solar ? wattsOf(item.solar.stateObj) : null;
@@ -4531,7 +4629,7 @@ function estimatePanels(readings, config, today) {
 // a panel is underperforming or the battery is too cold or hot.
 function systemStatus(status, forecast, panels, system) {
   if (status.state === "offline" || (isNum(forecast.soc) && forecast.soc <= forecast.minSoc + 1)) return "alert";
-  if (status.state === "delayed" || (isNum(forecast.soc) && forecast.soc < forecast.minSoc + 15) || panels?.weakest || system?.batteryWarn) return "warn";
+  if (status.state === "delayed" || (isNum(forecast.soc) && forecast.soc < forecast.minSoc + 15) || panels?.weakest || system?.batteryWarn || system?.voltageOver || system?.fuseHigh) return "warn";
   return "nominal";
 }
 
@@ -4935,8 +5033,12 @@ function systemHtml(m) {
         <button class="sfc-phase ${p.main === "grid" && isNum(p.grid) ? (p.grid < -ACTIVE_W ? "export" : p.grid > ACTIVE_W ? "import" : "") : ""}" ${attr(p.entityId)}>
           <small>${escapeHtml(p.main === "grid" ? `${p.name} · ${t.grid}` : p.name)}</small>
           <strong>${escapeHtml(formatPower(p.main === "grid" ? p.grid : p.load, locale))}</strong>
-          <i style="--p:${(() => { const v = p.main === "grid" ? Math.abs(p.grid ?? 0) : p.load; return isNum(v) ? ((v / data.phaseMax) * 100).toFixed(0) : 0; })()}%"></i>
-          <span>${escapeHtml([p.main !== "grid" && isNum(p.grid) && fill(t.phaseGrid, { power: formatPower(p.grid, locale) }), isNum(p.voltage) && `${formatNumber(p.voltage, locale, 0)} V`].filter(Boolean).join(" · "))}</span>
+          <i class="${isNum(p.fuseShare) && p.fuseShare >= 90 ? "high" : ""}" style="--p:${(() => { if (p.main === "grid" && isNum(p.fuseShare)) return p.fuseShare.toFixed(0); const v = p.main === "grid" ? Math.abs(p.grid ?? 0) : p.load; return isNum(v) ? ((v / data.phaseMax) * 100).toFixed(0) : 0; })()}%"></i>
+          <span>${[
+            p.main !== "grid" && isNum(p.grid) && escapeHtml(fill(t.phaseGrid, { power: formatPower(p.grid, locale) })),
+            isNum(p.voltage) && `<em class="${p.over ? "over" : ""}">${escapeHtml(`${formatNumber(p.voltage, locale, 0)} V`)}</em>`,
+            isNum(p.fuseShare) && escapeHtml(`${formatNumber(p.amps, locale, 1)} A · ${formatPercent(p.fuseShare, locale)}`),
+          ].filter(Boolean).join(" · ")}</span>
         </button>`).join("")}
     </div>` : "";
   const labels = { temperature: t.batteryTemperature, voltage: t.batteryVoltage, current: t.batteryCurrent };
@@ -4958,7 +5060,15 @@ function systemHtml(m) {
         <b>${escapeHtml(formatPower(data.generator.power, locale))}</b>
       </button>`,
   ].filter(Boolean).join("");
-  const warn = data.batteryWarn ? `<p class="sfc-panels-note warn">${escapeHtml(data.batteryWarn === "cold" ? t.batteryCold : t.batteryHot)}</p>` : "";
+  const guard = m.gridGuard;
+  const volts = (v) => `${formatNumber(v, locale, 1)} V`;
+  const warn = [
+    data.batteryWarn && [true, data.batteryWarn === "cold" ? t.batteryCold : t.batteryHot],
+    data.voltageOver && [true, fill(t.voltageHigh, { phase: data.voltageOver.name, volts: volts(data.voltageOver.voltage), limit: `${formatNumber(data.voltageLimit, locale, 0)} V` })],
+    data.fuseHigh && [true, fill(t.fuseHigh, { phase: data.fuseHigh.name, amps: `${formatNumber(data.fuseHigh.amps, locale, 1)} A`, fuse: `${formatNumber(data.fuse, locale, 0)} A` })],
+    // Today so far: only worth a line when the limit was crossed.
+    guard && guard.minutes >= 1 && [false, fill(t.voltageToday, { d: formatDuration(guard.minutes / 60, t), limit: `${formatNumber(data.voltageLimit, locale, 0)} V`, volts: volts(guard.max), phase: guard.phase, time: formatClock(guard.maxAt, locale) })],
+  ].filter(Boolean).map(([now, text]) => `<p class="sfc-panels-note ${now ? "warn" : ""}">${escapeHtml(text)}</p>`).join("");
   return `
     <section class="sfc-section sfc-system">
       <div class="sfc-head">
@@ -4986,6 +5096,8 @@ function insightsHtml(m) {
     m.config.showBattery && isNum(d.socMin) && kv("battery", t.socRange, `${formatNumber(d.socMin, locale, 0)}–${formatPercent(d.socMax, locale)}`, ""),
     m.config.showBattery && isNum(d.cycles) && kv("battery", t.batteryCycles, formatNumber(d.cycles, locale, 2), ""),
     isNum(d.offGridMinutes) && kv("grid", t.offGrid, formatDuration(d.offGridMinutes / 60, t), ""),
+    m.gridGuard && kv(m.gridGuard.minutes >= 1 ? "load" : "grid", t.voltageMax, `${formatNumber(m.gridGuard.max, locale, 1)} V`,
+      m.gridGuard.minutes >= 1 ? fill(t.voltageOverFor, { d: formatDuration(m.gridGuard.minutes / 60, t), limit: `${formatNumber(m.system?.voltageLimit ?? VOLTAGE_LIMIT, locale, 0)} V` }) : `${m.gridGuard.phase} · ${fill(t.atTime, { time: formatClock(m.gridGuard.maxAt, locale) })}`),
   ].filter(Boolean).join("") : "";
   return tiles ? `
     <section class="sfc-section sfc-insights">
@@ -7046,6 +7158,11 @@ const BASE_CSS = `
   .sfc-phase i, .sfc-meter i { display: block; height: 4px; margin: 3px 0 1px; border-radius: 999px;
     background: linear-gradient(90deg, var(--sfc-c, var(--sfc-load)) var(--p), var(--sfc-track) var(--p)); }
   .sfc-bank { grid-template-columns: repeat(var(--n), minmax(0, 1fr)); }
+  /* Grid guard: a phase above the voltage limit, or close to the main fuse. */
+  .sfc-phase span { white-space: normal; overflow-wrap: anywhere; }
+  .sfc-phase span em { font-style: normal; white-space: nowrap; }
+  .sfc-phase span em.over { color: var(--sfc-bad, #f0524a); font-weight: 700; }
+  .sfc-phase i.high { --sfc-c: var(--sfc-bad, #f0524a); }
   /* Grid per phase: green while exporting, red while importing. */
   .sfc-phase.export { --sfc-c: var(--sfc-good, #3fb950); }
   .sfc-phase.import { --sfc-c: var(--sfc-bad, #f0524a); }
@@ -8414,6 +8531,10 @@ class SolarFlowCard extends HTMLElement {
       const inverter = inverterOpen ? readings : null;
       const system = config.show_system !== false ? systemData(this._hass, resolved, config, this._energyBaseline(resolved)) : null;
       if (system && !showBattery) Object.assign(system, { battery: [], batteryWarn: null });
+      const gridGuard = system?.voltagePhases?.length && typeof this._hass.callWS === "function"
+        ? this._fetch(`voltage|${system.voltagePhases.map((p) => p.voltageId).join("+")}|${system.voltageLimit}|${new Date().toDateString()}`, 5 * 60000,
+          () => loadVoltageDay(this._hass, system.voltagePhases, startOfDay(new Date()), system.voltageLimit)).data || null
+        : null;
       const since = period === "all" && energy.buckets?.length
         ? energy.buckets[0].start.toLocaleDateString(locale, { month: "short", year: "numeric" })
         : null;
@@ -8439,6 +8560,7 @@ class SolarFlowCard extends HTMLElement {
         pvForecast && [pvForecast.total, pvForecast.remaining, pvForecast.days.map((d) => d.value)],
         priceChart && [priceChart.nowAt, priceChart.current, priceChart.hours.length],
         custom.map((c) => c.items.map((item) => item.state)),
+        gridGuard && [Math.round(gridGuard.max * 10), Math.round(gridGuard.minutes)],
         Math.floor(now.getTime() / 60000),
       ]);
       if (signature === this._signature) return;
@@ -8479,6 +8601,7 @@ class SolarFlowCard extends HTMLElement {
         pvForecast,
         priceChart,
         custom,
+        gridGuard,
         inverter,
         system,
         bank,
@@ -8630,6 +8753,8 @@ const EDITOR_NUMBERS = [
   ["pv_capacity", "editorPvCapacity", "0.1"],
   ["pv_panels", "editorPvPanels", "1"],
   ["inverter_power_rating", "editorInverterRating", "0.1"],
+  ["main_fuse", "editorMainFuse", "1"],
+  ["voltage_limit", "editorVoltageLimit", "1"],
 ];
 const EDITOR_PRICES = [
   ["price_import", "editorPriceImport", "0.01"],
