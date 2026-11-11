@@ -261,6 +261,7 @@ const TRANSLATIONS = {
     "editorPriceExport": "Export price per kWh",
     "editorCurrency": "Currency",
     "editorCo2": "Grid CO₂ (kg per kWh)",
+    "editorPriceWindow": "Cheapest hours in a row to point out (default 3)",
     "editorShowEnergy": "Show energy",
     "editorShowChart": "Show chart",
     "editorShowForecast": "Show battery forecast",
@@ -486,6 +487,9 @@ const TRANSLATIONS = {
     "pricesTitle": "Energy prices",
     "priceNow": "now {price}",
     "pricesAhead": "Coming up – cheapest: {cheap} ({cheapPrice}) · dearest: {dear} ({dearPrice})",
+    "pricesWindow": "Cheapest {n} h in a row: {from}–{to} (average {price})",
+    "pricesWindowPv": "solar forecast ≈ {power}",
+    "pricesNegative": "Negative prices ahead: {ranges}",
     "tomorrow": "tomorrow",
     "exportValue": "Value of energy sold",
     "editorNoImportPrice": "Savings need an import price: until you set one, the card shows the value of the energy sold.",
@@ -719,6 +723,7 @@ const TRANSLATIONS = {
     "editorPriceExport": "Einspeisepreis pro kWh",
     "editorCurrency": "Währung",
     "editorCo2": "Netz-CO₂ (kg pro kWh)",
+    "editorPriceWindow": "Günstigste Stunden am Stück anzeigen (Standard 3)",
     "editorShowEnergy": "Energie anzeigen",
     "editorShowChart": "Diagramm anzeigen",
     "editorShowForecast": "Batterieprognose anzeigen",
@@ -944,6 +949,9 @@ const TRANSLATIONS = {
     "pricesTitle": "Energiepreise",
     "priceNow": "jetzt {price}",
     "pricesAhead": "Nächste Stunden – am günstigsten: {cheap} ({cheapPrice}) · am teuersten: {dear} ({dearPrice})",
+    "pricesWindow": "Günstigste {n} h am Stück: {from}–{to} (im Schnitt {price})",
+    "pricesWindowPv": "PV-Prognose ≈ {power}",
+    "pricesNegative": "Negative Preise voraus: {ranges}",
     "tomorrow": "morgen",
     "exportValue": "Wert der eingespeisten Energie",
     "editorNoImportPrice": "Die Ersparnis braucht einen Bezugspreis: bis er gesetzt ist, zeigt die Karte den Wert der eingespeisten Energie.",
@@ -1177,6 +1185,7 @@ const TRANSLATIONS = {
     "editorPriceExport": "Prix de vente par kWh",
     "editorCurrency": "Devise",
     "editorCo2": "CO₂ réseau (kg par kWh)",
+    "editorPriceWindow": "Heures consécutives les moins chères à signaler (3 par défaut)",
     "editorShowEnergy": "Afficher l'énergie",
     "editorShowChart": "Afficher le graphique",
     "editorShowForecast": "Afficher la prévision de batterie",
@@ -1402,6 +1411,9 @@ const TRANSLATIONS = {
     "pricesTitle": "Prix de l'énergie",
     "priceNow": "maintenant {price}",
     "pricesAhead": "À venir – le moins cher : {cheap} ({cheapPrice}) · le plus cher : {dear} ({dearPrice})",
+    "pricesWindow": "Les {n} h consécutives les moins chères : {from}–{to} (en moyenne {price})",
+    "pricesWindowPv": "prévision solaire ≈ {power}",
+    "pricesNegative": "Prix négatifs à venir : {ranges}",
     "tomorrow": "demain",
     "exportValue": "Valeur de l'énergie vendue",
     "editorNoImportPrice": "Les économies nécessitent un prix d'achat : en attendant que vous en définissiez un, la carte affiche la valeur de l'énergie vendue.",
@@ -1635,6 +1647,7 @@ const TRANSLATIONS = {
     "editorPriceExport": "Verkoopprijs per kWh",
     "editorCurrency": "Valuta",
     "editorCo2": "Net-CO₂ (kg per kWh)",
+    "editorPriceWindow": "Goedkoopste uren op rij om aan te wijzen (standaard 3)",
     "editorShowEnergy": "Toon energie",
     "editorShowChart": "Toon grafiek",
     "editorShowForecast": "Toon batterijvoorspelling",
@@ -1860,6 +1873,9 @@ const TRANSLATIONS = {
     "pricesTitle": "Energieprijzen",
     "priceNow": "nu {price}",
     "pricesAhead": "Komende uren – goedkoopst: {cheap} ({cheapPrice}) · duurst: {dear} ({dearPrice})",
+    "pricesWindow": "Goedkoopste {n} u op rij: {from}–{to} (gemiddeld {price})",
+    "pricesWindowPv": "zonverwachting ≈ {power}",
+    "pricesNegative": "Negatieve prijzen op komst: {ranges}",
     "tomorrow": "morgen",
     "exportValue": "Waarde teruggeleverde energie",
     "editorNoImportPrice": "Besparing vraagt een afnameprijs: zolang die ontbreekt, toont de kaart de waarde van de teruggeleverde energie.",
@@ -2093,6 +2109,7 @@ const TRANSLATIONS = {
     "editorPriceExport": "Cena sprzedaży za kWh",
     "editorCurrency": "Waluta",
     "editorCo2": "CO₂ sieci (kg na kWh)",
+    "editorPriceWindow": "Ile najtańszych godzin pod rząd wskazać (domyślnie 3)",
     "editorShowEnergy": "Pokaż energię",
     "editorShowChart": "Pokaż wykres",
     "editorShowForecast": "Pokaż prognozę magazynu",
@@ -2318,6 +2335,9 @@ const TRANSLATIONS = {
     "pricesTitle": "Ceny energii",
     "priceNow": "teraz {price}",
     "pricesAhead": "Kolejne godziny – najtaniej: {cheap} ({cheapPrice}) · najdrożej: {dear} ({dearPrice})",
+    "pricesWindow": "Najtańsze {n} h pod rząd: {from}–{to} (średnio {price})",
+    "pricesWindowPv": "prognoza z dachu ≈ {power}",
+    "pricesNegative": "Ujemne ceny przed nami: {ranges}",
     "tomorrow": "jutro",
     "exportValue": "Wartość oddanej energii",
     "editorNoImportPrice": "Oszczędność wymaga ceny zakupu: dopóki jej nie podasz, karta pokazuje wartość oddanej energii.",
@@ -2551,6 +2571,7 @@ const TRANSLATIONS = {
     "editorPriceExport": "Preço de exportação por kWh",
     "editorCurrency": "Moeda",
     "editorCo2": "CO₂ da rede (kg por kWh)",
+    "editorPriceWindow": "Horas seguidas mais baratas a assinalar (3 por omissão)",
     "editorShowEnergy": "Mostrar energia",
     "editorShowChart": "Mostrar gráfico",
     "editorShowForecast": "Mostrar previsão da bateria",
@@ -2776,6 +2797,9 @@ const TRANSLATIONS = {
     "pricesTitle": "Preços de energia",
     "priceNow": "agora {price}",
     "pricesAhead": "A seguir – mais barato: {cheap} ({cheapPrice}) · mais caro: {dear} ({dearPrice})",
+    "pricesWindow": "As {n} h seguidas mais baratas: {from}–{to} (média {price})",
+    "pricesWindowPv": "previsão solar ≈ {power}",
+    "pricesNegative": "Preços negativos a seguir: {ranges}",
     "tomorrow": "amanhã",
     "exportValue": "Valor da energia vendida",
     "editorNoImportPrice": "As poupanças precisam de um preço de importação: até definir um, o cartão mostra o valor da energia vendida.",
@@ -3749,9 +3773,30 @@ function priceChartData(hass, config, now = new Date()) {
   hourNow.setMinutes(0, 0, 0);
   const ahead = hours.filter((h) => h.at >= hourNow.getTime());
   const pick = (better) => ahead.reduce((best, h) => (!best || better(h.price, best.price) ? h : best), null);
+  // The cheapest hours in a row among the coming ones (`price_window`,
+  // 3 hours unless set; false turns it off), and the coming hours with a
+  // negative price as ranges.
+  const span = config.price_window === false ? 0 : clamp(Math.round(positiveNumber(config.price_window) || 3), 1, 12);
+  let best = null;
+  for (let i = 0; span && i + span <= ahead.length; i++) {
+    const run = ahead.slice(i, i + span);
+    if (run[span - 1].at - run[0].at !== (span - 1) * 3600000) continue;
+    const mean = run.reduce((sum, h) => sum + h.price, 0) / span;
+    if (!best || mean < best.price - 1e-9) best = { from: run[0].at, to: run[span - 1].at + 3600000, price: mean, hours: span };
+  }
+  const negative = [];
+  for (const h of ahead) {
+    if (h.price >= 0) continue;
+    const last = negative[negative.length - 1];
+    if (last && last.to === h.at) last.to = h.at + 3600000;
+    else negative.push({ from: h.at, to: h.at + 3600000 });
+  }
   return {
     entityId: setting.entity,
     hours,
+    // Not worth a line when every coming hour costs the same.
+    window: best && ahead.some((h) => Math.abs(h.price - ahead[0].price) > 1e-9) && ahead.length > span ? best : null,
+    negative,
     nowAt: hourNow.getTime(),
     current: currentPrice(hass.states, setting),
     cheapest: pick((a, b) => a < b),
@@ -3792,7 +3837,12 @@ function forecastHoursFromStates(hass, config) {
 // any integration chosen in the Energy dashboard): watt-hours per hour,
 // summed over the forecast entries (e.g. Forecast.Solar's roof planes).
 async function loadEnergyForecastHours(hass) {
-  const response = await hass.callWS({ type: "energy/solar_forecast" });
+  let response = null;
+  try {
+    response = await hass.callWS({ type: "energy/solar_forecast" });
+  } catch (error) {
+    // No forecast set up in the Energy dashboard.
+  }
   const hours = new Map();
   for (const entry of Object.values(response || {})) {
     for (const [at, wh] of Object.entries(entry?.wh_hours || {})) {
@@ -5119,6 +5169,19 @@ function pricesHtml(m) {
     return axisLabel(i / n, day, hour % 12 ? "minor" : "");
   }).join("");
   const at = (h) => formatClock(new Date(h.at), locale);
+  // The cheapest hours in a row, with the solar forecast for them if known.
+  const clock = (ms, day = true) => {
+    const date = new Date(ms);
+    return `${!day || date.toDateString() === new Date(c.nowAt).toDateString() ? "" : `${t.tomorrow} `}${formatClock(date, locale)}`;
+  };
+  let windowNote = "";
+  if (c.window) {
+    const pv = [];
+    for (let at = c.window.from; at < c.window.to; at += 3600000) if (isNum(m.pvHours?.get(at))) pv.push(m.pvHours.get(at));
+    const solar = pv.length === c.window.hours ? pv.reduce((a, b) => a + b, 0) / pv.length : null;
+    windowNote = `<p class="sfc-panels-note sfc-prices-window">${escapeHtml(fill(t.pricesWindow, { n: c.window.hours, from: clock(c.window.from), to: clock(c.window.to, false), price: money(c.window.price) }))}${
+      isNum(solar) && solar > ACTIVE_W ? escapeHtml(` · ${fill(t.pricesWindowPv, { power: formatPower(solar, locale) })}`) : ""}</p>`;
+  }
   return `
     <section class="sfc-section sfc-prices" data-entity="${escapeHtml(c.entityId)}">
       <div class="sfc-head">
@@ -5129,13 +5192,15 @@ function pricesHtml(m) {
         ${c.hours.map((h, i) => {
           const share = high > low ? ((h.price - low) / (high - low)) * 100 : 50;
           const newDay = i > 0 && days.size > 1 && new Date(h.at).getHours() === 0;
-          const cls = [h.at < c.nowAt && "past", h.at === c.nowAt && "now", h.price < 0 && "neg", newDay && "day"].filter(Boolean).join(" ");
+          const cls = [h.at < c.nowAt && "past", h.at === c.nowAt && "now", h.price < 0 && "neg", newDay && "day", c.window && h.at >= c.window.from && h.at < c.window.to && "win"].filter(Boolean).join(" ");
           // Green (cheap) through yellow to red (dear).
           return `<i class="${cls}" style="--h:${((Math.abs(h.price) / range) * 100).toFixed(1)}%;--c:hsl(${(120 - share * 1.2).toFixed(0)} 68% 47%)" title="${escapeHtml(`${at(h)} · ${money(h.price)}`)}"><b></b></i>`;
         }).join("")}
       </div>
       <div class="sfc-prices-axis">${labels}</div>
       ${c.cheapest && c.priciest ? `<p class="sfc-panels-note">${escapeHtml(fill(t.pricesAhead, { cheap: at(c.cheapest), cheapPrice: money(c.cheapest.price), dear: at(c.priciest), dearPrice: money(c.priciest.price) }))}</p>` : ""}
+      ${windowNote}
+      ${c.negative.length ? `<p class="sfc-panels-note warn">${escapeHtml(fill(t.pricesNegative, { ranges: c.negative.map((r) => `${clock(r.from)}–${clock(r.to, false)}`).join(", ") }))}</p>` : ""}
     </section>`;
 }
 
@@ -7260,6 +7325,9 @@ const BASE_CSS = `
   .sfc-prices-chart i.neg b { bottom: auto; top: calc(100% - var(--zero)); border-radius: 0 0 3px 3px; background: var(--sfc-grid); }
   .sfc-prices-chart i.past b { opacity: .38; }
   .sfc-prices-chart i.now b { box-shadow: 0 0 0 2px var(--sfc-text); }
+  /* The cheapest hours in a row: a line under their bars. */
+  .sfc-prices-chart i.win::after { content: ""; position: absolute; left: -1px; right: -1px; bottom: -4px; height: 2px; background: var(--sfc-text); }
+  .sfc-prices-window { color: var(--sfc-text); font-weight: 600; }
   .sfc-prices-chart i.day { margin-left: 5px; }
   .sfc-prices-chart i.day::before { content: ""; position: absolute; left: -4px; top: 0; bottom: 0; border-left: 1px dashed var(--sfc-border); }
   .sfc-prices-axis { position: relative; height: 15px; margin-top: 3px; color: var(--sfc-muted); font-size: 10px; }
@@ -8838,6 +8906,8 @@ class SolarFlowCard extends HTMLElement {
       const panels = showSolar ? panelData(this._hass, resolved, config) || estimatePanels(readings, config, today) : null;
       const pvForecast = showSolar ? pvForecastData(this._hass, config, today) : null;
       const priceChart = priceChartData(this._hass, config);
+      // The hourly PV forecast, for the cheapest hours' note.
+      const pvHours = priceChart?.window && showSolar ? this._forecastHours(true).hours || null : null;
       const custom = customSections(this._hass, config);
       const consumerSensors = consumerList(this._hass, config);
       const consumerStats = consumerSensors.some((item) => item.energy) && typeof this._hass.callWS === "function"
@@ -8884,7 +8954,7 @@ class SolarFlowCard extends HTMLElement {
         [...this._collapsed],
         money && [money.kind, isNum(money.value) ? Math.round(money.value * 100) : null],
         pvForecast && [pvForecast.total, pvForecast.remaining, pvForecast.days.map((d) => d.value)],
-        priceChart && [priceChart.nowAt, priceChart.current, priceChart.hours.length],
+        priceChart && [priceChart.nowAt, priceChart.current, priceChart.hours.length, priceChart.window?.from, pvHours?.size],
         custom.map((c) => c.items.map((item) => item.state)),
         gridGuard && [Math.round(gridGuard.max * 10), Math.round(gridGuard.minutes)],
         batteryDay && [Math.round(batteryDay.low.soc), batteryDay.fullAt && Math.round(batteryDay.fullAt / 300000), batteryDay.reserveAt && Math.round(batteryDay.reserveAt / 300000)],
@@ -8928,6 +8998,7 @@ class SolarFlowCard extends HTMLElement {
         panels,
         pvForecast,
         priceChart,
+        pvHours,
         custom,
         consumers,
         gridGuard,
@@ -9089,6 +9160,7 @@ const EDITOR_PRICES = [
   ["price_import", "editorPriceImport", "0.01"],
   ["price_export", "editorPriceExport", "0.01"],
   ["co2_factor", "editorCo2", "0.01"],
+  ["price_window", "editorPriceWindow", "1"],
 ];
 // "Today at a glance" and the comparison: shown in the wide layout unless
 // switched off, elsewhere only when switched on.

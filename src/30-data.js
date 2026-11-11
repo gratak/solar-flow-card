@@ -708,9 +708,30 @@ function priceChartData(hass, config, now = new Date()) {
   hourNow.setMinutes(0, 0, 0);
   const ahead = hours.filter((h) => h.at >= hourNow.getTime());
   const pick = (better) => ahead.reduce((best, h) => (!best || better(h.price, best.price) ? h : best), null);
+  // The cheapest hours in a row among the coming ones (`price_window`,
+  // 3 hours unless set; false turns it off), and the coming hours with a
+  // negative price as ranges.
+  const span = config.price_window === false ? 0 : clamp(Math.round(positiveNumber(config.price_window) || 3), 1, 12);
+  let best = null;
+  for (let i = 0; span && i + span <= ahead.length; i++) {
+    const run = ahead.slice(i, i + span);
+    if (run[span - 1].at - run[0].at !== (span - 1) * 3600000) continue;
+    const mean = run.reduce((sum, h) => sum + h.price, 0) / span;
+    if (!best || mean < best.price - 1e-9) best = { from: run[0].at, to: run[span - 1].at + 3600000, price: mean, hours: span };
+  }
+  const negative = [];
+  for (const h of ahead) {
+    if (h.price >= 0) continue;
+    const last = negative[negative.length - 1];
+    if (last && last.to === h.at) last.to = h.at + 3600000;
+    else negative.push({ from: h.at, to: h.at + 3600000 });
+  }
   return {
     entityId: setting.entity,
     hours,
+    // Not worth a line when every coming hour costs the same.
+    window: best && ahead.some((h) => Math.abs(h.price - ahead[0].price) > 1e-9) && ahead.length > span ? best : null,
+    negative,
     nowAt: hourNow.getTime(),
     current: currentPrice(hass.states, setting),
     cheapest: pick((a, b) => a < b),
@@ -751,7 +772,12 @@ function forecastHoursFromStates(hass, config) {
 // any integration chosen in the Energy dashboard): watt-hours per hour,
 // summed over the forecast entries (e.g. Forecast.Solar's roof planes).
 async function loadEnergyForecastHours(hass) {
-  const response = await hass.callWS({ type: "energy/solar_forecast" });
+  let response = null;
+  try {
+    response = await hass.callWS({ type: "energy/solar_forecast" });
+  } catch (error) {
+    // No forecast set up in the Energy dashboard.
+  }
   const hours = new Map();
   for (const entry of Object.values(response || {})) {
     for (const [at, wh] of Object.entries(entry?.wh_hours || {})) {

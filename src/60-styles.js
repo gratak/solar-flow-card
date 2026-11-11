@@ -99,6 +99,9 @@ const BASE_CSS = `
   .sfc-prices-chart i.neg b { bottom: auto; top: calc(100% - var(--zero)); border-radius: 0 0 3px 3px; background: var(--sfc-grid); }
   .sfc-prices-chart i.past b { opacity: .38; }
   .sfc-prices-chart i.now b { box-shadow: 0 0 0 2px var(--sfc-text); }
+  /* The cheapest hours in a row: a line under their bars. */
+  .sfc-prices-chart i.win::after { content: ""; position: absolute; left: -1px; right: -1px; bottom: -4px; height: 2px; background: var(--sfc-text); }
+  .sfc-prices-window { color: var(--sfc-text); font-weight: 600; }
   .sfc-prices-chart i.day { margin-left: 5px; }
   .sfc-prices-chart i.day::before { content: ""; position: absolute; left: -4px; top: 0; bottom: 0; border-left: 1px dashed var(--sfc-border); }
   .sfc-prices-axis { position: relative; height: 15px; margin-top: 3px; color: var(--sfc-muted); font-size: 10px; }

@@ -13,6 +13,7 @@ const EDITOR_PRICES = [
   ["price_import", "editorPriceImport", "0.01"],
   ["price_export", "editorPriceExport", "0.01"],
   ["co2_factor", "editorCo2", "0.01"],
+  ["price_window", "editorPriceWindow", "1"],
 ];
 // "Today at a glance" and the comparison: shown in the wide layout unless
 // switched off, elsewhere only when switched on.

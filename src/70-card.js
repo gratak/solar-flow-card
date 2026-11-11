@@ -533,6 +533,8 @@ class SolarFlowCard extends HTMLElement {
       const panels = showSolar ? panelData(this._hass, resolved, config) || estimatePanels(readings, config, today) : null;
       const pvForecast = showSolar ? pvForecastData(this._hass, config, today) : null;
       const priceChart = priceChartData(this._hass, config);
+      // The hourly PV forecast, for the cheapest hours' note.
+      const pvHours = priceChart?.window && showSolar ? this._forecastHours(true).hours || null : null;
       const custom = customSections(this._hass, config);
       const consumerSensors = consumerList(this._hass, config);
       const consumerStats = consumerSensors.some((item) => item.energy) && typeof this._hass.callWS === "function"
@@ -579,7 +581,7 @@ class SolarFlowCard extends HTMLElement {
         [...this._collapsed],
         money && [money.kind, isNum(money.value) ? Math.round(money.value * 100) : null],
         pvForecast && [pvForecast.total, pvForecast.remaining, pvForecast.days.map((d) => d.value)],
-        priceChart && [priceChart.nowAt, priceChart.current, priceChart.hours.length],
+        priceChart && [priceChart.nowAt, priceChart.current, priceChart.hours.length, priceChart.window?.from, pvHours?.size],
         custom.map((c) => c.items.map((item) => item.state)),
         gridGuard && [Math.round(gridGuard.max * 10), Math.round(gridGuard.minutes)],
         batteryDay && [Math.round(batteryDay.low.soc), batteryDay.fullAt && Math.round(batteryDay.fullAt / 300000), batteryDay.reserveAt && Math.round(batteryDay.reserveAt / 300000)],
@@ -623,6 +625,7 @@ class SolarFlowCard extends HTMLElement {
         panels,
         pvForecast,
         priceChart,
+        pvHours,
         custom,
         consumers,
         gridGuard,
