@@ -526,6 +526,10 @@ class SolarFlowCard extends HTMLElement {
       const inverter = inverterOpen ? readings : null;
       const system = config.show_system !== false ? systemData(this._hass, resolved, config, this._energyBaseline(resolved)) : null;
       if (system && !showBattery) Object.assign(system, { battery: [], batteryWarn: null });
+      const gridGuard = system?.voltagePhases?.length && typeof this._hass.callWS === "function"
+        ? this._fetch(`voltage|${system.voltagePhases.map((p) => p.voltageId).join("+")}|${system.voltageLimit}|${new Date().toDateString()}`, 5 * 60000,
+          () => loadVoltageDay(this._hass, system.voltagePhases, startOfDay(new Date()), system.voltageLimit)).data || null
+        : null;
       const since = period === "all" && energy.buckets?.length
         ? energy.buckets[0].start.toLocaleDateString(locale, { month: "short", year: "numeric" })
         : null;
@@ -551,6 +555,7 @@ class SolarFlowCard extends HTMLElement {
         pvForecast && [pvForecast.total, pvForecast.remaining, pvForecast.days.map((d) => d.value)],
         priceChart && [priceChart.nowAt, priceChart.current, priceChart.hours.length],
         custom.map((c) => c.items.map((item) => item.state)),
+        gridGuard && [Math.round(gridGuard.max * 10), Math.round(gridGuard.minutes)],
         Math.floor(now.getTime() / 60000),
       ]);
       if (signature === this._signature) return;
@@ -591,6 +596,7 @@ class SolarFlowCard extends HTMLElement {
         pvForecast,
         priceChart,
         custom,
+        gridGuard,
         inverter,
         system,
         bank,

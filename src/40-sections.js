@@ -398,8 +398,12 @@ function systemHtml(m) {
         <button class="sfc-phase ${p.main === "grid" && isNum(p.grid) ? (p.grid < -ACTIVE_W ? "export" : p.grid > ACTIVE_W ? "import" : "") : ""}" ${attr(p.entityId)}>
           <small>${escapeHtml(p.main === "grid" ? `${p.name} · ${t.grid}` : p.name)}</small>
           <strong>${escapeHtml(formatPower(p.main === "grid" ? p.grid : p.load, locale))}</strong>
-          <i style="--p:${(() => { const v = p.main === "grid" ? Math.abs(p.grid ?? 0) : p.load; return isNum(v) ? ((v / data.phaseMax) * 100).toFixed(0) : 0; })()}%"></i>
-          <span>${escapeHtml([p.main !== "grid" && isNum(p.grid) && fill(t.phaseGrid, { power: formatPower(p.grid, locale) }), isNum(p.voltage) && `${formatNumber(p.voltage, locale, 0)} V`].filter(Boolean).join(" · "))}</span>
+          <i class="${isNum(p.fuseShare) && p.fuseShare >= 90 ? "high" : ""}" style="--p:${(() => { if (p.main === "grid" && isNum(p.fuseShare)) return p.fuseShare.toFixed(0); const v = p.main === "grid" ? Math.abs(p.grid ?? 0) : p.load; return isNum(v) ? ((v / data.phaseMax) * 100).toFixed(0) : 0; })()}%"></i>
+          <span>${[
+            p.main !== "grid" && isNum(p.grid) && escapeHtml(fill(t.phaseGrid, { power: formatPower(p.grid, locale) })),
+            isNum(p.voltage) && `<em class="${p.over ? "over" : ""}">${escapeHtml(`${formatNumber(p.voltage, locale, 0)} V`)}</em>`,
+            isNum(p.fuseShare) && escapeHtml(`${formatNumber(p.amps, locale, 1)} A · ${formatPercent(p.fuseShare, locale)}`),
+          ].filter(Boolean).join(" · ")}</span>
         </button>`).join("")}
     </div>` : "";
   const labels = { temperature: t.batteryTemperature, voltage: t.batteryVoltage, current: t.batteryCurrent };
@@ -421,7 +425,15 @@ function systemHtml(m) {
         <b>${escapeHtml(formatPower(data.generator.power, locale))}</b>
       </button>`,
   ].filter(Boolean).join("");
-  const warn = data.batteryWarn ? `<p class="sfc-panels-note warn">${escapeHtml(data.batteryWarn === "cold" ? t.batteryCold : t.batteryHot)}</p>` : "";
+  const guard = m.gridGuard;
+  const volts = (v) => `${formatNumber(v, locale, 1)} V`;
+  const warn = [
+    data.batteryWarn && [true, data.batteryWarn === "cold" ? t.batteryCold : t.batteryHot],
+    data.voltageOver && [true, fill(t.voltageHigh, { phase: data.voltageOver.name, volts: volts(data.voltageOver.voltage), limit: `${formatNumber(data.voltageLimit, locale, 0)} V` })],
+    data.fuseHigh && [true, fill(t.fuseHigh, { phase: data.fuseHigh.name, amps: `${formatNumber(data.fuseHigh.amps, locale, 1)} A`, fuse: `${formatNumber(data.fuse, locale, 0)} A` })],
+    // Today so far: only worth a line when the limit was crossed.
+    guard && guard.minutes >= 1 && [false, fill(t.voltageToday, { d: formatDuration(guard.minutes / 60, t), limit: `${formatNumber(data.voltageLimit, locale, 0)} V`, volts: volts(guard.max), phase: guard.phase, time: formatClock(guard.maxAt, locale) })],
+  ].filter(Boolean).map(([now, text]) => `<p class="sfc-panels-note ${now ? "warn" : ""}">${escapeHtml(text)}</p>`).join("");
   return `
     <section class="sfc-section sfc-system">
       <div class="sfc-head">
@@ -449,6 +461,8 @@ function insightsHtml(m) {
     m.config.showBattery && isNum(d.socMin) && kv("battery", t.socRange, `${formatNumber(d.socMin, locale, 0)}–${formatPercent(d.socMax, locale)}`, ""),
     m.config.showBattery && isNum(d.cycles) && kv("battery", t.batteryCycles, formatNumber(d.cycles, locale, 2), ""),
     isNum(d.offGridMinutes) && kv("grid", t.offGrid, formatDuration(d.offGridMinutes / 60, t), ""),
+    m.gridGuard && kv(m.gridGuard.minutes >= 1 ? "load" : "grid", t.voltageMax, `${formatNumber(m.gridGuard.max, locale, 1)} V`,
+      m.gridGuard.minutes >= 1 ? fill(t.voltageOverFor, { d: formatDuration(m.gridGuard.minutes / 60, t), limit: `${formatNumber(m.system?.voltageLimit ?? VOLTAGE_LIMIT, locale, 0)} V` }) : `${m.gridGuard.phase} · ${fill(t.atTime, { time: formatClock(m.gridGuard.maxAt, locale) })}`),
   ].filter(Boolean).join("") : "";
   return tiles ? `
     <section class="sfc-section sfc-insights">

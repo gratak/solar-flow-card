@@ -282,6 +282,11 @@ const BASE_CSS = `
   .sfc-phase i, .sfc-meter i { display: block; height: 4px; margin: 3px 0 1px; border-radius: 999px;
     background: linear-gradient(90deg, var(--sfc-c, var(--sfc-load)) var(--p), var(--sfc-track) var(--p)); }
   .sfc-bank { grid-template-columns: repeat(var(--n), minmax(0, 1fr)); }
+  /* Grid guard: a phase above the voltage limit, or close to the main fuse. */
+  .sfc-phase span { white-space: normal; overflow-wrap: anywhere; }
+  .sfc-phase span em { font-style: normal; white-space: nowrap; }
+  .sfc-phase span em.over { color: var(--sfc-bad, #f0524a); font-weight: 700; }
+  .sfc-phase i.high { --sfc-c: var(--sfc-bad, #f0524a); }
   /* Grid per phase: green while exporting, red while importing. */
   .sfc-phase.export { --sfc-c: var(--sfc-good, #3fb950); }
   .sfc-phase.import { --sfc-c: var(--sfc-bad, #f0524a); }
