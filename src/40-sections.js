@@ -243,6 +243,19 @@ function pricesHtml(m) {
     return axisLabel(i / n, day, hour % 12 ? "minor" : "");
   }).join("");
   const at = (h) => formatClock(new Date(h.at), locale);
+  // The cheapest hours in a row, with the solar forecast for them if known.
+  const clock = (ms, day = true) => {
+    const date = new Date(ms);
+    return `${!day || date.toDateString() === new Date(c.nowAt).toDateString() ? "" : `${t.tomorrow} `}${formatClock(date, locale)}`;
+  };
+  let windowNote = "";
+  if (c.window) {
+    const pv = [];
+    for (let at = c.window.from; at < c.window.to; at += 3600000) if (isNum(m.pvHours?.get(at))) pv.push(m.pvHours.get(at));
+    const solar = pv.length === c.window.hours ? pv.reduce((a, b) => a + b, 0) / pv.length : null;
+    windowNote = `<p class="sfc-panels-note sfc-prices-window">${escapeHtml(fill(t.pricesWindow, { n: c.window.hours, from: clock(c.window.from), to: clock(c.window.to, false), price: money(c.window.price) }))}${
+      isNum(solar) && solar > ACTIVE_W ? escapeHtml(` · ${fill(t.pricesWindowPv, { power: formatPower(solar, locale) })}`) : ""}</p>`;
+  }
   return `
     <section class="sfc-section sfc-prices" data-entity="${escapeHtml(c.entityId)}">
       <div class="sfc-head">
@@ -253,13 +266,15 @@ function pricesHtml(m) {
         ${c.hours.map((h, i) => {
           const share = high > low ? ((h.price - low) / (high - low)) * 100 : 50;
           const newDay = i > 0 && days.size > 1 && new Date(h.at).getHours() === 0;
-          const cls = [h.at < c.nowAt && "past", h.at === c.nowAt && "now", h.price < 0 && "neg", newDay && "day"].filter(Boolean).join(" ");
+          const cls = [h.at < c.nowAt && "past", h.at === c.nowAt && "now", h.price < 0 && "neg", newDay && "day", c.window && h.at >= c.window.from && h.at < c.window.to && "win"].filter(Boolean).join(" ");
           // Green (cheap) through yellow to red (dear).
           return `<i class="${cls}" style="--h:${((Math.abs(h.price) / range) * 100).toFixed(1)}%;--c:hsl(${(120 - share * 1.2).toFixed(0)} 68% 47%)" title="${escapeHtml(`${at(h)} · ${money(h.price)}`)}"><b></b></i>`;
         }).join("")}
       </div>
       <div class="sfc-prices-axis">${labels}</div>
       ${c.cheapest && c.priciest ? `<p class="sfc-panels-note">${escapeHtml(fill(t.pricesAhead, { cheap: at(c.cheapest), cheapPrice: money(c.cheapest.price), dear: at(c.priciest), dearPrice: money(c.priciest.price) }))}</p>` : ""}
+      ${windowNote}
+      ${c.negative.length ? `<p class="sfc-panels-note warn">${escapeHtml(fill(t.pricesNegative, { ranges: c.negative.map((r) => `${clock(r.from)}–${clock(r.to, false)}`).join(", ") }))}</p>` : ""}
     </section>`;
 }
 
