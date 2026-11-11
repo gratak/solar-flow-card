@@ -270,7 +270,7 @@ const BASE_CSS = `
   .sfc-compare-scroll { overflow-x: auto; }
 
   /* Installation */
-  .sfc-phases { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 8px; }
+  .sfc-phases { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 8px; container-type: inline-size; }
   .sfc-phase, .sfc-meter { position: relative; min-width: 0; display: grid; gap: 2px; padding: 9px 11px; text-align: left;
     border: 1px solid var(--sfc-border); border-radius: var(--sfc-tile-radius, 11px); background: var(--sfc-tile-bg); }
   .sfc-phase small, .sfc-meter small { color: var(--sfc-muted); font-size: 11px; font-weight: 700; line-height: 1.2; overflow: hidden;
@@ -278,7 +278,6 @@ const BASE_CSS = `
   .sfc-meter { align-content: start; }
   .sfc-phase strong { font-size: 16px; font-family: var(--sfc-num-font, inherit); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sfc-phase { grid-template-columns: minmax(0, 1fr); }
-  @container (max-width: 240px) { .sfc-phase { padding: 8px; } .sfc-phase strong { font-size: 13px; } }
   .sfc-phase span, .sfc-meter span { color: var(--sfc-muted); font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sfc-phase i, .sfc-meter i { display: block; height: 4px; margin: 3px 0 1px; border-radius: 999px;
     background: linear-gradient(90deg, var(--sfc-c, var(--sfc-load)) var(--p), var(--sfc-track) var(--p)); }
@@ -333,6 +332,60 @@ const BASE_CSS = `
   .sfc-empty { padding: 28px; text-align: center; }
   .sfc-empty h2 { margin: 0 0 6px; font-size: 18px; }
   .sfc-empty p { margin: 0; color: var(--sfc-muted); }
+`;
+
+// Narrow cards, after the themes' own rules: a value is never cut short and
+// a label wraps instead of ending in "…".
+const FIT_CSS = `
+  .sfc-tile small, .sfc-summary-item small, .sfc-phase small, .sfc-meter small { overflow-wrap: anywhere; }
+  .sfc-insight small { white-space: normal; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .dio-chip small, .dio-chip em, .gt-kv small { white-space: normal; overflow-wrap: anywhere; text-overflow: clip; }
+  /* The phase tiles follow the width of their row, not of the card. */
+  @container (max-width: 290px) { .sfc-phase { padding: 8px 6px; } .sfc-phase strong { font-size: 13px; letter-spacing: 0; } }
+  @container (max-width: 225px) { .sfc-phase { padding: 7px 4px; } .sfc-phase strong { font-size: 11px; letter-spacing: -.02em; } .sfc-phase small { font-size: 10px; } }
+  /* The forecast days share their columns, so the widest day name fits. */
+  @supports (grid-template-columns: subgrid) {
+    .sfc-pvf-days { grid-template-columns: max-content minmax(0, 1fr) auto; column-gap: 10px; }
+    .sfc-pvf-day { grid-column: 1 / -1; grid-template-columns: subgrid; }
+    .sfc-pvf-day small { overflow: visible; }
+  }
+  @container (max-width: 440px) {
+    /* Period tabs as wide as their words. */
+    .sfc-tabs { display: flex; }
+    .sfc-tab { flex: 1 1 auto; min-width: 0; padding-inline: 3px; letter-spacing: 0; }
+    .theme-paper .sfc-tab { flex: 0 1 auto; }
+    /* The comparison fits without scrolling sideways. */
+    .sfc-compare-table { font-size: 12px; }
+    .sfc-compare-table th, .sfc-compare-table td { padding: 6px 2px; }
+    .sfc-compare-table thead th { font-size: 9px; letter-spacing: 0; }
+    .sfc-compare-table thead th:not(:first-child) { min-width: 0; }
+    .sfc-compare-table tbody th { white-space: normal; overflow-wrap: break-word; }
+    /* A hint that does not fit beside its title goes under it. */
+    .sfc-head { flex-wrap: wrap; row-gap: 4px; }
+    .sfc-compare-table tbody th i { margin-right: 4px; }
+    .sfc-compare-table td.good, .sfc-compare-table td.bad { font-size: 10px; }
+    /* Titles: the name alone. */
+    .lc-topbar h1 .extra, .gt-title h1 .extra { display: none; }
+    .lc-topbar .b2 { display: none; }
+    .lc-topbar h1 { font-size: clamp(15px, 5cqw, 32px); }
+    .exp-title h1 { font-size: clamp(13px, 4.4cqw, 23px); letter-spacing: .03em; }
+    /* A long name takes a second line. */
+    .lc-topbar h1, .gt-title h1, .exp-title h1 { white-space: normal; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .gt-title h1 { letter-spacing: .08em; }
+    .sfc-tile small, .sfc-summary-item small { -webkit-line-clamp: 3; }
+  }
+  @container (max-width: 370px) {
+    .sfc-tab { font-size: 10px; padding-inline: 2px; }
+    .theme-lcars .sfc-tab { letter-spacing: 0; font-size: 11px; }
+    .sfc-tile { gap: 7px; padding-inline: 8px; }
+    .sfc-tile-icon { flex-basis: 28px; width: 28px; height: 28px; }
+    .theme-aurora .sfc-tile strong { font-size: 13px; }
+    .sfc-compare-table { font-size: 11px; }
+    .theme-lcars .sfc-compare-table { font-size: 10px; }
+    .theme-lcars .sfc-compare-table tbody th { font-size: 9px; letter-spacing: 0; }
+    .theme-lcars .sfc-compare-table td.good, .theme-lcars .sfc-compare-table td.bad { font-size: 9px; }
+    .theme-lcars .sfc-compare-table th, .theme-lcars .sfc-compare-table td { padding-inline: 1px; }
+  }
 `;
 
 const THEME_CSS = {
