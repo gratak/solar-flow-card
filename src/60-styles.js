@@ -407,6 +407,9 @@ const FIT_CSS = `
     .sfc-tile-icon { flex-basis: 28px; width: 28px; height: 28px; }
     .theme-aurora .sfc-tile strong { font-size: 13px; }
     .sfc-compare-table { font-size: 11px; }
+    /* The narrowest cards: with a year-ago column the change in % goes too. */
+    .sfc-compare-table.has-year .trend { display: none; }
+    .theme-lcars .sfc-compare-table.has-year .yday { display: none; }
     .theme-lcars .sfc-compare-table { font-size: 10px; }
     .theme-lcars .sfc-compare-table tbody th { font-size: 9px; letter-spacing: 0; }
     .theme-lcars .sfc-compare-table td.good, .theme-lcars .sfc-compare-table td.bad { font-size: 9px; }

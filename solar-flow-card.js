@@ -5582,18 +5582,18 @@ function comparisonHtml(m) {
   const cell = (v) => `<td>${escapeHtml(isNum(v) ? formatNumber(v, locale, v < 10 ? 1 : 0) : "—")}</td>`;
   const hasYear = rows.some((row) => isNum(row.yearAgo));
   const trend = (row) => {
-    if (!isNum(row.today) || !isNum(row.yesterday) || row.yesterday < 0.05) return "<td></td>";
+    if (!isNum(row.today) || !isNum(row.yesterday) || row.yesterday < 0.05) return '<td class="trend"></td>';
     const pct = ((row.today - row.yesterday) / row.yesterday) * 100;
     // More production or export is good news, more consumption or import is not.
     const good = (pct >= 0) === (row.name === "solar" || row.name === "gridExport");
-    return `<td class="${good ? "good" : "bad"}">${pct >= 0 ? "▲" : "▼"} ${escapeHtml(formatNumber(Math.abs(pct), locale, 0))}%</td>`;
+    return `<td class="trend ${good ? "good" : "bad"}">${pct >= 0 ? "▲" : "▼"} ${escapeHtml(formatNumber(Math.abs(pct), locale, 0))}%</td>`;
   };
   return `
     <section class="sfc-section sfc-compare">
       <div class="sfc-head"><div><span class="sfc-kicker">kWh</span><h3>${escapeHtml(t.compareTitle)}</h3></div></div>
       <div class="sfc-compare-scroll"><table class="sfc-compare-table ${hasYear ? "has-year" : ""}">
-        <thead><tr><th></th><th>${escapeHtml(t.periodToday)}</th><th>${escapeHtml(t.colYesterday)}</th><th></th><th class="avg">${escapeHtml(t.colAvg7)}</th><th>${escapeHtml(t.colMonth)}</th>${hasYear ? `<th title="${escapeHtml(t.colYearAgoHint)}">${escapeHtml(t.colYearAgo)}</th>` : ""}</tr></thead>
-        <tbody>${rows.map((row) => `<tr class="${row.name}"><th><i></i>${escapeHtml(labels[row.name])}</th>${cell(row.today)}${cell(row.yesterday)}${trend(row)}${cell(row.average).replace("<td>", '<td class="avg">')}${cell(row.month)}${hasYear ? cell(row.yearAgo) : ""}</tr>`).join("")}</tbody>
+        <thead><tr><th></th><th>${escapeHtml(t.periodToday)}</th><th class="yday">${escapeHtml(t.colYesterday)}</th><th class="trend"></th><th class="avg">${escapeHtml(t.colAvg7)}</th><th>${escapeHtml(t.colMonth)}</th>${hasYear ? `<th title="${escapeHtml(t.colYearAgoHint)}">${escapeHtml(t.colYearAgo)}</th>` : ""}</tr></thead>
+        <tbody>${rows.map((row) => `<tr class="${row.name}"><th><i></i>${escapeHtml(labels[row.name])}</th>${cell(row.today)}${cell(row.yesterday).replace("<td>", '<td class="yday">')}${trend(row)}${cell(row.average).replace("<td>", '<td class="avg">')}${cell(row.month)}${hasYear ? cell(row.yearAgo) : ""}</tr>`).join("")}</tbody>
       </table></div>
     </section>`;
 }
@@ -7753,6 +7753,9 @@ const FIT_CSS = `
     .sfc-tile-icon { flex-basis: 28px; width: 28px; height: 28px; }
     .theme-aurora .sfc-tile strong { font-size: 13px; }
     .sfc-compare-table { font-size: 11px; }
+    /* The narrowest cards: with a year-ago column the change in % goes too. */
+    .sfc-compare-table.has-year .trend { display: none; }
+    .theme-lcars .sfc-compare-table.has-year .yday { display: none; }
     .theme-lcars .sfc-compare-table { font-size: 10px; }
     .theme-lcars .sfc-compare-table tbody th { font-size: 9px; letter-spacing: 0; }
     .theme-lcars .sfc-compare-table td.good, .theme-lcars .sfc-compare-table td.bad { font-size: 9px; }
