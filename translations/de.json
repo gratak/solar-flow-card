@@ -121,7 +121,7 @@
   "chipHome": "Heute verbraucht",
   "whereFrom": "Woher der Strom heute kam",
   "noData": "Keine Energiesensoren gefunden",
-  "noDataHelp": "Installiere die DeyeCloud-Integration oder lege die Entitäten in der Kartenkonfiguration fest.",
+  "noDataHelp": "Richte das Energie-Dashboard von Home Assistant ein, installiere die DeyeCloud-Integration oder wähle deine Sensoren im Editor der Karte.",
   "editorTheme": "Design",
   "expanseTitle": "Energieverteilung",
   "foundationTitle": "Prime Radiant",
@@ -270,7 +270,9 @@
     "forecast": "PV-Prognose",
     "more": "Mehr"
   },
-  "editorSensorsHint": "DeyeCloud wird automatisch erkannt: diese Felder leer lassen. Für andere Wechselrichter die eigenen Sensoren wählen; die Konfigurationsanleitung im README beschreibt jeden.",
+  "editorSensorsHint": "DeyeCloud und die Sensoren des Energie-Dashboards von Home Assistant werden automatisch gefunden: diese Felder leer lassen. Sonst wähle deine Sensoren; die Konfigurationsanleitung im README erklärt jeden.",
+  "editorEnergyAuto": "Leere Felder nutzen die Sensoren des Energie-Dashboards von Home Assistant (Einstellungen → Dashboards → Energie).",
+  "editorEnergyCopy": "In diese Karte schreiben, um sie hier zu ändern",
   "editorEntityGroups": {
     "live": "Aktuelle Leistung",
     "energy": "Energie",

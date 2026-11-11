@@ -177,7 +177,7 @@ const TRANSLATIONS = {
     "chipHome": "Used today",
     "whereFrom": "Where today's power came from",
     "noData": "No energy sensors found",
-    "noDataHelp": "Install the DeyeCloud integration or set the entities in the card configuration.",
+    "noDataHelp": "Set up Home Assistant's Energy dashboard, install the DeyeCloud integration, or pick your sensors in the card's editor.",
     "editorTheme": "Theme",
     "expanseTitle": "Power distribution",
     "foundationTitle": "Prime Radiant",
@@ -326,7 +326,9 @@ const TRANSLATIONS = {
       "forecast": "PV forecast",
       "more": "More"
     },
-    "editorSensorsHint": "DeyeCloud is found automatically: leave these empty. For other inverters pick your sensors; the configuration guide in the README explains each one.",
+    "editorSensorsHint": "DeyeCloud and the sensors of Home Assistant's Energy dashboard are found automatically: leave those fields empty. Otherwise pick your sensors; the configuration guide in the README explains each one.",
+    "editorEnergyAuto": "Empty fields use the sensors from Home Assistant's Energy dashboard (Settings → Dashboards → Energy).",
+    "editorEnergyCopy": "Write them into this card, to change them here",
     "editorEntityGroups": {
       "live": "Live power",
       "energy": "Energy",
@@ -613,7 +615,7 @@ const TRANSLATIONS = {
     "chipHome": "Heute verbraucht",
     "whereFrom": "Woher der Strom heute kam",
     "noData": "Keine Energiesensoren gefunden",
-    "noDataHelp": "Installiere die DeyeCloud-Integration oder lege die Entitäten in der Kartenkonfiguration fest.",
+    "noDataHelp": "Richte das Energie-Dashboard von Home Assistant ein, installiere die DeyeCloud-Integration oder wähle deine Sensoren im Editor der Karte.",
     "editorTheme": "Design",
     "expanseTitle": "Energieverteilung",
     "foundationTitle": "Prime Radiant",
@@ -762,7 +764,9 @@ const TRANSLATIONS = {
       "forecast": "PV-Prognose",
       "more": "Mehr"
     },
-    "editorSensorsHint": "DeyeCloud wird automatisch erkannt: diese Felder leer lassen. Für andere Wechselrichter die eigenen Sensoren wählen; die Konfigurationsanleitung im README beschreibt jeden.",
+    "editorSensorsHint": "DeyeCloud und die Sensoren des Energie-Dashboards von Home Assistant werden automatisch gefunden: diese Felder leer lassen. Sonst wähle deine Sensoren; die Konfigurationsanleitung im README erklärt jeden.",
+    "editorEnergyAuto": "Leere Felder nutzen die Sensoren des Energie-Dashboards von Home Assistant (Einstellungen → Dashboards → Energie).",
+    "editorEnergyCopy": "In diese Karte schreiben, um sie hier zu ändern",
     "editorEntityGroups": {
       "live": "Aktuelle Leistung",
       "energy": "Energie",
@@ -1049,7 +1053,7 @@ const TRANSLATIONS = {
     "chipHome": "Utilisé aujourd'hui",
     "whereFrom": "D'où venait l'énergie du jour",
     "noData": "Aucun capteur d'énergie trouvé",
-    "noDataHelp": "Installez l'intégration DeyeCloud ou définissez les entités dans la configuration de la carte.",
+    "noDataHelp": "Configurez le tableau de bord Énergie de Home Assistant, installez l'intégration DeyeCloud ou choisissez vos capteurs dans l'éditeur de la carte.",
     "editorTheme": "Thème",
     "expanseTitle": "Répartition de la puissance",
     "foundationTitle": "Premier Radiant",
@@ -1198,7 +1202,9 @@ const TRANSLATIONS = {
       "forecast": "Prévision PV",
       "more": "Plus"
     },
-    "editorSensorsHint": "DeyeCloud est détecté automatiquement : laissez ces champs vides. Pour d'autres onduleurs, choisissez vos capteurs ; le guide de configuration du README explique chacun d'eux.",
+    "editorSensorsHint": "DeyeCloud et les capteurs du tableau de bord Énergie de Home Assistant sont détectés automatiquement : laissez ces champs vides. Sinon, choisissez vos capteurs ; le guide de configuration du README explique chacun d'eux.",
+    "editorEnergyAuto": "Les champs vides utilisent les capteurs du tableau de bord Énergie de Home Assistant (Paramètres → Tableaux de bord → Énergie).",
+    "editorEnergyCopy": "Les écrire dans cette carte, pour les modifier ici",
     "editorEntityGroups": {
       "live": "Puissance en direct",
       "energy": "Énergie",
@@ -1485,7 +1491,7 @@ const TRANSLATIONS = {
     "chipHome": "Vandaag gebruikt",
     "whereFrom": "Waar de energie van vandaag vandaan kwam",
     "noData": "Geen energiesensoren gevonden",
-    "noDataHelp": "Installeer de DeyeCloud-integratie of stel de entiteiten in de configuratie van de kaart in.",
+    "noDataHelp": "Stel het Energie-dashboard van Home Assistant in, installeer de DeyeCloud-integratie of kies je sensoren in de editor van de kaart.",
     "editorTheme": "Thema",
     "expanseTitle": "Stroomverdeling",
     "foundationTitle": "Prime Radiant",
@@ -1634,7 +1640,9 @@ const TRANSLATIONS = {
       "forecast": "PV-prognose",
       "more": "Meer"
     },
-    "editorSensorsHint": "DeyeCloud wordt automatisch gevonden: laat deze leeg. Kies voor andere omvormers je sensoren; de configuratiegids in de README beschrijft ze allemaal.",
+    "editorSensorsHint": "DeyeCloud en de sensoren van het Energie-dashboard van Home Assistant worden automatisch gevonden: laat die velden leeg. Kies anders je sensoren; de configuratiegids in de README legt ze uit.",
+    "editorEnergyAuto": "Lege velden gebruiken de sensoren van het Energie-dashboard van Home Assistant (Instellingen → Dashboards → Energie).",
+    "editorEnergyCopy": "Zet ze in deze kaart, om ze hier te wijzigen",
     "editorEntityGroups": {
       "live": "Actueel vermogen",
       "energy": "Energie",
@@ -1921,7 +1929,7 @@ const TRANSLATIONS = {
     "chipHome": "Zużycie dziś",
     "whereFrom": "Skąd dziś prąd w domu",
     "noData": "Nie znaleziono czujników energii",
-    "noDataHelp": "Zainstaluj integrację DeyeCloud albo wskaż encje w konfiguracji karty.",
+    "noDataHelp": "Skonfiguruj panel Energia w Home Assistant, zainstaluj integrację DeyeCloud albo wskaż czujniki w edytorze karty.",
     "editorTheme": "Motyw",
     "expanseTitle": "Rozdział mocy",
     "foundationTitle": "Pierwszy Radiant",
@@ -2070,7 +2078,9 @@ const TRANSLATIONS = {
       "forecast": "Prognoza PV",
       "more": "Więcej"
     },
-    "editorSensorsHint": "DeyeCloud jest wykrywany automatycznie – zostaw te pola puste. Dla innych falowników wybierz swoje czujniki; każdy jest opisany w przewodniku konfiguracji w README.",
+    "editorSensorsHint": "DeyeCloud i czujniki z panelu Energia Home Assistant są wykrywane automatycznie: zostaw te pola puste. W innym przypadku wskaż swoje czujniki; każdy opisuje przewodnik konfiguracji w README.",
+    "editorEnergyAuto": "Puste pola korzystają z czujników z panelu Energia Home Assistant (Ustawienia → Dashboardy → Energia).",
+    "editorEnergyCopy": "Wpisz je do tej karty, żeby zmienić je tutaj",
     "editorEntityGroups": {
       "live": "Moc na żywo",
       "energy": "Energia",
@@ -2357,7 +2367,7 @@ const TRANSLATIONS = {
     "chipHome": "Usado hoje",
     "whereFrom": "De onde veio a energia de hoje",
     "noData": "Nenhum sensor de energia encontrado",
-    "noDataHelp": "Instale a integração DeyeCloud ou configure as entidades na configuração do cartão.",
+    "noDataHelp": "Configure o painel Energia do Home Assistant, instale a integração DeyeCloud ou escolha os seus sensores no editor do cartão.",
     "editorTheme": "Tema",
     "expanseTitle": "Distribuição de potência",
     "foundationTitle": "Prime Radiant",
@@ -2506,7 +2516,9 @@ const TRANSLATIONS = {
       "forecast": "Previsão FV",
       "more": "Mais"
     },
-    "editorSensorsHint": "O DeyeCloud é encontrado automaticamente: deixe estes campos em branco. Para outros inversores escolha os seus sensores; o guia de configuração no README explica cada um.",
+    "editorSensorsHint": "O DeyeCloud e os sensores do painel Energia do Home Assistant são encontrados automaticamente: deixe esses campos em branco. Caso contrário escolha os seus sensores; o guia de configuração no README explica cada um.",
+    "editorEnergyAuto": "Os campos em branco usam os sensores do painel Energia do Home Assistant (Definições → Painéis → Energia).",
+    "editorEnergyCopy": "Escrevê-los neste cartão, para os alterar aqui",
     "editorEntityGroups": {
       "live": "Potência em direto",
       "energy": "Energia",
@@ -2952,6 +2964,101 @@ function deyeStations(hass) {
   return [...ids].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 }
 
+// ---------------------------------------------------------------------------
+// Home Assistant's Energy dashboard settings (energy/get_prefs): the sensors
+// set up there are used wherever the card has none of its own, so the card
+// works without configuration for any inverter. Power sensors (stat_rate)
+// have the card's signs: grid + importing, battery + discharging.
+// ---------------------------------------------------------------------------
+
+async function loadEnergyPrefs(hass) {
+  try {
+    return (await hass.callWS({ type: "energy/get_prefs" })) || null;
+  } catch (error) {
+    // The Energy dashboard is not set up.
+    return null;
+  }
+}
+
+function energyAuto(prefs, hass) {
+  if (!prefs || typeof prefs !== "object") return null;
+  const states = hass?.states || {};
+  const known = (id) => (typeof id === "string" && states[id] ? id : null);
+  const sources = {};
+  const add = (key, id) => {
+    if (known(id) && !(sources[key] || []).includes(id)) (sources[key] ||= []).push(id);
+  };
+  const batteries = [];
+  for (const source of Array.isArray(prefs.energy_sources) ? prefs.energy_sources : []) {
+    if (!source || typeof source !== "object") continue;
+    if (source.type === "grid") {
+      add("grid_import_energy", source.stat_energy_from);
+      add("grid_export_energy", source.stat_energy_to);
+      add("grid_power", source.stat_rate);
+      // The older format: lists of import and export meters.
+      for (const flow of Array.isArray(source.flow_from) ? source.flow_from : []) add("grid_import_energy", flow?.stat_energy_from);
+      for (const flow of Array.isArray(source.flow_to) ? source.flow_to : []) add("grid_export_energy", flow?.stat_energy_to);
+      for (const power of Array.isArray(source.power) ? source.power : []) add("grid_power", power?.stat_rate);
+    } else if (source.type === "solar") {
+      add("solar_energy", source.stat_energy_from);
+      add("solar_power", source.stat_rate);
+    } else if (source.type === "home") {
+      add("load_energy", source.stat_energy_to);
+      add("load_power", source.stat_rate);
+    } else if (source.type === "battery") {
+      add("battery_discharge_energy", source.stat_energy_from);
+      add("battery_charge_energy", source.stat_energy_to);
+      add("battery_power", source.stat_rate);
+      batteries.push({ name: source.name ? String(source.name) : null, soc: known(source.stat_soc), power: known(source.stat_rate), capacity: positiveNumber(source.capacity) });
+    }
+  }
+  const devices = (Array.isArray(prefs.device_consumption) ? prefs.device_consumption : [])
+    .filter((device) => device && typeof device === "object" && (known(device.stat_consumption) || known(device.stat_rate)))
+    .map((device) => ({ energy: known(device.stat_consumption), power: known(device.stat_rate), name: device.name ? String(device.name) : null, parent: typeof device.included_in_stat === "string" ? device.included_in_stat : null }));
+  return Object.keys(sources).length || devices.length ? { sources, batteries, devices } : null;
+}
+
+const POWER_GROUPS = {
+  solar_power: ["solar_power"],
+  load_power: ["load_power"],
+  grid_power: ["grid_power", "grid_import_power", "grid_export_power"],
+  battery_power: ["battery_power", "battery_charge_power", "battery_discharge_power"],
+};
+
+// The card's config with what the Energy dashboard adds: `_energy` (its
+// sensors and devices) and, where the card would otherwise have nothing,
+// the lifetime-counter mode, the battery capacity and several batteries.
+// DeyeCloud's own discovery and anything set in the card come first.
+function withEnergyAuto(config, auto, hass) {
+  if (!auto) return config;
+  const next = { ...config, _energy: { ...auto, live: false, energy: false } };
+  if (deyeStations(hass).length) return next;
+  const entities = config.entities || {};
+  const ownEnergy = Object.keys(entities).some((key) => /_energy$/.test(key) && entities[key])
+    || (Array.isArray(config.inverters) && config.inverters.some((item) => item?.solar_energy));
+  next._energy.live = true;
+  next._energy.energy = !ownEnergy && Object.keys(auto.sources).some((key) => /_energy$/.test(key));
+  if (next._energy.energy && !config.energy_sensors) next.energy_sensors = "total";
+  const ownBattery = POWER_GROUPS.battery_power.some((key) => entities[key]) || entities.battery_soc || Array.isArray(config.batteries);
+  // An installation set up from the Energy dashboard alone: no battery or
+  // no solar there, none in the card.
+  const ownLive = Object.values(POWER_GROUPS).flat().some((key) => entities[key]) || Array.isArray(config.inverters);
+  if (!ownLive && !ownEnergy && Object.keys(auto.sources).length) {
+    const has = (prefix) => Object.keys(auto.sources).some((key) => key.startsWith(prefix));
+    if (config.show_battery === undefined && !ownBattery && !has("battery_")) next.show_battery = false;
+    if (config.show_solar === undefined && !has("solar_")) next.show_solar = false;
+  }
+  if (!ownBattery && auto.batteries.length) {
+    const complete = auto.batteries.filter((battery) => battery.soc && battery.power);
+    if (auto.batteries.length > 1 && complete.length === auto.batteries.length) {
+      next.batteries = complete.map((battery, i) => ({ name: battery.name || `#${i + 1}`, soc: battery.soc, power: battery.power, ...(battery.capacity ? { capacity: battery.capacity } : {}) }));
+    }
+    const capacity = auto.batteries.every((battery) => battery.capacity) ? auto.batteries.reduce((sum, battery) => sum + battery.capacity, 0) : null;
+    if (capacity && !positiveNumber(config.battery_capacity)) next.battery_capacity = capacity;
+  }
+  return next;
+}
+
 function resolveEntities(hass, config) {
   const states = hass?.states || {};
   const stations = deyeStations(hass);
@@ -2985,6 +3092,24 @@ function resolveEntities(hass, config) {
   for (const [name, def] of Object.entries(ENERGY_METRICS)) {
     energy[name] = pick(configured[def.key])
       || find((a) => a.sensor_type === "daily" && a.metric_key === def.deye && a.relative_day === "today");
+  }
+  // Nothing of the card's own: the Energy dashboard's sensors, several of a
+  // kind added up.
+  const auto = station === null ? config._energy : null;
+  if (auto?.live) {
+    const from = (key, unit, read) => {
+      const parts = (auto.sources[key] || []).map(pick).filter(Boolean);
+      return parts.length ? combinedEntry(parts, unit, read) : null;
+    };
+    const free = (group) => POWER_GROUPS[group].every((key) => !configured[key]);
+    if (free("solar_power")) live.solar ||= from("solar_power", "W", wattsOf);
+    if (free("load_power")) live.load ||= from("load_power", "W", wattsOf);
+    if (free("grid_power")) live.grid ||= from("grid_power", "W", wattsOf);
+    if (free("battery_power")) live.battery ||= from("battery_power", "W", wattsOf);
+    if (!configured.battery_soc && auto.batteries.length === 1) live.soc ||= pick(auto.batteries[0].soc);
+    if (auto.energy) {
+      for (const [name, def] of Object.entries(ENERGY_METRICS)) energy[name] ||= from(def.key, "kWh", kwhOf);
+    }
   }
   // Several inverters: their solar power and energy added up, unless the
   // sum is set under entities:.
@@ -7900,6 +8025,9 @@ class SolarFlowCard extends HTMLElement {
     const normalized = config && typeof config === "object" && !Array.isArray(config) ? config : {};
     this._config = { ...DEFAULT_CONFIG, ...migrateConfig(normalized) };
     if (!THEMES.includes(this._config.theme)) this._config.theme = "diorama";
+    // As set in the dashboard; _config also carries what the Energy
+    // dashboard adds (see withEnergyAuto).
+    this._ownConfig = this._config;
     this._collapsed = loadCollapsed(this._config);
     this._signature = "";
     this._render();
@@ -8224,6 +8352,8 @@ class SolarFlowCard extends HTMLElement {
   _render() {
     if (!this.shadowRoot || !this._hass) return;
     try {
+      const prefs = typeof this._hass.callWS === "function" ? this._fetch("energy-prefs", 10 * 60000, () => loadEnergyPrefs(this._hass)) : null;
+      this._config = withEnergyAuto(this._ownConfig || this._config, energyAuto(prefs?.data, this._hass), this._hass);
       const config = this._config;
       const language = languageOf(this._hass, config);
       const t = stringsFor(language);
@@ -8940,11 +9070,46 @@ class SolarFlowCardEditor extends HTMLElement {
       ${this._config.load_fonts === true ? `<p class="warn">${escapeHtml(t.editorFontsHint)}</p>` : ""}`;
   }
 
+  // The config with the Energy dashboard's sensors for what is left empty
+  // (hints only: nothing of it is written unless asked for).
+  _withAuto() {
+    const cached = SHARED_CACHE.get("energy-prefs");
+    if (!cached && !this._prefsAsked && typeof this._hass?.callWS === "function") {
+      this._prefsAsked = true;
+      loadEnergyPrefs(this._hass).then((data) => {
+        SHARED_CACHE.set("energy-prefs", { data, at: Date.now() });
+        this._render();
+      });
+    }
+    return withEnergyAuto(this._config, energyAuto(cached?.data, this._hass), this._hass);
+  }
+
+  // The Energy dashboard's sensors written into the card, to adjust them.
+  _copyAuto() {
+    const auto = this._withAuto()._energy;
+    if (!auto?.live) return;
+    const entities = { ...(this._config.entities || {}) };
+    const free = (group) => POWER_GROUPS[group].every((key) => !entities[key]);
+    for (const group of Object.keys(POWER_GROUPS)) if (free(group) && auto.sources[group]?.length === 1) entities[group] = auto.sources[group][0];
+    if (!entities.battery_soc && auto.batteries.length === 1 && auto.batteries[0].soc) entities.battery_soc = auto.batteries[0].soc;
+    const next = { ...this._config, entities };
+    if (auto.energy) {
+      for (const def of Object.values(ENERGY_METRICS)) if (auto.sources[def.key]?.length === 1) entities[def.key] = auto.sources[def.key][0];
+      next.energy_sensors = "total";
+    }
+    this._emit(next);
+    this._render();
+  }
+
   _sensorsHtml(t) {
     const entities = this._config.entities || {};
+    const effective = this._withAuto();
+    // Only while a field is actually filled from the Energy dashboard.
+    const fromEnergy = Boolean(effective._energy?.live) && (effective._energy.energy
+      || Object.keys(POWER_GROUPS).some((group) => effective._energy.sources[group]?.length && POWER_GROUPS[group].every((key) => !entities[key])));
     let resolved = null;
     try {
-      resolved = resolveEntities(this._hass, this._config);
+      resolved = resolveEntities(this._hass, effective);
     } catch (error) {
       // No hints from the current setup.
     }
@@ -8975,7 +9140,7 @@ class SolarFlowCardEditor extends HTMLElement {
       if (key === "grid_power" && entities.grid_power && (entities.grid_import_power || entities.grid_export_power)) notes.push(["warn", t.editorPairConflict]);
       if (key === "battery_power" && entities.battery_power && (entities.battery_charge_power || entities.battery_discharge_power)) notes.push(["warn", t.editorBatteryPairConflict]);
       // A lifetime counter set up as a daily sensor shows its total as today.
-      if (/_energy$/.test(key) && this._config.energy_sensors !== "total") {
+      if (/_energy$/.test(key) && effective.energy_sensors !== "total") {
         const stateObj = this._hass?.states?.[entities[key]] || autoFor(key)?.stateObj;
         const kwh = stateObj ? kwhOf(stateObj) : null;
         if (isNum(kwh) && kwh > 500) notes.push(["warn", fill(t.editorLooksTotal, { value: formatEnergy(kwh, t.locale) })]);
@@ -8986,6 +9151,7 @@ class SolarFlowCardEditor extends HTMLElement {
     const names = Object.fromEntries(editorEntityGroups(t).flatMap(([, items]) => items));
     return `
       <p class="hint">${escapeHtml(t.editorSensorsHint)}</p>
+      ${fromEnergy ? `<div class="suggest"><p class="note">${escapeHtml(t.editorEnergyAuto)}</p><button type="button" class="link" data-copy-auto>${escapeHtml(t.editorEnergyCopy)}</button></div>` : ""}
       ${editorEntityGroups(t).map(([group, items]) => `
         <details class="box" data-box="entities-${group}" ${this._boxOpen(`entities-${group}`, group === "live" || group === "energy" || items.some(([key]) => entities[key])) ? "open" : ""}>
           <summary class="title">${escapeHtml(t.editorEntityGroups[group])}${(() => { const n = items.filter(([key]) => !entities[key] && autoFor(key)).length; return n ? ` <small class="found">${escapeHtml(fill(t.editorFoundN, { n }))}</small>` : ""; })()}</summary>
@@ -9003,13 +9169,13 @@ class SolarFlowCardEditor extends HTMLElement {
         </select>
       </label>
       ${this._switches(t, "sensors")}
-      ${this._liveCheck(t, resolved)}`;
+      ${this._liveCheck(t, resolved, effective)}`;
   }
 
   // The power right now with the current settings, so a wrong sign shows.
-  _liveCheck(t, resolved) {
+  _liveCheck(t, resolved, config = this._config) {
     if (!resolved) return "";
-    const live = liveValues(resolved, this._config);
+    const live = liveValues(resolved, config);
     const locale = t.locale;
     const grid = isNum(live.grid) ? `${formatPower(Math.abs(live.grid), locale)} ${live.grid > ACTIVE_W ? t.importing.toLowerCase() : live.grid < -ACTIVE_W ? t.exporting.toLowerCase() : ""}`.trim() : "—";
     const battery = isNum(live.battery) ? `${formatPower(Math.abs(live.battery), locale)} ${live.battery > ACTIVE_W ? t.discharging.toLowerCase() : live.battery < -ACTIVE_W ? t.charging.toLowerCase() : ""}`.trim() : "—";
@@ -9331,6 +9497,7 @@ class SolarFlowCardEditor extends HTMLElement {
       this._set("virtual_storage", e.target.checked ? true : undefined);
       this._render();
     });
+    root.querySelector("[data-copy-auto]")?.addEventListener("click", () => this._copyAuto());
     root.querySelector("[data-use-billing]")?.addEventListener("click", () => {
       // Net-billing values the energy sold at the RCE price: a fixed export
       // price would take its place, so it goes.

@@ -121,7 +121,7 @@
   "chipHome": "Utilisé aujourd'hui",
   "whereFrom": "D'où venait l'énergie du jour",
   "noData": "Aucun capteur d'énergie trouvé",
-  "noDataHelp": "Installez l'intégration DeyeCloud ou définissez les entités dans la configuration de la carte.",
+  "noDataHelp": "Configurez le tableau de bord Énergie de Home Assistant, installez l'intégration DeyeCloud ou choisissez vos capteurs dans l'éditeur de la carte.",
   "editorTheme": "Thème",
   "expanseTitle": "Répartition de la puissance",
   "foundationTitle": "Premier Radiant",
@@ -270,7 +270,9 @@
     "forecast": "Prévision PV",
     "more": "Plus"
   },
-  "editorSensorsHint": "DeyeCloud est détecté automatiquement : laissez ces champs vides. Pour d'autres onduleurs, choisissez vos capteurs ; le guide de configuration du README explique chacun d'eux.",
+  "editorSensorsHint": "DeyeCloud et les capteurs du tableau de bord Énergie de Home Assistant sont détectés automatiquement : laissez ces champs vides. Sinon, choisissez vos capteurs ; le guide de configuration du README explique chacun d'eux.",
+  "editorEnergyAuto": "Les champs vides utilisent les capteurs du tableau de bord Énergie de Home Assistant (Paramètres → Tableaux de bord → Énergie).",
+  "editorEnergyCopy": "Les écrire dans cette carte, pour les modifier ici",
   "editorEntityGroups": {
     "live": "Puissance en direct",
     "energy": "Énergie",

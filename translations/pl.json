@@ -121,7 +121,7 @@
   "chipHome": "Zużycie dziś",
   "whereFrom": "Skąd dziś prąd w domu",
   "noData": "Nie znaleziono czujników energii",
-  "noDataHelp": "Zainstaluj integrację DeyeCloud albo wskaż encje w konfiguracji karty.",
+  "noDataHelp": "Skonfiguruj panel Energia w Home Assistant, zainstaluj integrację DeyeCloud albo wskaż czujniki w edytorze karty.",
   "editorTheme": "Motyw",
   "expanseTitle": "Rozdział mocy",
   "foundationTitle": "Pierwszy Radiant",
@@ -270,7 +270,9 @@
     "forecast": "Prognoza PV",
     "more": "Więcej"
   },
-  "editorSensorsHint": "DeyeCloud jest wykrywany automatycznie – zostaw te pola puste. Dla innych falowników wybierz swoje czujniki; każdy jest opisany w przewodniku konfiguracji w README.",
+  "editorSensorsHint": "DeyeCloud i czujniki z panelu Energia Home Assistant są wykrywane automatycznie: zostaw te pola puste. W innym przypadku wskaż swoje czujniki; każdy opisuje przewodnik konfiguracji w README.",
+  "editorEnergyAuto": "Puste pola korzystają z czujników z panelu Energia Home Assistant (Ustawienia → Dashboardy → Energia).",
+  "editorEnergyCopy": "Wpisz je do tej karty, żeby zmienić je tutaj",
   "editorEntityGroups": {
     "live": "Moc na żywo",
     "energy": "Energia",

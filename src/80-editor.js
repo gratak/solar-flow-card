@@ -446,11 +446,46 @@ class SolarFlowCardEditor extends HTMLElement {
       ${this._config.load_fonts === true ? `<p class="warn">${escapeHtml(t.editorFontsHint)}</p>` : ""}`;
   }
 
+  // The config with the Energy dashboard's sensors for what is left empty
+  // (hints only: nothing of it is written unless asked for).
+  _withAuto() {
+    const cached = SHARED_CACHE.get("energy-prefs");
+    if (!cached && !this._prefsAsked && typeof this._hass?.callWS === "function") {
+      this._prefsAsked = true;
+      loadEnergyPrefs(this._hass).then((data) => {
+        SHARED_CACHE.set("energy-prefs", { data, at: Date.now() });
+        this._render();
+      });
+    }
+    return withEnergyAuto(this._config, energyAuto(cached?.data, this._hass), this._hass);
+  }
+
+  // The Energy dashboard's sensors written into the card, to adjust them.
+  _copyAuto() {
+    const auto = this._withAuto()._energy;
+    if (!auto?.live) return;
+    const entities = { ...(this._config.entities || {}) };
+    const free = (group) => POWER_GROUPS[group].every((key) => !entities[key]);
+    for (const group of Object.keys(POWER_GROUPS)) if (free(group) && auto.sources[group]?.length === 1) entities[group] = auto.sources[group][0];
+    if (!entities.battery_soc && auto.batteries.length === 1 && auto.batteries[0].soc) entities.battery_soc = auto.batteries[0].soc;
+    const next = { ...this._config, entities };
+    if (auto.energy) {
+      for (const def of Object.values(ENERGY_METRICS)) if (auto.sources[def.key]?.length === 1) entities[def.key] = auto.sources[def.key][0];
+      next.energy_sensors = "total";
+    }
+    this._emit(next);
+    this._render();
+  }
+
   _sensorsHtml(t) {
     const entities = this._config.entities || {};
+    const effective = this._withAuto();
+    // Only while a field is actually filled from the Energy dashboard.
+    const fromEnergy = Boolean(effective._energy?.live) && (effective._energy.energy
+      || Object.keys(POWER_GROUPS).some((group) => effective._energy.sources[group]?.length && POWER_GROUPS[group].every((key) => !entities[key])));
     let resolved = null;
     try {
-      resolved = resolveEntities(this._hass, this._config);
+      resolved = resolveEntities(this._hass, effective);
     } catch (error) {
       // No hints from the current setup.
     }
@@ -481,7 +516,7 @@ class SolarFlowCardEditor extends HTMLElement {
       if (key === "grid_power" && entities.grid_power && (entities.grid_import_power || entities.grid_export_power)) notes.push(["warn", t.editorPairConflict]);
       if (key === "battery_power" && entities.battery_power && (entities.battery_charge_power || entities.battery_discharge_power)) notes.push(["warn", t.editorBatteryPairConflict]);
       // A lifetime counter set up as a daily sensor shows its total as today.
-      if (/_energy$/.test(key) && this._config.energy_sensors !== "total") {
+      if (/_energy$/.test(key) && effective.energy_sensors !== "total") {
         const stateObj = this._hass?.states?.[entities[key]] || autoFor(key)?.stateObj;
         const kwh = stateObj ? kwhOf(stateObj) : null;
         if (isNum(kwh) && kwh > 500) notes.push(["warn", fill(t.editorLooksTotal, { value: formatEnergy(kwh, t.locale) })]);
@@ -492,6 +527,7 @@ class SolarFlowCardEditor extends HTMLElement {
     const names = Object.fromEntries(editorEntityGroups(t).flatMap(([, items]) => items));
     return `
       <p class="hint">${escapeHtml(t.editorSensorsHint)}</p>
+      ${fromEnergy ? `<div class="suggest"><p class="note">${escapeHtml(t.editorEnergyAuto)}</p><button type="button" class="link" data-copy-auto>${escapeHtml(t.editorEnergyCopy)}</button></div>` : ""}
       ${editorEntityGroups(t).map(([group, items]) => `
         <details class="box" data-box="entities-${group}" ${this._boxOpen(`entities-${group}`, group === "live" || group === "energy" || items.some(([key]) => entities[key])) ? "open" : ""}>
           <summary class="title">${escapeHtml(t.editorEntityGroups[group])}${(() => { const n = items.filter(([key]) => !entities[key] && autoFor(key)).length; return n ? ` <small class="found">${escapeHtml(fill(t.editorFoundN, { n }))}</small>` : ""; })()}</summary>
@@ -509,13 +545,13 @@ class SolarFlowCardEditor extends HTMLElement {
         </select>
       </label>
       ${this._switches(t, "sensors")}
-      ${this._liveCheck(t, resolved)}`;
+      ${this._liveCheck(t, resolved, effective)}`;
   }
 
   // The power right now with the current settings, so a wrong sign shows.
-  _liveCheck(t, resolved) {
+  _liveCheck(t, resolved, config = this._config) {
     if (!resolved) return "";
-    const live = liveValues(resolved, this._config);
+    const live = liveValues(resolved, config);
     const locale = t.locale;
     const grid = isNum(live.grid) ? `${formatPower(Math.abs(live.grid), locale)} ${live.grid > ACTIVE_W ? t.importing.toLowerCase() : live.grid < -ACTIVE_W ? t.exporting.toLowerCase() : ""}`.trim() : "—";
     const battery = isNum(live.battery) ? `${formatPower(Math.abs(live.battery), locale)} ${live.battery > ACTIVE_W ? t.discharging.toLowerCase() : live.battery < -ACTIVE_W ? t.charging.toLowerCase() : ""}`.trim() : "—";
@@ -837,6 +873,7 @@ class SolarFlowCardEditor extends HTMLElement {
       this._set("virtual_storage", e.target.checked ? true : undefined);
       this._render();
     });
+    root.querySelector("[data-copy-auto]")?.addEventListener("click", () => this._copyAuto());
     root.querySelector("[data-use-billing]")?.addEventListener("click", () => {
       // Net-billing values the energy sold at the RCE price: a fixed export
       // price would take its place, so it goes.

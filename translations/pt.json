@@ -121,7 +121,7 @@
   "chipHome": "Usado hoje",
   "whereFrom": "De onde veio a energia de hoje",
   "noData": "Nenhum sensor de energia encontrado",
-  "noDataHelp": "Instale a integração DeyeCloud ou configure as entidades na configuração do cartão.",
+  "noDataHelp": "Configure o painel Energia do Home Assistant, instale a integração DeyeCloud ou escolha os seus sensores no editor do cartão.",
   "editorTheme": "Tema",
   "expanseTitle": "Distribuição de potência",
   "foundationTitle": "Prime Radiant",
@@ -270,7 +270,9 @@
     "forecast": "Previsão FV",
     "more": "Mais"
   },
-  "editorSensorsHint": "O DeyeCloud é encontrado automaticamente: deixe estes campos em branco. Para outros inversores escolha os seus sensores; o guia de configuração no README explica cada um.",
+  "editorSensorsHint": "O DeyeCloud e os sensores do painel Energia do Home Assistant são encontrados automaticamente: deixe esses campos em branco. Caso contrário escolha os seus sensores; o guia de configuração no README explica cada um.",
+  "editorEnergyAuto": "Os campos em branco usam os sensores do painel Energia do Home Assistant (Definições → Painéis → Energia).",
+  "editorEnergyCopy": "Escrevê-los neste cartão, para os alterar aqui",
   "editorEntityGroups": {
     "live": "Potência em direto",
     "energy": "Energia",
