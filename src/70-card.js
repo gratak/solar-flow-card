@@ -513,6 +513,11 @@ class SolarFlowCard extends HTMLElement {
       const pvForecast = showSolar ? pvForecastData(this._hass, config, today) : null;
       const priceChart = priceChartData(this._hass, config);
       const custom = customSections(this._hass, config);
+      const consumerSensors = consumerList(this._hass, config);
+      const consumerStats = consumerSensors.some((item) => item.energy) && typeof this._hass.callWS === "function"
+        ? this._fetch(`consumers|${consumerSensors.map((item) => item.energy || "").join("+")}|${new Date().toDateString()}`, 5 * 60000, () => loadConsumersToday(this._hass, consumerSensors)).data
+        : null;
+      const consumers = consumersData(this._hass, config, live, today, consumerStats);
       const insights = this._insights(resolved, today, forecast);
       const weather = theme === "diorama" || theme === "reactor" ? weatherData(this._hass, config) : null;
       // The wide layout has room for everything: inverter details stay open.
@@ -556,6 +561,7 @@ class SolarFlowCard extends HTMLElement {
         priceChart && [priceChart.nowAt, priceChart.current, priceChart.hours.length],
         custom.map((c) => c.items.map((item) => item.state)),
         gridGuard && [Math.round(gridGuard.max * 10), Math.round(gridGuard.minutes)],
+        consumers && [consumers.items.map((item) => [item.power, isNum(item.today) ? Math.round(item.today * 100) : null]), consumers.other],
         Math.floor(now.getTime() / 60000),
       ]);
       if (signature === this._signature) return;
@@ -596,6 +602,7 @@ class SolarFlowCard extends HTMLElement {
         pvForecast,
         priceChart,
         custom,
+        consumers,
         gridGuard,
         inverter,
         system,

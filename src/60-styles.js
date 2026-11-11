@@ -72,6 +72,19 @@ const BASE_CSS = `
   .sfc-pvf-day small { color: var(--sfc-muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sfc-pvf-day.today small { color: var(--sfc-text); font-weight: 700; }
   .sfc-pvf-day strong { min-width: 4.8em; text-align: right; font-size: 13px; font-family: var(--sfc-num-font, inherit); }
+  /* Consumers: name, bar, power now, energy today. */
+  .sfc-cons-list { display: grid; grid-template-columns: minmax(4.5em, max-content) minmax(40px, 1fr) max-content max-content; gap: 7px 10px; align-items: center; }
+  .sfc-cons-list.no-power { grid-template-columns: minmax(0, 1fr) max-content; }
+  .sfc-cons-list.no-energy { grid-template-columns: minmax(4.5em, max-content) minmax(40px, 1fr) max-content; }
+  .sfc-cons { display: grid; grid-column: 1 / -1; grid-template-columns: subgrid; align-items: center; padding: 1px 0; border: 0; background: none; text-align: left; color: inherit; }
+  .sfc-cons small { min-width: 0; max-width: 11em; color: var(--sfc-muted); font-size: 12px; line-height: 1.2; overflow-wrap: anywhere; }
+  .sfc-cons.on small { color: var(--sfc-text); font-weight: 700; }
+  .sfc-cons.nested small { padding-left: 10px; }
+  .sfc-cons strong { text-align: right; font-size: 13px; font-family: var(--sfc-num-font, inherit); white-space: nowrap; }
+  .sfc-cons em { text-align: right; font-style: normal; font-size: 12px; font-family: var(--sfc-num-font, inherit); color: var(--sfc-muted); white-space: nowrap; }
+  .sfc-cons .sfc-pvf-bar i { background: var(--sfc-load); }
+  .sfc-cons.other .sfc-pvf-bar i { background: color-mix(in srgb, var(--sfc-muted) 60%, transparent); }
+  .sfc-cons.other small { font-style: italic; }
   .sfc-pvf-bar { position: relative; height: 10px; border-radius: 999px; background: var(--sfc-track); overflow: hidden; }
   .sfc-pvf-bar i { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: color-mix(in srgb, var(--sfc-pv) 45%, transparent); }
   .sfc-pvf-bar b { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--sfc-pv); }

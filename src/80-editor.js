@@ -604,6 +604,7 @@ class SolarFlowCardEditor extends HTMLElement {
         ["name", "text", t.editorItemName], ["solar_power", "power", t.editorInvSolarPower], ["solar_energy", "energy", t.editorInvSolarEnergy],
         ["power", "power", t.editorInvPower], ["rated_power", "number", t.editorInvRated],
       ])}
+      ${this._listHtml(t, "consumers", t.editorConsumers, t.editorConsumersHint, [["name", "text", t.editorItemName], ["power", "power", t.editorConsPower], ["energy", "energy", t.editorConsEnergy]])}
       ${this._listHtml(t, "panels", t.editorPanels, t.editorPanelsHint, [["entity", "energy", t.editorPanelEnergy], ["power", "power", t.editorPanelPower], ["name", "text", t.editorItemName]])}`;
   }
 

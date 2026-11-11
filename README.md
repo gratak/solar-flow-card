@@ -194,6 +194,7 @@ A font installed on your device is used too, with neither option.
 | `prices` | Energy prices by the hour, from a price sensor |
 | `virtual_storage` | Virtual storage |
 | `system` | Installation |
+| `consumers` | Consumers: where the home's power goes |
 | `energy` | Energy: period tabs, chart, tiles and summary |
 | `insights` | Today at a glance |
 | `comparison` | Comparison with yesterday, the week and the month |
@@ -306,6 +307,7 @@ The chart uses the export price's sensor, else the import price's. Without an im
 | `panels` | DeyeCloud optimizers | Per-panel energy sensors, see below. |
 | `batteries` | – | Several batteries (e.g. a hybrid inverter's BAT1 and BAT2), see below. |
 | `inverters` | – | Several inverters (e.g. an on-grid and an off-grid one), see below. |
+| `consumers` | Energy dashboard devices | Devices for the Consumers section, see below. `false` hides the section. |
 | `invert_battery` | `false` | Your signed battery power is positive while charging. |
 | `invert_grid` | `false` | Your signed grid power is positive while exporting. |
 | `entities: <key>_history` | – | A recorded copy of a live power sensor for the charts, e.g. `grid_power_history`, when the live one is kept out of the recorder. See the [configuration guide](docs/configuration.md#separate-history-sensors). |
@@ -413,6 +415,24 @@ batteries:
 ```
 
 `battery_capacity` defaults to the sum of the capacities; `invert_battery` flips all of them.
+
+### Consumers
+
+The **Consumers** section shows where the home's power goes: each device's power now as a bar against the home's consumption, its energy today, and **Other** for what the listed devices do not explain.
+
+- Without any configuration it lists the *individual devices* of Home Assistant's Energy dashboard (Settings → Dashboards → Energy), with their power sensors where those are set there.
+- Or list the devices yourself, each with a power sensor, an energy counter, or both:
+
+```yaml
+consumers:
+  - name: Heat pump
+    power: sensor.heat_pump_power            # W or kW
+    energy: sensor.heat_pump_energy          # kWh counter (lifetime or daily)
+  - name: EV charger
+    power: sensor.wallbox_power
+```
+
+Today's energy comes from the long-term statistics, so the energy sensors need `state_class: total_increasing`. `consumers: false` hides the section; `sections:` places it (`consumers`).
 
 ### Several inverters
 
