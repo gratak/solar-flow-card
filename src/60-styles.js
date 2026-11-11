@@ -143,6 +143,8 @@ const BASE_CSS = `
   .sfc-forecast-copy small { display: block; color: var(--sfc-muted); font-size: 11px; }
   .sfc-forecast-copy strong { display: block; font-size: 14px; margin-top: 1px; }
   .sfc-forecast-copy em { display: block; color: var(--sfc-muted); font-size: 11px; font-style: normal; }
+  .sfc-forecast-copy em.sfc-forecast-day { margin-top: 3px; color: color-mix(in srgb, var(--sfc-battery) 70%, var(--sfc-text)); }
+  .sfc-line.soc.ahead { stroke-dasharray: 1 6; stroke-linecap: round; stroke-width: 2.5; opacity: .8; }
   .sfc-forecast-stored { font-size: 14px; white-space: nowrap; font-family: var(--sfc-num-font, inherit); }
   @container (max-width: 380px) { .sfc-forecast-stored { white-space: normal; text-align: right; } }
   .sfc-forecast-bar { grid-column: 1 / -1; position: relative; height: 7px; border-radius: 999px; background: var(--sfc-track); }

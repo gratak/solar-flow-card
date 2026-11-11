@@ -92,6 +92,17 @@ function energySectionHtml(m, { title = true } = {}) {
     </section>`;
 }
 
+// "Next 24 h: full around 12:40 · lowest 35% around 06:00".
+function batteryDayText(f, t, locale) {
+  const d = f.day;
+  const parts = [
+    d.fullAt && fill(t.dayFull, { time: formatWhen(d.fullAt, locale) }),
+    d.reserveAt ? fill(t.dayReserve, { soc: formatNumber(f.minSoc, locale, 0), time: formatWhen(d.reserveAt, locale) })
+      : d.low.soc < f.soc - 1 && fill(t.dayLow, { soc: formatNumber(d.low.soc, locale, 0), time: formatWhen(new Date(d.low.at), locale) }),
+  ].filter(Boolean);
+  return `${t.dayAhead} ${parts.length ? parts.join(" · ") : fill(t.dayHolds, { soc: formatNumber(d.points[d.points.length - 1].soc, locale, 0) })}`;
+}
+
 function forecastHtml(m) {
   const f = m.forecast;
   if (!m.config.showForecast || f.capacity === null || !isNum(f.soc)) return "";
@@ -115,6 +126,7 @@ function forecastHtml(m) {
         <small>${escapeHtml(t.batteryForecast)}</small>
         <strong>${escapeHtml(headline)}</strong>
         ${detail ? `<em>${escapeHtml(detail)}</em>` : ""}
+        ${f.day ? `<em class="sfc-forecast-day">${escapeHtml(batteryDayText(f, t, locale))}</em>` : ""}
       </div>
       <b class="sfc-forecast-stored">${escapeHtml(fill(t.storedOf, { kwh: formatEnergy(f.stored, locale), cap: formatEnergy(f.capacity, locale) }))}</b>
       <div class="sfc-forecast-bar" aria-hidden="true"><i style="width:${f.soc}%"></i><b style="left:${f.minSoc}%"></b></div>
@@ -763,6 +775,7 @@ function powerChartHtml(source, t, locale, hidden) {
       ${data.grid ? `<path class="sfc-line grid" d="${linePath(data.grid, x, y)}" />` : ""}
       ${data.load ? `<path class="sfc-line load" d="${linePath(data.load, x, y)}" />` : ""}
       ${data.soc ? `<path class="sfc-line soc" d="${linePath(data.soc, x, socY)}" />` : ""}
+      ${data.soc && source.socAhead ? `<path class="sfc-line soc ahead" d="${linePath(source.socAhead, x, socY)}" />` : ""}
       ${data.forecast ? `<path class="sfc-line forecast" d="${linePath(data.forecast, x, y)}" />` : ""}
     </svg>`;
   return chartFrame(

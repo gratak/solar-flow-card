@@ -374,14 +374,30 @@ class SolarFlowCard extends HTMLElement {
 
   // Solcast's hourly attributes, or else Home Assistant's energy forecast
   // (Forecast.Solar and the like), only with pv_forecast configured.
-  _forecastHours() {
+  // `always`: also without pv_forecast (the battery's day ahead).
+  _forecastHours(always = false) {
     const config = this._config;
     const fromStates = forecastHoursFromStates(this._hass, config);
     if (fromStates) return { hours: fromStates, at: [...fromStates].slice(0, 30).map(([, w]) => Math.round(w)).join(",") };
     const f = config.pv_forecast;
-    if (!f || typeof f !== "object" || f.hourly === false || typeof this._hass.callWS !== "function") return {};
+    if (typeof this._hass.callWS !== "function") return {};
+    if (!always && (!f || typeof f !== "object" || f.hourly === false)) return {};
     const entry = this._fetch(`solar-forecast|${startOfDay(new Date()).getTime()}`, 30 * 60000, () => loadEnergyForecastHours(this._hass));
     return { hours: entry.data, at: entry.at, loading: entry.loading };
+  }
+
+  // The battery's charge level over the next day (see simulateBattery):
+  // needs the capacity, an hourly PV forecast (with solar) and a week of
+  // hourly energy statistics. `battery_day: false` turns it off.
+  _batteryDay(resolved, forecast, showSolar) {
+    if (this._config.battery_day === false || !forecast.capacity || !isNum(forecast.soc) || typeof this._hass.callWS !== "function") return null;
+    const pv = showSolar ? this._forecastHours(true).hours : null;
+    if (showSolar && !pv?.size) return null;
+    const sources = sourcesKey(resolved.energy);
+    if (!sources) return null;
+    const start = startOfDay(addDays(new Date(), -7));
+    const history = this._fetch(`load-profile|${sources}|${start.getTime()}`, 60 * 60000, () => loadHourlyEnergy(this._hass, resolved.energy, start));
+    return simulateBattery(forecast, pv, loadProfile(history.data));
   }
 
   _chartStateBase(resolved, period, energy) {
@@ -508,6 +524,11 @@ class SolarFlowCard extends HTMLElement {
       const energy = this._periodEnergy(resolved, period, today);
       const chart = this._chartState(resolved, period, energy);
       const forecast = batteryForecast(live, bank?.capacity && !positiveNumber(config.battery_capacity) ? { ...config, battery_capacity: bank.capacity } : config);
+      const batteryDay = showBattery && config.show_forecast !== false ? this._batteryDay(resolved, forecast, showSolar) : null;
+      forecast.day = batteryDay;
+      if (batteryDay && period === "today" && chart?.data?.kind === "power" && chart.data.soc) {
+        chart.data = { ...chart.data, socAhead: socAheadSeries(batteryDay, chart.data.spec) };
+      }
       const readings = inverterReadings(resolved, this._hass, config);
       const panels = showSolar ? panelData(this._hass, resolved, config) || estimatePanels(readings, config, today) : null;
       const pvForecast = showSolar ? pvForecastData(this._hass, config, today) : null;
@@ -561,6 +582,7 @@ class SolarFlowCard extends HTMLElement {
         priceChart && [priceChart.nowAt, priceChart.current, priceChart.hours.length],
         custom.map((c) => c.items.map((item) => item.state)),
         gridGuard && [Math.round(gridGuard.max * 10), Math.round(gridGuard.minutes)],
+        batteryDay && [Math.round(batteryDay.low.soc), batteryDay.fullAt && Math.round(batteryDay.fullAt / 300000), batteryDay.reserveAt && Math.round(batteryDay.reserveAt / 300000)],
         consumers && [consumers.items.map((item) => [item.power, isNum(item.today) ? Math.round(item.today * 100) : null]), consumers.other],
         Math.floor(now.getTime() / 60000),
       ]);

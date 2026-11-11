@@ -118,6 +118,11 @@ const TRANSLATIONS = {
     "slowCharge": "Charging slowly",
     "slowDischarge": "Discharging slowly",
     "slowDetail": "more than 2 days at this rate",
+    "dayAhead": "Next 24 h:",
+    "dayFull": "full around {time}",
+    "dayReserve": "down to the {soc}% reserve around {time}",
+    "dayLow": "lowest {soc}% around {time}",
+    "dayHolds": "stays around {soc}%",
     "storedOf": "{kwh} of {cap}",
     "inverterDetails": "Inverter details",
     "pvStrings": "PV strings",
@@ -571,6 +576,11 @@ const TRANSLATIONS = {
     "slowCharge": "Lädt langsam",
     "slowDischarge": "Entlädt langsam",
     "slowDetail": "mehr als 2 Tage bei dieser Rate",
+    "dayAhead": "Nächste 24 h:",
+    "dayFull": "voll gegen {time}",
+    "dayReserve": "fällt gegen {time} auf die Reserve von {soc}%",
+    "dayLow": "Tiefstwert {soc}% gegen {time}",
+    "dayHolds": "bleibt bei etwa {soc}%",
     "storedOf": "{kwh} von {cap}",
     "inverterDetails": "Wechselrichter-Details",
     "pvStrings": "PV-Strings",
@@ -1024,6 +1034,11 @@ const TRANSLATIONS = {
     "slowCharge": "Charge lente",
     "slowDischarge": "Décharge lente",
     "slowDetail": "plus de 2 jours à ce rythme",
+    "dayAhead": "Prochaines 24 h :",
+    "dayFull": "pleine vers {time}",
+    "dayReserve": "descend à la réserve de {soc}% vers {time}",
+    "dayLow": "au plus bas {soc}% vers {time}",
+    "dayHolds": "reste autour de {soc}%",
     "storedOf": "{kwh} sur {cap}",
     "inverterDetails": "Détails de l'onduleur",
     "pvStrings": "Chaînes PV",
@@ -1477,6 +1492,11 @@ const TRANSLATIONS = {
     "slowCharge": "Laadt langzaam op",
     "slowDischarge": "Ontlaadt langzaam",
     "slowDetail": "meer dan 2 dagen in dit tempo",
+    "dayAhead": "Komende 24 u:",
+    "dayFull": "vol rond {time}",
+    "dayReserve": "zakt tot de reserve van {soc}% rond {time}",
+    "dayLow": "laagste {soc}% rond {time}",
+    "dayHolds": "blijft rond {soc}%",
     "storedOf": "{kwh} van {cap}",
     "inverterDetails": "Omvormer details",
     "pvStrings": "PV-strings",
@@ -1930,6 +1950,11 @@ const TRANSLATIONS = {
     "slowCharge": "Ładuje się powoli",
     "slowDischarge": "Rozładowuje się powoli",
     "slowDetail": "przy tym tempie ponad 2 doby",
+    "dayAhead": "Najbliższa doba:",
+    "dayFull": "pełny ok. {time}",
+    "dayReserve": "spadnie do rezerwy {soc}% ok. {time}",
+    "dayLow": "najniżej {soc}% ok. {time}",
+    "dayHolds": "utrzyma ok. {soc}%",
     "storedOf": "{kwh} z {cap}",
     "inverterDetails": "Szczegóły falownika",
     "pvStrings": "Stringi PV",
@@ -2383,6 +2408,11 @@ const TRANSLATIONS = {
     "slowCharge": "A carregar lentamente",
     "slowDischarge": "A descarregar lentamente",
     "slowDetail": "mais de 2 dias a esta taxa",
+    "dayAhead": "Próximas 24 h:",
+    "dayFull": "cheia por volta das {time}",
+    "dayReserve": "desce até à reserva de {soc}% por volta das {time}",
+    "dayLow": "mínimo de {soc}% por volta das {time}",
+    "dayHolds": "mantém-se em cerca de {soc}%",
     "storedOf": "{kwh} de {cap}",
     "inverterDetails": "Detalhes do inversor",
     "pvStrings": "Strings FV",
@@ -4001,6 +4031,80 @@ function batteryForecast(live, config) {
   return forecast;
 }
 
+// ---------------------------------------------------------------------------
+// The battery over the next day: the charge level simulated hour by hour
+// from the PV forecast and the home's usual consumption at that hour.
+// ---------------------------------------------------------------------------
+
+// The usual consumption by hour of the day (W), from the hourly energy
+// statistics of the last days; the load is derived when it has no sensor.
+function loadProfile(hourly, now = new Date()) {
+  if (!hourly) return null;
+  const hours = new Set();
+  for (const map of Object.values(hourly)) for (const at of map.keys()) hours.add(at);
+  const current = startOfHour(now).getTime();
+  const sums = Array.from({ length: 24 }, () => [0, 0]);
+  for (const at of hours) {
+    if (at >= current) continue;
+    const row = deriveLoadEnergy(Object.fromEntries(Object.entries(hourly).map(([name, map]) => [name, map.get(at)]).filter(([, v]) => isNum(v))));
+    // An hour above 50 kWh is a counter glitch, not a home.
+    if (!isNum(row.load) || row.load > 50) continue;
+    const slot = sums[new Date(at).getHours()];
+    slot[0] += row.load * 1000;
+    slot[1] += 1;
+  }
+  const filled = sums.filter(([, n]) => n);
+  if (filled.length < 12) return null;
+  const mean = filled.reduce((total, [sum, n]) => total + sum / n, 0) / filled.length;
+  return sums.map(([sum, n]) => (n ? sum / n : mean));
+}
+
+function simulateBattery(forecast, pvHours, profile, now = new Date()) {
+  const { capacity, minSoc } = forecast;
+  if (!capacity || !isNum(forecast.soc) || !profile) return null;
+  const HOUR = 3600000;
+  const start = now.getTime();
+  // As far as the PV forecast reaches, a day at most; without solar, a day.
+  const reach = pvHours ? Math.max(...pvHours.keys()) + HOUR : start + 24 * HOUR;
+  const end = Math.min(start + 24 * HOUR, reach);
+  if (end - start < 3 * HOUR) return null;
+  const floor = Math.min(forecast.soc, minSoc) / 100 * capacity;
+  let energy = (forecast.soc / 100) * capacity;
+  const soc = () => (energy / capacity) * 100;
+  const out = { points: [{ at: start, soc: soc() }], fullAt: null, reserveAt: null, low: { soc: soc(), at: start }, end };
+  for (let at = start; at < end;) {
+    const hour = startOfHour(new Date(at)).getTime();
+    const until = Math.min(hour + HOUR, end);
+    const share = (until - at) / HOUR;
+    const net = ((pvHours?.get(hour) ?? 0) - profile[new Date(hour).getHours()]) / 1000 * share;
+    // Charging loses a little on the way in.
+    const delta = net > 0 ? net * 0.95 : net;
+    const before = energy;
+    energy = clamp(before + delta, floor, capacity);
+    const crossed = (level) => new Date(at + (until - at) * ((level - before) / delta));
+    if (!out.fullAt && before < capacity * 0.995 && energy >= capacity * 0.995) out.fullAt = crossed(capacity * 0.995);
+    if (!out.reserveAt && delta < 0 && before > floor && energy <= floor) out.reserveAt = crossed(floor);
+    if (soc() < out.low.soc - 0.05) out.low = { soc: soc(), at: until };
+    out.points.push({ at: until, soc: soc() });
+    at = until;
+  }
+  return out;
+}
+
+// The simulated charge level on a chart's buckets after now.
+function socAheadSeries(day, spec, now = Date.now()) {
+  if (!day) return null;
+  const series = Array.from({ length: spec.count }, (_, i) => {
+    const at = spec.start.getTime() + (i + 0.5) * spec.bucketMs;
+    if (at < now - spec.bucketMs || at > day.end) return null;
+    const next = day.points.findIndex((point) => point.at >= at);
+    if (next <= 0) return day.points[0].soc;
+    const [a, b] = [day.points[next - 1], day.points[next]];
+    return a.soc + (b.soc - a.soc) * ((at - a.at) / (b.at - a.at));
+  });
+  return series.some(isNum) ? series : null;
+}
+
 // DeyeCloud device sensors are named "<key> <serial>"; newer versions also
 // expose the key as an attribute.
 function deviceKey(stateObj) {
@@ -4864,6 +4968,17 @@ function energySectionHtml(m, { title = true } = {}) {
     </section>`;
 }
 
+// "Next 24 h: full around 12:40 · lowest 35% around 06:00".
+function batteryDayText(f, t, locale) {
+  const d = f.day;
+  const parts = [
+    d.fullAt && fill(t.dayFull, { time: formatWhen(d.fullAt, locale) }),
+    d.reserveAt ? fill(t.dayReserve, { soc: formatNumber(f.minSoc, locale, 0), time: formatWhen(d.reserveAt, locale) })
+      : d.low.soc < f.soc - 1 && fill(t.dayLow, { soc: formatNumber(d.low.soc, locale, 0), time: formatWhen(new Date(d.low.at), locale) }),
+  ].filter(Boolean);
+  return `${t.dayAhead} ${parts.length ? parts.join(" · ") : fill(t.dayHolds, { soc: formatNumber(d.points[d.points.length - 1].soc, locale, 0) })}`;
+}
+
 function forecastHtml(m) {
   const f = m.forecast;
   if (!m.config.showForecast || f.capacity === null || !isNum(f.soc)) return "";
@@ -4887,6 +5002,7 @@ function forecastHtml(m) {
         <small>${escapeHtml(t.batteryForecast)}</small>
         <strong>${escapeHtml(headline)}</strong>
         ${detail ? `<em>${escapeHtml(detail)}</em>` : ""}
+        ${f.day ? `<em class="sfc-forecast-day">${escapeHtml(batteryDayText(f, t, locale))}</em>` : ""}
       </div>
       <b class="sfc-forecast-stored">${escapeHtml(fill(t.storedOf, { kwh: formatEnergy(f.stored, locale), cap: formatEnergy(f.capacity, locale) }))}</b>
       <div class="sfc-forecast-bar" aria-hidden="true"><i style="width:${f.soc}%"></i><b style="left:${f.minSoc}%"></b></div>
@@ -5535,6 +5651,7 @@ function powerChartHtml(source, t, locale, hidden) {
       ${data.grid ? `<path class="sfc-line grid" d="${linePath(data.grid, x, y)}" />` : ""}
       ${data.load ? `<path class="sfc-line load" d="${linePath(data.load, x, y)}" />` : ""}
       ${data.soc ? `<path class="sfc-line soc" d="${linePath(data.soc, x, socY)}" />` : ""}
+      ${data.soc && source.socAhead ? `<path class="sfc-line soc ahead" d="${linePath(source.socAhead, x, socY)}" />` : ""}
       ${data.forecast ? `<path class="sfc-line forecast" d="${linePath(data.forecast, x, y)}" />` : ""}
     </svg>`;
   return chartFrame(
@@ -7187,6 +7304,8 @@ const BASE_CSS = `
   .sfc-forecast-copy small { display: block; color: var(--sfc-muted); font-size: 11px; }
   .sfc-forecast-copy strong { display: block; font-size: 14px; margin-top: 1px; }
   .sfc-forecast-copy em { display: block; color: var(--sfc-muted); font-size: 11px; font-style: normal; }
+  .sfc-forecast-copy em.sfc-forecast-day { margin-top: 3px; color: color-mix(in srgb, var(--sfc-battery) 70%, var(--sfc-text)); }
+  .sfc-line.soc.ahead { stroke-dasharray: 1 6; stroke-linecap: round; stroke-width: 2.5; opacity: .8; }
   .sfc-forecast-stored { font-size: 14px; white-space: nowrap; font-family: var(--sfc-num-font, inherit); }
   @container (max-width: 380px) { .sfc-forecast-stored { white-space: normal; text-align: right; } }
   .sfc-forecast-bar { grid-column: 1 / -1; position: relative; height: 7px; border-radius: 999px; background: var(--sfc-track); }
@@ -8560,14 +8679,30 @@ class SolarFlowCard extends HTMLElement {
 
   // Solcast's hourly attributes, or else Home Assistant's energy forecast
   // (Forecast.Solar and the like), only with pv_forecast configured.
-  _forecastHours() {
+  // `always`: also without pv_forecast (the battery's day ahead).
+  _forecastHours(always = false) {
     const config = this._config;
     const fromStates = forecastHoursFromStates(this._hass, config);
     if (fromStates) return { hours: fromStates, at: [...fromStates].slice(0, 30).map(([, w]) => Math.round(w)).join(",") };
     const f = config.pv_forecast;
-    if (!f || typeof f !== "object" || f.hourly === false || typeof this._hass.callWS !== "function") return {};
+    if (typeof this._hass.callWS !== "function") return {};
+    if (!always && (!f || typeof f !== "object" || f.hourly === false)) return {};
     const entry = this._fetch(`solar-forecast|${startOfDay(new Date()).getTime()}`, 30 * 60000, () => loadEnergyForecastHours(this._hass));
     return { hours: entry.data, at: entry.at, loading: entry.loading };
+  }
+
+  // The battery's charge level over the next day (see simulateBattery):
+  // needs the capacity, an hourly PV forecast (with solar) and a week of
+  // hourly energy statistics. `battery_day: false` turns it off.
+  _batteryDay(resolved, forecast, showSolar) {
+    if (this._config.battery_day === false || !forecast.capacity || !isNum(forecast.soc) || typeof this._hass.callWS !== "function") return null;
+    const pv = showSolar ? this._forecastHours(true).hours : null;
+    if (showSolar && !pv?.size) return null;
+    const sources = sourcesKey(resolved.energy);
+    if (!sources) return null;
+    const start = startOfDay(addDays(new Date(), -7));
+    const history = this._fetch(`load-profile|${sources}|${start.getTime()}`, 60 * 60000, () => loadHourlyEnergy(this._hass, resolved.energy, start));
+    return simulateBattery(forecast, pv, loadProfile(history.data));
   }
 
   _chartStateBase(resolved, period, energy) {
@@ -8694,6 +8829,11 @@ class SolarFlowCard extends HTMLElement {
       const energy = this._periodEnergy(resolved, period, today);
       const chart = this._chartState(resolved, period, energy);
       const forecast = batteryForecast(live, bank?.capacity && !positiveNumber(config.battery_capacity) ? { ...config, battery_capacity: bank.capacity } : config);
+      const batteryDay = showBattery && config.show_forecast !== false ? this._batteryDay(resolved, forecast, showSolar) : null;
+      forecast.day = batteryDay;
+      if (batteryDay && period === "today" && chart?.data?.kind === "power" && chart.data.soc) {
+        chart.data = { ...chart.data, socAhead: socAheadSeries(batteryDay, chart.data.spec) };
+      }
       const readings = inverterReadings(resolved, this._hass, config);
       const panels = showSolar ? panelData(this._hass, resolved, config) || estimatePanels(readings, config, today) : null;
       const pvForecast = showSolar ? pvForecastData(this._hass, config, today) : null;
@@ -8747,6 +8887,7 @@ class SolarFlowCard extends HTMLElement {
         priceChart && [priceChart.nowAt, priceChart.current, priceChart.hours.length],
         custom.map((c) => c.items.map((item) => item.state)),
         gridGuard && [Math.round(gridGuard.max * 10), Math.round(gridGuard.minutes)],
+        batteryDay && [Math.round(batteryDay.low.soc), batteryDay.fullAt && Math.round(batteryDay.fullAt / 300000), batteryDay.reserveAt && Math.round(batteryDay.reserveAt / 300000)],
         consumers && [consumers.items.map((item) => [item.power, isNum(item.today) ? Math.round(item.today * 100) : null]), consumers.other],
         Math.floor(now.getTime() / 60000),
       ]);
