@@ -73,11 +73,11 @@ const BASE_CSS = `
   .sfc-pvf-day.today small { color: var(--sfc-text); font-weight: 700; }
   .sfc-pvf-day strong { min-width: 4.8em; text-align: right; font-size: 13px; font-family: var(--sfc-num-font, inherit); }
   /* Consumers: name, bar, power now, energy today. */
-  .sfc-cons-list { display: grid; grid-template-columns: minmax(4.5em, max-content) minmax(40px, 1fr) max-content max-content; gap: 7px 10px; align-items: center; }
+  .sfc-cons-list { display: grid; grid-template-columns: fit-content(11em) minmax(20px, 1fr) max-content max-content; gap: 7px 8px; align-items: center; }
   .sfc-cons-list.no-power { grid-template-columns: minmax(0, 1fr) max-content; }
-  .sfc-cons-list.no-energy { grid-template-columns: minmax(4.5em, max-content) minmax(40px, 1fr) max-content; }
+  .sfc-cons-list.no-energy { grid-template-columns: fit-content(11em) minmax(20px, 1fr) max-content; }
   .sfc-cons { display: grid; grid-column: 1 / -1; grid-template-columns: subgrid; align-items: center; padding: 1px 0; border: 0; background: none; text-align: left; color: inherit; }
-  .sfc-cons small { min-width: 0; max-width: 11em; color: var(--sfc-muted); font-size: 12px; line-height: 1.2; overflow-wrap: anywhere; }
+  .sfc-cons small { min-width: 0; color: var(--sfc-muted); font-size: 12px; line-height: 1.2; overflow-wrap: anywhere; }
   .sfc-cons.on small { color: var(--sfc-text); font-weight: 700; }
   .sfc-cons.nested small { padding-left: 10px; }
   .sfc-cons strong { text-align: right; font-size: 13px; font-family: var(--sfc-num-font, inherit); white-space: nowrap; }
@@ -125,6 +125,7 @@ const BASE_CSS = `
   .sfc-tile.load { --sfc-c: var(--sfc-load); }
   .sfc-tile.gridImport, .sfc-tile.gridExport, .sfc-summary-item.autarky { --sfc-c: var(--sfc-grid); }
   .sfc-tile.charge, .sfc-tile.discharge, .sfc-summary-item.money, .sfc-summary-item.co2 { --sfc-c: var(--sfc-battery); }
+  .sfc-summary-item.cost { --sfc-c: var(--sfc-load); } .sfc-summary-item.sold { --sfc-c: var(--sfc-grid); }
   .sfc-tile-icon { flex: 0 0 34px; width: 34px; height: 34px; display: grid; place-items: center;
     border-radius: var(--sfc-icon-radius, 10px); background: color-mix(in srgb, var(--sfc-c) 16%, transparent); }
   .sfc-tile-icon svg, .sfc-forecast-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -382,6 +383,8 @@ const FIT_CSS = `
     .sfc-compare-table th, .sfc-compare-table td { padding: 6px 2px; }
     .sfc-compare-table thead th { font-size: 9px; letter-spacing: 0; }
     .sfc-compare-table thead th:not(:first-child) { min-width: 0; }
+    /* With a year-ago column there is no room for the 7-day average. */
+    .sfc-compare-table.has-year .avg { display: none; }
     .sfc-compare-table tbody th { white-space: normal; overflow-wrap: break-word; }
     /* A hint that does not fit beside its title goes under it. */
     .sfc-head { flex-wrap: wrap; row-gap: 4px; }
@@ -404,12 +407,26 @@ const FIT_CSS = `
     .sfc-tile-icon { flex-basis: 28px; width: 28px; height: 28px; }
     .theme-aurora .sfc-tile strong { font-size: 13px; }
     .sfc-compare-table { font-size: 11px; }
+    /* The narrowest cards: with a year-ago column the change in % goes too. */
+    .sfc-compare-table.has-year .trend { display: none; }
+    .theme-lcars .sfc-compare-table.has-year .yday { display: none; }
     .theme-lcars .sfc-compare-table { font-size: 10px; }
     .theme-lcars .sfc-compare-table tbody th { font-size: 9px; letter-spacing: 0; }
     .theme-lcars .sfc-compare-table td.good, .theme-lcars .sfc-compare-table td.bad { font-size: 9px; }
     .theme-lcars .sfc-compare-table th, .theme-lcars .sfc-compare-table td { padding-inline: 1px; }
   }
 `;
+
+// `colors: { solar, load, grid, battery }`: the user's colours for the
+// charts, tiles and bars, over the theme's own.
+const COLOR_VARS = { solar: "--sfc-pv", load: "--sfc-load", grid: "--sfc-grid", battery: "--sfc-battery" };
+function colorCss(config) {
+  const colors = config.colors && typeof config.colors === "object" ? config.colors : {};
+  const rules = Object.entries(COLOR_VARS)
+    .filter(([key]) => typeof colors[key] === "string" && /^(#[0-9a-f]{3,8}|[a-z]{3,20}|(rgb|hsl)a?\([\d\s.,%/]+\))$/i.test(colors[key].trim()))
+    .map(([key, name]) => `${name}: ${colors[key].trim()};`);
+  return rules.length ? `\n  ha-card.sfc { ${rules.join(" ")} }\n` : "";
+}
 
 const THEME_CSS = {
   // ---------------------------------------------------------------- Diorama

@@ -141,6 +141,8 @@ co2_factor: 0.7
 | `pv_panels` | `8` | Modules drawn on the Diorama roof when no optimizers are found. |
 | `battery_day` | `true` | The battery over the next 24 hours: the charge level simulated hour by hour from the hourly PV forecast and the home's usual consumption at each hour (the last 7 days of statistics). The battery forecast gets a line such as "Next 24 h: full around 12:40 · lowest 35% around 06:00", and the 24H chart continues the charge level as a dotted line. Needs `battery_capacity` and an hourly PV forecast (Solcast attributes, or a forecast set up in Home Assistant's Energy dashboard such as Forecast.Solar). `false` turns it off. |
 | `price_window` | `3` | With hourly prices: the cheapest hours in a row among the coming ones are named under the Energy prices chart and underlined in it, with the solar forecast for those hours when an hourly PV forecast is available. Coming hours with a negative price are listed too. A number of hours (1–12); `false` turns it off. |
+| `colors` | theme | Your own colours for the charts, tiles and bars: `colors: { solar: "#f5a400", load: "#f26b5b", grid: "#5b8def", battery: "#1fbf86" }` (any of them). Also in the editor under Appearance. The themes' scenes keep their own artwork. |
+| `show_costs` | `false` | With prices set: the summary also shows what the energy bought cost and what the energy sold was worth, next to the savings. |
 | `inverter_power_rating` | from the inverter | Inverter rated power in kW, for the inverter load. DeyeCloud reports it; set it for other inverters. |
 | `voltage_limit` | `253` | Grid guard: a phase above this voltage (V) is marked in the Installation section with a warning, and the section and "Today at a glance" show the day's highest voltage and the time spent above the limit. Above 253 V (230 V + 10 %) an inverter limits its power or switches off. `false` turns the check off. Needs the phase voltage sensors (`grid_voltage_l1`…; found automatically with DeyeCloud). |
 | `main_fuse` | – | Main fuse per phase in A, e.g. `25`: each phase tile shows its current and share of the fuse (from the phase's grid power and voltage), with a warning from 90 %. |
@@ -199,7 +201,7 @@ A font installed on your device is used too, with neither option.
 | `consumers` | Consumers: where the home's power goes |
 | `energy` | Energy: period tabs, chart, tiles and summary |
 | `insights` | Today at a glance |
-| `comparison` | Comparison with yesterday, the week and the month |
+| `comparison` | Comparison with yesterday, the week, the month and, where the statistics go back that far, the same days of this month a year ago |
 | `panels` | Panels |
 | `custom_1`, `custom_2`… | Your own sections from `custom_sections:`, see below |
 

@@ -37,7 +37,7 @@ const EDITOR_DEFAULT_ON = ["show_solar", "show_battery", "show_chart", "show_wea
 const EDITOR_SWITCH_GROUPS = {
   look: [["wide", "editorWide"], ["background", "editorGlass", "glass"], ["animation", "editorAnimation"], ["load_fonts", "editorFonts"], ["collapsible", "editorCollapsible"], ["show_chart", "editorShowChart"], ["show_weather", "editorShowWeather"]],
   install: [["show_solar", "editorSolar"], ["show_battery", "editorBattery"], ["panels_average", "editorPanelsAverage", "per_string"]],
-  summary: [["show_self_sufficiency", "editorShowSelfSufficiency"], ["show_self_use", "editorShowSelfUse"], ["show_savings", "editorShowSavings"], ["show_co2", "editorShowCo2"], ["show_yield", "editorShowYield"], ["show_insights", "editorInsights"]],
+  summary: [["show_self_sufficiency", "editorShowSelfSufficiency"], ["show_self_use", "editorShowSelfUse"], ["show_savings", "editorShowSavings"], ["show_costs", "editorShowCosts"], ["show_co2", "editorShowCo2"], ["show_yield", "editorShowYield"], ["show_insights", "editorInsights"]],
   sensors: [["invert_grid", "editorInvertGrid"], ["invert_battery", "editorInvertBattery"]],
 };
 
@@ -445,6 +445,14 @@ class SolarFlowCardEditor extends HTMLElement {
             </select>
           </label>` : ""}
       </div>
+      <div class="box">
+        <span class="title">${escapeHtml(t.editorColors)}</span>
+        <div class="colors">${Object.keys(COLOR_VARS).map((key) => {
+          const value = this._config.colors?.[key];
+          return `<label><input type="color" data-color="${key}" value="${escapeHtml(/^#[0-9a-f]{6}$/i.test(value || "") ? value : "#888888")}" class="${value ? "" : "unset"}" /><span>${escapeHtml(t.editorColorNames[key])}</span></label>`;
+        }).join("")}</div>
+        ${this._config.colors ? `<button type="button" class="link" data-reset-colors>${escapeHtml(t.editorColorsReset)}</button>` : `<p class="hint">${escapeHtml(t.editorColorsHint)}</p>`}
+      </div>
       ${this._switches(t, "look")}
       ${this._config.load_fonts === true ? `<p class="warn">${escapeHtml(t.editorFontsHint)}</p>` : ""}`;
   }
@@ -768,6 +776,10 @@ class SolarFlowCardEditor extends HTMLElement {
         .item { display: grid; gap: 8px; padding: 10px; border: 1px dashed var(--divider-color, rgba(127,127,127,.35)); border-radius: 10px; }
         .danger { color: var(--error-color, #db4437) !important; }
         .suggest { display: grid; gap: 4px; padding: 8px 10px; border-radius: 10px; background: rgba(67, 160, 71, .1); }
+        .colors { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+        .colors label { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+        .colors input { width: 34px; height: 26px; padding: 0; border: 1px solid var(--divider-color, rgba(127,127,127,.35)); border-radius: 6px; background: none; }
+        .colors input.unset { opacity: .45; }
         .link { justify-self: start; padding: 0; border: 0; background: none; color: var(--primary-color, #03a9f4); font: inherit; font-size: 13px; cursor: pointer; }
       </style>
       <datalist id="sfc-sensor">${ids("sensor").map((id) => `<option value="${escapeHtml(id)}"></option>`).join("")}</datalist>
@@ -875,6 +887,14 @@ class SolarFlowCardEditor extends HTMLElement {
     }));
     root.getElementById("vs-on")?.addEventListener("change", (e) => {
       this._set("virtual_storage", e.target.checked ? true : undefined);
+      this._render();
+    });
+    root.querySelectorAll("[data-color]").forEach((input) => input.addEventListener("change", (e) => {
+      this._setIn("colors", input.dataset.color, e.target.value);
+      this._render();
+    }));
+    root.querySelector("[data-reset-colors]")?.addEventListener("click", () => {
+      this._set("colors", undefined);
       this._render();
     });
     root.querySelector("[data-copy-auto]")?.addEventListener("click", () => this._copyAuto());
