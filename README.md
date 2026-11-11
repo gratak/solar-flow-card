@@ -90,6 +90,11 @@ Copy `solar-flow-card.js` to `config/www/` and add a dashboard resource `/local/
 
 ## Configuration
 
+**Works out of the box in two cases:**
+- **DeyeCloud:** the integration's sensors are found automatically.
+- **Home Assistant's Energy dashboard:** the card uses the sensors set up under *Settings → Dashboards → Energy* (grid, solar, battery, home; several of a kind are added up), including the power sensors and the battery's charge level and capacity where they are set there. Nothing to configure in the card; anything you do set in the card takes precedence. In the editor, **Sensors → "Write them into this card"** copies them into the card's YAML to adjust.
+
+
 For inverters other than DeyeCloud, the [configuration guide](docs/configuration.md) explains every `entities:` entry, the units and state classes the card expects, the helper sensors to create when something is missing, and has complete examples (including Huawei with a separate energy meter).
 
 The visual editor (new in 2.0) has groups for the appearance, the **sensors** (pick each one from your Home Assistant entities), the **sections** (tick and reorder), your installation, the summary and prices, virtual storage, the PV forecast and more. Every sensor field shows its value right now (or what DeyeCloud found by itself) and warns about likely mistakes: a sensor that does not exist or has the wrong unit, a lifetime counter set up as a daily one, a size entered in W instead of kW, a grid sensor with the other sign. Options the editor does not show stay in your YAML untouched.

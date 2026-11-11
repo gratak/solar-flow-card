@@ -43,6 +43,101 @@ function deyeStations(hass) {
   return [...ids].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 }
 
+// ---------------------------------------------------------------------------
+// Home Assistant's Energy dashboard settings (energy/get_prefs): the sensors
+// set up there are used wherever the card has none of its own, so the card
+// works without configuration for any inverter. Power sensors (stat_rate)
+// have the card's signs: grid + importing, battery + discharging.
+// ---------------------------------------------------------------------------
+
+async function loadEnergyPrefs(hass) {
+  try {
+    return (await hass.callWS({ type: "energy/get_prefs" })) || null;
+  } catch (error) {
+    // The Energy dashboard is not set up.
+    return null;
+  }
+}
+
+function energyAuto(prefs, hass) {
+  if (!prefs || typeof prefs !== "object") return null;
+  const states = hass?.states || {};
+  const known = (id) => (typeof id === "string" && states[id] ? id : null);
+  const sources = {};
+  const add = (key, id) => {
+    if (known(id) && !(sources[key] || []).includes(id)) (sources[key] ||= []).push(id);
+  };
+  const batteries = [];
+  for (const source of Array.isArray(prefs.energy_sources) ? prefs.energy_sources : []) {
+    if (!source || typeof source !== "object") continue;
+    if (source.type === "grid") {
+      add("grid_import_energy", source.stat_energy_from);
+      add("grid_export_energy", source.stat_energy_to);
+      add("grid_power", source.stat_rate);
+      // The older format: lists of import and export meters.
+      for (const flow of Array.isArray(source.flow_from) ? source.flow_from : []) add("grid_import_energy", flow?.stat_energy_from);
+      for (const flow of Array.isArray(source.flow_to) ? source.flow_to : []) add("grid_export_energy", flow?.stat_energy_to);
+      for (const power of Array.isArray(source.power) ? source.power : []) add("grid_power", power?.stat_rate);
+    } else if (source.type === "solar") {
+      add("solar_energy", source.stat_energy_from);
+      add("solar_power", source.stat_rate);
+    } else if (source.type === "home") {
+      add("load_energy", source.stat_energy_to);
+      add("load_power", source.stat_rate);
+    } else if (source.type === "battery") {
+      add("battery_discharge_energy", source.stat_energy_from);
+      add("battery_charge_energy", source.stat_energy_to);
+      add("battery_power", source.stat_rate);
+      batteries.push({ name: source.name ? String(source.name) : null, soc: known(source.stat_soc), power: known(source.stat_rate), capacity: positiveNumber(source.capacity) });
+    }
+  }
+  const devices = (Array.isArray(prefs.device_consumption) ? prefs.device_consumption : [])
+    .filter((device) => device && typeof device === "object" && (known(device.stat_consumption) || known(device.stat_rate)))
+    .map((device) => ({ energy: known(device.stat_consumption), power: known(device.stat_rate), name: device.name ? String(device.name) : null, parent: typeof device.included_in_stat === "string" ? device.included_in_stat : null }));
+  return Object.keys(sources).length || devices.length ? { sources, batteries, devices } : null;
+}
+
+const POWER_GROUPS = {
+  solar_power: ["solar_power"],
+  load_power: ["load_power"],
+  grid_power: ["grid_power", "grid_import_power", "grid_export_power"],
+  battery_power: ["battery_power", "battery_charge_power", "battery_discharge_power"],
+};
+
+// The card's config with what the Energy dashboard adds: `_energy` (its
+// sensors and devices) and, where the card would otherwise have nothing,
+// the lifetime-counter mode, the battery capacity and several batteries.
+// DeyeCloud's own discovery and anything set in the card come first.
+function withEnergyAuto(config, auto, hass) {
+  if (!auto) return config;
+  const next = { ...config, _energy: { ...auto, live: false, energy: false } };
+  if (deyeStations(hass).length) return next;
+  const entities = config.entities || {};
+  const ownEnergy = Object.keys(entities).some((key) => /_energy$/.test(key) && entities[key])
+    || (Array.isArray(config.inverters) && config.inverters.some((item) => item?.solar_energy));
+  next._energy.live = true;
+  next._energy.energy = !ownEnergy && Object.keys(auto.sources).some((key) => /_energy$/.test(key));
+  if (next._energy.energy && !config.energy_sensors) next.energy_sensors = "total";
+  const ownBattery = POWER_GROUPS.battery_power.some((key) => entities[key]) || entities.battery_soc || Array.isArray(config.batteries);
+  // An installation set up from the Energy dashboard alone: no battery or
+  // no solar there, none in the card.
+  const ownLive = Object.values(POWER_GROUPS).flat().some((key) => entities[key]) || Array.isArray(config.inverters);
+  if (!ownLive && !ownEnergy && Object.keys(auto.sources).length) {
+    const has = (prefix) => Object.keys(auto.sources).some((key) => key.startsWith(prefix));
+    if (config.show_battery === undefined && !ownBattery && !has("battery_")) next.show_battery = false;
+    if (config.show_solar === undefined && !has("solar_")) next.show_solar = false;
+  }
+  if (!ownBattery && auto.batteries.length) {
+    const complete = auto.batteries.filter((battery) => battery.soc && battery.power);
+    if (auto.batteries.length > 1 && complete.length === auto.batteries.length) {
+      next.batteries = complete.map((battery, i) => ({ name: battery.name || `#${i + 1}`, soc: battery.soc, power: battery.power, ...(battery.capacity ? { capacity: battery.capacity } : {}) }));
+    }
+    const capacity = auto.batteries.every((battery) => battery.capacity) ? auto.batteries.reduce((sum, battery) => sum + battery.capacity, 0) : null;
+    if (capacity && !positiveNumber(config.battery_capacity)) next.battery_capacity = capacity;
+  }
+  return next;
+}
+
 function resolveEntities(hass, config) {
   const states = hass?.states || {};
   const stations = deyeStations(hass);
@@ -76,6 +171,24 @@ function resolveEntities(hass, config) {
   for (const [name, def] of Object.entries(ENERGY_METRICS)) {
     energy[name] = pick(configured[def.key])
       || find((a) => a.sensor_type === "daily" && a.metric_key === def.deye && a.relative_day === "today");
+  }
+  // Nothing of the card's own: the Energy dashboard's sensors, several of a
+  // kind added up.
+  const auto = station === null ? config._energy : null;
+  if (auto?.live) {
+    const from = (key, unit, read) => {
+      const parts = (auto.sources[key] || []).map(pick).filter(Boolean);
+      return parts.length ? combinedEntry(parts, unit, read) : null;
+    };
+    const free = (group) => POWER_GROUPS[group].every((key) => !configured[key]);
+    if (free("solar_power")) live.solar ||= from("solar_power", "W", wattsOf);
+    if (free("load_power")) live.load ||= from("load_power", "W", wattsOf);
+    if (free("grid_power")) live.grid ||= from("grid_power", "W", wattsOf);
+    if (free("battery_power")) live.battery ||= from("battery_power", "W", wattsOf);
+    if (!configured.battery_soc && auto.batteries.length === 1) live.soc ||= pick(auto.batteries[0].soc);
+    if (auto.energy) {
+      for (const [name, def] of Object.entries(ENERGY_METRICS)) energy[name] ||= from(def.key, "kWh", kwhOf);
+    }
   }
   // Several inverters: their solar power and energy added up, unless the
   // sum is set under entities:.

@@ -121,7 +121,7 @@
   "chipHome": "Used today",
   "whereFrom": "Where today's power came from",
   "noData": "No energy sensors found",
-  "noDataHelp": "Install the DeyeCloud integration or set the entities in the card configuration.",
+  "noDataHelp": "Set up Home Assistant's Energy dashboard, install the DeyeCloud integration, or pick your sensors in the card's editor.",
   "editorTheme": "Theme",
   "expanseTitle": "Power distribution",
   "foundationTitle": "Prime Radiant",
@@ -270,7 +270,9 @@
     "forecast": "PV forecast",
     "more": "More"
   },
-  "editorSensorsHint": "DeyeCloud is found automatically: leave these empty. For other inverters pick your sensors; the configuration guide in the README explains each one.",
+  "editorSensorsHint": "DeyeCloud and the sensors of Home Assistant's Energy dashboard are found automatically: leave those fields empty. Otherwise pick your sensors; the configuration guide in the README explains each one.",
+  "editorEnergyAuto": "Empty fields use the sensors from Home Assistant's Energy dashboard (Settings → Dashboards → Energy).",
+  "editorEnergyCopy": "Write them into this card, to change them here",
   "editorEntityGroups": {
     "live": "Live power",
     "energy": "Energy",

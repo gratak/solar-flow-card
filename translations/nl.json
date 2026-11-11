@@ -121,7 +121,7 @@
   "chipHome": "Vandaag gebruikt",
   "whereFrom": "Waar de energie van vandaag vandaan kwam",
   "noData": "Geen energiesensoren gevonden",
-  "noDataHelp": "Installeer de DeyeCloud-integratie of stel de entiteiten in de configuratie van de kaart in.",
+  "noDataHelp": "Stel het Energie-dashboard van Home Assistant in, installeer de DeyeCloud-integratie of kies je sensoren in de editor van de kaart.",
   "editorTheme": "Thema",
   "expanseTitle": "Stroomverdeling",
   "foundationTitle": "Prime Radiant",
@@ -270,7 +270,9 @@
     "forecast": "PV-prognose",
     "more": "Meer"
   },
-  "editorSensorsHint": "DeyeCloud wordt automatisch gevonden: laat deze leeg. Kies voor andere omvormers je sensoren; de configuratiegids in de README beschrijft ze allemaal.",
+  "editorSensorsHint": "DeyeCloud en de sensoren van het Energie-dashboard van Home Assistant worden automatisch gevonden: laat die velden leeg. Kies anders je sensoren; de configuratiegids in de README legt ze uit.",
+  "editorEnergyAuto": "Lege velden gebruiken de sensoren van het Energie-dashboard van Home Assistant (Instellingen → Dashboards → Energie).",
+  "editorEnergyCopy": "Zet ze in deze kaart, om ze hier te wijzigen",
   "editorEntityGroups": {
     "live": "Actueel vermogen",
     "energy": "Energie",

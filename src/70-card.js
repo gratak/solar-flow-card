@@ -137,6 +137,9 @@ class SolarFlowCard extends HTMLElement {
     const normalized = config && typeof config === "object" && !Array.isArray(config) ? config : {};
     this._config = { ...DEFAULT_CONFIG, ...migrateConfig(normalized) };
     if (!THEMES.includes(this._config.theme)) this._config.theme = "diorama";
+    // As set in the dashboard; _config also carries what the Energy
+    // dashboard adds (see withEnergyAuto).
+    this._ownConfig = this._config;
     this._collapsed = loadCollapsed(this._config);
     this._signature = "";
     this._render();
@@ -461,6 +464,8 @@ class SolarFlowCard extends HTMLElement {
   _render() {
     if (!this.shadowRoot || !this._hass) return;
     try {
+      const prefs = typeof this._hass.callWS === "function" ? this._fetch("energy-prefs", 10 * 60000, () => loadEnergyPrefs(this._hass)) : null;
+      this._config = withEnergyAuto(this._ownConfig || this._config, energyAuto(prefs?.data, this._hass), this._hass);
       const config = this._config;
       const language = languageOf(this._hass, config);
       const t = stringsFor(language);
