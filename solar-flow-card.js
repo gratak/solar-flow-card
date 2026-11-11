@@ -230,6 +230,8 @@ const TRANSLATIONS = {
     "colYesterday": "Yesterday",
     "colAvg7": "7-day avg",
     "colMonth": "This month",
+    "colYearAgo": "Year ago",
+    "colYearAgoHint": "The same days of this month a year ago",
     "themeNames": {
       "diorama": "Diorama",
       "aurora": "Aurora",
@@ -275,6 +277,7 @@ const TRANSLATIONS = {
     "editorShowSelfSufficiency": "Show self-sufficiency",
     "editorShowSelfUse": "Show self-consumption",
     "editorShowSavings": "Show savings",
+    "editorShowCosts": "Show the cost of energy bought and the value of energy sold",
     "editorShowCo2": "Show CO₂ avoided",
     "editorShowYield": "Show yield per kWp",
     "editorAnimation": "Animations",
@@ -308,6 +311,15 @@ const TRANSLATIONS = {
     },
     "editorPanelsAverage": "Panel average and weakest panel per string",
     "editorGlass": "Glass background (the dashboard background shows through the card)",
+    "editorColors": "Your colours",
+    "editorColorsHint": "For the charts, tiles and bars; the theme's own colours until you pick one.",
+    "editorColorsReset": "Back to the theme's colours",
+    "editorColorNames": {
+      "solar": "Solar",
+      "load": "Home",
+      "grid": "Grid",
+      "battery": "Battery"
+    },
     "vsTitle": "Virtual storage · hourly balance",
     "vsSurplus": "Surplus this hour",
     "vsDeficit": "Deficit this hour",
@@ -492,6 +504,7 @@ const TRANSLATIONS = {
     "pricesNegative": "Negative prices ahead: {ranges}",
     "tomorrow": "tomorrow",
     "exportValue": "Value of energy sold",
+    "importCost": "Cost of energy bought",
     "editorNoImportPrice": "Savings need an import price: until you set one, the card shows the value of the energy sold.",
     "editorSettlement": "Settlement with your utility",
     "editorSettlementFixed": "Fixed prices",
@@ -692,6 +705,8 @@ const TRANSLATIONS = {
     "colYesterday": "Gestern",
     "colAvg7": "7-Tage-Ø",
     "colMonth": "Dieser Monat",
+    "colYearAgo": "Vor einem Jahr",
+    "colYearAgoHint": "Dieselben Tage dieses Monats vor einem Jahr",
     "themeNames": {
       "diorama": "Diorama",
       "aurora": "Aurora",
@@ -741,10 +756,20 @@ const TRANSLATIONS = {
     "editorCollapsible": "Einklappbare Abschnitte (Titel antippen)",
     "editorFonts": "Theme-Schriften laden (Google Fonts)",
     "editorGlass": "Glas-Hintergrund (der Dashboard-Hintergrund scheint durch)",
+    "editorColors": "Eigene Farben",
+    "editorColorsHint": "Für Diagramme, Kacheln und Balken; bis zur Auswahl gelten die Farben des Themes.",
+    "editorColorsReset": "Zurück zu den Farben des Themes",
+    "editorColorNames": {
+      "solar": "PV",
+      "load": "Haus",
+      "grid": "Netz",
+      "battery": "Batterie"
+    },
     "editorHint": "DeyeCloud-Sensoren werden automatisch gefunden. Andere Wechselrichter: Entitäten in YAML festlegen (siehe README).",
     "editorPanelsAverage": "Moduldurchschnitt und schwächstes Modul pro String",
     "editorShowCo2": "Vermiedenes CO₂ anzeigen",
     "editorShowSavings": "Ersparnis anzeigen",
+    "editorShowCosts": "Kosten des Netzbezugs und Wert der Einspeisung anzeigen",
     "editorShowSelfUse": "Eigenverbrauch anzeigen",
     "editorShowYield": "Ertrag pro kWp anzeigen",
     "otherDetails": "Weitere Messwerte",
@@ -954,6 +979,7 @@ const TRANSLATIONS = {
     "pricesNegative": "Negative Preise voraus: {ranges}",
     "tomorrow": "morgen",
     "exportValue": "Wert der eingespeisten Energie",
+    "importCost": "Kosten des Netzbezugs",
     "editorNoImportPrice": "Die Ersparnis braucht einen Bezugspreis: bis er gesetzt ist, zeigt die Karte den Wert der eingespeisten Energie.",
     "editorSettlement": "Abrechnung mit dem Energieversorger",
     "editorSettlementFixed": "Feste Preise",
@@ -1154,6 +1180,8 @@ const TRANSLATIONS = {
     "colYesterday": "Hier",
     "colAvg7": "Moy. 7 jours",
     "colMonth": "Ce mois-ci",
+    "colYearAgo": "Il y a un an",
+    "colYearAgoHint": "Les mêmes jours de ce mois il y a un an",
     "themeNames": {
       "diorama": "Diorama",
       "aurora": "Aurora",
@@ -1199,6 +1227,7 @@ const TRANSLATIONS = {
     "editorShowSelfSufficiency": "Afficher l'autosuffisance",
     "editorShowSelfUse": "Afficher l'autoconsommation",
     "editorShowSavings": "Afficher les économies",
+    "editorShowCosts": "Afficher le coût de l'énergie achetée et la valeur de l'énergie vendue",
     "editorShowCo2": "Afficher le CO₂ évité",
     "editorShowYield": "Afficher le rendement par kWc",
     "editorAnimation": "Animations",
@@ -1232,6 +1261,15 @@ const TRANSLATIONS = {
     },
     "editorPanelsAverage": "Moyenne des panneaux et panneau le plus faible par chaîne",
     "editorGlass": "Fond transparent (l'arrière-plan du tableau de bord apparaît à travers la carte)",
+    "editorColors": "Vos couleurs",
+    "editorColorsHint": "Pour les graphiques, les tuiles et les barres ; celles du thème tant que vous n'en choisissez pas.",
+    "editorColorsReset": "Revenir aux couleurs du thème",
+    "editorColorNames": {
+      "solar": "Solaire",
+      "load": "Maison",
+      "grid": "Réseau",
+      "battery": "Batterie"
+    },
     "vsTitle": "Stockage virtuel · bilan horaire",
     "vsSurplus": "Surplus cette heure",
     "vsDeficit": "Déficit cette heure",
@@ -1416,6 +1454,7 @@ const TRANSLATIONS = {
     "pricesNegative": "Prix négatifs à venir : {ranges}",
     "tomorrow": "demain",
     "exportValue": "Valeur de l'énergie vendue",
+    "importCost": "Coût de l'énergie achetée",
     "editorNoImportPrice": "Les économies nécessitent un prix d'achat : en attendant que vous en définissiez un, la carte affiche la valeur de l'énergie vendue.",
     "editorSettlement": "Règlement avec votre fournisseur",
     "editorSettlementFixed": "Prix fixes",
@@ -1616,6 +1655,8 @@ const TRANSLATIONS = {
     "colYesterday": "Gisteren",
     "colAvg7": "Gem. 7 dagen",
     "colMonth": "Deze maand",
+    "colYearAgo": "Jaar geleden",
+    "colYearAgoHint": "Dezelfde dagen van deze maand een jaar geleden",
     "themeNames": {
       "diorama": "Diorama",
       "aurora": "Aurora",
@@ -1661,6 +1702,7 @@ const TRANSLATIONS = {
     "editorShowSelfSufficiency": "Toon zelfvoorziening",
     "editorShowSelfUse": "Toon eigen verbruik",
     "editorShowSavings": "Toon besparingen",
+    "editorShowCosts": "Kosten van afgenomen en waarde van teruggeleverde energie tonen",
     "editorShowCo2": "Toon bespaarde CO₂",
     "editorShowYield": "Toon opbrengst per kWp",
     "editorAnimation": "Animaties",
@@ -1694,6 +1736,15 @@ const TRANSLATIONS = {
     },
     "editorPanelsAverage": "Gemiddelde en zwakste paneel per string",
     "editorGlass": "Glazen achtergrond (de dashboardachtergrond schijnt door de kaart)",
+    "editorColors": "Eigen kleuren",
+    "editorColorsHint": "Voor de grafieken, tegels en balken; de kleuren van het thema tot je er een kiest.",
+    "editorColorsReset": "Terug naar de kleuren van het thema",
+    "editorColorNames": {
+      "solar": "Zon",
+      "load": "Huis",
+      "grid": "Net",
+      "battery": "Batterij"
+    },
     "vsTitle": "Virtuele opslag · uurbalans",
     "vsSurplus": "Overschot dit uur",
     "vsDeficit": "Tekort dit uur",
@@ -1878,6 +1929,7 @@ const TRANSLATIONS = {
     "pricesNegative": "Negatieve prijzen op komst: {ranges}",
     "tomorrow": "morgen",
     "exportValue": "Waarde teruggeleverde energie",
+    "importCost": "Kosten van afgenomen energie",
     "editorNoImportPrice": "Besparing vraagt een afnameprijs: zolang die ontbreekt, toont de kaart de waarde van de teruggeleverde energie.",
     "editorSettlement": "Verrekening met je energieleverancier",
     "editorSettlementFixed": "Vaste prijzen",
@@ -2078,6 +2130,8 @@ const TRANSLATIONS = {
     "colYesterday": "Wczoraj",
     "colAvg7": "Śr. 7 dni",
     "colMonth": "Ten miesiąc",
+    "colYearAgo": "Rok temu",
+    "colYearAgoHint": "Te same dni tego miesiąca rok temu",
     "themeNames": {
       "diorama": "Diorama",
       "aurora": "Aurora",
@@ -2123,6 +2177,7 @@ const TRANSLATIONS = {
     "editorShowSelfSufficiency": "Pokaż samowystarczalność",
     "editorShowSelfUse": "Pokaż autokonsumpcję",
     "editorShowSavings": "Pokaż oszczędność",
+    "editorShowCosts": "Pokaż koszt pobranej i wartość oddanej energii",
     "editorShowCo2": "Pokaż uniknięte CO₂",
     "editorShowYield": "Pokaż uzysk na kWp",
     "editorAnimation": "Animacje",
@@ -2156,6 +2211,15 @@ const TRANSLATIONS = {
     },
     "editorPanelsAverage": "Średnia i najsłabszy panel osobno dla każdego stringu",
     "editorGlass": "Szklane tło (tło dashboardu prześwituje przez kartę)",
+    "editorColors": "Własne kolory",
+    "editorColorsHint": "Dla wykresów, kafelków i pasków; dopóki nic nie wybierzesz, obowiązują kolory motywu.",
+    "editorColorsReset": "Wróć do kolorów motywu",
+    "editorColorNames": {
+      "solar": "PV",
+      "load": "Dom",
+      "grid": "Sieć",
+      "battery": "Magazyn"
+    },
     "vsTitle": "Wirtualny magazyn · bilans godzinowy",
     "vsSurplus": "Nadwyżka w tej godzinie",
     "vsDeficit": "Niedobór w tej godzinie",
@@ -2340,6 +2404,7 @@ const TRANSLATIONS = {
     "pricesNegative": "Ujemne ceny przed nami: {ranges}",
     "tomorrow": "jutro",
     "exportValue": "Wartość oddanej energii",
+    "importCost": "Koszt pobranej energii",
     "editorNoImportPrice": "Oszczędność wymaga ceny zakupu: dopóki jej nie podasz, karta pokazuje wartość oddanej energii.",
     "editorSettlement": "Rozliczenie z zakładem energetycznym",
     "editorSettlementFixed": "Stałe ceny",
@@ -2540,6 +2605,8 @@ const TRANSLATIONS = {
     "colYesterday": "Ontem",
     "colAvg7": "Média 7 dias",
     "colMonth": "Este mês",
+    "colYearAgo": "Há um ano",
+    "colYearAgoHint": "Os mesmos dias deste mês há um ano",
     "themeNames": {
       "diorama": "Diorama",
       "aurora": "Aurora",
@@ -2585,6 +2652,7 @@ const TRANSLATIONS = {
     "editorShowSelfSufficiency": "Mostrar autossuficiência",
     "editorShowSelfUse": "Mostrar autoconsumo",
     "editorShowSavings": "Mostrar poupança",
+    "editorShowCosts": "Mostrar o custo da energia comprada e o valor da energia vendida",
     "editorShowCo2": "Mostrar CO₂ evitado",
     "editorShowYield": "Mostrar rendimento por kWp",
     "editorAnimation": "Animações",
@@ -2618,6 +2686,15 @@ const TRANSLATIONS = {
     },
     "editorPanelsAverage": "Média e painel mais fraco por string",
     "editorGlass": "Fundo transparente (o fundo do painel aparece por baixo do cartão)",
+    "editorColors": "As suas cores",
+    "editorColorsHint": "Para os gráficos, blocos e barras; as cores do tema até escolher uma.",
+    "editorColorsReset": "Voltar às cores do tema",
+    "editorColorNames": {
+      "solar": "Solar",
+      "load": "Casa",
+      "grid": "Rede",
+      "battery": "Bateria"
+    },
     "vsTitle": "Armazenamento virtual · balanço horário",
     "vsSurplus": "Excedente nesta hora",
     "vsDeficit": "Défice nesta hora",
@@ -2802,6 +2879,7 @@ const TRANSLATIONS = {
     "pricesNegative": "Preços negativos a seguir: {ranges}",
     "tomorrow": "amanhã",
     "exportValue": "Valor da energia vendida",
+    "importCost": "Custo da energia comprada",
     "editorNoImportPrice": "As poupanças precisam de um preço de importação: até definir um, o cartão mostra o valor da energia vendida.",
     "editorSettlement": "Liquidação com o seu distribuidor",
     "editorSettlementFixed": "Preços fixos",
@@ -3668,6 +3746,9 @@ async function loadPriceStats(hass, ids, start, period) {
 // statistics do not cover yet (the current hour), valued at today's price.
 function pricedSavings(rows, rest, price, net) {
   let saved = 0;
+  // Also what the energy bought cost and what the energy sold was worth.
+  let cost = 0;
+  let sold = 0;
   const add = (values, at) => {
     const h = deriveLoadEnergy(values);
     const imported = h.gridImport || 0;
@@ -3675,10 +3756,12 @@ function pricedSavings(rows, rest, price, net) {
     const billedImport = net ? Math.max(0, imported - exported) : imported;
     const billedExport = net ? Math.max(0, exported - imported) : exported;
     saved += Math.max(0, (h.load || 0) - billedImport) * price("import", at) + billedExport * price("export", at);
+    cost += billedImport * price("import", at);
+    sold += billedExport * price("export", at);
   };
   for (const row of rows) add(row, row.at);
   if (rest) add(rest, null);
-  return saved;
+  return { saved, cost, sold };
 }
 
 // How the energy sent to the grid is settled (`settlement`):
@@ -4019,7 +4102,13 @@ function periodSummary(totals, config, t, locale, net = null, money = undefined)
     // of the energy sold instead.
     const label = money?.kind === "exportValue" ? t.exportValue : t.savings;
     const value = money?.value;
-    if (show("show_savings")) items.push(["money", label, isNum(value) ? `${formatNumber(value, locale, 2)} ${config.currency ?? t.currency}`.trim() : "…"]);
+    const amount = (v) => `${formatNumber(v, locale, 2)} ${config.currency ?? t.currency}`.trim();
+    if (show("show_savings")) items.push(["money", label, isNum(value) ? amount(value) : "…"]);
+    // show_costs: what the energy bought cost and what the energy sold was worth.
+    if (config.show_costs === true && money?.kind !== "exportValue") {
+      if (isNum(money?.cost)) items.push(["cost", t.importCost, amount(money.cost)]);
+      if (isNum(money?.sold) && money.sold > 0.005) items.push(["sold", t.exportValue, amount(money.sold)]);
+    }
     return items.concat(periodSummaryRest(totals, config, t, locale));
   }
   const priceImport = positiveNumber(config.price_import);
@@ -4029,7 +4118,12 @@ function periodSummary(totals, config, t, locale, net = null, money = undefined)
     const billedImport = net ? net.gridImport : gridImport;
     const billedExport = net ? net.gridExport : gridExport;
     const saved = Math.max(0, load - billedImport) * priceImport + (isNum(billedExport) ? billedExport : 0) * priceExport;
-    items.push(["money", t.savings, `${formatNumber(saved, locale, 2)} ${config.currency ?? t.currency}`.trim()]);
+    const amount = (v) => `${formatNumber(v, locale, 2)} ${config.currency ?? t.currency}`.trim();
+    items.push(["money", t.savings, amount(saved)]);
+    if (config.show_costs === true) {
+      items.push(["cost", t.importCost, amount(billedImport * priceImport)]);
+      if (priceExport && isNum(billedExport) && billedExport > 0.005) items.push(["sold", t.exportValue, amount(billedExport * priceExport)]);
+    }
   }
   return items.concat(periodSummaryRest(totals, config, t, locale));
 }
@@ -4814,7 +4908,31 @@ function dayHighlights(data, spec, today, forecast) {
 }
 
 // Today against yesterday, the 7-day average and this month, per flow.
-function comparisonRows(today, week, month) {
+// The same days of this month a year ago (1st to today's date), from the
+// daily statistics: totals per flow, or null without data that old.
+async function loadYearAgo(hass, energy) {
+  const now = new Date();
+  const start = new Date(now.getFullYear() - 1, now.getMonth(), 1);
+  const end = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate() + 1);
+  const sources = energySources(energy);
+  const response = await hass.callWS({
+    type: "recorder/statistics_during_period",
+    start_time: start.toISOString(),
+    end_time: end.toISOString(),
+    statistic_ids: [...new Set(Object.values(sources).flat())],
+    period: "day",
+    types: ["change"],
+    units: { energy: "kWh" },
+  });
+  const totals = {};
+  for (const [name, ids] of Object.entries(sources)) {
+    const rows = statRows(response, ids);
+    if (rows.length) totals[name] = rows.reduce((sum, row) => sum + Math.max(0, Number(row.change) || 0), 0);
+  }
+  return Object.keys(totals).length ? deriveLoadEnergy(totals) : null;
+}
+
+function comparisonRows(today, week, month, yearAgo = null) {
   const days = week.buckets || [];
   const yesterday = days.length >= 2 ? days[days.length - 2] : null;
   const rows = ["solar", "load", "gridImport", "gridExport"].map((name) => {
@@ -4825,6 +4943,7 @@ function comparisonRows(today, week, month) {
       yesterday: yesterday ? yesterday[name] : null,
       average: values.length ? values.reduce((s, v) => s + v, 0) / values.length : null,
       month: month.totals?.[name] ?? null,
+      yearAgo: yearAgo?.[name] ?? null,
     };
   }).filter((row) => [row.today, row.yesterday, row.month].some(isNum));
   return rows.length ? rows : null;
@@ -5461,6 +5580,7 @@ function comparisonHtml(m) {
   const { t, locale } = m;
   const labels = { solar: t.pvProduction, load: t.consumption, gridImport: t.gridImport, gridExport: t.gridExport };
   const cell = (v) => `<td>${escapeHtml(isNum(v) ? formatNumber(v, locale, v < 10 ? 1 : 0) : "—")}</td>`;
+  const hasYear = rows.some((row) => isNum(row.yearAgo));
   const trend = (row) => {
     if (!isNum(row.today) || !isNum(row.yesterday) || row.yesterday < 0.05) return "<td></td>";
     const pct = ((row.today - row.yesterday) / row.yesterday) * 100;
@@ -5471,9 +5591,9 @@ function comparisonHtml(m) {
   return `
     <section class="sfc-section sfc-compare">
       <div class="sfc-head"><div><span class="sfc-kicker">kWh</span><h3>${escapeHtml(t.compareTitle)}</h3></div></div>
-      <div class="sfc-compare-scroll"><table class="sfc-compare-table">
-        <thead><tr><th></th><th>${escapeHtml(t.periodToday)}</th><th>${escapeHtml(t.colYesterday)}</th><th></th><th>${escapeHtml(t.colAvg7)}</th><th>${escapeHtml(t.colMonth)}</th></tr></thead>
-        <tbody>${rows.map((row) => `<tr class="${row.name}"><th><i></i>${escapeHtml(labels[row.name])}</th>${cell(row.today)}${cell(row.yesterday)}${trend(row)}${cell(row.average)}${cell(row.month)}</tr>`).join("")}</tbody>
+      <div class="sfc-compare-scroll"><table class="sfc-compare-table ${hasYear ? "has-year" : ""}">
+        <thead><tr><th></th><th>${escapeHtml(t.periodToday)}</th><th>${escapeHtml(t.colYesterday)}</th><th></th><th class="avg">${escapeHtml(t.colAvg7)}</th><th>${escapeHtml(t.colMonth)}</th>${hasYear ? `<th title="${escapeHtml(t.colYearAgoHint)}">${escapeHtml(t.colYearAgo)}</th>` : ""}</tr></thead>
+        <tbody>${rows.map((row) => `<tr class="${row.name}"><th><i></i>${escapeHtml(labels[row.name])}</th>${cell(row.today)}${cell(row.yesterday)}${trend(row)}${cell(row.average).replace("<td>", '<td class="avg">')}${cell(row.month)}${hasYear ? cell(row.yearAgo) : ""}</tr>`).join("")}</tbody>
       </table></div>
     </section>`;
 }
@@ -7351,6 +7471,7 @@ const BASE_CSS = `
   .sfc-tile.load { --sfc-c: var(--sfc-load); }
   .sfc-tile.gridImport, .sfc-tile.gridExport, .sfc-summary-item.autarky { --sfc-c: var(--sfc-grid); }
   .sfc-tile.charge, .sfc-tile.discharge, .sfc-summary-item.money, .sfc-summary-item.co2 { --sfc-c: var(--sfc-battery); }
+  .sfc-summary-item.cost { --sfc-c: var(--sfc-load); } .sfc-summary-item.sold { --sfc-c: var(--sfc-grid); }
   .sfc-tile-icon { flex: 0 0 34px; width: 34px; height: 34px; display: grid; place-items: center;
     border-radius: var(--sfc-icon-radius, 10px); background: color-mix(in srgb, var(--sfc-c) 16%, transparent); }
   .sfc-tile-icon svg, .sfc-forecast-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -7608,6 +7729,8 @@ const FIT_CSS = `
     .sfc-compare-table th, .sfc-compare-table td { padding: 6px 2px; }
     .sfc-compare-table thead th { font-size: 9px; letter-spacing: 0; }
     .sfc-compare-table thead th:not(:first-child) { min-width: 0; }
+    /* With a year-ago column there is no room for the 7-day average. */
+    .sfc-compare-table.has-year .avg { display: none; }
     .sfc-compare-table tbody th { white-space: normal; overflow-wrap: break-word; }
     /* A hint that does not fit beside its title goes under it. */
     .sfc-head { flex-wrap: wrap; row-gap: 4px; }
@@ -7636,6 +7759,17 @@ const FIT_CSS = `
     .theme-lcars .sfc-compare-table th, .theme-lcars .sfc-compare-table td { padding-inline: 1px; }
   }
 `;
+
+// `colors: { solar, load, grid, battery }`: the user's colours for the
+// charts, tiles and bars, over the theme's own.
+const COLOR_VARS = { solar: "--sfc-pv", load: "--sfc-load", grid: "--sfc-grid", battery: "--sfc-battery" };
+function colorCss(config) {
+  const colors = config.colors && typeof config.colors === "object" ? config.colors : {};
+  const rules = Object.entries(COLOR_VARS)
+    .filter(([key]) => typeof colors[key] === "string" && /^(#[0-9a-f]{3,8}|[a-z]{3,20}|(rgb|hsl)a?\([\d\s.,%/]+\))$/i.test(colors[key].trim()))
+    .map(([key, name]) => `${name}: ${colors[key].trim()};`);
+  return rules.length ? `\n  ha-card.sfc { ${rules.join(" ")} }\n` : "";
+}
 
 const THEME_CSS = {
   // ---------------------------------------------------------------- Diorama
@@ -8648,7 +8782,8 @@ class SolarFlowCard extends HTMLElement {
       if (!isNum(totals.load) || !isNum(totals.gridImport)) return undefined;
       const billedImport = net ? net.gridImport : totals.gridImport;
       const billedExport = net ? net.gridExport : totals.gridExport || 0;
-      return { kind, value: Math.max(0, totals.load - billedImport) * prices.import.value + billedExport * (prices.export?.value || 0) * prices.factor };
+      const sold = billedExport * (prices.export?.value || 0) * prices.factor;
+      return { kind, value: Math.max(0, totals.load - billedImport) * prices.import.value + sold, cost: billedImport * prices.import.value, sold };
     }
     if (!prices.import) prices.import = { value: 0 };
     if (typeof this._hass.callWS !== "function") return undefined;
@@ -8697,7 +8832,8 @@ class SolarFlowCard extends HTMLElement {
     // Without an import price, only what was sold counts.
     const counted = kind === "exportValue" ? rows.map((r) => ({ ...r, load: 0, gridImport: 0 })) : rows;
     const left = kind === "exportValue" && rest ? { ...rest, load: 0, gridImport: 0 } : rest;
-    return { kind, value: pricedSavings(counted, left, price, Boolean(virtualStorageConfig(config))) };
+    const priced = pricedSavings(counted, left, price, Boolean(virtualStorageConfig(config)));
+    return { kind, value: priced.saved, cost: kind === "savings" ? priced.cost : null, sold: priced.sold };
   }
 
   // Recorder history of the power sensors for today or the last 3 days,
@@ -8730,9 +8866,14 @@ class SolarFlowCard extends HTMLElement {
     const day = history?.entry.data ? dayHighlights(this._powerChartData(history.entry.data.series, history.spec), history.spec, today, forecast) : null;
     const week = this._periodEnergy(resolved, "7d", today);
     const month = this._periodEnergy(resolved, "month", today);
-    const compare = comparisonRows(today, week, month);
+    // The same days of this month a year ago, where the statistics go back that far.
+    const sources = sourcesKey(resolved.energy);
+    const yearAgo = sources && typeof this._hass.callWS === "function"
+      ? this._fetch(`year-ago|${sources}|${new Date().toDateString()}`, 6 * 3600000, () => loadYearAgo(this._hass, resolved.energy)).data
+      : null;
+    const compare = comparisonRows(today, week, month, yearAgo);
     if (!day && !compare) return { loading: Boolean(history?.entry.loading || week.loading) };
-    return { day, compare, at: [history?.entry.at, week.buckets?.length, month.buckets?.length] };
+    return { day, compare, at: [history?.entry.at, week.buckets?.length, month.buckets?.length, Boolean(yearAgo)] };
   }
 
   _chartState(resolved, period, energy) {
@@ -8866,7 +9007,7 @@ class SolarFlowCard extends HTMLElement {
         const signature = `empty|${language}|${theme}`;
         if (signature === this._signature) return;
         this._signature = signature;
-        this._paint(BASE_CSS + THEME_CSS[theme] + FIT_CSS, `sfc theme-${theme}`, `<div class="sfc-empty"><h2>${escapeHtml(t.noData)}</h2><p>${escapeHtml(t.noDataHelp)}</p></div>`);
+        this._paint(BASE_CSS + THEME_CSS[theme] + FIT_CSS + colorCss(config), `sfc theme-${theme}`, `<div class="sfc-empty"><h2>${escapeHtml(t.noData)}</h2><p>${escapeHtml(t.noDataHelp)}</p></div>`);
         return;
       }
       const period = PERIODS.includes(this._period) ? this._period : PERIODS.includes(config.period) ? config.period : "today";
@@ -8952,7 +9093,7 @@ class SolarFlowCard extends HTMLElement {
         inverter?.map((d) => [[...d.strings.values()].map((s) => Object.values(s).map((r) => r.value)), d.temperatures.map((r) => r.value), d.battery.map((r) => r.value), d.grid.map((r) => r.value)]),
         vstore,
         [...this._collapsed],
-        money && [money.kind, isNum(money.value) ? Math.round(money.value * 100) : null],
+        money && [money.kind, isNum(money.value) ? Math.round(money.value * 100) : null, isNum(money.cost) ? Math.round(money.cost * 100) : null],
         pvForecast && [pvForecast.total, pvForecast.remaining, pvForecast.days.map((d) => d.value)],
         priceChart && [priceChart.nowAt, priceChart.current, priceChart.hours.length, priceChart.window?.from, pvHours?.size],
         custom.map((c) => c.items.map((item) => item.state)),
@@ -9019,7 +9160,7 @@ class SolarFlowCard extends HTMLElement {
       model.systemStatus = systemStatus(status, forecast, panels, system);
 
       const painted = this._paint(
-        BASE_CSS + THEME_CSS[theme] + FIT_CSS,
+        BASE_CSS + THEME_CSS[theme] + FIT_CSS + colorCss(config),
         ["sfc", `theme-${theme}`, config.animation === false && "no-anim", config.background === "glass" && "glass", !flowShown && theme !== "lcars" && theme !== "gate" && "parts", live.exportActive ? "grid-export" : live.importActive && "grid-import"].filter(Boolean).join(" "),
         wide ? wideLayout(theme, THEME_RENDER[theme](model)) : withoutFlow(theme, THEME_RENDER[theme](model), flowShown),
       );
@@ -9184,7 +9325,7 @@ const EDITOR_DEFAULT_ON = ["show_solar", "show_battery", "show_chart", "show_wea
 const EDITOR_SWITCH_GROUPS = {
   look: [["wide", "editorWide"], ["background", "editorGlass", "glass"], ["animation", "editorAnimation"], ["load_fonts", "editorFonts"], ["collapsible", "editorCollapsible"], ["show_chart", "editorShowChart"], ["show_weather", "editorShowWeather"]],
   install: [["show_solar", "editorSolar"], ["show_battery", "editorBattery"], ["panels_average", "editorPanelsAverage", "per_string"]],
-  summary: [["show_self_sufficiency", "editorShowSelfSufficiency"], ["show_self_use", "editorShowSelfUse"], ["show_savings", "editorShowSavings"], ["show_co2", "editorShowCo2"], ["show_yield", "editorShowYield"], ["show_insights", "editorInsights"]],
+  summary: [["show_self_sufficiency", "editorShowSelfSufficiency"], ["show_self_use", "editorShowSelfUse"], ["show_savings", "editorShowSavings"], ["show_costs", "editorShowCosts"], ["show_co2", "editorShowCo2"], ["show_yield", "editorShowYield"], ["show_insights", "editorInsights"]],
   sensors: [["invert_grid", "editorInvertGrid"], ["invert_battery", "editorInvertBattery"]],
 };
 
@@ -9592,6 +9733,14 @@ class SolarFlowCardEditor extends HTMLElement {
             </select>
           </label>` : ""}
       </div>
+      <div class="box">
+        <span class="title">${escapeHtml(t.editorColors)}</span>
+        <div class="colors">${Object.keys(COLOR_VARS).map((key) => {
+          const value = this._config.colors?.[key];
+          return `<label><input type="color" data-color="${key}" value="${escapeHtml(/^#[0-9a-f]{6}$/i.test(value || "") ? value : "#888888")}" class="${value ? "" : "unset"}" /><span>${escapeHtml(t.editorColorNames[key])}</span></label>`;
+        }).join("")}</div>
+        ${this._config.colors ? `<button type="button" class="link" data-reset-colors>${escapeHtml(t.editorColorsReset)}</button>` : `<p class="hint">${escapeHtml(t.editorColorsHint)}</p>`}
+      </div>
       ${this._switches(t, "look")}
       ${this._config.load_fonts === true ? `<p class="warn">${escapeHtml(t.editorFontsHint)}</p>` : ""}`;
   }
@@ -9915,6 +10064,10 @@ class SolarFlowCardEditor extends HTMLElement {
         .item { display: grid; gap: 8px; padding: 10px; border: 1px dashed var(--divider-color, rgba(127,127,127,.35)); border-radius: 10px; }
         .danger { color: var(--error-color, #db4437) !important; }
         .suggest { display: grid; gap: 4px; padding: 8px 10px; border-radius: 10px; background: rgba(67, 160, 71, .1); }
+        .colors { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+        .colors label { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+        .colors input { width: 34px; height: 26px; padding: 0; border: 1px solid var(--divider-color, rgba(127,127,127,.35)); border-radius: 6px; background: none; }
+        .colors input.unset { opacity: .45; }
         .link { justify-self: start; padding: 0; border: 0; background: none; color: var(--primary-color, #03a9f4); font: inherit; font-size: 13px; cursor: pointer; }
       </style>
       <datalist id="sfc-sensor">${ids("sensor").map((id) => `<option value="${escapeHtml(id)}"></option>`).join("")}</datalist>
@@ -10022,6 +10175,14 @@ class SolarFlowCardEditor extends HTMLElement {
     }));
     root.getElementById("vs-on")?.addEventListener("change", (e) => {
       this._set("virtual_storage", e.target.checked ? true : undefined);
+      this._render();
+    });
+    root.querySelectorAll("[data-color]").forEach((input) => input.addEventListener("change", (e) => {
+      this._setIn("colors", input.dataset.color, e.target.value);
+      this._render();
+    }));
+    root.querySelector("[data-reset-colors]")?.addEventListener("click", () => {
+      this._set("colors", undefined);
       this._render();
     });
     root.querySelector("[data-copy-auto]")?.addEventListener("click", () => this._copyAuto());

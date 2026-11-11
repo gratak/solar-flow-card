@@ -275,7 +275,8 @@ class SolarFlowCard extends HTMLElement {
       if (!isNum(totals.load) || !isNum(totals.gridImport)) return undefined;
       const billedImport = net ? net.gridImport : totals.gridImport;
       const billedExport = net ? net.gridExport : totals.gridExport || 0;
-      return { kind, value: Math.max(0, totals.load - billedImport) * prices.import.value + billedExport * (prices.export?.value || 0) * prices.factor };
+      const sold = billedExport * (prices.export?.value || 0) * prices.factor;
+      return { kind, value: Math.max(0, totals.load - billedImport) * prices.import.value + sold, cost: billedImport * prices.import.value, sold };
     }
     if (!prices.import) prices.import = { value: 0 };
     if (typeof this._hass.callWS !== "function") return undefined;
@@ -324,7 +325,8 @@ class SolarFlowCard extends HTMLElement {
     // Without an import price, only what was sold counts.
     const counted = kind === "exportValue" ? rows.map((r) => ({ ...r, load: 0, gridImport: 0 })) : rows;
     const left = kind === "exportValue" && rest ? { ...rest, load: 0, gridImport: 0 } : rest;
-    return { kind, value: pricedSavings(counted, left, price, Boolean(virtualStorageConfig(config))) };
+    const priced = pricedSavings(counted, left, price, Boolean(virtualStorageConfig(config)));
+    return { kind, value: priced.saved, cost: kind === "savings" ? priced.cost : null, sold: priced.sold };
   }
 
   // Recorder history of the power sensors for today or the last 3 days,
@@ -357,9 +359,14 @@ class SolarFlowCard extends HTMLElement {
     const day = history?.entry.data ? dayHighlights(this._powerChartData(history.entry.data.series, history.spec), history.spec, today, forecast) : null;
     const week = this._periodEnergy(resolved, "7d", today);
     const month = this._periodEnergy(resolved, "month", today);
-    const compare = comparisonRows(today, week, month);
+    // The same days of this month a year ago, where the statistics go back that far.
+    const sources = sourcesKey(resolved.energy);
+    const yearAgo = sources && typeof this._hass.callWS === "function"
+      ? this._fetch(`year-ago|${sources}|${new Date().toDateString()}`, 6 * 3600000, () => loadYearAgo(this._hass, resolved.energy)).data
+      : null;
+    const compare = comparisonRows(today, week, month, yearAgo);
     if (!day && !compare) return { loading: Boolean(history?.entry.loading || week.loading) };
-    return { day, compare, at: [history?.entry.at, week.buckets?.length, month.buckets?.length] };
+    return { day, compare, at: [history?.entry.at, week.buckets?.length, month.buckets?.length, Boolean(yearAgo)] };
   }
 
   _chartState(resolved, period, energy) {
@@ -493,7 +500,7 @@ class SolarFlowCard extends HTMLElement {
         const signature = `empty|${language}|${theme}`;
         if (signature === this._signature) return;
         this._signature = signature;
-        this._paint(BASE_CSS + THEME_CSS[theme] + FIT_CSS, `sfc theme-${theme}`, `<div class="sfc-empty"><h2>${escapeHtml(t.noData)}</h2><p>${escapeHtml(t.noDataHelp)}</p></div>`);
+        this._paint(BASE_CSS + THEME_CSS[theme] + FIT_CSS + colorCss(config), `sfc theme-${theme}`, `<div class="sfc-empty"><h2>${escapeHtml(t.noData)}</h2><p>${escapeHtml(t.noDataHelp)}</p></div>`);
         return;
       }
       const period = PERIODS.includes(this._period) ? this._period : PERIODS.includes(config.period) ? config.period : "today";
@@ -579,7 +586,7 @@ class SolarFlowCard extends HTMLElement {
         inverter?.map((d) => [[...d.strings.values()].map((s) => Object.values(s).map((r) => r.value)), d.temperatures.map((r) => r.value), d.battery.map((r) => r.value), d.grid.map((r) => r.value)]),
         vstore,
         [...this._collapsed],
-        money && [money.kind, isNum(money.value) ? Math.round(money.value * 100) : null],
+        money && [money.kind, isNum(money.value) ? Math.round(money.value * 100) : null, isNum(money.cost) ? Math.round(money.cost * 100) : null],
         pvForecast && [pvForecast.total, pvForecast.remaining, pvForecast.days.map((d) => d.value)],
         priceChart && [priceChart.nowAt, priceChart.current, priceChart.hours.length, priceChart.window?.from, pvHours?.size],
         custom.map((c) => c.items.map((item) => item.state)),
@@ -646,7 +653,7 @@ class SolarFlowCard extends HTMLElement {
       model.systemStatus = systemStatus(status, forecast, panels, system);
 
       const painted = this._paint(
-        BASE_CSS + THEME_CSS[theme] + FIT_CSS,
+        BASE_CSS + THEME_CSS[theme] + FIT_CSS + colorCss(config),
         ["sfc", `theme-${theme}`, config.animation === false && "no-anim", config.background === "glass" && "glass", !flowShown && theme !== "lcars" && theme !== "gate" && "parts", live.exportActive ? "grid-export" : live.importActive && "grid-import"].filter(Boolean).join(" "),
         wide ? wideLayout(theme, THEME_RENDER[theme](model)) : withoutFlow(theme, THEME_RENDER[theme](model), flowShown),
       );

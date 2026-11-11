@@ -535,6 +535,7 @@ function comparisonHtml(m) {
   const { t, locale } = m;
   const labels = { solar: t.pvProduction, load: t.consumption, gridImport: t.gridImport, gridExport: t.gridExport };
   const cell = (v) => `<td>${escapeHtml(isNum(v) ? formatNumber(v, locale, v < 10 ? 1 : 0) : "—")}</td>`;
+  const hasYear = rows.some((row) => isNum(row.yearAgo));
   const trend = (row) => {
     if (!isNum(row.today) || !isNum(row.yesterday) || row.yesterday < 0.05) return "<td></td>";
     const pct = ((row.today - row.yesterday) / row.yesterday) * 100;
@@ -545,9 +546,9 @@ function comparisonHtml(m) {
   return `
     <section class="sfc-section sfc-compare">
       <div class="sfc-head"><div><span class="sfc-kicker">kWh</span><h3>${escapeHtml(t.compareTitle)}</h3></div></div>
-      <div class="sfc-compare-scroll"><table class="sfc-compare-table">
-        <thead><tr><th></th><th>${escapeHtml(t.periodToday)}</th><th>${escapeHtml(t.colYesterday)}</th><th></th><th>${escapeHtml(t.colAvg7)}</th><th>${escapeHtml(t.colMonth)}</th></tr></thead>
-        <tbody>${rows.map((row) => `<tr class="${row.name}"><th><i></i>${escapeHtml(labels[row.name])}</th>${cell(row.today)}${cell(row.yesterday)}${trend(row)}${cell(row.average)}${cell(row.month)}</tr>`).join("")}</tbody>
+      <div class="sfc-compare-scroll"><table class="sfc-compare-table ${hasYear ? "has-year" : ""}">
+        <thead><tr><th></th><th>${escapeHtml(t.periodToday)}</th><th>${escapeHtml(t.colYesterday)}</th><th></th><th class="avg">${escapeHtml(t.colAvg7)}</th><th>${escapeHtml(t.colMonth)}</th>${hasYear ? `<th title="${escapeHtml(t.colYearAgoHint)}">${escapeHtml(t.colYearAgo)}</th>` : ""}</tr></thead>
+        <tbody>${rows.map((row) => `<tr class="${row.name}"><th><i></i>${escapeHtml(labels[row.name])}</th>${cell(row.today)}${cell(row.yesterday)}${trend(row)}${cell(row.average).replace("<td>", '<td class="avg">')}${cell(row.month)}${hasYear ? cell(row.yearAgo) : ""}</tr>`).join("")}</tbody>
       </table></div>
     </section>`;
 }

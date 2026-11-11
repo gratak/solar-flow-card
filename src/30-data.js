@@ -603,6 +603,9 @@ async function loadPriceStats(hass, ids, start, period) {
 // statistics do not cover yet (the current hour), valued at today's price.
 function pricedSavings(rows, rest, price, net) {
   let saved = 0;
+  // Also what the energy bought cost and what the energy sold was worth.
+  let cost = 0;
+  let sold = 0;
   const add = (values, at) => {
     const h = deriveLoadEnergy(values);
     const imported = h.gridImport || 0;
@@ -610,10 +613,12 @@ function pricedSavings(rows, rest, price, net) {
     const billedImport = net ? Math.max(0, imported - exported) : imported;
     const billedExport = net ? Math.max(0, exported - imported) : exported;
     saved += Math.max(0, (h.load || 0) - billedImport) * price("import", at) + billedExport * price("export", at);
+    cost += billedImport * price("import", at);
+    sold += billedExport * price("export", at);
   };
   for (const row of rows) add(row, row.at);
   if (rest) add(rest, null);
-  return saved;
+  return { saved, cost, sold };
 }
 
 // How the energy sent to the grid is settled (`settlement`):
@@ -954,7 +959,13 @@ function periodSummary(totals, config, t, locale, net = null, money = undefined)
     // of the energy sold instead.
     const label = money?.kind === "exportValue" ? t.exportValue : t.savings;
     const value = money?.value;
-    if (show("show_savings")) items.push(["money", label, isNum(value) ? `${formatNumber(value, locale, 2)} ${config.currency ?? t.currency}`.trim() : "…"]);
+    const amount = (v) => `${formatNumber(v, locale, 2)} ${config.currency ?? t.currency}`.trim();
+    if (show("show_savings")) items.push(["money", label, isNum(value) ? amount(value) : "…"]);
+    // show_costs: what the energy bought cost and what the energy sold was worth.
+    if (config.show_costs === true && money?.kind !== "exportValue") {
+      if (isNum(money?.cost)) items.push(["cost", t.importCost, amount(money.cost)]);
+      if (isNum(money?.sold) && money.sold > 0.005) items.push(["sold", t.exportValue, amount(money.sold)]);
+    }
     return items.concat(periodSummaryRest(totals, config, t, locale));
   }
   const priceImport = positiveNumber(config.price_import);
@@ -964,7 +975,12 @@ function periodSummary(totals, config, t, locale, net = null, money = undefined)
     const billedImport = net ? net.gridImport : gridImport;
     const billedExport = net ? net.gridExport : gridExport;
     const saved = Math.max(0, load - billedImport) * priceImport + (isNum(billedExport) ? billedExport : 0) * priceExport;
-    items.push(["money", t.savings, `${formatNumber(saved, locale, 2)} ${config.currency ?? t.currency}`.trim()]);
+    const amount = (v) => `${formatNumber(v, locale, 2)} ${config.currency ?? t.currency}`.trim();
+    items.push(["money", t.savings, amount(saved)]);
+    if (config.show_costs === true) {
+      items.push(["cost", t.importCost, amount(billedImport * priceImport)]);
+      if (priceExport && isNum(billedExport) && billedExport > 0.005) items.push(["sold", t.exportValue, amount(billedExport * priceExport)]);
+    }
   }
   return items.concat(periodSummaryRest(totals, config, t, locale));
 }
@@ -1749,7 +1765,31 @@ function dayHighlights(data, spec, today, forecast) {
 }
 
 // Today against yesterday, the 7-day average and this month, per flow.
-function comparisonRows(today, week, month) {
+// The same days of this month a year ago (1st to today's date), from the
+// daily statistics: totals per flow, or null without data that old.
+async function loadYearAgo(hass, energy) {
+  const now = new Date();
+  const start = new Date(now.getFullYear() - 1, now.getMonth(), 1);
+  const end = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate() + 1);
+  const sources = energySources(energy);
+  const response = await hass.callWS({
+    type: "recorder/statistics_during_period",
+    start_time: start.toISOString(),
+    end_time: end.toISOString(),
+    statistic_ids: [...new Set(Object.values(sources).flat())],
+    period: "day",
+    types: ["change"],
+    units: { energy: "kWh" },
+  });
+  const totals = {};
+  for (const [name, ids] of Object.entries(sources)) {
+    const rows = statRows(response, ids);
+    if (rows.length) totals[name] = rows.reduce((sum, row) => sum + Math.max(0, Number(row.change) || 0), 0);
+  }
+  return Object.keys(totals).length ? deriveLoadEnergy(totals) : null;
+}
+
+function comparisonRows(today, week, month, yearAgo = null) {
   const days = week.buckets || [];
   const yesterday = days.length >= 2 ? days[days.length - 2] : null;
   const rows = ["solar", "load", "gridImport", "gridExport"].map((name) => {
@@ -1760,6 +1800,7 @@ function comparisonRows(today, week, month) {
       yesterday: yesterday ? yesterday[name] : null,
       average: values.length ? values.reduce((s, v) => s + v, 0) / values.length : null,
       month: month.totals?.[name] ?? null,
+      yearAgo: yearAgo?.[name] ?? null,
     };
   }).filter((row) => [row.today, row.yesterday, row.month].some(isNum));
   return rows.length ? rows : null;

@@ -125,6 +125,7 @@ const BASE_CSS = `
   .sfc-tile.load { --sfc-c: var(--sfc-load); }
   .sfc-tile.gridImport, .sfc-tile.gridExport, .sfc-summary-item.autarky { --sfc-c: var(--sfc-grid); }
   .sfc-tile.charge, .sfc-tile.discharge, .sfc-summary-item.money, .sfc-summary-item.co2 { --sfc-c: var(--sfc-battery); }
+  .sfc-summary-item.cost { --sfc-c: var(--sfc-load); } .sfc-summary-item.sold { --sfc-c: var(--sfc-grid); }
   .sfc-tile-icon { flex: 0 0 34px; width: 34px; height: 34px; display: grid; place-items: center;
     border-radius: var(--sfc-icon-radius, 10px); background: color-mix(in srgb, var(--sfc-c) 16%, transparent); }
   .sfc-tile-icon svg, .sfc-forecast-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -382,6 +383,8 @@ const FIT_CSS = `
     .sfc-compare-table th, .sfc-compare-table td { padding: 6px 2px; }
     .sfc-compare-table thead th { font-size: 9px; letter-spacing: 0; }
     .sfc-compare-table thead th:not(:first-child) { min-width: 0; }
+    /* With a year-ago column there is no room for the 7-day average. */
+    .sfc-compare-table.has-year .avg { display: none; }
     .sfc-compare-table tbody th { white-space: normal; overflow-wrap: break-word; }
     /* A hint that does not fit beside its title goes under it. */
     .sfc-head { flex-wrap: wrap; row-gap: 4px; }
@@ -410,6 +413,17 @@ const FIT_CSS = `
     .theme-lcars .sfc-compare-table th, .theme-lcars .sfc-compare-table td { padding-inline: 1px; }
   }
 `;
+
+// `colors: { solar, load, grid, battery }`: the user's colours for the
+// charts, tiles and bars, over the theme's own.
+const COLOR_VARS = { solar: "--sfc-pv", load: "--sfc-load", grid: "--sfc-grid", battery: "--sfc-battery" };
+function colorCss(config) {
+  const colors = config.colors && typeof config.colors === "object" ? config.colors : {};
+  const rules = Object.entries(COLOR_VARS)
+    .filter(([key]) => typeof colors[key] === "string" && /^(#[0-9a-f]{3,8}|[a-z]{3,20}|(rgb|hsl)a?\([\d\s.,%/]+\))$/i.test(colors[key].trim()))
+    .map(([key, name]) => `${name}: ${colors[key].trim()};`);
+  return rules.length ? `\n  ha-card.sfc { ${rules.join(" ")} }\n` : "";
+}
 
 const THEME_CSS = {
   // ---------------------------------------------------------------- Diorama
