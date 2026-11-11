@@ -7419,11 +7419,11 @@ const BASE_CSS = `
   .sfc-pvf-day.today small { color: var(--sfc-text); font-weight: 700; }
   .sfc-pvf-day strong { min-width: 4.8em; text-align: right; font-size: 13px; font-family: var(--sfc-num-font, inherit); }
   /* Consumers: name, bar, power now, energy today. */
-  .sfc-cons-list { display: grid; grid-template-columns: minmax(4.5em, max-content) minmax(40px, 1fr) max-content max-content; gap: 7px 10px; align-items: center; }
+  .sfc-cons-list { display: grid; grid-template-columns: fit-content(11em) minmax(20px, 1fr) max-content max-content; gap: 7px 8px; align-items: center; }
   .sfc-cons-list.no-power { grid-template-columns: minmax(0, 1fr) max-content; }
-  .sfc-cons-list.no-energy { grid-template-columns: minmax(4.5em, max-content) minmax(40px, 1fr) max-content; }
+  .sfc-cons-list.no-energy { grid-template-columns: fit-content(11em) minmax(20px, 1fr) max-content; }
   .sfc-cons { display: grid; grid-column: 1 / -1; grid-template-columns: subgrid; align-items: center; padding: 1px 0; border: 0; background: none; text-align: left; color: inherit; }
-  .sfc-cons small { min-width: 0; max-width: 11em; color: var(--sfc-muted); font-size: 12px; line-height: 1.2; overflow-wrap: anywhere; }
+  .sfc-cons small { min-width: 0; color: var(--sfc-muted); font-size: 12px; line-height: 1.2; overflow-wrap: anywhere; }
   .sfc-cons.on small { color: var(--sfc-text); font-weight: 700; }
   .sfc-cons.nested small { padding-left: 10px; }
   .sfc-cons strong { text-align: right; font-size: 13px; font-family: var(--sfc-num-font, inherit); white-space: nowrap; }
