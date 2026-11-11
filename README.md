@@ -477,7 +477,10 @@ The 3D, 7D, month and all-time totals and bars come from the long-term statistic
 
 ## Roadmap
 
-Nothing is planned right now. Ideas and votes are welcome in [issues](https://github.com/gratak/solar-flow-card/issues).
+Planned. Ideas and votes are welcome in [issues](https://github.com/gratak/solar-flow-card/issues).
+
+- **2.1.0 out of beta**, after feedback on the Energy dashboard set-up, the grid guard, the Consumers section and the battery's day ahead.
+- **Browsing earlier days and months** with arrows.
 
 ## Translations
 

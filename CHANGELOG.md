@@ -1,5 +1,38 @@
 # Changelog
 
+## 2.1.0-beta.1
+
+**Works without configuration with Home Assistant's Energy dashboard**
+- The card uses the sensors set up under *Settings → Dashboards → Energy* (grid, solar, battery, home; power, charge level and capacity where set) wherever it has none of its own. Several of a kind are added up. Before, a user without DeyeCloud saw an empty card until every sensor was picked by hand.
+- Sensors set in the card come first, then DeyeCloud, then the Energy dashboard.
+- Editor: empty fields show what was found; one click writes the sensors into the card to adjust them.
+
+**Grid guard**
+- `voltage_limit` (default 253 V, `false` = off): a phase above the limit is marked in Installation with a warning. The day's highest voltage and the time above the limit show there and in "Today at a glance".
+- `main_fuse` (A per phase): each phase's current and share of the main fuse, with a warning from 90 %.
+
+**Consumers** (section `consumers`)
+- Where the home's power goes: each device's power now as a bar against the home's load, its energy today, and "Other" for the rest.
+- Devices from `consumers:` or, without it, the individual devices of Home Assistant's Energy dashboard.
+
+**Battery over the next day**
+- The charge level simulated hour by hour from the hourly PV forecast and the home's usual consumption: "Next 24 h: full around 12:40 · lowest 35% around 06:00". The 24H chart continues the charge level as a dotted line.
+- Needs `battery_capacity` and an hourly PV forecast (Solcast, or one set up in the Energy dashboard such as Forecast.Solar). `battery_day: false` turns it off.
+
+**Energy prices**
+- The cheapest hours in a row among the coming ones (`price_window`, default 3) are named and underlined in the chart, with the solar forecast for those hours when known.
+- Coming hours with a negative price are listed.
+
+**Smaller additions**
+- **Your colours:** `colors: { solar, load, grid, battery }` for the charts, tiles and bars, also in the editor.
+- **Costs:** `show_costs: true` adds the cost of the energy bought and the value of the energy sold to the summary.
+- **Comparison:** a column with the same days of this month a year ago, when the statistics go back that far.
+
+**Narrow cards**
+- Values are no longer cut short: phase tiles showed "-120…" without the unit in five themes at 320 px.
+- Period tabs, tile labels, insight labels and titles fit or wrap instead of ending in "…"; Polish tabs are "Mies." and "Całość".
+- The comparison table fits a phone without scrolling sideways.
+
 ## 2.0.2
 
 - **French:** a full French translation, thanks to @lboue ([#109](https://github.com/gratak/solar-flow-card/pull/109)). Home Assistant set to French uses it automatically, including Belgian, Swiss and Canadian French.
