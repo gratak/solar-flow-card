@@ -472,7 +472,7 @@ class SolarFlowCard extends HTMLElement {
         const signature = `empty|${language}|${theme}`;
         if (signature === this._signature) return;
         this._signature = signature;
-        this._paint(BASE_CSS + THEME_CSS[theme], `sfc theme-${theme}`, `<div class="sfc-empty"><h2>${escapeHtml(t.noData)}</h2><p>${escapeHtml(t.noDataHelp)}</p></div>`);
+        this._paint(BASE_CSS + THEME_CSS[theme] + FIT_CSS, `sfc theme-${theme}`, `<div class="sfc-empty"><h2>${escapeHtml(t.noData)}</h2><p>${escapeHtml(t.noDataHelp)}</p></div>`);
         return;
       }
       const period = PERIODS.includes(this._period) ? this._period : PERIODS.includes(config.period) ? config.period : "today";
@@ -603,7 +603,7 @@ class SolarFlowCard extends HTMLElement {
       model.systemStatus = systemStatus(status, forecast, panels, system);
 
       const painted = this._paint(
-        BASE_CSS + THEME_CSS[theme],
+        BASE_CSS + THEME_CSS[theme] + FIT_CSS,
         ["sfc", `theme-${theme}`, config.animation === false && "no-anim", config.background === "glass" && "glass", !flowShown && theme !== "lcars" && theme !== "gate" && "parts", live.exportActive ? "grid-export" : live.importActive && "grid-import"].filter(Boolean).join(" "),
         wide ? wideLayout(theme, THEME_RENDER[theme](model)) : withoutFlow(theme, THEME_RENDER[theme](model), flowShown),
       );
@@ -612,7 +612,7 @@ class SolarFlowCard extends HTMLElement {
       if (wide) this._balanceWide();
     } catch (error) {
       console.error("Home Energy Hub render error", error);
-      this._paint(BASE_CSS + THEME_CSS.diorama, "sfc", `<div class="sfc-empty"><h2>Home Energy Hub</h2><p>${escapeHtml(error?.message || error)}</p></div>`);
+      this._paint(BASE_CSS + THEME_CSS.diorama + FIT_CSS, "sfc", `<div class="sfc-empty"><h2>Home Energy Hub</h2><p>${escapeHtml(error?.message || error)}</p></div>`);
     }
   }
 

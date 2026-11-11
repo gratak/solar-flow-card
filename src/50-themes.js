@@ -6,6 +6,14 @@ function entityAttr(entityId) {
   return entityId ? `data-entity="${escapeHtml(entityId)}"` : "";
 }
 
+// A title built around the card's name ("Power · {name}"): the words around
+// the name are marked, so a narrow card can show the name alone.
+function titleWithExtras(template, name) {
+  const [before, after = ""] = fill(template, { name: "\u0001" }).split("\u0001");
+  const extra = (text) => (text ? `<span class="extra">${escapeHtml(text)}</span>` : "");
+  return `${extra(before)}${escapeHtml(name)}${extra(after)}`;
+}
+
 function liveBadge(m) {
   const state = m.status.state;
   return `<span class="sfc-badge ${state}"><i></i>${escapeHtml(m.t[state])}</span>`;
@@ -485,7 +493,7 @@ function renderLcars(m) {
   return `
     <div class="lc-frame">
       <div class="lc-elbow top"><span>${escapeHtml(`${code.slice(0, 2)}-${code.slice(2)}`)}</span></div>
-      <div class="lc-topbar"><h1>${escapeHtml(fill(t.lcarsTitle, { name: m.name }))}</h1><i class="b1"></i><i class="b2"></i><i class="b3"></i></div>
+      <div class="lc-topbar"><h1>${titleWithExtras(t.lcarsTitle, m.name)}</h1><i class="b1"></i><i class="b2"></i><i class="b3"></i></div>
       <nav class="lc-side">
         ${side.map(([cls, num, label, attr]) => `<button class="${cls}" ${attr}><small>${num}-${(label.length * 7) % 10}</small>${escapeHtml(label)}</button>`).join("")}
         <span class="lc-fill"></span>
@@ -1032,7 +1040,7 @@ function renderGate(m) {
   return `
     <header class="gt-top">
       <span class="gt-tag">SGC-E</span>
-      <div class="gt-title"><h1>${escapeHtml(m.name)} · ${escapeHtml(t.gateTitle)}</h1><span>${escapeHtml(t.gateSub)} · ${escapeHtml(String(m.station || "—"))}</span></div>
+      <div class="gt-title"><h1>${escapeHtml(m.name)}<span class="extra"> · ${escapeHtml(t.gateTitle)}</span></h1><span>${escapeHtml(t.gateSub)} · ${escapeHtml(String(m.station || "—"))}</span></div>
       <div class="gt-right"><span>${escapeHtml(m.now.toLocaleDateString(locale, { day: "numeric", month: "short" }))} · ${escapeHtml(clockText(m))}</span><span class="gt-live ${m.status.state}">${escapeHtml(m.t[m.status.state])}</span></div>
     </header>
     <div class="gt-layout ${config.wide ? "wide" : ""}">
