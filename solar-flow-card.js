@@ -48,7 +48,15 @@ const LEGACY_EDITOR_TAG = "solar-flow-card-editor";
 const CARD_TYPE = `custom:${CARD_TAG}`;
 const LEGACY_CARD_TYPE = `custom:${LEGACY_CARD_TAG}`;
 const THEMES = ["diorama", "aurora", "paper", "lcars", "atlantis", "expanse", "foundation", "galaxy", "gate", "reactor"];
-const PERIODS = ["today", "3d", "7d", "month", "all"];
+// Every period a tab can show; `periods:` picks and orders them.
+const PERIODS = ["today", "3d", "7d", "month", "last_month", "year", "all"];
+const DEFAULT_PERIODS = ["today", "3d", "7d", "month", "all"];
+// Periods charted month by month.
+const MONTHLY_PERIODS = ["year", "all"];
+function periodList(config) {
+  const list = Array.isArray(config?.periods) ? [...new Set(config.periods.map((p) => String(p).trim().toLowerCase()).filter((p) => PERIODS.includes(p)))] : [];
+  return list.length ? list : DEFAULT_PERIODS;
+}
 // A flow below this many watts counts as idle.
 const ACTIVE_W = 5;
 
@@ -86,6 +94,10 @@ const TRANSLATIONS = {
     "periodAll": "All time",
     "periodMonthShort": "Month",
     "periodAllShort": "All",
+    "periodLastMonth": "Last month",
+    "periodLastMonthShort": "Last mo.",
+    "periodYear": "This year",
+    "periodYearShort": "Year",
     "since": "since {date}",
     "energy": "Energy",
     "pvProduction": "PV production",
@@ -434,6 +446,7 @@ const TRANSLATIONS = {
     "editorDetails": "Inverter details: extra sensors",
     "editorWeather": "Weather",
     "editorPeriod": "Starting period",
+    "editorPeriods": "Period tabs",
     "editorFontUrl": "Own font stylesheet (URL)",
     "editorNow": "now: {value}",
     "editorAuto": "found automatically: {entity} · {value}",
@@ -561,6 +574,10 @@ const TRANSLATIONS = {
     "periodAll": "Gesamt",
     "periodMonthShort": "Monat",
     "periodAllShort": "Gesamt",
+    "periodLastMonth": "Letzter Monat",
+    "periodLastMonthShort": "Vormon.",
+    "periodYear": "Dieses Jahr",
+    "periodYearShort": "Jahr",
     "since": "seit {date}",
     "energy": "Energie",
     "pvProduction": "PV-Erzeugung",
@@ -909,6 +926,7 @@ const TRANSLATIONS = {
     "editorDetails": "Wechselrichterdetails: weitere Sensoren",
     "editorWeather": "Wetter",
     "editorPeriod": "Startzeitraum",
+    "editorPeriods": "Zeitraum-Tabs",
     "editorFontUrl": "Eigenes Schrift-Stylesheet (URL)",
     "editorNow": "jetzt: {value}",
     "editorAuto": "automatisch gefunden: {entity} · {value}",
@@ -1036,6 +1054,10 @@ const TRANSLATIONS = {
     "periodAll": "Depuis toujours",
     "periodMonthShort": "Mois",
     "periodAllShort": "Total",
+    "periodLastMonth": "Mois dernier",
+    "periodLastMonthShort": "M-1",
+    "periodYear": "Cette année",
+    "periodYearShort": "Année",
     "since": "depuis {date}",
     "energy": "Énergie",
     "pvProduction": "Production PV",
@@ -1384,6 +1406,7 @@ const TRANSLATIONS = {
     "editorDetails": "Détails de l'onduleur : capteurs supplémentaires",
     "editorWeather": "Météo",
     "editorPeriod": "Période de départ",
+    "editorPeriods": "Onglets de période",
     "editorFontUrl": "Feuille de style de polices personnalisée (URL)",
     "editorNow": "maintenant : {value}",
     "editorAuto": "détecté automatiquement : {entity} · {value}",
@@ -1511,6 +1534,10 @@ const TRANSLATIONS = {
     "periodAll": "Alles",
     "periodMonthShort": "Maand",
     "periodAllShort": "Alles",
+    "periodLastMonth": "Vorige maand",
+    "periodLastMonthShort": "Vorige",
+    "periodYear": "Dit jaar",
+    "periodYearShort": "Jaar",
     "since": "sinds {date}",
     "energy": "Energie",
     "pvProduction": "PV-productie",
@@ -1859,6 +1886,7 @@ const TRANSLATIONS = {
     "editorDetails": "Omvormerdetails: extra sensoren",
     "editorWeather": "Weer",
     "editorPeriod": "Startperiode",
+    "editorPeriods": "Periodetabs",
     "editorFontUrl": "Eigen lettertype-stylesheet (URL)",
     "editorNow": "nu: {value}",
     "editorAuto": "automatisch gevonden: {entity} · {value}",
@@ -1986,6 +2014,10 @@ const TRANSLATIONS = {
     "periodAll": "Cały okres",
     "periodMonthShort": "Mies.",
     "periodAllShort": "Całość",
+    "periodLastMonth": "Poprzedni miesiąc",
+    "periodLastMonthShort": "Poprz.",
+    "periodYear": "Ten rok",
+    "periodYearShort": "Rok",
     "since": "od {date}",
     "energy": "Energia",
     "pvProduction": "Produkcja PV",
@@ -2334,6 +2366,7 @@ const TRANSLATIONS = {
     "editorDetails": "Szczegóły falownika: dodatkowe czujniki",
     "editorWeather": "Pogoda",
     "editorPeriod": "Okres na start",
+    "editorPeriods": "Zakładki okresów",
     "editorFontUrl": "Własny arkusz czcionek (URL)",
     "editorNow": "teraz: {value}",
     "editorAuto": "wykryty automatycznie: {entity} · {value}",
@@ -2461,6 +2494,10 @@ const TRANSLATIONS = {
     "periodAll": "Desde sempre",
     "periodMonthShort": "Mês",
     "periodAllShort": "Tudo",
+    "periodLastMonth": "Mês passado",
+    "periodLastMonthShort": "Mês ant.",
+    "periodYear": "Este ano",
+    "periodYearShort": "Ano",
     "since": "desde {date}",
     "energy": "Energia",
     "pvProduction": "Produção FV",
@@ -2809,6 +2846,7 @@ const TRANSLATIONS = {
     "editorDetails": "Detalhes do inversor: sensores adicionais",
     "editorWeather": "Tempo",
     "editorPeriod": "Período inicial",
+    "editorPeriods": "Separadores de período",
     "editorFontUrl": "Folha de estilo de tipo de letra própria (URL)",
     "editorNow": "agora: {value}",
     "editorAuto": "encontrado automaticamente: {entity} · {value}",
@@ -4018,6 +4056,14 @@ function statsSpec(period) {
     start.setDate(1);
     return { period, start, statPeriod: "day", ttl: 15 * 60000 };
   }
+  if (period === "last_month") {
+    // The whole previous month: it has an end.
+    const end = startOfDay(now);
+    end.setDate(1);
+    const start = new Date(end.getFullYear(), end.getMonth() - 1, 1);
+    return { period, start, end, statPeriod: "day", ttl: 60 * 60000 };
+  }
+  if (period === "year") return { period, start: new Date(now.getFullYear(), 0, 1), statPeriod: "month", ttl: 60 * 60000 };
   return { period, start: new Date(2015, 0, 1), statPeriod: "month", ttl: 60 * 60000 };
 }
 
@@ -4026,7 +4072,7 @@ async function loadStatistics(hass, spec, energy) {
   const response = await hass.callWS({
     type: "recorder/statistics_during_period",
     start_time: spec.start.toISOString(),
-    end_time: new Date().toISOString(),
+    end_time: (spec.end || new Date()).toISOString(),
     statistic_ids: [...new Set(Object.values(sources).flat())],
     period: spec.statPeriod,
     types: ["change"],
@@ -4046,7 +4092,7 @@ async function loadStatistics(hass, spec, energy) {
   if (spec.statPeriod === "day") {
     // A fixed day axis, so a missing day shows as a gap instead of shifting.
     buckets = [];
-    for (let day = new Date(spec.start); day <= new Date(); day = addDays(day, 1)) {
+    for (let day = new Date(spec.start); spec.end ? day < spec.end : day <= new Date(); day = addDays(day, 1)) {
       buckets.push(byKey.get(day.toDateString()) || { start: new Date(day) });
     }
   } else {
@@ -5087,6 +5133,8 @@ function periodLabels(t) {
     "3d": ["3D", t.period3d],
     "7d": ["7D", t.period7d],
     month: [t.periodMonthShort, t.periodMonth],
+    last_month: [t.periodLastMonthShort, t.periodLastMonth],
+    year: [t.periodYearShort, t.periodYear],
     all: [t.periodAllShort, t.periodAll],
   };
 }
@@ -5095,7 +5143,7 @@ function tabsHtml(m) {
   const labels = periodLabels(m.t);
   return `
     <div class="sfc-tabs" role="radiogroup" aria-label="${escapeHtml(m.t.energy)}">
-      ${PERIODS.map((period) => `
+      ${m.periods.map((period) => `
         <button type="button" role="radio" class="sfc-tab ${period === m.period ? "on" : ""}"
           aria-checked="${period === m.period}" title="${escapeHtml(labels[period][1])}"
           data-period="${period}">${escapeHtml(labels[period][0])}</button>`).join("")}
@@ -5881,7 +5929,7 @@ function energyChartHtml(data, t, locale, hidden) {
   for (let v = 0; v <= top + step / 2; v += step) ticks.push(v);
   const label = (start, i) => {
     if (spec.period === "3d" || spec.period === "7d") return start.toLocaleDateString(locale, { weekday: "short" });
-    if (spec.period === "month") {
+    if (spec.period === "month" || spec.period === "last_month") {
       const day = start.getDate();
       return day === 1 || day % 5 === 0 ? String(day) : "";
     }
@@ -8784,7 +8832,7 @@ class SolarFlowCard extends HTMLElement {
       const hourly = (start) => this._fetch(`vs-hours|${ids.join(",")}|${start.getTime()}`, 5 * 60000, () => loadHourlyGrid(this._hass, resolved.energy, start)).data || null;
       const today = startOfDay(now);
       todayHours = hourly(today);
-      if (period !== "today" && period !== "all") {
+      if (period !== "today" && !MONTHLY_PERIODS.includes(period) && !statsSpec(period).end) {
         const start = statsSpec(period).start;
         net = hourlyNet(hourly(start), start.getTime(), current);
       }
@@ -8828,7 +8876,8 @@ class SolarFlowCard extends HTMLElement {
     let rows;
     let start;
     let statPeriod = "hour";
-    if (period === "all") {
+    const ended = period === "today" ? null : statsSpec(period).end || null;
+    if (MONTHLY_PERIODS.includes(period)) {
       if (!energy.buckets) return { kind, value: null };
       rows = energy.buckets.map((b) => ({ ...b, at: b.start.getTime() }));
       start = energy.spec.start;
@@ -8839,7 +8888,7 @@ class SolarFlowCard extends HTMLElement {
       if (!hourly.data) return { kind, value: null };
       const hours = new Map();
       for (const [name, map] of Object.entries(hourly.data)) {
-        for (const [at, kwh] of map) hours.set(at, { ...(hours.get(at) || { at }), [name]: kwh });
+        for (const [at, kwh] of map) if (!ended || at < ended.getTime()) hours.set(at, { ...(hours.get(at) || { at }), [name]: kwh });
       }
       // Each hour with its consumption worked out, as in the totals.
       rows = [...hours.values()].map((row) => ({ ...deriveLoadEnergy(row), at: row.at }));
@@ -8858,7 +8907,7 @@ class SolarFlowCard extends HTMLElement {
     };
     // What the hourly statistics do not cover yet (the current hour).
     let rest = null;
-    if (period !== "all") {
+    if (!MONTHLY_PERIODS.includes(period) && !ended) {
       const total = energy.totals || {};
       const sum = (name) => rows.reduce((acc, r) => acc + (r[name] || 0), 0);
       rest = Object.fromEntries(ENERGY_ORDER.filter((name) => isNum(total[name])).map((name) => [name, Math.max(0, total[name] - sum(name))]));
@@ -9044,7 +9093,8 @@ class SolarFlowCard extends HTMLElement {
         this._paint(BASE_CSS + THEME_CSS[theme] + FIT_CSS + colorCss(config), `sfc theme-${theme}`, `<div class="sfc-empty"><h2>${escapeHtml(t.noData)}</h2><p>${escapeHtml(t.noDataHelp)}</p></div>`);
         return;
       }
-      const period = PERIODS.includes(this._period) ? this._period : PERIODS.includes(config.period) ? config.period : "today";
+      const periods = periodList(config);
+      const period = periods.includes(this._period) ? this._period : periods.includes(config.period) ? config.period : periods[0];
       const showSolar = config.show_solar !== false;
       const live = liveValues(resolved, config);
       if (!showSolar) {
@@ -9163,6 +9213,7 @@ class SolarFlowCard extends HTMLElement {
         status,
         today,
         period,
+        periods,
         totals: energy.totals || {},
         energyLoading: Boolean(energy.loading),
         summary: periodSummary(energy.totals || {}, config, t, locale, vstore.net, money),
@@ -9758,7 +9809,7 @@ class SolarFlowCardEditor extends HTMLElement {
           </select>
         </label>
         <label><span>${escapeHtml(t.editorPeriod)}</span>
-          <select data-select="period">${PERIODS.map((p) => `<option value="${p === "today" ? "" : p}" ${(this._config.period || "today") === p ? "selected" : ""}>${escapeHtml(labels[p][1])}</option>`).join("")}</select>
+          <select data-select="period">${periodList(this._config).map((p) => `<option value="${p === "today" ? "" : p}" ${(this._config.period || "today") === p ? "selected" : ""}>${escapeHtml(labels[p][1])}</option>`).join("")}</select>
         </label>
         ${stations.length > 1 ? `
           <label><span>${escapeHtml(t.editorStation)}</span>
@@ -9766,6 +9817,10 @@ class SolarFlowCardEditor extends HTMLElement {
               ${stations.map((id) => `<option value="${escapeHtml(id)}" ${String(this._config.station_id) === id ? "selected" : ""}>${escapeHtml(id)}</option>`).join("")}
             </select>
           </label>` : ""}
+      </div>
+      <div class="box">
+        <span class="title">${escapeHtml(t.editorPeriods)}</span>
+        <div class="colors">${PERIODS.map((p) => `<label><input type="checkbox" data-period-tab="${p}" ${periodList(this._config).includes(p) ? "checked" : ""} /><span>${escapeHtml(labels[p][1])}</span></label>`).join("")}</div>
       </div>
       <div class="box">
         <span class="title">${escapeHtml(t.editorColors)}</span>
@@ -10100,7 +10155,7 @@ class SolarFlowCardEditor extends HTMLElement {
         .suggest { display: grid; gap: 4px; padding: 8px 10px; border-radius: 10px; background: rgba(67, 160, 71, .1); }
         .colors { display: flex; flex-wrap: wrap; gap: 8px 16px; }
         .colors label { display: flex; align-items: center; gap: 6px; font-size: 13px; }
-        .colors input { width: 34px; height: 26px; padding: 0; border: 1px solid var(--divider-color, rgba(127,127,127,.35)); border-radius: 6px; background: none; }
+        .colors input[type=color] { width: 34px; height: 26px; padding: 0; border: 1px solid var(--divider-color, rgba(127,127,127,.35)); border-radius: 6px; background: none; }
         .colors input.unset { opacity: .45; }
         .link { justify-self: start; padding: 0; border: 0; background: none; color: var(--primary-color, #03a9f4); font: inherit; font-size: 13px; cursor: pointer; }
       </style>
@@ -10211,6 +10266,17 @@ class SolarFlowCardEditor extends HTMLElement {
       this._set("virtual_storage", e.target.checked ? true : undefined);
       this._render();
     });
+    root.querySelectorAll("[data-period-tab]").forEach((input) => input.addEventListener("change", () => {
+      // In the fixed order; the default set is not written, and one tab stays.
+      const picked = [...root.querySelectorAll("[data-period-tab]")].filter((el) => el.checked).map((el) => el.dataset.periodTab);
+      if (!picked.length) { input.checked = true; return; }
+      const next = { ...this._config };
+      if (picked.join() === DEFAULT_PERIODS.join()) delete next.periods;
+      else next.periods = picked;
+      if (next.period && !picked.includes(next.period)) delete next.period;
+      this._emit(next);
+      this._render();
+    }));
     root.querySelectorAll("[data-color]").forEach((input) => input.addEventListener("change", (e) => {
       this._setIn("colors", input.dataset.color, e.target.value);
       this._render();
