@@ -3,6 +3,7 @@
 ## 2.1.0-beta.2
 
 - **Battery and grid power on the 24H and 3D charts** ([#120](https://github.com/gratak/solar-flow-card/issues/120)): with separate charge/discharge (or import/export) power sensors the chart could show too much power and charging as discharging. Such sensors often report nothing while no power flows their way, or report charging as a negative number (DeyeCloud does both); the chart kept the last reading for hours and subtracted it. A one-way sensor now counts by its size, and as 0 while it reports nothing.
+- **Period tabs of your choice** ([#119](https://github.com/gratak/solar-flow-card/issues/119)): `periods:` picks and orders the tabs, with two new periods: `last_month` (the whole previous month, day by day) and `year` (this year, month by month). Leaving a period out hides its tab, for example `all`. Also in the editor under Appearance.
 - **Comparison:** the "Year ago" column shows only with real data from a year ago, not as a column of zeros.
 
 ## 2.1.0-beta.1

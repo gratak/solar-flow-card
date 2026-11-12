@@ -47,6 +47,14 @@ const LEGACY_EDITOR_TAG = "solar-flow-card-editor";
 const CARD_TYPE = `custom:${CARD_TAG}`;
 const LEGACY_CARD_TYPE = `custom:${LEGACY_CARD_TAG}`;
 const THEMES = ["diorama", "aurora", "paper", "lcars", "atlantis", "expanse", "foundation", "galaxy", "gate", "reactor"];
-const PERIODS = ["today", "3d", "7d", "month", "all"];
+// Every period a tab can show; `periods:` picks and orders them.
+const PERIODS = ["today", "3d", "7d", "month", "last_month", "year", "all"];
+const DEFAULT_PERIODS = ["today", "3d", "7d", "month", "all"];
+// Periods charted month by month.
+const MONTHLY_PERIODS = ["year", "all"];
+function periodList(config) {
+  const list = Array.isArray(config?.periods) ? [...new Set(config.periods.map((p) => String(p).trim().toLowerCase()).filter((p) => PERIODS.includes(p)))] : [];
+  return list.length ? list : DEFAULT_PERIODS;
+}
 // A flow below this many watts counts as idle.
 const ACTIVE_W = 5;

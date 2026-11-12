@@ -27,6 +27,8 @@ function periodLabels(t) {
     "3d": ["3D", t.period3d],
     "7d": ["7D", t.period7d],
     month: [t.periodMonthShort, t.periodMonth],
+    last_month: [t.periodLastMonthShort, t.periodLastMonth],
+    year: [t.periodYearShort, t.periodYear],
     all: [t.periodAllShort, t.periodAll],
   };
 }
@@ -35,7 +37,7 @@ function tabsHtml(m) {
   const labels = periodLabels(m.t);
   return `
     <div class="sfc-tabs" role="radiogroup" aria-label="${escapeHtml(m.t.energy)}">
-      ${PERIODS.map((period) => `
+      ${m.periods.map((period) => `
         <button type="button" role="radio" class="sfc-tab ${period === m.period ? "on" : ""}"
           aria-checked="${period === m.period}" title="${escapeHtml(labels[period][1])}"
           data-period="${period}">${escapeHtml(labels[period][0])}</button>`).join("")}
@@ -821,7 +823,7 @@ function energyChartHtml(data, t, locale, hidden) {
   for (let v = 0; v <= top + step / 2; v += step) ticks.push(v);
   const label = (start, i) => {
     if (spec.period === "3d" || spec.period === "7d") return start.toLocaleDateString(locale, { weekday: "short" });
-    if (spec.period === "month") {
+    if (spec.period === "month" || spec.period === "last_month") {
       const day = start.getDate();
       return day === 1 || day % 5 === 0 ? String(day) : "";
     }

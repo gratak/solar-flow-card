@@ -253,7 +253,7 @@ class SolarFlowCard extends HTMLElement {
       const hourly = (start) => this._fetch(`vs-hours|${ids.join(",")}|${start.getTime()}`, 5 * 60000, () => loadHourlyGrid(this._hass, resolved.energy, start)).data || null;
       const today = startOfDay(now);
       todayHours = hourly(today);
-      if (period !== "today" && period !== "all") {
+      if (period !== "today" && !MONTHLY_PERIODS.includes(period) && !statsSpec(period).end) {
         const start = statsSpec(period).start;
         net = hourlyNet(hourly(start), start.getTime(), current);
       }
@@ -297,7 +297,8 @@ class SolarFlowCard extends HTMLElement {
     let rows;
     let start;
     let statPeriod = "hour";
-    if (period === "all") {
+    const ended = period === "today" ? null : statsSpec(period).end || null;
+    if (MONTHLY_PERIODS.includes(period)) {
       if (!energy.buckets) return { kind, value: null };
       rows = energy.buckets.map((b) => ({ ...b, at: b.start.getTime() }));
       start = energy.spec.start;
@@ -308,7 +309,7 @@ class SolarFlowCard extends HTMLElement {
       if (!hourly.data) return { kind, value: null };
       const hours = new Map();
       for (const [name, map] of Object.entries(hourly.data)) {
-        for (const [at, kwh] of map) hours.set(at, { ...(hours.get(at) || { at }), [name]: kwh });
+        for (const [at, kwh] of map) if (!ended || at < ended.getTime()) hours.set(at, { ...(hours.get(at) || { at }), [name]: kwh });
       }
       // Each hour with its consumption worked out, as in the totals.
       rows = [...hours.values()].map((row) => ({ ...deriveLoadEnergy(row), at: row.at }));
@@ -327,7 +328,7 @@ class SolarFlowCard extends HTMLElement {
     };
     // What the hourly statistics do not cover yet (the current hour).
     let rest = null;
-    if (period !== "all") {
+    if (!MONTHLY_PERIODS.includes(period) && !ended) {
       const total = energy.totals || {};
       const sum = (name) => rows.reduce((acc, r) => acc + (r[name] || 0), 0);
       rest = Object.fromEntries(ENERGY_ORDER.filter((name) => isNum(total[name])).map((name) => [name, Math.max(0, total[name] - sum(name))]));
@@ -513,7 +514,8 @@ class SolarFlowCard extends HTMLElement {
         this._paint(BASE_CSS + THEME_CSS[theme] + FIT_CSS + colorCss(config), `sfc theme-${theme}`, `<div class="sfc-empty"><h2>${escapeHtml(t.noData)}</h2><p>${escapeHtml(t.noDataHelp)}</p></div>`);
         return;
       }
-      const period = PERIODS.includes(this._period) ? this._period : PERIODS.includes(config.period) ? config.period : "today";
+      const periods = periodList(config);
+      const period = periods.includes(this._period) ? this._period : periods.includes(config.period) ? config.period : periods[0];
       const showSolar = config.show_solar !== false;
       const live = liveValues(resolved, config);
       if (!showSolar) {
@@ -632,6 +634,7 @@ class SolarFlowCard extends HTMLElement {
         status,
         today,
         period,
+        periods,
         totals: energy.totals || {},
         energyLoading: Boolean(energy.loading),
         summary: periodSummary(energy.totals || {}, config, t, locale, vstore.net, money),

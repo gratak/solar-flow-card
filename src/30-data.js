@@ -860,6 +860,14 @@ function statsSpec(period) {
     start.setDate(1);
     return { period, start, statPeriod: "day", ttl: 15 * 60000 };
   }
+  if (period === "last_month") {
+    // The whole previous month: it has an end.
+    const end = startOfDay(now);
+    end.setDate(1);
+    const start = new Date(end.getFullYear(), end.getMonth() - 1, 1);
+    return { period, start, end, statPeriod: "day", ttl: 60 * 60000 };
+  }
+  if (period === "year") return { period, start: new Date(now.getFullYear(), 0, 1), statPeriod: "month", ttl: 60 * 60000 };
   return { period, start: new Date(2015, 0, 1), statPeriod: "month", ttl: 60 * 60000 };
 }
 
@@ -868,7 +876,7 @@ async function loadStatistics(hass, spec, energy) {
   const response = await hass.callWS({
     type: "recorder/statistics_during_period",
     start_time: spec.start.toISOString(),
-    end_time: new Date().toISOString(),
+    end_time: (spec.end || new Date()).toISOString(),
     statistic_ids: [...new Set(Object.values(sources).flat())],
     period: spec.statPeriod,
     types: ["change"],
@@ -888,7 +896,7 @@ async function loadStatistics(hass, spec, energy) {
   if (spec.statPeriod === "day") {
     // A fixed day axis, so a missing day shows as a gap instead of shifting.
     buckets = [];
-    for (let day = new Date(spec.start); day <= new Date(); day = addDays(day, 1)) {
+    for (let day = new Date(spec.start); spec.end ? day < spec.end : day <= new Date(); day = addDays(day, 1)) {
       buckets.push(byKey.get(day.toDateString()) || { start: new Date(day) });
     }
   } else {

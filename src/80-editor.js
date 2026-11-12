@@ -436,7 +436,7 @@ class SolarFlowCardEditor extends HTMLElement {
           </select>
         </label>
         <label><span>${escapeHtml(t.editorPeriod)}</span>
-          <select data-select="period">${PERIODS.map((p) => `<option value="${p === "today" ? "" : p}" ${(this._config.period || "today") === p ? "selected" : ""}>${escapeHtml(labels[p][1])}</option>`).join("")}</select>
+          <select data-select="period">${periodList(this._config).map((p) => `<option value="${p === "today" ? "" : p}" ${(this._config.period || "today") === p ? "selected" : ""}>${escapeHtml(labels[p][1])}</option>`).join("")}</select>
         </label>
         ${stations.length > 1 ? `
           <label><span>${escapeHtml(t.editorStation)}</span>
@@ -444,6 +444,10 @@ class SolarFlowCardEditor extends HTMLElement {
               ${stations.map((id) => `<option value="${escapeHtml(id)}" ${String(this._config.station_id) === id ? "selected" : ""}>${escapeHtml(id)}</option>`).join("")}
             </select>
           </label>` : ""}
+      </div>
+      <div class="box">
+        <span class="title">${escapeHtml(t.editorPeriods)}</span>
+        <div class="colors">${PERIODS.map((p) => `<label><input type="checkbox" data-period-tab="${p}" ${periodList(this._config).includes(p) ? "checked" : ""} /><span>${escapeHtml(labels[p][1])}</span></label>`).join("")}</div>
       </div>
       <div class="box">
         <span class="title">${escapeHtml(t.editorColors)}</span>
@@ -778,7 +782,7 @@ class SolarFlowCardEditor extends HTMLElement {
         .suggest { display: grid; gap: 4px; padding: 8px 10px; border-radius: 10px; background: rgba(67, 160, 71, .1); }
         .colors { display: flex; flex-wrap: wrap; gap: 8px 16px; }
         .colors label { display: flex; align-items: center; gap: 6px; font-size: 13px; }
-        .colors input { width: 34px; height: 26px; padding: 0; border: 1px solid var(--divider-color, rgba(127,127,127,.35)); border-radius: 6px; background: none; }
+        .colors input[type=color] { width: 34px; height: 26px; padding: 0; border: 1px solid var(--divider-color, rgba(127,127,127,.35)); border-radius: 6px; background: none; }
         .colors input.unset { opacity: .45; }
         .link { justify-self: start; padding: 0; border: 0; background: none; color: var(--primary-color, #03a9f4); font: inherit; font-size: 13px; cursor: pointer; }
       </style>
@@ -889,6 +893,17 @@ class SolarFlowCardEditor extends HTMLElement {
       this._set("virtual_storage", e.target.checked ? true : undefined);
       this._render();
     });
+    root.querySelectorAll("[data-period-tab]").forEach((input) => input.addEventListener("change", () => {
+      // In the fixed order; the default set is not written, and one tab stays.
+      const picked = [...root.querySelectorAll("[data-period-tab]")].filter((el) => el.checked).map((el) => el.dataset.periodTab);
+      if (!picked.length) { input.checked = true; return; }
+      const next = { ...this._config };
+      if (picked.join() === DEFAULT_PERIODS.join()) delete next.periods;
+      else next.periods = picked;
+      if (next.period && !picked.includes(next.period)) delete next.period;
+      this._emit(next);
+      this._render();
+    }));
     root.querySelectorAll("[data-color]").forEach((input) => input.addEventListener("change", (e) => {
       this._setIn("colors", input.dataset.color, e.target.value);
       this._render();
