@@ -109,6 +109,21 @@ function historyPoints(rows) {
   return points;
 }
 
+// History of a one-way sensor (charge, discharge, import, export): its size
+// whatever sign it reports with, and 0 while it reports nothing. Such
+// sensors often go "unknown" when nothing flows their way (DeyeCloud), and
+// the last reading must not linger on the chart for hours.
+function directionPoints(rows) {
+  const points = [];
+  for (const row of rows || []) {
+    const time = row.lu !== undefined ? row.lu * 1000 : Date.parse(row.last_updated || row.last_changed);
+    if (!Number.isFinite(time)) continue;
+    const value = Number.parseFloat(row.s ?? row.state);
+    points.push([time, Number.isFinite(value) ? Math.abs(value) : 0]);
+  }
+  return points;
+}
+
 // Average of the samples in each bucket; a bucket without samples keeps the
 // last known value (the recorder only stores changes). Buckets after nowMs
 // stay null so today's chart ends at the current time.

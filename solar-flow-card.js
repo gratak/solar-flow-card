@@ -38,7 +38,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "2.1.0-beta.1";
+const CARD_VERSION = "2.1.0-beta.2";
 // The card's type is custom:home-energy-hub since 2.0.0. The old name stays
 // registered so dashboards with custom:solar-flow-card keep working.
 const CARD_TAG = "home-energy-hub";
@@ -3044,6 +3044,21 @@ function historyPoints(rows) {
   return points;
 }
 
+// History of a one-way sensor (charge, discharge, import, export): its size
+// whatever sign it reports with, and 0 while it reports nothing. Such
+// sensors often go "unknown" when nothing flows their way (DeyeCloud), and
+// the last reading must not linger on the chart for hours.
+function directionPoints(rows) {
+  const points = [];
+  for (const row of rows || []) {
+    const time = row.lu !== undefined ? row.lu * 1000 : Date.parse(row.last_updated || row.last_changed);
+    if (!Number.isFinite(time)) continue;
+    const value = Number.parseFloat(row.s ?? row.state);
+    points.push([time, Number.isFinite(value) ? Math.abs(value) : 0]);
+  }
+  return points;
+}
+
 // Average of the samples in each bucket; a bucket without samples keeps the
 // last known value (the recorder only stores changes). Buckets after nowMs
 // stay null so today's chart ends at the current time.
@@ -5580,7 +5595,8 @@ function comparisonHtml(m) {
   const { t, locale } = m;
   const labels = { solar: t.pvProduction, load: t.consumption, gridImport: t.gridImport, gridExport: t.gridExport };
   const cell = (v) => `<td>${escapeHtml(isNum(v) ? formatNumber(v, locale, v < 10 ? 1 : 0) : "—")}</td>`;
-  const hasYear = rows.some((row) => isNum(row.yearAgo));
+  // Only with real data from a year ago, not a column of zeros.
+  const hasYear = rows.some((row) => isNum(row.yearAgo) && row.yearAgo > 0.05);
   const trend = (row) => {
     if (!isNum(row.today) || !isNum(row.yesterday) || row.yesterday < 0.05) return '<td class="trend"></td>';
     const pct = ((row.today - row.yesterday) / row.yesterday) * 100;
@@ -5975,6 +5991,8 @@ function powerSpec(period) {
   return { period, start, axisEnd, bucketMs, count: Math.max(1, Math.ceil((axisEnd - start) / bucketMs)), ttl: 5 * 60000 };
 }
 
+const ONE_WAY = ["charge", "discharge", "gridImport", "gridExport"];
+
 async function loadPowerHistory(hass, spec, live) {
   const sources = Object.fromEntries(
     ["solar", "load", "battery", "charge", "discharge", "gridImport", "gridExport", "grid", "soc", ...Object.keys(live).filter((name) => name.startsWith("bank_"))]
@@ -5998,7 +6016,10 @@ async function loadPowerHistory(hass, spec, live) {
     // sensors behind one reading (inverters:) are added up.
     const parts = (entry.parts || [entry]).map((part) => {
       const scale = unitScale(part.stateObj, POWER_SCALE);
-      const values = bucketHistory(historyPoints(response?.[part.entityId]).map(([t, v]) => [t, v * scale]), spec.start.getTime(), spec.count, spec.bucketMs, nowMs);
+      const numeric = historyPoints(response?.[part.entityId]);
+      // One-way sensors: their size, and 0 while they report nothing.
+      const points = ONE_WAY.includes(name) && numeric.length ? directionPoints(response[part.entityId]) : numeric;
+      const values = bucketHistory(points.map(([t, v]) => [t, v * scale]), spec.start.getTime(), spec.count, spec.bucketMs, nowMs);
       // Power sensors without any recorded value in the period (e.g.
       // excluded from the recorder), named when the chart has to explain
       // itself.
@@ -8616,6 +8637,16 @@ function balanceWide(root) {
   return true;
 }
 
+// One signed series from two one-way ones (discharge − charge, import −
+// export): a gap in one counts as 0 while the other has a reading.
+function flowSeries(plus, minus) {
+  const length = (plus || minus).length;
+  return Array.from({ length }, (_, i) => {
+    const [a, b] = [plus?.[i] ?? null, minus?.[i] ?? null];
+    return a === null && b === null ? null : (a || 0) - (b || 0);
+  });
+}
+
 class SolarFlowCard extends HTMLElement {
   constructor() {
     super();
@@ -8956,13 +8987,13 @@ class SolarFlowCard extends HTMLElement {
     const gridFactor = this._config.invert_grid ? -1 : 1;
     let battery = null;
     if (!(quiet(series.charge) && quiet(series.discharge))) {
-      battery = combineSeries(series.discharge || series.charge.map(() => 0), series.charge || series.discharge.map(() => 0), (d, c) => d - c);
+      battery = flowSeries(series.discharge, series.charge);
     } else if (series.battery) {
       battery = series.battery.map((v) => (v === null ? null : v * batteryFactor));
     }
     let grid = null;
     if (!(quiet(series.gridImport) && quiet(series.gridExport)) && (series.gridImport || series.gridExport)) {
-      grid = combineSeries(series.gridImport || series.gridExport.map(() => 0), series.gridExport || series.gridImport.map(() => 0), (i, e) => i - e);
+      grid = flowSeries(series.gridImport, series.gridExport);
     } else if (series.grid) {
       grid = series.grid.map((v) => (v === null ? null : v * gridFactor));
     } else if (series.gridImport) {

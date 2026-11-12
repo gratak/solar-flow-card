@@ -106,6 +106,16 @@ function balanceWide(root) {
   return true;
 }
 
+// One signed series from two one-way ones (discharge − charge, import −
+// export): a gap in one counts as 0 while the other has a reading.
+function flowSeries(plus, minus) {
+  const length = (plus || minus).length;
+  return Array.from({ length }, (_, i) => {
+    const [a, b] = [plus?.[i] ?? null, minus?.[i] ?? null];
+    return a === null && b === null ? null : (a || 0) - (b || 0);
+  });
+}
+
 class SolarFlowCard extends HTMLElement {
   constructor() {
     super();
@@ -446,13 +456,13 @@ class SolarFlowCard extends HTMLElement {
     const gridFactor = this._config.invert_grid ? -1 : 1;
     let battery = null;
     if (!(quiet(series.charge) && quiet(series.discharge))) {
-      battery = combineSeries(series.discharge || series.charge.map(() => 0), series.charge || series.discharge.map(() => 0), (d, c) => d - c);
+      battery = flowSeries(series.discharge, series.charge);
     } else if (series.battery) {
       battery = series.battery.map((v) => (v === null ? null : v * batteryFactor));
     }
     let grid = null;
     if (!(quiet(series.gridImport) && quiet(series.gridExport)) && (series.gridImport || series.gridExport)) {
-      grid = combineSeries(series.gridImport || series.gridExport.map(() => 0), series.gridExport || series.gridImport.map(() => 0), (i, e) => i - e);
+      grid = flowSeries(series.gridImport, series.gridExport);
     } else if (series.grid) {
       grid = series.grid.map((v) => (v === null ? null : v * gridFactor));
     } else if (series.gridImport) {
