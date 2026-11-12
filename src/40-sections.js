@@ -535,7 +535,8 @@ function comparisonHtml(m) {
   const { t, locale } = m;
   const labels = { solar: t.pvProduction, load: t.consumption, gridImport: t.gridImport, gridExport: t.gridExport };
   const cell = (v) => `<td>${escapeHtml(isNum(v) ? formatNumber(v, locale, v < 10 ? 1 : 0) : "—")}</td>`;
-  const hasYear = rows.some((row) => isNum(row.yearAgo));
+  // Only with real data from a year ago, not a column of zeros.
+  const hasYear = rows.some((row) => isNum(row.yearAgo) && row.yearAgo > 0.05);
   const trend = (row) => {
     if (!isNum(row.today) || !isNum(row.yesterday) || row.yesterday < 0.05) return '<td class="trend"></td>';
     const pct = ((row.today - row.yesterday) / row.yesterday) * 100;
@@ -930,6 +931,8 @@ function powerSpec(period) {
   return { period, start, axisEnd, bucketMs, count: Math.max(1, Math.ceil((axisEnd - start) / bucketMs)), ttl: 5 * 60000 };
 }
 
+const ONE_WAY = ["charge", "discharge", "gridImport", "gridExport"];
+
 async function loadPowerHistory(hass, spec, live) {
   const sources = Object.fromEntries(
     ["solar", "load", "battery", "charge", "discharge", "gridImport", "gridExport", "grid", "soc", ...Object.keys(live).filter((name) => name.startsWith("bank_"))]
@@ -953,7 +956,10 @@ async function loadPowerHistory(hass, spec, live) {
     // sensors behind one reading (inverters:) are added up.
     const parts = (entry.parts || [entry]).map((part) => {
       const scale = unitScale(part.stateObj, POWER_SCALE);
-      const values = bucketHistory(historyPoints(response?.[part.entityId]).map(([t, v]) => [t, v * scale]), spec.start.getTime(), spec.count, spec.bucketMs, nowMs);
+      const numeric = historyPoints(response?.[part.entityId]);
+      // One-way sensors: their size, and 0 while they report nothing.
+      const points = ONE_WAY.includes(name) && numeric.length ? directionPoints(response[part.entityId]) : numeric;
+      const values = bucketHistory(points.map(([t, v]) => [t, v * scale]), spec.start.getTime(), spec.count, spec.bucketMs, nowMs);
       // Power sensors without any recorded value in the period (e.g.
       // excluded from the recorder), named when the chart has to explain
       // itself.
