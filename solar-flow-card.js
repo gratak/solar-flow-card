@@ -87,6 +87,7 @@ const TRANSLATIONS = {
     "balanced": "Balanced",
     "fromRoof": "from the roof",
     "inHome": "in the home",
+    "evCar": "car",
     "periodToday": "Today",
     "period3d": "Last 3 days",
     "period7d": "Last 7 days",
@@ -567,6 +568,7 @@ const TRANSLATIONS = {
     "balanced": "Ausgeglichen",
     "fromRoof": "vom Dach",
     "inHome": "im Haus",
+    "evCar": "Auto",
     "periodToday": "Heute",
     "period3d": "Letzte 3 Tage",
     "period7d": "Letzte 7 Tage",
@@ -1047,6 +1049,7 @@ const TRANSLATIONS = {
     "balanced": "Équilibré",
     "fromRoof": "depuis le toit",
     "inHome": "dans la maison",
+    "evCar": "voiture",
     "periodToday": "Aujourd'hui",
     "period3d": "3 derniers jours",
     "period7d": "7 derniers jours",
@@ -1527,6 +1530,7 @@ const TRANSLATIONS = {
     "balanced": "In balans",
     "fromRoof": "van het dak",
     "inHome": "in de woning",
+    "evCar": "auto",
     "periodToday": "Vandaag",
     "period3d": "Afgelopen 3 dagen",
     "period7d": "Afgelopen 7 dagen",
@@ -2007,6 +2011,7 @@ const TRANSLATIONS = {
     "balanced": "Zbalansowana",
     "fromRoof": "z dachu",
     "inHome": "w domu",
+    "evCar": "auto",
     "periodToday": "Dziś",
     "period3d": "Ostatnie 3 dni",
     "period7d": "Ostatnie 7 dni",
@@ -2487,6 +2492,7 @@ const TRANSLATIONS = {
     "balanced": "Equilibrado",
     "fromRoof": "do telhado",
     "inHome": "em casa",
+    "evCar": "carro",
     "periodToday": "Hoje",
     "period3d": "Últimos 3 dias",
     "period7d": "Últimos 7 dias",
@@ -4206,6 +4212,23 @@ function periodSummaryRest(totals, config, t, locale) {
     items.push(["yield", t.specificYield, `${formatNumber(yieldValue, locale, yieldValue < 10 ? 2 : 0)} kWh/kWp`]);
   }
   return items;
+}
+
+// An electric car (`ev: { power, soc, name }`), drawn in the Diorama scene.
+function evData(hass, config) {
+  const ev = config.ev;
+  if (!ev || typeof ev !== "object") return null;
+  const states = hass?.states || {};
+  const power = typeof ev.power === "string" && states[ev.power] ? wattsOf(states[ev.power]) : null;
+  const soc = typeof ev.soc === "string" && states[ev.soc] ? stateNumber(states[ev.soc]) : null;
+  if (!isNum(power) && !isNum(soc)) return null;
+  return {
+    name: ev.name ? String(ev.name) : null,
+    power: isNum(power) ? Math.max(0, power) : null,
+    soc: isNum(soc) ? clamp(soc, 0, 100) : null,
+    charging: isNum(power) && power > ACTIVE_W,
+    entityId: (states[ev.power] && ev.power) || (states[ev.soc] && ev.soc) || null,
+  };
 }
 
 const FORECAST_MAX_HOURS = 48;
@@ -6345,8 +6368,24 @@ function dioramaScene(m) {
   g += flowPath(`M${roof} Q${roof[0] + 40} ${roof[1] + 30} ${inside}`, L.solarActive, false, "pv");
   if (m.config.showBattery) g += flowPath(`M${bat} Q${(bat[0] + wallL[0]) / 2} ${bat[1] - 30} ${wallL}`, L.chargeActive || L.dischargeActive, L.chargeActive, "battery");
   g += flowPath(`M${pole} Q${(pole[0] + wallR[0]) / 2} ${pole[1] + 30} ${wallR}`, L.importActive || L.exportActive, L.exportActive, "grid");
+  if (m.ev) {
+    const plug = P(4, 2.6, 0.7);
+    const port = P(4.5, 2.6, 0.4);
+    g += flowPath(`M${plug} Q${(plug[0] + port[0]) / 2 + 6} ${Math.max(plug[1], port[1]) + 10} ${port}`, m.ev.charging, false, "load");
+  }
   g += "</g>";
-  const tree = P(5.6, 4.6);
+  // An electric car in front of the house, with its charger on the wall.
+  const ev = m.ev;
+  if (ev) {
+    g += `<g class="sfc-click" ${entityAttr(ev.entityId)}>`;
+    g += poly("#3a4a5c", [4, 2.35, 0.45], [4, 2.85, 0.45], [4, 2.85, 1.15], [4, 2.35, 1.15]);
+    g += poly(ev.charging ? "#2fd39a" : "#8a99aa", [4, 2.5, 0.85], [4, 2.7, 0.85], [4, 2.7, 0.95], [4, 2.5, 0.95]);
+    for (const [wx, wy] of [[4.65, 2.15], [5.35, 2.15], [4.65, 3.3], [5.35, 3.3]]) g += poly("#1e2630", [wx, wy, 0], [wx + 0.2, wy, 0], [wx + 0.2, wy, 0.28], [wx, wy, 0.28]);
+    g += box(4.5, 1.95, 1.05, 1.65, 0.4, "#e8eef5", "#cfd9e4", "#b6c3d1", 0.12);
+    g += box(4.62, 2.35, 0.8, 0.9, 0.3, "#2b3a4d", "#5c7591", "#43586f", 0.52);
+    g += "</g>";
+  }
+  const tree = ev ? P(3, 5.6) : P(5.6, 4.6);
   g += `<rect x="${tree[0] - 3}" y="${tree[1] - 26}" width="6" height="26" fill="#8a6b4a"/><circle cx="${tree[0]}" cy="${tree[1] - 38}" r="18" fill="${night ? "#3f7a55" : "#5fb878"}"/><circle cx="${tree[0] + 10}" cy="${tree[1] - 30}" r="12" fill="${night ? "#356a49" : "#4fa868"}"/>`;
   return { svg: g, sky };
 }
@@ -6383,6 +6422,8 @@ function renderDiorama(m) {
       ${m.config.showBattery ? pill(22, 208, "battery", formatPercent(live.soc, locale), batteryNote, batteryEntityId(m)) : ""}
       ${pill(378, 240, "grid", formatPower(gridValue, locale), `${live.exportActive ? "↑ " : live.importActive ? "↓ " : ""}${t.grid.toLowerCase()}`, gridEntityId(m))}
       ${pill(120, 296, "load", formatPower(live.load, locale), t.inHome, m.ids.live.load)}
+      ${m.ev ? pill(342, 294, "load", m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle,
+        m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : m.ev.name || t.evCar, m.ev.entityId) : ""}
     </div>` : ""}
     ${showChips || showShare ? `<div class="dio-bottom">
       ${showChips ? `<div class="dio-chips">
@@ -9134,6 +9175,7 @@ class SolarFlowCard extends HTMLElement {
       // The hourly PV forecast, for the cheapest hours' note.
       const pvHours = priceChart?.window && showSolar ? this._forecastHours(true).hours || null : null;
       const custom = customSections(this._hass, config);
+      const ev = theme === "diorama" ? evData(this._hass, config) : null;
       const consumerSensors = consumerList(this._hass, config);
       const consumerStats = consumerSensors.some((item) => item.energy) && typeof this._hass.callWS === "function"
         ? this._fetch(`consumers|${consumerSensors.map((item) => item.energy || "").join("+")}|${new Date().toDateString()}`, 5 * 60000, () => loadConsumersToday(this._hass, consumerSensors)).data
@@ -9181,6 +9223,7 @@ class SolarFlowCard extends HTMLElement {
         pvForecast && [pvForecast.total, pvForecast.remaining, pvForecast.days.map((d) => d.value)],
         priceChart && [priceChart.nowAt, priceChart.current, priceChart.hours.length, priceChart.window?.from, pvHours?.size],
         custom.map((c) => c.items.map((item) => item.state)),
+        ev && [Math.round(ev.power || 0), ev.soc],
         gridGuard && [Math.round(gridGuard.max * 10), Math.round(gridGuard.minutes)],
         batteryDay && [Math.round(batteryDay.low.soc), batteryDay.fullAt && Math.round(batteryDay.fullAt / 300000), batteryDay.reserveAt && Math.round(batteryDay.reserveAt / 300000)],
         consumers && [consumers.items.map((item) => [item.power, isNum(item.today) ? Math.round(item.today * 100) : null]), consumers.other],
@@ -9226,6 +9269,7 @@ class SolarFlowCard extends HTMLElement {
         priceChart,
         pvHours,
         custom,
+        ev,
         consumers,
         gridGuard,
         inverter,
