@@ -116,6 +116,14 @@ function flowSeries(plus, minus) {
   });
 }
 
+// dark_mode: true, or auto to follow Home Assistant's dark mode (Diorama).
+const DARK_THEMES = ["diorama"];
+function darkMode(config, hass) {
+  if (!DARK_THEMES.includes(config.theme)) return false;
+  if (config.dark_mode === true || config.dark_mode === "on") return true;
+  return config.dark_mode === "auto" && Boolean(hass?.themes?.darkMode);
+}
+
 class SolarFlowCard extends HTMLElement {
   constructor() {
     super();
@@ -612,7 +620,7 @@ class SolarFlowCard extends HTMLElement {
       const introElapsed = (Date.now() - this._introAt) / 1000;
       const introAt = introElapsed < 2.6 ? introElapsed : null;
       const signature = JSON.stringify([
-        language, config, period, [...this._hiddenSeries], live, status.state, today, energy.totals, Boolean(energy.loading),
+        language, config, darkMode(config, this._hass), period, [...this._hiddenSeries], live, status.state, today, energy.totals, Boolean(energy.loading),
         chart && [Boolean(chart.loading), Boolean(chart.error), chart.at], forecast.mode, Math.round(forecast.hours * 60 || 0),
         panels?.panels.map((p) => [p.today, p.power]), system, bank, insights && [insights.loading, insights.at, insights.day?.offGridMinutes], weather && [weather.condition, weather.temperature], inverterOpen,
         inverter?.map((d) => [[...d.strings.values()].map((s) => Object.values(s).map((r) => r.value)), d.temperatures.map((r) => r.value), d.battery.map((r) => r.value), d.grid.map((r) => r.value)]),
@@ -689,7 +697,7 @@ class SolarFlowCard extends HTMLElement {
 
       const painted = this._paint(
         BASE_CSS + THEME_CSS[theme] + FIT_CSS + colorCss(config),
-        ["sfc", `theme-${theme}`, config.animation === false && "no-anim", config.background === "glass" && "glass", !flowShown && theme !== "lcars" && theme !== "gate" && "parts", live.exportActive ? "grid-export" : live.importActive && "grid-import"].filter(Boolean).join(" "),
+        ["sfc", `theme-${theme}`, darkMode(config, this._hass) && "dark", config.animation === false && "no-anim", config.background === "glass" && "glass", !flowShown && theme !== "lcars" && theme !== "gate" && "parts", live.exportActive ? "grid-export" : live.importActive && "grid-import"].filter(Boolean).join(" "),
         wide ? wideLayout(theme, THEME_RENDER[theme](model)) : withoutFlow(theme, THEME_RENDER[theme](model), flowShown),
       );
       if (!painted) return;

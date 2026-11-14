@@ -498,6 +498,23 @@ const THEME_CSS = {
     .dio-legend .pv::before { background: #ffc23d; } .dio-legend .battery::before { background: #2bc48f; } .dio-legend .vstore::before { background: #3cc5d6; } .dio-legend .grid::before { background: #7aa4f2; }
     .sfc-section { border: 0; border-radius: 20px; }
     .sfc-flow { --sfc-dash: 1 9; }
+    /* dark_mode: the same scene with the card around it in night colours. */
+    .sfc.dark {
+      --sfc-glass: rgba(14, 22, 34, .6);
+      --sfc-bg: #141c27; --sfc-surface: #1b2532; --sfc-border: #2a3746; --sfc-text: #e6edf5; --sfc-muted: #93a4b8;
+      --sfc-pv: #ffb42e; --sfc-load: #ff7a69; --sfc-battery: #2fd39a; --sfc-grid: #7aa2ff; --sfc-good: #3fcf7f; --sfc-bad: #ff6b6b;
+      --sfc-accent: #6aa5ff; --sfc-accent-soft: rgba(106,165,255,.14); --sfc-tile-bg: #1b2532; --sfc-track: #2a3746;
+      --sfc-tab-bg: #1b2532; --sfc-tab-on-bg: #2a3746; --sfc-tab-on: #e6edf5; --sfc-tab-shadow: none;
+      --sfc-shadow: 0 18px 50px rgba(0,0,0,.45);
+    }
+    .sfc.dark .dio-pill { background: rgba(20, 28, 39, .9); color: #e6edf5; box-shadow: 0 6px 16px rgba(0,0,0,.35); }
+    .sfc.dark .dio-pill small, .sfc.dark .dio-chip small, .sfc.dark .dio-share header span, .sfc.dark .dio-legend { color: #93a4b8; }
+    .sfc.dark .dio-chip { background: #1b2532; color: #e6edf5; }
+    .sfc.dark .dio-chip.sun { background: #2e2716; } .sfc.dark .dio-chip.grid { background: #1a2540; }
+    .sfc.dark .dio-chip.bat { background: #15302a; } .sfc.dark .dio-chip.home { background: #33201f; }
+    .sfc.dark .dio-chip em { color: #f0b84a; }
+    .sfc.dark .dio-track { background: #2a3746; }
+    .sfc.dark .dio-clock, .sfc.dark .dio-title .sfc-badge { background: rgba(10, 16, 26, .45); }
   `,
   // ----------------------------------------------------------------- Aurora
   aurora: `

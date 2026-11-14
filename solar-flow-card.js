@@ -449,6 +449,10 @@ const TRANSLATIONS = {
     "editorDetails": "Inverter details: extra sensors",
     "editorWeather": "Weather",
     "editorPeriod": "Starting period",
+    "editorDarkMode": "Dark colours",
+    "editorDarkOff": "Light",
+    "editorDarkAuto": "Like Home Assistant",
+    "editorDarkOn": "Dark",
     "editorPeriods": "Period tabs",
     "editorFontUrl": "Own font stylesheet (URL)",
     "editorNow": "now: {value}",
@@ -936,6 +940,10 @@ const TRANSLATIONS = {
     "editorDetails": "Wechselrichterdetails: weitere Sensoren",
     "editorWeather": "Wetter",
     "editorPeriod": "Startzeitraum",
+    "editorDarkMode": "Dunkle Farben",
+    "editorDarkOff": "Hell",
+    "editorDarkAuto": "Wie Home Assistant",
+    "editorDarkOn": "Dunkel",
     "editorPeriods": "Zeitraum-Tabs",
     "editorFontUrl": "Eigenes Schrift-Stylesheet (URL)",
     "editorNow": "jetzt: {value}",
@@ -1423,6 +1431,10 @@ const TRANSLATIONS = {
     "editorDetails": "Détails de l'onduleur : capteurs supplémentaires",
     "editorWeather": "Météo",
     "editorPeriod": "Période de départ",
+    "editorDarkMode": "Couleurs sombres",
+    "editorDarkOff": "Clair",
+    "editorDarkAuto": "Comme Home Assistant",
+    "editorDarkOn": "Sombre",
     "editorPeriods": "Onglets de période",
     "editorFontUrl": "Feuille de style de polices personnalisée (URL)",
     "editorNow": "maintenant : {value}",
@@ -1910,6 +1922,10 @@ const TRANSLATIONS = {
     "editorDetails": "Omvormerdetails: extra sensoren",
     "editorWeather": "Weer",
     "editorPeriod": "Startperiode",
+    "editorDarkMode": "Donkere kleuren",
+    "editorDarkOff": "Licht",
+    "editorDarkAuto": "Zoals Home Assistant",
+    "editorDarkOn": "Donker",
     "editorPeriods": "Periodetabs",
     "editorFontUrl": "Eigen lettertype-stylesheet (URL)",
     "editorNow": "nu: {value}",
@@ -2397,6 +2413,10 @@ const TRANSLATIONS = {
     "editorDetails": "Szczegóły falownika: dodatkowe czujniki",
     "editorWeather": "Pogoda",
     "editorPeriod": "Okres na start",
+    "editorDarkMode": "Ciemne kolory",
+    "editorDarkOff": "Jasne",
+    "editorDarkAuto": "Jak w Home Assistant",
+    "editorDarkOn": "Ciemne",
     "editorPeriods": "Zakładki okresów",
     "editorFontUrl": "Własny arkusz czcionek (URL)",
     "editorNow": "teraz: {value}",
@@ -2884,6 +2904,10 @@ const TRANSLATIONS = {
     "editorDetails": "Detalhes do inversor: sensores adicionais",
     "editorWeather": "Tempo",
     "editorPeriod": "Período inicial",
+    "editorDarkMode": "Cores escuras",
+    "editorDarkOff": "Claro",
+    "editorDarkAuto": "Como o Home Assistant",
+    "editorDarkOn": "Escuro",
     "editorPeriods": "Separadores de período",
     "editorFontUrl": "Folha de estilo de tipo de letra própria (URL)",
     "editorNow": "agora: {value}",
@@ -7996,6 +8020,23 @@ const THEME_CSS = {
     .dio-legend .pv::before { background: #ffc23d; } .dio-legend .battery::before { background: #2bc48f; } .dio-legend .vstore::before { background: #3cc5d6; } .dio-legend .grid::before { background: #7aa4f2; }
     .sfc-section { border: 0; border-radius: 20px; }
     .sfc-flow { --sfc-dash: 1 9; }
+    /* dark_mode: the same scene with the card around it in night colours. */
+    .sfc.dark {
+      --sfc-glass: rgba(14, 22, 34, .6);
+      --sfc-bg: #141c27; --sfc-surface: #1b2532; --sfc-border: #2a3746; --sfc-text: #e6edf5; --sfc-muted: #93a4b8;
+      --sfc-pv: #ffb42e; --sfc-load: #ff7a69; --sfc-battery: #2fd39a; --sfc-grid: #7aa2ff; --sfc-good: #3fcf7f; --sfc-bad: #ff6b6b;
+      --sfc-accent: #6aa5ff; --sfc-accent-soft: rgba(106,165,255,.14); --sfc-tile-bg: #1b2532; --sfc-track: #2a3746;
+      --sfc-tab-bg: #1b2532; --sfc-tab-on-bg: #2a3746; --sfc-tab-on: #e6edf5; --sfc-tab-shadow: none;
+      --sfc-shadow: 0 18px 50px rgba(0,0,0,.45);
+    }
+    .sfc.dark .dio-pill { background: rgba(20, 28, 39, .9); color: #e6edf5; box-shadow: 0 6px 16px rgba(0,0,0,.35); }
+    .sfc.dark .dio-pill small, .sfc.dark .dio-chip small, .sfc.dark .dio-share header span, .sfc.dark .dio-legend { color: #93a4b8; }
+    .sfc.dark .dio-chip { background: #1b2532; color: #e6edf5; }
+    .sfc.dark .dio-chip.sun { background: #2e2716; } .sfc.dark .dio-chip.grid { background: #1a2540; }
+    .sfc.dark .dio-chip.bat { background: #15302a; } .sfc.dark .dio-chip.home { background: #33201f; }
+    .sfc.dark .dio-chip em { color: #f0b84a; }
+    .sfc.dark .dio-track { background: #2a3746; }
+    .sfc.dark .dio-clock, .sfc.dark .dio-title .sfc-badge { background: rgba(10, 16, 26, .45); }
   `,
   // ----------------------------------------------------------------- Aurora
   aurora: `
@@ -8787,6 +8828,14 @@ function flowSeries(plus, minus) {
   });
 }
 
+// dark_mode: true, or auto to follow Home Assistant's dark mode (Diorama).
+const DARK_THEMES = ["diorama"];
+function darkMode(config, hass) {
+  if (!DARK_THEMES.includes(config.theme)) return false;
+  if (config.dark_mode === true || config.dark_mode === "on") return true;
+  return config.dark_mode === "auto" && Boolean(hass?.themes?.darkMode);
+}
+
 class SolarFlowCard extends HTMLElement {
   constructor() {
     super();
@@ -9283,7 +9332,7 @@ class SolarFlowCard extends HTMLElement {
       const introElapsed = (Date.now() - this._introAt) / 1000;
       const introAt = introElapsed < 2.6 ? introElapsed : null;
       const signature = JSON.stringify([
-        language, config, period, [...this._hiddenSeries], live, status.state, today, energy.totals, Boolean(energy.loading),
+        language, config, darkMode(config, this._hass), period, [...this._hiddenSeries], live, status.state, today, energy.totals, Boolean(energy.loading),
         chart && [Boolean(chart.loading), Boolean(chart.error), chart.at], forecast.mode, Math.round(forecast.hours * 60 || 0),
         panels?.panels.map((p) => [p.today, p.power]), system, bank, insights && [insights.loading, insights.at, insights.day?.offGridMinutes], weather && [weather.condition, weather.temperature], inverterOpen,
         inverter?.map((d) => [[...d.strings.values()].map((s) => Object.values(s).map((r) => r.value)), d.temperatures.map((r) => r.value), d.battery.map((r) => r.value), d.grid.map((r) => r.value)]),
@@ -9360,7 +9409,7 @@ class SolarFlowCard extends HTMLElement {
 
       const painted = this._paint(
         BASE_CSS + THEME_CSS[theme] + FIT_CSS + colorCss(config),
-        ["sfc", `theme-${theme}`, config.animation === false && "no-anim", config.background === "glass" && "glass", !flowShown && theme !== "lcars" && theme !== "gate" && "parts", live.exportActive ? "grid-export" : live.importActive && "grid-import"].filter(Boolean).join(" "),
+        ["sfc", `theme-${theme}`, darkMode(config, this._hass) && "dark", config.animation === false && "no-anim", config.background === "glass" && "glass", !flowShown && theme !== "lcars" && theme !== "gate" && "parts", live.exportActive ? "grid-export" : live.importActive && "grid-import"].filter(Boolean).join(" "),
         wide ? wideLayout(theme, THEME_RENDER[theme](model)) : withoutFlow(theme, THEME_RENDER[theme](model), flowShown),
       );
       if (!painted) return;
@@ -9922,6 +9971,9 @@ class SolarFlowCardEditor extends HTMLElement {
             ${Object.entries(LANGUAGE_NAMES).map(([code, name]) => `<option value="${code}" ${this._config.language === code ? "selected" : ""}>${escapeHtml(name)}</option>`).join("")}
           </select>
         </label>
+        ${DARK_THEMES.includes(this._config.theme || "diorama") ? `<label><span>${escapeHtml(t.editorDarkMode)}</span>
+          <select data-select="dark_mode">${[["", t.editorDarkOff], ["auto", t.editorDarkAuto], ["on", t.editorDarkOn]].map(([value, label]) => `<option value="${value}" ${String(this._config.dark_mode === true ? "on" : this._config.dark_mode ?? "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
+        </label>` : ""}
         <label><span>${escapeHtml(t.editorPeriod)}</span>
           <select data-select="period">${periodList(this._config).map((p) => `<option value="${p === "today" ? "" : p}" ${(this._config.period || "today") === p ? "selected" : ""}>${escapeHtml(labels[p][1])}</option>`).join("")}</select>
         </label>
