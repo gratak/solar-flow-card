@@ -3,6 +3,7 @@
 ## 2.1.0-beta.4
 
 - **Every option in the visual editor:** the electric car in the Diorama scene (`ev`, under Installation), the battery's next day (`battery_day`) and the number of PV strings (`panel_strings`) can now be set there too. A check in the repository makes sure every documented option stays in the editor.
+- **Diorama:** the electric car is now drawn as a car (body, cabin, windows, wheels and lights) instead of a block, and the home's pill moves aside so it does not cover it.
 
 ## 2.1.0-beta.3
 

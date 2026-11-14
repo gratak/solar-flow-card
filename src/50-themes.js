@@ -217,7 +217,7 @@ function dioramaScene(m) {
   g += flowPath(`M${pole} Q${(pole[0] + wallR[0]) / 2} ${pole[1] + 30} ${wallR}`, L.importActive || L.exportActive, L.exportActive, "grid");
   if (m.ev) {
     const plug = P(4, 2.6, 0.7);
-    const port = P(4.5, 2.6, 0.4);
+    const port = P(4.45, 2.4, 0.42);
     g += flowPath(`M${plug} Q${(plug[0] + port[0]) / 2 + 6} ${Math.max(plug[1], port[1]) + 10} ${port}`, m.ev.charging, false, "load");
   }
   g += "</g>";
@@ -227,9 +227,42 @@ function dioramaScene(m) {
     g += `<g class="sfc-click" ${entityAttr(ev.entityId)}>`;
     g += poly("#3a4a5c", [4, 2.35, 0.45], [4, 2.85, 0.45], [4, 2.85, 1.15], [4, 2.35, 1.15]);
     g += poly(ev.charging ? "#2fd39a" : "#8a99aa", [4, 2.5, 0.85], [4, 2.7, 0.85], [4, 2.7, 0.95], [4, 2.5, 0.95]);
-    for (const [wx, wy] of [[4.65, 2.15], [5.35, 2.15], [4.65, 3.3], [5.35, 3.3]]) g += poly("#1e2630", [wx, wy, 0], [wx + 0.2, wy, 0], [wx + 0.2, wy, 0.28], [wx, wy, 0.28]);
-    g += box(4.5, 1.95, 1.05, 1.65, 0.4, "#e8eef5", "#cfd9e4", "#b6c3d1", 0.12);
-    g += box(4.62, 2.35, 0.8, 0.9, 0.3, "#2b3a4d", "#5c7591", "#43586f", 0.52);
+    // A hatchback seen from the front left: body, cabin with windows,
+    // windscreen, lights and wheels. Length along y, the front towards y+.
+    const [x0, x1, y0, y1] = [4.45, 5.55, 1.7, 3.8];
+    const paint = ["#3f86d6", "#2f6fb8", "#5a9ee6"];
+    const glass = night ? "#2a3c55" : "#9dc6ea";
+    const wheel = (x, y) => {
+      const pts = Array.from({ length: 14 }, (_, i) => {
+        const a = (i / 14) * Math.PI * 2;
+        return [x, y + Math.cos(a) * 0.22, 0.22 + Math.sin(a) * 0.22];
+      });
+      return poly("#1b2129", ...pts) + poly("#9aa6b3", ...pts.map(([px, py, pz]) => [px, y + (py - y) * 0.45, 0.22 + (pz - 0.22) * 0.45]));
+    };
+    // Shadow under the car.
+    g += poly("rgba(0,0,0,.18)", [x0 - 0.05, y0 - 0.05, 0], [x1 + 0.1, y0 - 0.05, 0], [x1 + 0.1, y1 + 0.1, 0], [x0 - 0.05, y1 + 0.1, 0]);
+    // Lower body.
+    g += box(x0, y0, x1 - x0, y1 - y0, 0.36, paint[2], paint[0], paint[1], 0.16);
+    // Bonnet slope at the front, boot slope at the back.
+    const zb = 0.52;
+    const zt = 0.92;
+    const [ca, cb] = [2.05, 3.05];
+    // Cabin sides (the right side shows), roof, windscreen.
+    g += poly(paint[1], [x1 - 0.06, ca - 0.25, zb], [x1 - 0.06, cb + 0.35, zb], [x1 - 0.14, cb, zt], [x1 - 0.14, ca, zt]);
+    g += poly(glass, [x1 - 0.07, ca - 0.1, zb + 0.06], [x1 - 0.07, cb + 0.2, zb + 0.06], [x1 - 0.13, cb - 0.02, zt - 0.06], [x1 - 0.13, ca + 0.04, zt - 0.06]);
+    g += poly(paint[1], [x1 - 0.07, 2.58, zb + 0.05], [x1 - 0.07, 2.63, zb + 0.05], [x1 - 0.13, 2.63, zt - 0.05], [x1 - 0.13, 2.58, zt - 0.05]);
+    g += poly(paint[2], [x0 + 0.14, ca, zt], [x1 - 0.14, ca, zt], [x1 - 0.14, cb, zt], [x0 + 0.14, cb, zt]);
+    g += poly(glass, [x0 + 0.06, cb + 0.35, zb], [x1 - 0.06, cb + 0.35, zb], [x1 - 0.14, cb, zt], [x0 + 0.14, cb, zt]);
+    g += poly("rgba(255,255,255,.35)", [x0 + 0.25, cb + 0.28, zb + 0.07], [x0 + 0.4, cb + 0.28, zb + 0.07], [x0 + 0.42, cb + 0.04, zt - 0.03], [x0 + 0.3, cb + 0.04, zt - 0.03]);
+    // Front: headlights and the number plate.
+    g += poly(night ? "#fff3b0" : "#f4f7fb", [x0 + 0.08, y1, 0.36], [x0 + 0.3, y1, 0.36], [x0 + 0.3, y1, 0.46], [x0 + 0.08, y1, 0.46]);
+    g += poly(night ? "#fff3b0" : "#f4f7fb", [x1 - 0.3, y1, 0.36], [x1 - 0.08, y1, 0.36], [x1 - 0.08, y1, 0.46], [x1 - 0.3, y1, 0.46]);
+    g += poly("#eef2f6", [x0 + 0.38, y1, 0.22], [x1 - 0.38, y1, 0.22], [x1 - 0.38, y1, 0.3], [x0 + 0.38, y1, 0.3]);
+    // Rear light on the side, wheels.
+    g += poly("#e2463a", [x1, y0 + 0.02, 0.36], [x1, y0 + 0.14, 0.36], [x1, y0 + 0.14, 0.46], [x1, y0 + 0.02, 0.46]);
+    g += wheel(x1 + 0.01, y0 + 0.45) + wheel(x1 + 0.01, y1 - 0.45);
+    // The charging port glows while it charges.
+    if (ev.charging) g += poly("#2fd39a", [x1, y0 + 0.3, 0.42], [x1, y0 + 0.42, 0.42], [x1, y0 + 0.42, 0.5], [x1, y0 + 0.3, 0.5]);
     g += "</g>";
   }
   const tree = ev ? P(3, 5.6) : P(5.6, 4.6);
@@ -268,7 +301,7 @@ function renderDiorama(m) {
       ${m.config.showSolar ? pill(288, 78, "pv", formatPower(live.solar, locale), t.fromRoof, m.ids.live.solar) : ""}
       ${m.config.showBattery ? pill(22, 208, "battery", formatPercent(live.soc, locale), batteryNote, batteryEntityId(m)) : ""}
       ${pill(378, 240, "grid", formatPower(gridValue, locale), `${live.exportActive ? "↑ " : live.importActive ? "↓ " : ""}${t.grid.toLowerCase()}`, gridEntityId(m))}
-      ${pill(120, 296, "load", formatPower(live.load, locale), t.inHome, m.ids.live.load)}
+      ${pill(m.ev ? 70 : 120, 296, "load", formatPower(live.load, locale), t.inHome, m.ids.live.load)}
       ${m.ev ? pill(342, 294, "load", m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle,
         m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : m.ev.name || t.evCar, m.ev.entityId) : ""}
     </div>` : ""}
