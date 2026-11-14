@@ -15,6 +15,8 @@ jobs:
           node-version: 22
       - name: Check translations
         run: node scripts/check-translations.mjs
+      - name: Every option in the editor
+        run: node scripts/check-editor.mjs
       - name: Build
         run: node scripts/build.mjs
       - name: Syntax check

@@ -6,6 +6,7 @@ const EDITOR_NUMBERS = [
   ["pv_capacity", "editorPvCapacity", "0.1"],
   ["pv_panels", "editorPvPanels", "1"],
   ["inverter_power_rating", "editorInverterRating", "0.1"],
+  ["panel_strings", "editorPanelStrings", "1"],
   ["main_fuse", "editorMainFuse", "1"],
   ["voltage_limit", "editorVoltageLimit", "1"],
 ];
@@ -33,10 +34,10 @@ function editorStrings(hass, config) {
 
 // Switches: [config key, label key, value when on]; on unless set to false
 // (EDITOR_DEFAULT_ON) or off unless set (the rest).
-const EDITOR_DEFAULT_ON = ["show_solar", "show_battery", "show_chart", "show_weather", "show_self_sufficiency", "show_self_use", "show_savings", "show_co2", "show_yield", "animation"];
+const EDITOR_DEFAULT_ON = ["show_solar", "show_battery", "battery_day", "show_chart", "show_weather", "show_self_sufficiency", "show_self_use", "show_savings", "show_co2", "show_yield", "animation"];
 const EDITOR_SWITCH_GROUPS = {
   look: [["wide", "editorWide"], ["background", "editorGlass", "glass"], ["animation", "editorAnimation"], ["load_fonts", "editorFonts"], ["collapsible", "editorCollapsible"], ["show_chart", "editorShowChart"], ["show_weather", "editorShowWeather"]],
-  install: [["show_solar", "editorSolar"], ["show_battery", "editorBattery"], ["panels_average", "editorPanelsAverage", "per_string"]],
+  install: [["show_solar", "editorSolar"], ["show_battery", "editorBattery"], ["battery_day", "editorBatteryDay"], ["panels_average", "editorPanelsAverage", "per_string"]],
   summary: [["show_self_sufficiency", "editorShowSelfSufficiency"], ["show_self_use", "editorShowSelfUse"], ["show_savings", "editorShowSavings"], ["show_costs", "editorShowCosts"], ["show_co2", "editorShowCo2"], ["show_yield", "editorShowYield"], ["show_insights", "editorInsights"]],
   sensors: [["invert_grid", "editorInvertGrid"], ["invert_battery", "editorInvertBattery"]],
 };
@@ -249,6 +250,7 @@ class SolarFlowCardEditor extends HTMLElement {
     else if (group === "pv_forecast") this._setIn("pv_forecast", key, value);
     else if (group === "list") return this._setItem(key, Number(index), path.split(".")[3], value);
     else if (group === "custom") return this._setCustomEntity(Number(key), Number(index), value);
+    else if (group === "ev") this._setIn("ev", key, value);
     else this._set(group, value);
     // The notes under the field follow the new sensor.
     this._render();
@@ -620,6 +622,18 @@ class SolarFlowCardEditor extends HTMLElement {
         ["name", "text", t.editorItemName], ["solar_power", "power", t.editorInvSolarPower], ["solar_energy", "energy", t.editorInvSolarEnergy],
         ["power", "power", t.editorInvPower], ["rated_power", "number", t.editorInvRated],
       ])}
+      ${(() => {
+        const ev = this._config.ev && typeof this._config.ev === "object" ? this._config.ev : {};
+        return `<details class="box" data-box="ev" ${this._boxOpen("ev", Boolean(ev.power || ev.soc)) ? "open" : ""}>
+          <summary class="title">${escapeHtml(t.editorEv)}</summary>
+          <p class="hint">${escapeHtml(t.editorEvHint)}</p>
+          <div class="pickers">
+            ${this._picker("ev.power", t.editorEvPower, ev.power, "sensor", { kind: "power" })}
+            ${this._picker("ev.soc", t.editorEvSoc, ev.soc, "sensor", { kind: "soc" })}
+            <label><span>${escapeHtml(t.editorItemName)}</span><input type="text" data-ev-name value="${escapeHtml(ev.name ?? "")}" /></label>
+          </div>
+        </details>`;
+      })()}
       ${this._listHtml(t, "consumers", t.editorConsumers, t.editorConsumersHint, [["name", "text", t.editorItemName], ["power", "power", t.editorConsPower], ["energy", "energy", t.editorConsEnergy]])}
       ${this._listHtml(t, "panels", t.editorPanels, t.editorPanelsHint, [["entity", "energy", t.editorPanelEnergy], ["power", "power", t.editorPanelPower], ["name", "text", t.editorItemName]])}`;
   }
@@ -904,6 +918,7 @@ class SolarFlowCardEditor extends HTMLElement {
       this._set("virtual_storage", e.target.checked ? true : undefined);
       this._render();
     });
+    root.querySelector("[data-ev-name]")?.addEventListener("change", (e) => this._setIn("ev", "name", e.target.value.trim() || undefined));
     root.querySelectorAll("[data-payback]").forEach((input) => input.addEventListener("change", (e) => {
       const number = Number.parseFloat(e.target.value);
       // A bare number (payback: 12000) becomes the object form.

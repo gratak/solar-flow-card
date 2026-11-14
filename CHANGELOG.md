@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0-beta.4
+
+- **Every option in the visual editor:** the electric car in the Diorama scene (`ev`, under Installation), the battery's next day (`battery_day`) and the number of PV strings (`panel_strings`) can now be set there too. A check in the repository makes sure every documented option stays in the editor.
+
 ## 2.1.0-beta.3
 
 - **Payback** ([#124](https://github.com/gratak/solar-flow-card/issues/124)): `payback: { cost, saved_before }` (or `payback: <cost>`). The energy section shows how much of the system's cost the all-time savings have paid back, with a bar and the estimated payback date at the average rate so far. Needs prices. Also in the editor under Summary and prices.
