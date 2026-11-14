@@ -215,8 +215,24 @@ function dioramaScene(m) {
   g += flowPath(`M${roof} Q${roof[0] + 40} ${roof[1] + 30} ${inside}`, L.solarActive, false, "pv");
   if (m.config.showBattery) g += flowPath(`M${bat} Q${(bat[0] + wallL[0]) / 2} ${bat[1] - 30} ${wallL}`, L.chargeActive || L.dischargeActive, L.chargeActive, "battery");
   g += flowPath(`M${pole} Q${(pole[0] + wallR[0]) / 2} ${pole[1] + 30} ${wallR}`, L.importActive || L.exportActive, L.exportActive, "grid");
+  if (m.ev) {
+    const plug = P(4, 2.6, 0.7);
+    const port = P(4.5, 2.6, 0.4);
+    g += flowPath(`M${plug} Q${(plug[0] + port[0]) / 2 + 6} ${Math.max(plug[1], port[1]) + 10} ${port}`, m.ev.charging, false, "load");
+  }
   g += "</g>";
-  const tree = P(5.6, 4.6);
+  // An electric car in front of the house, with its charger on the wall.
+  const ev = m.ev;
+  if (ev) {
+    g += `<g class="sfc-click" ${entityAttr(ev.entityId)}>`;
+    g += poly("#3a4a5c", [4, 2.35, 0.45], [4, 2.85, 0.45], [4, 2.85, 1.15], [4, 2.35, 1.15]);
+    g += poly(ev.charging ? "#2fd39a" : "#8a99aa", [4, 2.5, 0.85], [4, 2.7, 0.85], [4, 2.7, 0.95], [4, 2.5, 0.95]);
+    for (const [wx, wy] of [[4.65, 2.15], [5.35, 2.15], [4.65, 3.3], [5.35, 3.3]]) g += poly("#1e2630", [wx, wy, 0], [wx + 0.2, wy, 0], [wx + 0.2, wy, 0.28], [wx, wy, 0.28]);
+    g += box(4.5, 1.95, 1.05, 1.65, 0.4, "#e8eef5", "#cfd9e4", "#b6c3d1", 0.12);
+    g += box(4.62, 2.35, 0.8, 0.9, 0.3, "#2b3a4d", "#5c7591", "#43586f", 0.52);
+    g += "</g>";
+  }
+  const tree = ev ? P(3, 5.6) : P(5.6, 4.6);
   g += `<rect x="${tree[0] - 3}" y="${tree[1] - 26}" width="6" height="26" fill="#8a6b4a"/><circle cx="${tree[0]}" cy="${tree[1] - 38}" r="18" fill="${night ? "#3f7a55" : "#5fb878"}"/><circle cx="${tree[0] + 10}" cy="${tree[1] - 30}" r="12" fill="${night ? "#356a49" : "#4fa868"}"/>`;
   return { svg: g, sky };
 }
@@ -253,6 +269,8 @@ function renderDiorama(m) {
       ${m.config.showBattery ? pill(22, 208, "battery", formatPercent(live.soc, locale), batteryNote, batteryEntityId(m)) : ""}
       ${pill(378, 240, "grid", formatPower(gridValue, locale), `${live.exportActive ? "↑ " : live.importActive ? "↓ " : ""}${t.grid.toLowerCase()}`, gridEntityId(m))}
       ${pill(120, 296, "load", formatPower(live.load, locale), t.inHome, m.ids.live.load)}
+      ${m.ev ? pill(342, 294, "load", m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle,
+        m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : m.ev.name || t.evCar, m.ev.entityId) : ""}
     </div>` : ""}
     ${showChips || showShare ? `<div class="dio-bottom">
       ${showChips ? `<div class="dio-chips">

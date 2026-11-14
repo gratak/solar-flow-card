@@ -1012,6 +1012,23 @@ function periodSummaryRest(totals, config, t, locale) {
   return items;
 }
 
+// An electric car (`ev: { power, soc, name }`), drawn in the Diorama scene.
+function evData(hass, config) {
+  const ev = config.ev;
+  if (!ev || typeof ev !== "object") return null;
+  const states = hass?.states || {};
+  const power = typeof ev.power === "string" && states[ev.power] ? wattsOf(states[ev.power]) : null;
+  const soc = typeof ev.soc === "string" && states[ev.soc] ? stateNumber(states[ev.soc]) : null;
+  if (!isNum(power) && !isNum(soc)) return null;
+  return {
+    name: ev.name ? String(ev.name) : null,
+    power: isNum(power) ? Math.max(0, power) : null,
+    soc: isNum(soc) ? clamp(soc, 0, 100) : null,
+    charging: isNum(power) && power > ACTIVE_W,
+    entityId: (states[ev.power] && ev.power) || (states[ev.soc] && ev.soc) || null,
+  };
+}
+
 // Payback (`payback: { cost, saved_before }` or `payback: <cost>`): the
 // all-time savings against what the system cost, and when it is paid back
 // at the average rate so far.
