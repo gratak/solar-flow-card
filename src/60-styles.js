@@ -133,6 +133,15 @@ const BASE_CSS = `
   .sfc-tile small, .sfc-summary-item small { color: var(--sfc-muted); font-size: 11px; line-height: 1.2; overflow: hidden;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
   .sfc-tile strong { color: var(--sfc-text); font-size: 15px; font-family: var(--sfc-num-font, inherit); white-space: nowrap; }
+  /* Payback: share, bar, amounts. */
+  .sfc-payback { display: grid; grid-template-columns: max-content minmax(40px, 1fr); align-items: center; gap: 2px 12px; margin-top: 10px; padding: 9px 11px;
+    border: 1px solid var(--sfc-border); border-radius: var(--sfc-tile-radius, 11px); background: var(--sfc-tile-bg); }
+  .sfc-payback > div { display: flex; align-items: baseline; gap: 8px; }
+  .sfc-payback small { color: var(--sfc-muted); font-size: 11px; }
+  .sfc-payback strong { font-size: 15px; font-family: var(--sfc-num-font, inherit); color: var(--sfc-battery); }
+  .sfc-payback .sfc-pvf-bar i { background: var(--sfc-battery); }
+  .sfc-payback em { grid-column: 1 / -1; font-style: normal; font-size: 11px; color: var(--sfc-muted); }
+  .sfc-payback.done strong { color: var(--sfc-good, #1f9d55); }
   .sfc-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 8px; margin-top: 10px; }
   .sfc-summary-item { min-width: 0; padding: 8px 10px; border-radius: var(--sfc-tile-radius, 11px); border: 1px solid var(--sfc-border);
     background: color-mix(in srgb, var(--sfc-tile-bg) 85%, var(--sfc-c, var(--sfc-accent)) 15%); }
@@ -489,6 +498,23 @@ const THEME_CSS = {
     .dio-legend .pv::before { background: #ffc23d; } .dio-legend .battery::before { background: #2bc48f; } .dio-legend .vstore::before { background: #3cc5d6; } .dio-legend .grid::before { background: #7aa4f2; }
     .sfc-section { border: 0; border-radius: 20px; }
     .sfc-flow { --sfc-dash: 1 9; }
+    /* dark_mode: the same scene with the card around it in night colours. */
+    .sfc.dark {
+      --sfc-glass: rgba(14, 22, 34, .6);
+      --sfc-bg: #141c27; --sfc-surface: #1b2532; --sfc-border: #2a3746; --sfc-text: #e6edf5; --sfc-muted: #93a4b8;
+      --sfc-pv: #ffb42e; --sfc-load: #ff7a69; --sfc-battery: #2fd39a; --sfc-grid: #7aa2ff; --sfc-good: #3fcf7f; --sfc-bad: #ff6b6b;
+      --sfc-accent: #6aa5ff; --sfc-accent-soft: rgba(106,165,255,.14); --sfc-tile-bg: #1b2532; --sfc-track: #2a3746;
+      --sfc-tab-bg: #1b2532; --sfc-tab-on-bg: #2a3746; --sfc-tab-on: #e6edf5; --sfc-tab-shadow: none;
+      --sfc-shadow: 0 18px 50px rgba(0,0,0,.45);
+    }
+    .sfc.dark .dio-pill { background: rgba(20, 28, 39, .9); color: #e6edf5; box-shadow: 0 6px 16px rgba(0,0,0,.35); }
+    .sfc.dark .dio-pill small, .sfc.dark .dio-chip small, .sfc.dark .dio-share header span, .sfc.dark .dio-legend { color: #93a4b8; }
+    .sfc.dark .dio-chip { background: #1b2532; color: #e6edf5; }
+    .sfc.dark .dio-chip.sun { background: #2e2716; } .sfc.dark .dio-chip.grid { background: #1a2540; }
+    .sfc.dark .dio-chip.bat { background: #15302a; } .sfc.dark .dio-chip.home { background: #33201f; }
+    .sfc.dark .dio-chip em { color: #f0b84a; }
+    .sfc.dark .dio-track { background: #2a3746; }
+    .sfc.dark .dio-clock, .sfc.dark .dio-title .sfc-badge { background: rgba(10, 16, 26, .45); }
   `,
   // ----------------------------------------------------------------- Aurora
   aurora: `

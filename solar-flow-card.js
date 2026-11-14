@@ -291,6 +291,9 @@ const TRANSLATIONS = {
     "editorShowSelfUse": "Show self-consumption",
     "editorShowSavings": "Show savings",
     "editorShowCosts": "Show the cost of energy bought and the value of energy sold",
+    "editorPaybackCost": "System cost",
+    "editorPaybackBefore": "Savings before Home Assistant's statistics (optional)",
+    "editorPaybackHint": "The savings for all time against what the system cost, and when it is paid back at the average rate so far. Needs prices under Summary and prices.",
     "editorShowCo2": "Show CO₂ avoided",
     "editorShowYield": "Show yield per kWp",
     "editorAnimation": "Animations",
@@ -447,6 +450,10 @@ const TRANSLATIONS = {
     "editorDetails": "Inverter details: extra sensors",
     "editorWeather": "Weather",
     "editorPeriod": "Starting period",
+    "editorDarkMode": "Dark colours",
+    "editorDarkOff": "Light",
+    "editorDarkAuto": "Like Home Assistant",
+    "editorDarkOn": "Dark",
     "editorPeriods": "Period tabs",
     "editorFontUrl": "Own font stylesheet (URL)",
     "editorNow": "now: {value}",
@@ -519,6 +526,10 @@ const TRANSLATIONS = {
     "tomorrow": "tomorrow",
     "exportValue": "Value of energy sold",
     "importCost": "Cost of energy bought",
+    "paybackTitle": "Payback",
+    "paybackOf": "{saved} of {cost}",
+    "paybackAt": "paid back around {date}",
+    "paybackDone": "paid back",
     "editorNoImportPrice": "Savings need an import price: until you set one, the card shows the value of the energy sold.",
     "editorSettlement": "Settlement with your utility",
     "editorSettlementFixed": "Fixed prices",
@@ -789,6 +800,9 @@ const TRANSLATIONS = {
     "editorShowCo2": "Vermiedenes CO₂ anzeigen",
     "editorShowSavings": "Ersparnis anzeigen",
     "editorShowCosts": "Kosten des Netzbezugs und Wert der Einspeisung anzeigen",
+    "editorPaybackCost": "Kosten der Anlage",
+    "editorPaybackBefore": "Ersparnis vor den Statistiken von Home Assistant (optional)",
+    "editorPaybackHint": "Die Ersparnis über die ganze Zeit im Vergleich zu den Kosten der Anlage, und wann sie sich beim bisherigen Tempo amortisiert. Benötigt Preise unter Zusammenfassung und Preise.",
     "editorShowSelfUse": "Eigenverbrauch anzeigen",
     "editorShowYield": "Ertrag pro kWp anzeigen",
     "otherDetails": "Weitere Messwerte",
@@ -928,6 +942,10 @@ const TRANSLATIONS = {
     "editorDetails": "Wechselrichterdetails: weitere Sensoren",
     "editorWeather": "Wetter",
     "editorPeriod": "Startzeitraum",
+    "editorDarkMode": "Dunkle Farben",
+    "editorDarkOff": "Hell",
+    "editorDarkAuto": "Wie Home Assistant",
+    "editorDarkOn": "Dunkel",
     "editorPeriods": "Zeitraum-Tabs",
     "editorFontUrl": "Eigenes Schrift-Stylesheet (URL)",
     "editorNow": "jetzt: {value}",
@@ -1000,6 +1018,10 @@ const TRANSLATIONS = {
     "tomorrow": "morgen",
     "exportValue": "Wert der eingespeisten Energie",
     "importCost": "Kosten des Netzbezugs",
+    "paybackTitle": "Amortisation",
+    "paybackOf": "{saved} von {cost}",
+    "paybackAt": "amortisiert etwa {date}",
+    "paybackDone": "amortisiert",
     "editorNoImportPrice": "Die Ersparnis braucht einen Bezugspreis: bis er gesetzt ist, zeigt die Karte den Wert der eingespeisten Energie.",
     "editorSettlement": "Abrechnung mit dem Energieversorger",
     "editorSettlementFixed": "Feste Preise",
@@ -1253,6 +1275,9 @@ const TRANSLATIONS = {
     "editorShowSelfUse": "Afficher l'autoconsommation",
     "editorShowSavings": "Afficher les économies",
     "editorShowCosts": "Afficher le coût de l'énergie achetée et la valeur de l'énergie vendue",
+    "editorPaybackCost": "Coût de l'installation",
+    "editorPaybackBefore": "Économies d'avant les statistiques de Home Assistant (optionnel)",
+    "editorPaybackHint": "Les économies sur toute la période face au coût de l'installation, et quand elle sera remboursée au rythme actuel. Nécessite des prix dans Résumé et prix.",
     "editorShowCo2": "Afficher le CO₂ évité",
     "editorShowYield": "Afficher le rendement par kWc",
     "editorAnimation": "Animations",
@@ -1409,6 +1434,10 @@ const TRANSLATIONS = {
     "editorDetails": "Détails de l'onduleur : capteurs supplémentaires",
     "editorWeather": "Météo",
     "editorPeriod": "Période de départ",
+    "editorDarkMode": "Couleurs sombres",
+    "editorDarkOff": "Clair",
+    "editorDarkAuto": "Comme Home Assistant",
+    "editorDarkOn": "Sombre",
     "editorPeriods": "Onglets de période",
     "editorFontUrl": "Feuille de style de polices personnalisée (URL)",
     "editorNow": "maintenant : {value}",
@@ -1481,6 +1510,10 @@ const TRANSLATIONS = {
     "tomorrow": "demain",
     "exportValue": "Valeur de l'énergie vendue",
     "importCost": "Coût de l'énergie achetée",
+    "paybackTitle": "Retour sur investissement",
+    "paybackOf": "{saved} sur {cost}",
+    "paybackAt": "remboursée vers {date}",
+    "paybackDone": "remboursée",
     "editorNoImportPrice": "Les économies nécessitent un prix d'achat : en attendant que vous en définissiez un, la carte affiche la valeur de l'énergie vendue.",
     "editorSettlement": "Règlement avec votre fournisseur",
     "editorSettlementFixed": "Prix fixes",
@@ -1734,6 +1767,9 @@ const TRANSLATIONS = {
     "editorShowSelfUse": "Toon eigen verbruik",
     "editorShowSavings": "Toon besparingen",
     "editorShowCosts": "Kosten van afgenomen en waarde van teruggeleverde energie tonen",
+    "editorPaybackCost": "Kosten van de installatie",
+    "editorPaybackBefore": "Besparing van vóór de statistieken van Home Assistant (optioneel)",
+    "editorPaybackHint": "De besparing over alle tijd tegenover de kosten van de installatie, en wanneer die is terugverdiend in het tempo tot nu toe. Vereist prijzen onder Samenvatting en prijzen.",
     "editorShowCo2": "Toon bespaarde CO₂",
     "editorShowYield": "Toon opbrengst per kWp",
     "editorAnimation": "Animaties",
@@ -1890,6 +1926,10 @@ const TRANSLATIONS = {
     "editorDetails": "Omvormerdetails: extra sensoren",
     "editorWeather": "Weer",
     "editorPeriod": "Startperiode",
+    "editorDarkMode": "Donkere kleuren",
+    "editorDarkOff": "Licht",
+    "editorDarkAuto": "Zoals Home Assistant",
+    "editorDarkOn": "Donker",
     "editorPeriods": "Periodetabs",
     "editorFontUrl": "Eigen lettertype-stylesheet (URL)",
     "editorNow": "nu: {value}",
@@ -1962,6 +2002,10 @@ const TRANSLATIONS = {
     "tomorrow": "morgen",
     "exportValue": "Waarde teruggeleverde energie",
     "importCost": "Kosten van afgenomen energie",
+    "paybackTitle": "Terugverdientijd",
+    "paybackOf": "{saved} van {cost}",
+    "paybackAt": "terugverdiend rond {date}",
+    "paybackDone": "terugverdiend",
     "editorNoImportPrice": "Besparing vraagt een afnameprijs: zolang die ontbreekt, toont de kaart de waarde van de teruggeleverde energie.",
     "editorSettlement": "Verrekening met je energieleverancier",
     "editorSettlementFixed": "Vaste prijzen",
@@ -2215,6 +2259,9 @@ const TRANSLATIONS = {
     "editorShowSelfUse": "Pokaż autokonsumpcję",
     "editorShowSavings": "Pokaż oszczędność",
     "editorShowCosts": "Pokaż koszt pobranej i wartość oddanej energii",
+    "editorPaybackCost": "Koszt instalacji",
+    "editorPaybackBefore": "Oszczędności sprzed statystyk Home Assistant (opcjonalnie)",
+    "editorPaybackHint": "Oszczędności z całego okresu wobec kosztu instalacji i przewidywany termin zwrotu przy dotychczasowym tempie. Wymaga cen w grupie Podsumowanie i ceny.",
     "editorShowCo2": "Pokaż uniknięte CO₂",
     "editorShowYield": "Pokaż uzysk na kWp",
     "editorAnimation": "Animacje",
@@ -2371,6 +2418,10 @@ const TRANSLATIONS = {
     "editorDetails": "Szczegóły falownika: dodatkowe czujniki",
     "editorWeather": "Pogoda",
     "editorPeriod": "Okres na start",
+    "editorDarkMode": "Ciemne kolory",
+    "editorDarkOff": "Jasne",
+    "editorDarkAuto": "Jak w Home Assistant",
+    "editorDarkOn": "Ciemne",
     "editorPeriods": "Zakładki okresów",
     "editorFontUrl": "Własny arkusz czcionek (URL)",
     "editorNow": "teraz: {value}",
@@ -2443,6 +2494,10 @@ const TRANSLATIONS = {
     "tomorrow": "jutro",
     "exportValue": "Wartość oddanej energii",
     "importCost": "Koszt pobranej energii",
+    "paybackTitle": "Zwrot inwestycji",
+    "paybackOf": "{saved} z {cost}",
+    "paybackAt": "zwrot ok. {date}",
+    "paybackDone": "zwróciła się",
     "editorNoImportPrice": "Oszczędność wymaga ceny zakupu: dopóki jej nie podasz, karta pokazuje wartość oddanej energii.",
     "editorSettlement": "Rozliczenie z zakładem energetycznym",
     "editorSettlementFixed": "Stałe ceny",
@@ -2696,6 +2751,9 @@ const TRANSLATIONS = {
     "editorShowSelfUse": "Mostrar autoconsumo",
     "editorShowSavings": "Mostrar poupança",
     "editorShowCosts": "Mostrar o custo da energia comprada e o valor da energia vendida",
+    "editorPaybackCost": "Custo da instalação",
+    "editorPaybackBefore": "Poupança anterior às estatísticas do Home Assistant (opcional)",
+    "editorPaybackHint": "A poupança de todo o período face ao custo da instalação, e quando fica paga ao ritmo atual. Requer preços em Resumo e preços.",
     "editorShowCo2": "Mostrar CO₂ evitado",
     "editorShowYield": "Mostrar rendimento por kWp",
     "editorAnimation": "Animações",
@@ -2852,6 +2910,10 @@ const TRANSLATIONS = {
     "editorDetails": "Detalhes do inversor: sensores adicionais",
     "editorWeather": "Tempo",
     "editorPeriod": "Período inicial",
+    "editorDarkMode": "Cores escuras",
+    "editorDarkOff": "Claro",
+    "editorDarkAuto": "Como o Home Assistant",
+    "editorDarkOn": "Escuro",
     "editorPeriods": "Separadores de período",
     "editorFontUrl": "Folha de estilo de tipo de letra própria (URL)",
     "editorNow": "agora: {value}",
@@ -2924,6 +2986,10 @@ const TRANSLATIONS = {
     "tomorrow": "amanhã",
     "exportValue": "Valor da energia vendida",
     "importCost": "Custo da energia comprada",
+    "paybackTitle": "Retorno do investimento",
+    "paybackOf": "{saved} de {cost}",
+    "paybackAt": "pago por volta de {date}",
+    "paybackDone": "pago",
     "editorNoImportPrice": "As poupanças precisam de um preço de importação: até definir um, o cartão mostra o valor da energia vendida.",
     "editorSettlement": "Liquidação com o seu distribuidor",
     "editorSettlementFixed": "Preços fixos",
@@ -4231,6 +4297,32 @@ function evData(hass, config) {
   };
 }
 
+// Payback (`payback: { cost, saved_before }` or `payback: <cost>`): the
+// all-time savings against what the system cost, and when it is paid back
+// at the average rate so far.
+function paybackConfig(config) {
+  const p = config.payback;
+  const cost = positiveNumber(typeof p === "object" && p ? p.cost : p);
+  if (!cost) return null;
+  const before = Number.parseFloat(typeof p === "object" && p ? p.saved_before : 0);
+  return { cost, before: Number.isFinite(before) && before > 0 ? before : 0 };
+}
+
+function paybackData(setup, saved, since, now = new Date()) {
+  if (!setup || !isNum(saved)) return null;
+  const total = setup.before + Math.max(0, saved);
+  const share = clamp((total / setup.cost) * 100, 0, 100);
+  // The average saving per day since the statistics begin, at least a month.
+  let at = null;
+  if (since && total < setup.cost && saved > 0) {
+    const days = Math.max(30, (now - since) / 864e5);
+    const perDay = saved / days;
+    const left = (setup.cost - total) / perDay;
+    if (left < 365 * 40) at = new Date(now.getTime() + left * 864e5);
+  }
+  return { cost: setup.cost, saved: total, share, done: total >= setup.cost, at };
+}
+
 const FORECAST_MAX_HOURS = 48;
 
 // Time until full while charging, until the reserve while discharging.
@@ -5193,9 +5285,24 @@ function tilesHtml(m) {
     </div>`;
 }
 
-function summaryHtml(m) {
-  if (!m.summary.length) return "";
+// Payback: the share of the system's cost the savings have paid back.
+function paybackHtml(m) {
+  const p = m.payback;
+  if (!p) return "";
+  const { t, locale } = m;
+  const money = (v) => `${formatNumber(v, locale, 0)} ${m.config.currency ?? t.currency}`.trim();
+  const note = p.done ? t.paybackDone : p.at ? fill(t.paybackAt, { date: p.at.toLocaleDateString(locale, { month: "long", year: "numeric" }) }) : "";
   return `
+    <div class="sfc-payback ${p.done ? "done" : ""}">
+      <div><small>${escapeHtml(t.paybackTitle)}</small><strong>${escapeHtml(formatPercent(p.share, locale))}</strong></div>
+      <span class="sfc-pvf-bar"><i style="width:${p.share.toFixed(1)}%"></i></span>
+      <em>${escapeHtml(fill(t.paybackOf, { saved: money(p.saved), cost: money(p.cost) }))}${note ? ` · ${escapeHtml(note)}` : ""}</em>
+    </div>`;
+}
+
+function summaryHtml(m) {
+  if (!m.summary.length) return paybackHtml(m);
+  return `${paybackHtml(m)}
     <div class="sfc-summary">
       ${m.summary.map(([kind, label, value]) => `
         <div class="sfc-summary-item ${kind}">
@@ -7589,6 +7696,15 @@ const BASE_CSS = `
   .sfc-tile small, .sfc-summary-item small { color: var(--sfc-muted); font-size: 11px; line-height: 1.2; overflow: hidden;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
   .sfc-tile strong { color: var(--sfc-text); font-size: 15px; font-family: var(--sfc-num-font, inherit); white-space: nowrap; }
+  /* Payback: share, bar, amounts. */
+  .sfc-payback { display: grid; grid-template-columns: max-content minmax(40px, 1fr); align-items: center; gap: 2px 12px; margin-top: 10px; padding: 9px 11px;
+    border: 1px solid var(--sfc-border); border-radius: var(--sfc-tile-radius, 11px); background: var(--sfc-tile-bg); }
+  .sfc-payback > div { display: flex; align-items: baseline; gap: 8px; }
+  .sfc-payback small { color: var(--sfc-muted); font-size: 11px; }
+  .sfc-payback strong { font-size: 15px; font-family: var(--sfc-num-font, inherit); color: var(--sfc-battery); }
+  .sfc-payback .sfc-pvf-bar i { background: var(--sfc-battery); }
+  .sfc-payback em { grid-column: 1 / -1; font-style: normal; font-size: 11px; color: var(--sfc-muted); }
+  .sfc-payback.done strong { color: var(--sfc-good, #1f9d55); }
   .sfc-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 8px; margin-top: 10px; }
   .sfc-summary-item { min-width: 0; padding: 8px 10px; border-radius: var(--sfc-tile-radius, 11px); border: 1px solid var(--sfc-border);
     background: color-mix(in srgb, var(--sfc-tile-bg) 85%, var(--sfc-c, var(--sfc-accent)) 15%); }
@@ -7945,6 +8061,23 @@ const THEME_CSS = {
     .dio-legend .pv::before { background: #ffc23d; } .dio-legend .battery::before { background: #2bc48f; } .dio-legend .vstore::before { background: #3cc5d6; } .dio-legend .grid::before { background: #7aa4f2; }
     .sfc-section { border: 0; border-radius: 20px; }
     .sfc-flow { --sfc-dash: 1 9; }
+    /* dark_mode: the same scene with the card around it in night colours. */
+    .sfc.dark {
+      --sfc-glass: rgba(14, 22, 34, .6);
+      --sfc-bg: #141c27; --sfc-surface: #1b2532; --sfc-border: #2a3746; --sfc-text: #e6edf5; --sfc-muted: #93a4b8;
+      --sfc-pv: #ffb42e; --sfc-load: #ff7a69; --sfc-battery: #2fd39a; --sfc-grid: #7aa2ff; --sfc-good: #3fcf7f; --sfc-bad: #ff6b6b;
+      --sfc-accent: #6aa5ff; --sfc-accent-soft: rgba(106,165,255,.14); --sfc-tile-bg: #1b2532; --sfc-track: #2a3746;
+      --sfc-tab-bg: #1b2532; --sfc-tab-on-bg: #2a3746; --sfc-tab-on: #e6edf5; --sfc-tab-shadow: none;
+      --sfc-shadow: 0 18px 50px rgba(0,0,0,.45);
+    }
+    .sfc.dark .dio-pill { background: rgba(20, 28, 39, .9); color: #e6edf5; box-shadow: 0 6px 16px rgba(0,0,0,.35); }
+    .sfc.dark .dio-pill small, .sfc.dark .dio-chip small, .sfc.dark .dio-share header span, .sfc.dark .dio-legend { color: #93a4b8; }
+    .sfc.dark .dio-chip { background: #1b2532; color: #e6edf5; }
+    .sfc.dark .dio-chip.sun { background: #2e2716; } .sfc.dark .dio-chip.grid { background: #1a2540; }
+    .sfc.dark .dio-chip.bat { background: #15302a; } .sfc.dark .dio-chip.home { background: #33201f; }
+    .sfc.dark .dio-chip em { color: #f0b84a; }
+    .sfc.dark .dio-track { background: #2a3746; }
+    .sfc.dark .dio-clock, .sfc.dark .dio-title .sfc-badge { background: rgba(10, 16, 26, .45); }
   `,
   // ----------------------------------------------------------------- Aurora
   aurora: `
@@ -8736,6 +8869,14 @@ function flowSeries(plus, minus) {
   });
 }
 
+// dark_mode: true, or auto to follow Home Assistant's dark mode (Diorama).
+const DARK_THEMES = ["diorama"];
+function darkMode(config, hass) {
+  if (!DARK_THEMES.includes(config.theme)) return false;
+  if (config.dark_mode === true || config.dark_mode === "on") return true;
+  return config.dark_mode === "auto" && Boolean(hass?.themes?.darkMode);
+}
+
 class SolarFlowCard extends HTMLElement {
   constructor() {
     super();
@@ -8958,6 +9099,25 @@ class SolarFlowCard extends HTMLElement {
     const left = kind === "exportValue" && rest ? { ...rest, load: 0, gridImport: 0 } : rest;
     const priced = pricedSavings(counted, left, price, Boolean(virtualStorageConfig(config)));
     return { kind, value: priced.saved, cost: kind === "savings" ? priced.cost : null, sold: priced.sold };
+  }
+
+  // Payback: the savings for all time, whatever period is shown.
+  _payback(resolved, today) {
+    const setup = paybackConfig(this._config);
+    if (!setup) return null;
+    const all = this._periodEnergy(resolved, "all", today);
+    if (!all.buckets?.length) return null;
+    let money = this._savings(resolved, "all", all, null);
+    if (money === undefined) {
+      // Fixed prices: from the totals, as in the summary.
+      const totals = all.totals;
+      const buy = positiveNumber(this._config.price_import);
+      const sell = positiveNumber(this._config.price_export) || 0;
+      if (!buy || !isNum(totals.load) || !isNum(totals.gridImport)) return null;
+      money = { value: Math.max(0, totals.load - totals.gridImport) * buy + (totals.gridExport || 0) * sell };
+    }
+    const first = all.buckets.find((b) => ENERGY_ORDER.some((name) => isNum(b[name]) && b[name] > 0));
+    return paybackData(setup, money?.value, first?.start || null);
   }
 
   // Recorder history of the power sensors for today or the last 3 days,
@@ -9209,16 +9369,18 @@ class SolarFlowCard extends HTMLElement {
       const now = new Date();
       const vstore = this._virtualStorage(resolved, config, period, now, today);
       const money = this._savings(resolved, period, energy, vstore.net);
+      const payback = this._payback(resolved, today);
       this._introAt ??= Date.now();
       const introElapsed = (Date.now() - this._introAt) / 1000;
       const introAt = introElapsed < 2.6 ? introElapsed : null;
       const signature = JSON.stringify([
-        language, config, period, [...this._hiddenSeries], live, status.state, today, energy.totals, Boolean(energy.loading),
+        language, config, darkMode(config, this._hass), period, [...this._hiddenSeries], live, status.state, today, energy.totals, Boolean(energy.loading),
         chart && [Boolean(chart.loading), Boolean(chart.error), chart.at], forecast.mode, Math.round(forecast.hours * 60 || 0),
         panels?.panels.map((p) => [p.today, p.power]), system, bank, insights && [insights.loading, insights.at, insights.day?.offGridMinutes], weather && [weather.condition, weather.temperature], inverterOpen,
         inverter?.map((d) => [[...d.strings.values()].map((s) => Object.values(s).map((r) => r.value)), d.temperatures.map((r) => r.value), d.battery.map((r) => r.value), d.grid.map((r) => r.value)]),
         vstore,
         [...this._collapsed],
+        payback && [Math.round(payback.saved), payback.at && payback.at.getMonth()],
         money && [money.kind, isNum(money.value) ? Math.round(money.value * 100) : null, isNum(money.cost) ? Math.round(money.cost * 100) : null],
         pvForecast && [pvForecast.total, pvForecast.remaining, pvForecast.days.map((d) => d.value)],
         priceChart && [priceChart.nowAt, priceChart.current, priceChart.hours.length, priceChart.window?.from, pvHours?.size],
@@ -9259,6 +9421,7 @@ class SolarFlowCard extends HTMLElement {
         periods,
         totals: energy.totals || {},
         energyLoading: Boolean(energy.loading),
+        payback,
         summary: periodSummary(energy.totals || {}, config, t, locale, vstore.net, money),
         virtualStorage: vstore.store,
         since,
@@ -9290,7 +9453,7 @@ class SolarFlowCard extends HTMLElement {
 
       const painted = this._paint(
         BASE_CSS + THEME_CSS[theme] + FIT_CSS + colorCss(config),
-        ["sfc", `theme-${theme}`, config.animation === false && "no-anim", config.background === "glass" && "glass", !flowShown && theme !== "lcars" && theme !== "gate" && "parts", live.exportActive ? "grid-export" : live.importActive && "grid-import"].filter(Boolean).join(" "),
+        ["sfc", `theme-${theme}`, darkMode(config, this._hass) && "dark", config.animation === false && "no-anim", config.background === "glass" && "glass", !flowShown && theme !== "lcars" && theme !== "gate" && "parts", live.exportActive ? "grid-export" : live.importActive && "grid-import"].filter(Boolean).join(" "),
         wide ? wideLayout(theme, THEME_RENDER[theme](model)) : withoutFlow(theme, THEME_RENDER[theme](model), flowShown),
       );
       if (!painted) return;
@@ -9852,6 +10015,9 @@ class SolarFlowCardEditor extends HTMLElement {
             ${Object.entries(LANGUAGE_NAMES).map(([code, name]) => `<option value="${code}" ${this._config.language === code ? "selected" : ""}>${escapeHtml(name)}</option>`).join("")}
           </select>
         </label>
+        ${DARK_THEMES.includes(this._config.theme || "diorama") ? `<label><span>${escapeHtml(t.editorDarkMode)}</span>
+          <select data-select="dark_mode">${[["", t.editorDarkOff], ["auto", t.editorDarkAuto], ["on", t.editorDarkOn]].map(([value, label]) => `<option value="${value}" ${String(this._config.dark_mode === true ? "on" : this._config.dark_mode ?? "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
+        </label>` : ""}
         <label><span>${escapeHtml(t.editorPeriod)}</span>
           <select data-select="period">${periodList(this._config).map((p) => `<option value="${p === "today" ? "" : p}" ${(this._config.period || "today") === p ? "selected" : ""}>${escapeHtml(labels[p][1])}</option>`).join("")}</select>
         </label>
@@ -10108,7 +10274,15 @@ class SolarFlowCardEditor extends HTMLElement {
             ${this._picker("price_export", t.editorPriceExportSensor, sensor("price_export"), "sensor", { kind: "price" })}
           </div>
         </details>` : ""}
-      ${this._switches(t, "summary")}`;
+      ${this._switches(t, "summary")}
+      <div class="box">
+        <span class="title">${escapeHtml(t.paybackTitle)}</span>
+        <div class="grid">${[["cost", t.editorPaybackCost], ["saved_before", t.editorPaybackBefore]].map(([key, label]) => {
+          const value = typeof this._config.payback === "object" && this._config.payback ? this._config.payback[key] : key === "cost" ? this._config.payback : undefined;
+          return `<label><span>${escapeHtml(label)}</span><input data-payback="${key}" type="number" min="0" step="1" inputmode="decimal" value="${escapeHtml(Number.isFinite(Number.parseFloat(value)) ? value : "")}" /></label>`;
+        }).join("")}</div>
+        <p class="hint">${escapeHtml(t.editorPaybackHint)}</p>
+      </div>`;
   }
 
   _vstoreHtml(t) {
@@ -10310,6 +10484,15 @@ class SolarFlowCardEditor extends HTMLElement {
       this._set("virtual_storage", e.target.checked ? true : undefined);
       this._render();
     });
+    root.querySelectorAll("[data-payback]").forEach((input) => input.addEventListener("change", (e) => {
+      const number = Number.parseFloat(e.target.value);
+      // A bare number (payback: 12000) becomes the object form.
+      if (typeof this._config.payback !== "object" || !this._config.payback) {
+        const cost = positiveNumber(this._config.payback);
+        this._config = { ...this._config, payback: cost ? { cost } : undefined };
+      }
+      this._setIn("payback", input.dataset.payback, number > 0 ? number : undefined);
+    }));
     root.querySelectorAll("[data-period-tab]").forEach((input) => input.addEventListener("change", () => {
       // In the fixed order; the default set is not written, and one tab stays.
       const picked = [...root.querySelectorAll("[data-period-tab]")].filter((el) => el.checked).map((el) => el.dataset.periodTab);
