@@ -481,6 +481,10 @@ The 3D, 7D, month and all-time totals and bars come from the long-term statistic
 Planned. Ideas and votes are welcome in [issues](https://github.com/gratak/solar-flow-card/issues).
 
 - **2.1.0 out of beta**, after feedback on the Energy dashboard set-up, the grid guard, the Consumers section and the battery's day ahead.
+- **Payback** ([#124](https://github.com/gratak/solar-flow-card/issues/124)): enter what the system cost and see how much of it the savings have paid back, with an estimated payback date.
+- **Dark Diorama** ([#125](https://github.com/gratak/solar-flow-card/issues/125)): the Diorama scene in night colours for dark dashboards.
+- **EV charging in the Diorama scene** ([#126](https://github.com/gratak/solar-flow-card/issues/126)): a car at the house with its own flow while it charges. (The Consumers section can already list a charger.)
+- **Blueprints for using the surplus**: ready-made Home Assistant automations to import, e.g. switch on heating, the air conditioning or the car charger while the panels export more than a set power, and off again when the surplus is gone, with a minimum run time so devices do not flicker on and off.
 - **Browsing earlier days and months** with arrows.
 
 ## Translations
