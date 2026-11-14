@@ -467,6 +467,26 @@ inverters:
 
 The 3D, 7D, month and all-time totals and bars come from the long-term statistics of the daily energy sensors, so those need `state_class: total_increasing`. Statistics are compiled hourly; today's part always uses the live sensor.
 
+## Blueprints: use the solar surplus
+
+Two ready-made Home Assistant automations come with the card. Import one with its button, then create an automation from it under *Settings → Automations & scenes → Blueprints*. They are independent of the card: they read your grid power sensor.
+
+**Switch on with solar surplus** switches a device on (a heater, an air conditioner, a water heater, a plug…) while the panels export more than a set power, and off again when the home starts importing.
+- Delays for switching on and off, and a minimum run time, keep a passing cloud from switching it on and off.
+- Optionally only above a home battery charge level, and only within set hours.
+- A device switched on by hand (in the app or a dashboard) is left on.
+
+[![Import the blueprint](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fgratak%2Fsolar-flow-card%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fhome-energy-hub%2Fsurplus_switch.yaml)
+
+**Charge the car with solar surplus** sets a wallbox's charging current to follow the surplus.
+- Every minute the current goes up while the home exports and down while it imports, between a minimum (6 A) and a maximum.
+- With a charging switch, charging starts when the surplus covers the minimum current for a few minutes, and stops when it has not for a while.
+- Needs a number entity for the charging current; one or three phases.
+
+[![Import the blueprint](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fgratak%2Fsolar-flow-card%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fhome-energy-hub%2Fsurplus_ev_charging.yaml)
+
+Both take the grid power with either sign convention ("+ while importing" is the most common) and in W or kW.
+
 ## Upgrading to 2.0
 
 2.0.0 renames the card's **type** from `custom:solar-flow-card` to `custom:home-energy-hub`.
@@ -484,7 +504,6 @@ The 3D, 7D, month and all-time totals and bars come from the long-term statistic
 Planned. Ideas and votes are welcome in [issues](https://github.com/gratak/solar-flow-card/issues).
 
 - **2.1.0 out of beta**, after feedback on the Energy dashboard set-up, the grid guard, the Consumers section and the battery's day ahead.
-- **Blueprints for using the surplus**: ready-made Home Assistant automations to import, e.g. switch on heating, the air conditioning or the car charger while the panels export more than a set power, and off again when the surplus is gone, with a minimum run time so devices do not flicker on and off.
 - **Browsing earlier days and months** with arrows.
 
 ## Translations

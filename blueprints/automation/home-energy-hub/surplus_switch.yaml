@@ -1,0 +1,175 @@
+blueprint:
+  name: Home Energy Hub – switch on with solar surplus
+  description: >-
+    Switches a device on (a heater, an air conditioner, a water heater, a
+    plug…) while the panels send more than a set power to the grid, and off
+    again when the home starts importing. Delays and a minimum run time keep
+    a passing cloud from switching it on and off.
+
+
+    Part of Home Energy Hub: https://github.com/gratak/solar-flow-card
+  domain: automation
+  source_url: https://github.com/gratak/solar-flow-card/blob/main/blueprints/automation/home-energy-hub/surplus_switch.yaml
+  input:
+    grid_power:
+      name: Grid power sensor
+      description: Signed grid power in W or kW, e.g. the card's grid_power.
+      selector:
+        entity:
+          domain: sensor
+          device_class: power
+    grid_sign:
+      name: Sign of the grid sensor
+      default: import_positive
+      selector:
+        select:
+          options:
+            - label: "+ while importing, − while exporting (most meters, DeyeCloud)"
+              value: import_positive
+            - label: "+ while exporting, − while importing"
+              value: export_positive
+    target:
+      name: Device to switch
+      selector:
+        entity:
+          domain: [switch, input_boolean, fan, climate, water_heater, light]
+    on_export:
+      name: Switch on when exporting more than (W)
+      description: Roughly the device's own power, so it runs on the surplus.
+      default: 1500
+      selector:
+        number: { min: 100, max: 20000, step: 50, unit_of_measurement: W, mode: box }
+    on_delay:
+      name: … for at least (minutes)
+      default: 5
+      selector:
+        number: { min: 0, max: 60, unit_of_measurement: min, mode: box }
+    off_import:
+      name: Switch off when importing more than (W)
+      default: 300
+      selector:
+        number: { min: 0, max: 20000, step: 50, unit_of_measurement: W, mode: box }
+    off_delay:
+      name: … for at least (minutes)
+      default: 5
+      selector:
+        number: { min: 0, max: 60, unit_of_measurement: min, mode: box }
+    min_on:
+      name: Minimum run time (minutes)
+      description: Once on, the device stays on at least this long.
+      default: 15
+      selector:
+        number: { min: 0, max: 240, unit_of_measurement: min, mode: box }
+    battery_soc:
+      name: Home battery charge level (optional)
+      description: Only switch on when the home battery is charged at least to the level below.
+      default: []
+      selector:
+        entity:
+          domain: sensor
+          device_class: battery
+    min_soc:
+      name: … at least (%)
+      default: 90
+      selector:
+        number: { min: 0, max: 100, unit_of_measurement: "%", mode: slider }
+    manual_stays:
+      name: Leave it on when switched on by hand
+      description: Switch off only what this automation switched on, not a device someone switched on in the app or dashboard.
+      default: true
+      selector:
+        boolean: {}
+    only_between_start:
+      name: Only from (optional)
+      default: "00:00:00"
+      selector:
+        time: {}
+    only_between_end:
+      name: … until
+      default: "00:00:00"
+      selector:
+        time: {}
+
+mode: single
+max_exceeded: silent
+
+trigger_variables:
+  grid_entity: !input grid_power
+  grid_sign: !input grid_sign
+  on_w: !input on_export
+  off_w: !input off_import
+
+triggers:
+  # Exporting (W, + export): the grid power with its sign turned around,
+  # in W whatever the sensor's unit.
+  - trigger: template
+    id: surplus
+    value_template: >-
+      {% set raw = states(grid_entity) | float(none) %}
+      {% set unit = state_attr(grid_entity, 'unit_of_measurement') | default('W', true) | lower %}
+      {% set w = (raw * (1000 if unit == 'kw' else 1)) if raw is not none else none %}
+      {{ w is not none and (-w if grid_sign == 'import_positive' else w) > on_w | float(0) }}
+    for:
+      minutes: !input on_delay
+  - trigger: template
+    id: deficit
+    value_template: >-
+      {% set raw = states(grid_entity) | float(none) %}
+      {% set unit = state_attr(grid_entity, 'unit_of_measurement') | default('W', true) | lower %}
+      {% set w = (raw * (1000 if unit == 'kw' else 1)) if raw is not none else none %}
+      {{ w is not none and (w if grid_sign == 'import_positive' else -w) > off_w | float(0) }}
+    for:
+      minutes: !input off_delay
+  # Every few minutes: a deficit that came during the minimum run time.
+  - trigger: time_pattern
+    id: recheck
+    minutes: /5
+
+variables:
+  target_entity: !input target
+  soc_entity: !input battery_soc
+  soc_min: !input min_soc
+  min_on_minutes: !input min_on
+  window_start: !input only_between_start
+  window_end: !input only_between_end
+  grid_w: >-
+    {% set raw = states(grid_entity) | float(none) %}
+    {% set unit = state_attr(grid_entity, 'unit_of_measurement') | default('W', true) | lower %}
+    {% set w = (raw * (1000 if unit == 'kw' else 1)) if raw is not none else none %}
+    {{ none if w is none else (w if grid_sign == 'import_positive' else -w) }}
+  is_on: "{{ states(target_entity) not in ['off', 'unavailable', 'unknown'] }}"
+  on_long_enough: >-
+    {% set st = expand(target_entity) | first | default(none) %}
+    {{ st is not none and (now() - st.last_changed).total_seconds() >= (min_on_minutes | float(0)) * 60 }}
+  in_window: >-
+    {% if window_start == window_end %}{{ true }}
+    {% elif window_start < window_end %}{{ window_start <= now().strftime('%H:%M:%S') < window_end }}
+    {% else %}{{ now().strftime('%H:%M:%S') >= window_start or now().strftime('%H:%M:%S') < window_end }}{% endif %}
+  keep_manual: !input manual_stays
+  # Switched on by a person (the app, a dashboard) rather than by an automation.
+  by_hand: >-
+    {% set st = expand(target_entity) | first | default(none) %}
+    {{ st is not none and st.context.user_id is not none }}
+  battery_ok: >-
+    {{ not soc_entity or (states(soc_entity) | float(0)) >= (soc_min | float(0)) }}
+
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: surplus
+          - condition: template
+            value_template: "{{ not is_on and in_window and battery_ok }}"
+        sequence:
+          - action: homeassistant.turn_on
+            target:
+              entity_id: "{{ target_entity }}"
+      - conditions:
+          - condition: template
+            value_template: >-
+              {{ is_on and on_long_enough and not (keep_manual and by_hand) and (trigger.id == 'deficit'
+                or (trigger.id == 'recheck' and grid_w is not none and grid_w > off_w | float(0))) }}
+        sequence:
+          - action: homeassistant.turn_off
+            target:
+              entity_id: "{{ target_entity }}"

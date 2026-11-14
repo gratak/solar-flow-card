@@ -1,0 +1,203 @@
+blueprint:
+  name: Home Energy Hub – charge the car with solar surplus
+  description: >-
+    Sets the charging current of a wallbox to follow the solar surplus: every
+    minute the current goes up while the home exports and down while it
+    imports. Charging starts when the surplus covers the minimum current for a
+    few minutes and stops when it has not for a while. Needs a number entity
+    for the charging current (A); a charging switch is optional.
+
+
+    Part of Home Energy Hub: https://github.com/gratak/solar-flow-card
+  domain: automation
+  source_url: https://github.com/gratak/solar-flow-card/blob/main/blueprints/automation/home-energy-hub/surplus_ev_charging.yaml
+  input:
+    grid_power:
+      name: Grid power sensor
+      description: Signed grid power in W or kW, e.g. the card's grid_power.
+      selector:
+        entity:
+          domain: sensor
+          device_class: power
+    grid_sign:
+      name: Sign of the grid sensor
+      default: import_positive
+      selector:
+        select:
+          options:
+            - label: "+ while importing, − while exporting (most meters, DeyeCloud)"
+              value: import_positive
+            - label: "+ while exporting, − while importing"
+              value: export_positive
+    current:
+      name: Charging current (number entity, A)
+      selector:
+        entity:
+          domain: number
+    charge_switch:
+      name: Charging on/off (optional)
+      description: The wallbox's charging switch. Without it, the current is only set down to the minimum.
+      default: []
+      selector:
+        entity:
+          domain: [switch, input_boolean]
+    min_amps:
+      name: Minimum current (A)
+      default: 6
+      selector:
+        number: { min: 1, max: 32, unit_of_measurement: A, mode: box }
+    max_amps:
+      name: Maximum current (A)
+      default: 16
+      selector:
+        number: { min: 1, max: 63, unit_of_measurement: A, mode: box }
+    phases:
+      name: Phases the car charges on
+      default: "1"
+      selector:
+        select:
+          options: ["1", "3"]
+    voltage:
+      name: Voltage (V)
+      default: 230
+      selector:
+        number: { min: 100, max: 260, unit_of_measurement: V, mode: box }
+    reserve:
+      name: Keep exporting at least (W)
+      description: A margin, so short dips do not draw from the grid.
+      default: 100
+      selector:
+        number: { min: 0, max: 3000, step: 50, unit_of_measurement: W, mode: box }
+    start_after:
+      name: Start after a surplus for (minutes)
+      default: 3
+      selector:
+        number: { min: 0, max: 60, unit_of_measurement: min, mode: box }
+    stop_after:
+      name: Stop after a shortfall for (minutes)
+      default: 10
+      selector:
+        number: { min: 0, max: 60, unit_of_measurement: min, mode: box }
+    battery_soc:
+      name: Home battery charge level (optional)
+      description: Only start when the home battery is charged at least to the level below.
+      default: []
+      selector:
+        entity:
+          domain: sensor
+          device_class: battery
+    min_soc:
+      name: … at least (%)
+      default: 90
+      selector:
+        number: { min: 0, max: 100, unit_of_measurement: "%", mode: slider }
+
+mode: single
+max_exceeded: silent
+
+trigger_variables:
+  grid_entity: !input grid_power
+  grid_sign: !input grid_sign
+  amps_min: !input min_amps
+  phase_count: !input phases
+  volts: !input voltage
+  reserve_w: !input reserve
+  current_entity_t: !input current
+
+triggers:
+  - trigger: time_pattern
+    id: adjust
+    minutes: /1
+  # Enough surplus for the minimum current, for a while: start.
+  - trigger: template
+    id: start
+    value_template: >-
+      {% set raw = states(grid_entity) | float(none) %}
+      {% set unit = state_attr(grid_entity, 'unit_of_measurement') | default('W', true) | lower %}
+      {% set w = (raw * (1000 if unit == 'kw' else 1)) if raw is not none else none %}
+      {% set export = none if w is none else (-w if grid_sign == 'import_positive' else w) %}
+      {{ export is not none and export - (reserve_w | float(0)) >= (amps_min | float(6)) * (phase_count | int(1)) * (volts | float(230)) }}
+    for:
+      minutes: !input start_after
+  # Not even the minimum current covered, for a while: stop.
+  - trigger: template
+    id: stop
+    value_template: >-
+      {% set raw = states(grid_entity) | float(none) %}
+      {% set unit = state_attr(grid_entity, 'unit_of_measurement') | default('W', true) | lower %}
+      {% set w = (raw * (1000 if unit == 'kw' else 1)) if raw is not none else none %}
+      {% set export = none if w is none else (-w if grid_sign == 'import_positive' else w) %}
+      {% set amps = states(current_entity_t) | float(0) %}
+      {{ export is not none and amps + (export - (reserve_w | float(0))) / ((phase_count | int(1)) * (volts | float(230))) < amps_min | float(6) }}
+    for:
+      minutes: !input stop_after
+
+variables:
+  current_entity: !input current
+  switch_entity: !input charge_switch
+  soc_entity: !input battery_soc
+  soc_min: !input min_soc
+  amps_max: !input max_amps
+  watts_per_amp: "{{ (phase_count | int(1)) * (volts | float(230)) }}"
+  export_w: >-
+    {% set raw = states(grid_entity) | float(none) %}
+    {% set unit = state_attr(grid_entity, 'unit_of_measurement') | default('W', true) | lower %}
+    {% set w = (raw * (1000 if unit == 'kw' else 1)) if raw is not none else none %}
+    {{ none if w is none else (-w if grid_sign == 'import_positive' else w) }}
+  charging: "{{ not switch_entity or is_state(switch_entity, 'on') }}"
+  amps_now: "{{ states(current_entity) | float(amps_min | float(6)) }}"
+  # The current the surplus allows: today's current plus what is still
+  # exported (or minus what is imported), less the margin.
+  amps_wanted: >-
+    {{ ((amps_now | float) + ((export_w | float(0)) - (reserve_w | float(0))) / (watts_per_amp | float)) | round(0, 'floor') | int }}
+  battery_ok: "{{ not soc_entity or (states(soc_entity) | float(0)) >= (soc_min | float(0)) }}"
+
+conditions:
+  - condition: template
+    value_template: "{{ export_w is not none }}"
+
+actions:
+  - choose:
+      # Start charging at the minimum current.
+      - conditions:
+          - condition: trigger
+            id: start
+          - condition: template
+            value_template: "{{ switch_entity and not is_state(switch_entity, 'on') and battery_ok }}"
+        sequence:
+          - action: number.set_value
+            target:
+              entity_id: "{{ current_entity }}"
+            data:
+              value: "{{ amps_min | int }}"
+          - action: homeassistant.turn_on
+            target:
+              entity_id: "{{ switch_entity }}"
+      # The surplus has not covered the minimum current for a while: stop.
+      - conditions:
+          - condition: trigger
+            id: stop
+          - condition: template
+            value_template: "{{ switch_entity and is_state(switch_entity, 'on') }}"
+        sequence:
+          - action: homeassistant.turn_off
+            target:
+              entity_id: "{{ switch_entity }}"
+      # While charging: follow the surplus between the minimum and maximum.
+      - conditions:
+          - condition: trigger
+            id: adjust
+          - condition: template
+            value_template: "{{ charging }}"
+        sequence:
+          - variables:
+              amps_new: "{{ [[amps_wanted | int, amps_min | int] | max, amps_max | int] | min }}"
+          - if:
+              - condition: template
+                value_template: "{{ amps_new != (amps_now | int) }}"
+            then:
+              - action: number.set_value
+                target:
+                  entity_id: "{{ current_entity }}"
+                data:
+                  value: "{{ amps_new }}"
