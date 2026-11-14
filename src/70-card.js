@@ -340,6 +340,25 @@ class SolarFlowCard extends HTMLElement {
     return { kind, value: priced.saved, cost: kind === "savings" ? priced.cost : null, sold: priced.sold };
   }
 
+  // Payback: the savings for all time, whatever period is shown.
+  _payback(resolved, today) {
+    const setup = paybackConfig(this._config);
+    if (!setup) return null;
+    const all = this._periodEnergy(resolved, "all", today);
+    if (!all.buckets?.length) return null;
+    let money = this._savings(resolved, "all", all, null);
+    if (money === undefined) {
+      // Fixed prices: from the totals, as in the summary.
+      const totals = all.totals;
+      const buy = positiveNumber(this._config.price_import);
+      const sell = positiveNumber(this._config.price_export) || 0;
+      if (!buy || !isNum(totals.load) || !isNum(totals.gridImport)) return null;
+      money = { value: Math.max(0, totals.load - totals.gridImport) * buy + (totals.gridExport || 0) * sell };
+    }
+    const first = all.buckets.find((b) => ENERGY_ORDER.some((name) => isNum(b[name]) && b[name] > 0));
+    return paybackData(setup, money?.value, first?.start || null);
+  }
+
   // Recorder history of the power sensors for today or the last 3 days,
   // shared by the chart and the day's highlights.
   _powerHistory(resolved, period) {
@@ -588,6 +607,7 @@ class SolarFlowCard extends HTMLElement {
       const now = new Date();
       const vstore = this._virtualStorage(resolved, config, period, now, today);
       const money = this._savings(resolved, period, energy, vstore.net);
+      const payback = this._payback(resolved, today);
       this._introAt ??= Date.now();
       const introElapsed = (Date.now() - this._introAt) / 1000;
       const introAt = introElapsed < 2.6 ? introElapsed : null;
@@ -598,6 +618,7 @@ class SolarFlowCard extends HTMLElement {
         inverter?.map((d) => [[...d.strings.values()].map((s) => Object.values(s).map((r) => r.value)), d.temperatures.map((r) => r.value), d.battery.map((r) => r.value), d.grid.map((r) => r.value)]),
         vstore,
         [...this._collapsed],
+        payback && [Math.round(payback.saved), payback.at && payback.at.getMonth()],
         money && [money.kind, isNum(money.value) ? Math.round(money.value * 100) : null, isNum(money.cost) ? Math.round(money.cost * 100) : null],
         pvForecast && [pvForecast.total, pvForecast.remaining, pvForecast.days.map((d) => d.value)],
         priceChart && [priceChart.nowAt, priceChart.current, priceChart.hours.length, priceChart.window?.from, pvHours?.size],
@@ -637,6 +658,7 @@ class SolarFlowCard extends HTMLElement {
         periods,
         totals: energy.totals || {},
         energyLoading: Boolean(energy.loading),
+        payback,
         summary: periodSummary(energy.totals || {}, config, t, locale, vstore.net, money),
         virtualStorage: vstore.store,
         since,

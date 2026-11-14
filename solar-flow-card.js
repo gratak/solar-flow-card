@@ -290,6 +290,9 @@ const TRANSLATIONS = {
     "editorShowSelfUse": "Show self-consumption",
     "editorShowSavings": "Show savings",
     "editorShowCosts": "Show the cost of energy bought and the value of energy sold",
+    "editorPaybackCost": "System cost",
+    "editorPaybackBefore": "Savings before Home Assistant's statistics (optional)",
+    "editorPaybackHint": "The savings for all time against what the system cost, and when it is paid back at the average rate so far. Needs prices under Summary and prices.",
     "editorShowCo2": "Show CO₂ avoided",
     "editorShowYield": "Show yield per kWp",
     "editorAnimation": "Animations",
@@ -518,6 +521,10 @@ const TRANSLATIONS = {
     "tomorrow": "tomorrow",
     "exportValue": "Value of energy sold",
     "importCost": "Cost of energy bought",
+    "paybackTitle": "Payback",
+    "paybackOf": "{saved} of {cost}",
+    "paybackAt": "paid back around {date}",
+    "paybackDone": "paid back",
     "editorNoImportPrice": "Savings need an import price: until you set one, the card shows the value of the energy sold.",
     "editorSettlement": "Settlement with your utility",
     "editorSettlementFixed": "Fixed prices",
@@ -787,6 +794,9 @@ const TRANSLATIONS = {
     "editorShowCo2": "Vermiedenes CO₂ anzeigen",
     "editorShowSavings": "Ersparnis anzeigen",
     "editorShowCosts": "Kosten des Netzbezugs und Wert der Einspeisung anzeigen",
+    "editorPaybackCost": "Kosten der Anlage",
+    "editorPaybackBefore": "Ersparnis vor den Statistiken von Home Assistant (optional)",
+    "editorPaybackHint": "Die Ersparnis über die ganze Zeit im Vergleich zu den Kosten der Anlage, und wann sie sich beim bisherigen Tempo amortisiert. Benötigt Preise unter Zusammenfassung und Preise.",
     "editorShowSelfUse": "Eigenverbrauch anzeigen",
     "editorShowYield": "Ertrag pro kWp anzeigen",
     "otherDetails": "Weitere Messwerte",
@@ -998,6 +1008,10 @@ const TRANSLATIONS = {
     "tomorrow": "morgen",
     "exportValue": "Wert der eingespeisten Energie",
     "importCost": "Kosten des Netzbezugs",
+    "paybackTitle": "Amortisation",
+    "paybackOf": "{saved} von {cost}",
+    "paybackAt": "amortisiert etwa {date}",
+    "paybackDone": "amortisiert",
     "editorNoImportPrice": "Die Ersparnis braucht einen Bezugspreis: bis er gesetzt ist, zeigt die Karte den Wert der eingespeisten Energie.",
     "editorSettlement": "Abrechnung mit dem Energieversorger",
     "editorSettlementFixed": "Feste Preise",
@@ -1250,6 +1264,9 @@ const TRANSLATIONS = {
     "editorShowSelfUse": "Afficher l'autoconsommation",
     "editorShowSavings": "Afficher les économies",
     "editorShowCosts": "Afficher le coût de l'énergie achetée et la valeur de l'énergie vendue",
+    "editorPaybackCost": "Coût de l'installation",
+    "editorPaybackBefore": "Économies d'avant les statistiques de Home Assistant (optionnel)",
+    "editorPaybackHint": "Les économies sur toute la période face au coût de l'installation, et quand elle sera remboursée au rythme actuel. Nécessite des prix dans Résumé et prix.",
     "editorShowCo2": "Afficher le CO₂ évité",
     "editorShowYield": "Afficher le rendement par kWc",
     "editorAnimation": "Animations",
@@ -1478,6 +1495,10 @@ const TRANSLATIONS = {
     "tomorrow": "demain",
     "exportValue": "Valeur de l'énergie vendue",
     "importCost": "Coût de l'énergie achetée",
+    "paybackTitle": "Retour sur investissement",
+    "paybackOf": "{saved} sur {cost}",
+    "paybackAt": "remboursée vers {date}",
+    "paybackDone": "remboursée",
     "editorNoImportPrice": "Les économies nécessitent un prix d'achat : en attendant que vous en définissiez un, la carte affiche la valeur de l'énergie vendue.",
     "editorSettlement": "Règlement avec votre fournisseur",
     "editorSettlementFixed": "Prix fixes",
@@ -1730,6 +1751,9 @@ const TRANSLATIONS = {
     "editorShowSelfUse": "Toon eigen verbruik",
     "editorShowSavings": "Toon besparingen",
     "editorShowCosts": "Kosten van afgenomen en waarde van teruggeleverde energie tonen",
+    "editorPaybackCost": "Kosten van de installatie",
+    "editorPaybackBefore": "Besparing van vóór de statistieken van Home Assistant (optioneel)",
+    "editorPaybackHint": "De besparing over alle tijd tegenover de kosten van de installatie, en wanneer die is terugverdiend in het tempo tot nu toe. Vereist prijzen onder Samenvatting en prijzen.",
     "editorShowCo2": "Toon bespaarde CO₂",
     "editorShowYield": "Toon opbrengst per kWp",
     "editorAnimation": "Animaties",
@@ -1958,6 +1982,10 @@ const TRANSLATIONS = {
     "tomorrow": "morgen",
     "exportValue": "Waarde teruggeleverde energie",
     "importCost": "Kosten van afgenomen energie",
+    "paybackTitle": "Terugverdientijd",
+    "paybackOf": "{saved} van {cost}",
+    "paybackAt": "terugverdiend rond {date}",
+    "paybackDone": "terugverdiend",
     "editorNoImportPrice": "Besparing vraagt een afnameprijs: zolang die ontbreekt, toont de kaart de waarde van de teruggeleverde energie.",
     "editorSettlement": "Verrekening met je energieleverancier",
     "editorSettlementFixed": "Vaste prijzen",
@@ -2210,6 +2238,9 @@ const TRANSLATIONS = {
     "editorShowSelfUse": "Pokaż autokonsumpcję",
     "editorShowSavings": "Pokaż oszczędność",
     "editorShowCosts": "Pokaż koszt pobranej i wartość oddanej energii",
+    "editorPaybackCost": "Koszt instalacji",
+    "editorPaybackBefore": "Oszczędności sprzed statystyk Home Assistant (opcjonalnie)",
+    "editorPaybackHint": "Oszczędności z całego okresu wobec kosztu instalacji i przewidywany termin zwrotu przy dotychczasowym tempie. Wymaga cen w grupie Podsumowanie i ceny.",
     "editorShowCo2": "Pokaż uniknięte CO₂",
     "editorShowYield": "Pokaż uzysk na kWp",
     "editorAnimation": "Animacje",
@@ -2438,6 +2469,10 @@ const TRANSLATIONS = {
     "tomorrow": "jutro",
     "exportValue": "Wartość oddanej energii",
     "importCost": "Koszt pobranej energii",
+    "paybackTitle": "Zwrot inwestycji",
+    "paybackOf": "{saved} z {cost}",
+    "paybackAt": "zwrot ok. {date}",
+    "paybackDone": "zwróciła się",
     "editorNoImportPrice": "Oszczędność wymaga ceny zakupu: dopóki jej nie podasz, karta pokazuje wartość oddanej energii.",
     "editorSettlement": "Rozliczenie z zakładem energetycznym",
     "editorSettlementFixed": "Stałe ceny",
@@ -2690,6 +2725,9 @@ const TRANSLATIONS = {
     "editorShowSelfUse": "Mostrar autoconsumo",
     "editorShowSavings": "Mostrar poupança",
     "editorShowCosts": "Mostrar o custo da energia comprada e o valor da energia vendida",
+    "editorPaybackCost": "Custo da instalação",
+    "editorPaybackBefore": "Poupança anterior às estatísticas do Home Assistant (opcional)",
+    "editorPaybackHint": "A poupança de todo o período face ao custo da instalação, e quando fica paga ao ritmo atual. Requer preços em Resumo e preços.",
     "editorShowCo2": "Mostrar CO₂ evitado",
     "editorShowYield": "Mostrar rendimento por kWp",
     "editorAnimation": "Animações",
@@ -2918,6 +2956,10 @@ const TRANSLATIONS = {
     "tomorrow": "amanhã",
     "exportValue": "Valor da energia vendida",
     "importCost": "Custo da energia comprada",
+    "paybackTitle": "Retorno do investimento",
+    "paybackOf": "{saved} de {cost}",
+    "paybackAt": "pago por volta de {date}",
+    "paybackDone": "pago",
     "editorNoImportPrice": "As poupanças precisam de um preço de importação: até definir um, o cartão mostra o valor da energia vendida.",
     "editorSettlement": "Liquidação com o seu distribuidor",
     "editorSettlementFixed": "Preços fixos",
@@ -4208,6 +4250,32 @@ function periodSummaryRest(totals, config, t, locale) {
   return items;
 }
 
+// Payback (`payback: { cost, saved_before }` or `payback: <cost>`): the
+// all-time savings against what the system cost, and when it is paid back
+// at the average rate so far.
+function paybackConfig(config) {
+  const p = config.payback;
+  const cost = positiveNumber(typeof p === "object" && p ? p.cost : p);
+  if (!cost) return null;
+  const before = Number.parseFloat(typeof p === "object" && p ? p.saved_before : 0);
+  return { cost, before: Number.isFinite(before) && before > 0 ? before : 0 };
+}
+
+function paybackData(setup, saved, since, now = new Date()) {
+  if (!setup || !isNum(saved)) return null;
+  const total = setup.before + Math.max(0, saved);
+  const share = clamp((total / setup.cost) * 100, 0, 100);
+  // The average saving per day since the statistics begin, at least a month.
+  let at = null;
+  if (since && total < setup.cost && saved > 0) {
+    const days = Math.max(30, (now - since) / 864e5);
+    const perDay = saved / days;
+    const left = (setup.cost - total) / perDay;
+    if (left < 365 * 40) at = new Date(now.getTime() + left * 864e5);
+  }
+  return { cost: setup.cost, saved: total, share, done: total >= setup.cost, at };
+}
+
 const FORECAST_MAX_HOURS = 48;
 
 // Time until full while charging, until the reserve while discharging.
@@ -5170,9 +5238,24 @@ function tilesHtml(m) {
     </div>`;
 }
 
-function summaryHtml(m) {
-  if (!m.summary.length) return "";
+// Payback: the share of the system's cost the savings have paid back.
+function paybackHtml(m) {
+  const p = m.payback;
+  if (!p) return "";
+  const { t, locale } = m;
+  const money = (v) => `${formatNumber(v, locale, 0)} ${m.config.currency ?? t.currency}`.trim();
+  const note = p.done ? t.paybackDone : p.at ? fill(t.paybackAt, { date: p.at.toLocaleDateString(locale, { month: "long", year: "numeric" }) }) : "";
   return `
+    <div class="sfc-payback ${p.done ? "done" : ""}">
+      <div><small>${escapeHtml(t.paybackTitle)}</small><strong>${escapeHtml(formatPercent(p.share, locale))}</strong></div>
+      <span class="sfc-pvf-bar"><i style="width:${p.share.toFixed(1)}%"></i></span>
+      <em>${escapeHtml(fill(t.paybackOf, { saved: money(p.saved), cost: money(p.cost) }))}${note ? ` · ${escapeHtml(note)}` : ""}</em>
+    </div>`;
+}
+
+function summaryHtml(m) {
+  if (!m.summary.length) return paybackHtml(m);
+  return `${paybackHtml(m)}
     <div class="sfc-summary">
       ${m.summary.map(([kind, label, value]) => `
         <div class="sfc-summary-item ${kind}">
@@ -7548,6 +7631,15 @@ const BASE_CSS = `
   .sfc-tile small, .sfc-summary-item small { color: var(--sfc-muted); font-size: 11px; line-height: 1.2; overflow: hidden;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
   .sfc-tile strong { color: var(--sfc-text); font-size: 15px; font-family: var(--sfc-num-font, inherit); white-space: nowrap; }
+  /* Payback: share, bar, amounts. */
+  .sfc-payback { display: grid; grid-template-columns: max-content minmax(40px, 1fr); align-items: center; gap: 2px 12px; margin-top: 10px; padding: 9px 11px;
+    border: 1px solid var(--sfc-border); border-radius: var(--sfc-tile-radius, 11px); background: var(--sfc-tile-bg); }
+  .sfc-payback > div { display: flex; align-items: baseline; gap: 8px; }
+  .sfc-payback small { color: var(--sfc-muted); font-size: 11px; }
+  .sfc-payback strong { font-size: 15px; font-family: var(--sfc-num-font, inherit); color: var(--sfc-battery); }
+  .sfc-payback .sfc-pvf-bar i { background: var(--sfc-battery); }
+  .sfc-payback em { grid-column: 1 / -1; font-style: normal; font-size: 11px; color: var(--sfc-muted); }
+  .sfc-payback.done strong { color: var(--sfc-good, #1f9d55); }
   .sfc-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 8px; margin-top: 10px; }
   .sfc-summary-item { min-width: 0; padding: 8px 10px; border-radius: var(--sfc-tile-radius, 11px); border: 1px solid var(--sfc-border);
     background: color-mix(in srgb, var(--sfc-tile-bg) 85%, var(--sfc-c, var(--sfc-accent)) 15%); }
@@ -8919,6 +9011,25 @@ class SolarFlowCard extends HTMLElement {
     return { kind, value: priced.saved, cost: kind === "savings" ? priced.cost : null, sold: priced.sold };
   }
 
+  // Payback: the savings for all time, whatever period is shown.
+  _payback(resolved, today) {
+    const setup = paybackConfig(this._config);
+    if (!setup) return null;
+    const all = this._periodEnergy(resolved, "all", today);
+    if (!all.buckets?.length) return null;
+    let money = this._savings(resolved, "all", all, null);
+    if (money === undefined) {
+      // Fixed prices: from the totals, as in the summary.
+      const totals = all.totals;
+      const buy = positiveNumber(this._config.price_import);
+      const sell = positiveNumber(this._config.price_export) || 0;
+      if (!buy || !isNum(totals.load) || !isNum(totals.gridImport)) return null;
+      money = { value: Math.max(0, totals.load - totals.gridImport) * buy + (totals.gridExport || 0) * sell };
+    }
+    const first = all.buckets.find((b) => ENERGY_ORDER.some((name) => isNum(b[name]) && b[name] > 0));
+    return paybackData(setup, money?.value, first?.start || null);
+  }
+
   // Recorder history of the power sensors for today or the last 3 days,
   // shared by the chart and the day's highlights.
   _powerHistory(resolved, period) {
@@ -9167,6 +9278,7 @@ class SolarFlowCard extends HTMLElement {
       const now = new Date();
       const vstore = this._virtualStorage(resolved, config, period, now, today);
       const money = this._savings(resolved, period, energy, vstore.net);
+      const payback = this._payback(resolved, today);
       this._introAt ??= Date.now();
       const introElapsed = (Date.now() - this._introAt) / 1000;
       const introAt = introElapsed < 2.6 ? introElapsed : null;
@@ -9177,6 +9289,7 @@ class SolarFlowCard extends HTMLElement {
         inverter?.map((d) => [[...d.strings.values()].map((s) => Object.values(s).map((r) => r.value)), d.temperatures.map((r) => r.value), d.battery.map((r) => r.value), d.grid.map((r) => r.value)]),
         vstore,
         [...this._collapsed],
+        payback && [Math.round(payback.saved), payback.at && payback.at.getMonth()],
         money && [money.kind, isNum(money.value) ? Math.round(money.value * 100) : null, isNum(money.cost) ? Math.round(money.cost * 100) : null],
         pvForecast && [pvForecast.total, pvForecast.remaining, pvForecast.days.map((d) => d.value)],
         priceChart && [priceChart.nowAt, priceChart.current, priceChart.hours.length, priceChart.window?.from, pvHours?.size],
@@ -9216,6 +9329,7 @@ class SolarFlowCard extends HTMLElement {
         periods,
         totals: energy.totals || {},
         energyLoading: Boolean(energy.loading),
+        payback,
         summary: periodSummary(energy.totals || {}, config, t, locale, vstore.net, money),
         virtualStorage: vstore.store,
         since,
@@ -10064,7 +10178,15 @@ class SolarFlowCardEditor extends HTMLElement {
             ${this._picker("price_export", t.editorPriceExportSensor, sensor("price_export"), "sensor", { kind: "price" })}
           </div>
         </details>` : ""}
-      ${this._switches(t, "summary")}`;
+      ${this._switches(t, "summary")}
+      <div class="box">
+        <span class="title">${escapeHtml(t.paybackTitle)}</span>
+        <div class="grid">${[["cost", t.editorPaybackCost], ["saved_before", t.editorPaybackBefore]].map(([key, label]) => {
+          const value = typeof this._config.payback === "object" && this._config.payback ? this._config.payback[key] : key === "cost" ? this._config.payback : undefined;
+          return `<label><span>${escapeHtml(label)}</span><input data-payback="${key}" type="number" min="0" step="1" inputmode="decimal" value="${escapeHtml(Number.isFinite(Number.parseFloat(value)) ? value : "")}" /></label>`;
+        }).join("")}</div>
+        <p class="hint">${escapeHtml(t.editorPaybackHint)}</p>
+      </div>`;
   }
 
   _vstoreHtml(t) {
@@ -10266,6 +10388,15 @@ class SolarFlowCardEditor extends HTMLElement {
       this._set("virtual_storage", e.target.checked ? true : undefined);
       this._render();
     });
+    root.querySelectorAll("[data-payback]").forEach((input) => input.addEventListener("change", (e) => {
+      const number = Number.parseFloat(e.target.value);
+      // A bare number (payback: 12000) becomes the object form.
+      if (typeof this._config.payback !== "object" || !this._config.payback) {
+        const cost = positiveNumber(this._config.payback);
+        this._config = { ...this._config, payback: cost ? { cost } : undefined };
+      }
+      this._setIn("payback", input.dataset.payback, number > 0 ? number : undefined);
+    }));
     root.querySelectorAll("[data-period-tab]").forEach((input) => input.addEventListener("change", () => {
       // In the fixed order; the default set is not written, and one tab stays.
       const picked = [...root.querySelectorAll("[data-period-tab]")].filter((el) => el.checked).map((el) => el.dataset.periodTab);
