@@ -38,7 +38,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "2.1.0-beta.3";
+const CARD_VERSION = "2.1.0-beta.4";
 // The card's type is custom:home-energy-hub since 2.0.0. The old name stays
 // registered so dashboards with custom:solar-flow-card keep working.
 const CARD_TAG = "home-energy-hub";
@@ -267,6 +267,7 @@ const TRANSLATIONS = {
     "editorPvCapacity": "PV size (kWp)",
     "editorPvPanels": "Number of panels",
     "editorPanelsPerString": "Panels per string",
+    "editorPanelStrings": "Number of PV strings (panels split in order)",
     "editorStringPanels": "PV{n} · now {volts}",
     "editorStringsHint": "Panels on each string. Without optimizers the card estimates each panel from its string's power; leave unused strings empty.",
     "editorInverterRating": "Inverter rated power (kW)",
@@ -287,6 +288,7 @@ const TRANSLATIONS = {
     "editorInsights": "Today at a glance and comparison",
     "editorSolar": "The installation has PV panels",
     "editorBattery": "The installation has a battery",
+    "editorBatteryDay": "Battery over the next day (from the PV forecast)",
     "editorShowSelfSufficiency": "Show self-sufficiency",
     "editorShowSelfUse": "Show self-consumption",
     "editorShowSavings": "Show savings",
@@ -481,6 +483,10 @@ const TRANSLATIONS = {
     "editorConsumersHint": "Devices with their power and/or energy sensor, e.g. a heat pump or an EV charger: a section shows where the home's power goes. Left empty, the individual devices of Home Assistant's Energy dashboard are used.",
     "editorConsPower": "Power (optional)",
     "editorConsEnergy": "Energy counter (optional)",
+    "editorEv": "Electric car (Diorama)",
+    "editorEvHint": "The car beside the house in the Diorama scene, with a flow while it charges. Either sensor is enough.",
+    "editorEvPower": "Charging power",
+    "editorEvSoc": "Car battery level (optional)",
     "editorAdd": "Add",
     "editorRemove": "Remove",
     "editorConfirmRemove": "Remove this item and its settings?",
@@ -759,6 +765,7 @@ const TRANSLATIONS = {
     "editorPvCapacity": "PV-Größe (kWp)",
     "editorPvPanels": "Anzahl der Module",
     "editorPanelsPerString": "Module pro String",
+    "editorPanelStrings": "Anzahl der PV-Strings (Module der Reihe nach aufgeteilt)",
     "editorStringPanels": "PV{n} · jetzt {volts}",
     "editorStringsHint": "Module je String. Ohne Optimierer schätzt die Karte jedes Modul aus der Leistung seines Strings; ungenutzte Strings leer lassen.",
     "editorInverterRating": "Wechselrichter-Nennleistung (kW)",
@@ -779,6 +786,7 @@ const TRANSLATIONS = {
     "editorInsights": "Heute auf einen Blick und Vergleich",
     "editorSolar": "Die Anlage hat PV-Module",
     "editorBattery": "Die Anlage hat eine Batterie",
+    "editorBatteryDay": "Batterie für den nächsten Tag (aus der PV-Prognose)",
     "editorShowSelfSufficiency": "Autarkie anzeigen",
     "autarkyHourly": "Autarkie mit Stundenbilanz",
     "computedHint": "Aus den anderen Sensoren berechnet",
@@ -973,6 +981,10 @@ const TRANSLATIONS = {
     "editorConsumersHint": "Geräte mit Leistungs- und/oder Energiesensor, z. B. Wärmepumpe oder Wallbox: ein Abschnitt zeigt, wohin der Strom im Haus geht. Bleibt die Liste leer, werden die einzelnen Geräte des Energie-Dashboards von Home Assistant verwendet.",
     "editorConsPower": "Leistung (optional)",
     "editorConsEnergy": "Energiezähler (optional)",
+    "editorEv": "Elektroauto (Diorama)",
+    "editorEvHint": "Das Auto neben dem Haus in der Diorama-Szene, mit einem Fluss während des Ladens. Ein Sensor genügt.",
+    "editorEvPower": "Ladeleistung",
+    "editorEvSoc": "Akkustand des Autos (optional)",
     "editorAdd": "Hinzufügen",
     "editorRemove": "Entfernen",
     "editorConfirmRemove": "Diesen Eintrag mit seinen Einstellungen entfernen?",
@@ -1251,6 +1263,7 @@ const TRANSLATIONS = {
     "editorPvCapacity": "Puissance PV (kWc)",
     "editorPvPanels": "Nombre de panneaux",
     "editorPanelsPerString": "Panneaux par chaîne",
+    "editorPanelStrings": "Nombre de chaînes PV (panneaux répartis dans l'ordre)",
     "editorStringPanels": "PV{n} · actuellement {volts}",
     "editorStringsHint": "Panneaux sur chaque chaîne. Sans optimiseurs, la carte estime chaque panneau à partir de la puissance de sa chaîne ; laissez les chaînes inutilisées vides.",
     "editorInverterRating": "Puissance nominale de l'onduleur (kW)",
@@ -1271,6 +1284,7 @@ const TRANSLATIONS = {
     "editorInsights": "Aperçu du jour et comparaison",
     "editorSolar": "L'installation dispose de panneaux PV",
     "editorBattery": "L'installation dispose d'une batterie",
+    "editorBatteryDay": "Batterie sur les prochaines 24 h (d'après la prévision PV)",
     "editorShowSelfSufficiency": "Afficher l'autosuffisance",
     "editorShowSelfUse": "Afficher l'autoconsommation",
     "editorShowSavings": "Afficher les économies",
@@ -1465,6 +1479,10 @@ const TRANSLATIONS = {
     "editorConsumersHint": "Des appareils avec leur capteur de puissance et/ou d'énergie, par ex. une pompe à chaleur ou une borne de recharge : une section montre où va l'électricité de la maison. Si la liste est vide, les appareils individuels du tableau de bord Énergie de Home Assistant sont utilisés.",
     "editorConsPower": "Puissance (optionnel)",
     "editorConsEnergy": "Compteur d'énergie (optionnel)",
+    "editorEv": "Voiture électrique (Diorama)",
+    "editorEvHint": "La voiture à côté de la maison dans la scène Diorama, avec un flux pendant la recharge. Un seul capteur suffit.",
+    "editorEvPower": "Puissance de recharge",
+    "editorEvSoc": "Niveau de batterie de la voiture (optionnel)",
     "editorAdd": "Ajouter",
     "editorRemove": "Supprimer",
     "editorConfirmRemove": "Supprimer cet élément et ses réglages ?",
@@ -1743,6 +1761,7 @@ const TRANSLATIONS = {
     "editorPvCapacity": "PV-grootte (kWp)",
     "editorPvPanels": "Aantal panelen",
     "editorPanelsPerString": "Panelen per string",
+    "editorPanelStrings": "Aantal PV-strings (panelen op volgorde verdeeld)",
     "editorStringPanels": "PV{n} · nu {volts}",
     "editorStringsHint": "Panelen per string. Zonder optimizers schat de kaart elk paneel uit het vermogen van zijn string; laat ongebruikte strings leeg.",
     "editorInverterRating": "Nominaal vermogen omvormer (kW)",
@@ -1763,6 +1782,7 @@ const TRANSLATIONS = {
     "editorInsights": "Vandaag in het kort en vergelijking",
     "editorSolar": "De installatie heeft zonnepanelen",
     "editorBattery": "De installatie heeft een batterij",
+    "editorBatteryDay": "Batterij voor het komende etmaal (uit de zonverwachting)",
     "editorShowSelfSufficiency": "Toon zelfvoorziening",
     "editorShowSelfUse": "Toon eigen verbruik",
     "editorShowSavings": "Toon besparingen",
@@ -1957,6 +1977,10 @@ const TRANSLATIONS = {
     "editorConsumersHint": "Apparaten met hun vermogens- en/of energiesensor, bijv. een warmtepomp of laadpaal: een sectie toont waar de stroom in huis heen gaat. Leeg gelaten worden de individuele apparaten van het Energie-dashboard van Home Assistant gebruikt.",
     "editorConsPower": "Vermogen (optioneel)",
     "editorConsEnergy": "Energieteller (optioneel)",
+    "editorEv": "Elektrische auto (Diorama)",
+    "editorEvHint": "De auto naast het huis in de Diorama-scène, met een stroom tijdens het laden. Eén sensor is genoeg.",
+    "editorEvPower": "Laadvermogen",
+    "editorEvSoc": "Accuniveau van de auto (optioneel)",
     "editorAdd": "Toevoegen",
     "editorRemove": "Verwijderen",
     "editorConfirmRemove": "Dit item met zijn instellingen verwijderen?",
@@ -2235,6 +2259,7 @@ const TRANSLATIONS = {
     "editorPvCapacity": "Moc instalacji PV (kWp)",
     "editorPvPanels": "Liczba paneli",
     "editorPanelsPerString": "Paneli na string",
+    "editorPanelStrings": "Liczba stringów PV (panele dzielone po kolei)",
     "editorStringPanels": "PV{n} · teraz {volts}",
     "editorStringsHint": "Liczba paneli na każdym stringu. Bez optymalizatorów karta szacuje każdy panel z mocy jego stringu; nieużywane stringi zostaw puste.",
     "editorInverterRating": "Moc znamionowa falownika (kW)",
@@ -2255,6 +2280,7 @@ const TRANSLATIONS = {
     "editorInsights": "Dziś w skrócie i porównanie",
     "editorSolar": "Instalacja ma panele PV",
     "editorBattery": "Instalacja ma magazyn energii",
+    "editorBatteryDay": "Magazyn na najbliższą dobę (z prognozy PV)",
     "editorShowSelfSufficiency": "Pokaż samowystarczalność",
     "editorShowSelfUse": "Pokaż autokonsumpcję",
     "editorShowSavings": "Pokaż oszczędność",
@@ -2449,6 +2475,10 @@ const TRANSLATIONS = {
     "editorConsumersHint": "Urządzenia z czujnikiem mocy i/lub energii, np. pompa ciepła albo ładowarka: sekcja pokazuje, na co idzie prąd w domu. Gdy lista jest pusta, karta bierze urządzenia z panelu Energia Home Assistant.",
     "editorConsPower": "Moc (opcjonalnie)",
     "editorConsEnergy": "Licznik energii (opcjonalnie)",
+    "editorEv": "Auto elektryczne (Diorama)",
+    "editorEvHint": "Auto obok domu w scenie Dioramy, z przepływem w trakcie ładowania. Wystarczy jeden z czujników.",
+    "editorEvPower": "Moc ładowania",
+    "editorEvSoc": "Poziom baterii auta (opcjonalnie)",
     "editorAdd": "Dodaj",
     "editorRemove": "Usuń",
     "editorConfirmRemove": "Usunąć ten element razem z ustawieniami?",
@@ -2727,6 +2757,7 @@ const TRANSLATIONS = {
     "editorPvCapacity": "Tamanho do sistema FV (kWp)",
     "editorPvPanels": "Número de painéis",
     "editorPanelsPerString": "Painéis por string",
+    "editorPanelStrings": "Número de strings FV (painéis divididos por ordem)",
     "editorStringPanels": "FV{n} · agora {volts}",
     "editorStringsHint": "Painéis em cada string. Sem otimizadores o cartão estima cada painel a partir da potência da string; deixe strings não utilizadas em branco.",
     "editorInverterRating": "Potência nominal do inversor (kW)",
@@ -2747,6 +2778,7 @@ const TRANSLATIONS = {
     "editorInsights": "Hoje de relance e comparação",
     "editorSolar": "A instalação tem painéis FV",
     "editorBattery": "A instalação tem bateria",
+    "editorBatteryDay": "Bateria nas próximas 24 h (a partir da previsão FV)",
     "editorShowSelfSufficiency": "Mostrar autossuficiência",
     "editorShowSelfUse": "Mostrar autoconsumo",
     "editorShowSavings": "Mostrar poupança",
@@ -2941,6 +2973,10 @@ const TRANSLATIONS = {
     "editorConsumersHint": "Dispositivos com o seu sensor de potência e/ou de energia, p.ex. uma bomba de calor ou um carregador de VE: uma secção mostra para onde vai a energia da casa. Se a lista ficar vazia, são usados os dispositivos individuais do painel Energia do Home Assistant.",
     "editorConsPower": "Potência (opcional)",
     "editorConsEnergy": "Contador de energia (opcional)",
+    "editorEv": "Carro elétrico (Diorama)",
+    "editorEvHint": "O carro ao lado da casa na cena Diorama, com um fluxo durante o carregamento. Basta um dos sensores.",
+    "editorEvPower": "Potência de carregamento",
+    "editorEvSoc": "Nível da bateria do carro (opcional)",
     "editorAdd": "Adicionar",
     "editorRemove": "Remover",
     "editorConfirmRemove": "Remover este item e as suas configurações?",
@@ -9586,6 +9622,7 @@ const EDITOR_NUMBERS = [
   ["pv_capacity", "editorPvCapacity", "0.1"],
   ["pv_panels", "editorPvPanels", "1"],
   ["inverter_power_rating", "editorInverterRating", "0.1"],
+  ["panel_strings", "editorPanelStrings", "1"],
   ["main_fuse", "editorMainFuse", "1"],
   ["voltage_limit", "editorVoltageLimit", "1"],
 ];
@@ -9613,10 +9650,10 @@ function editorStrings(hass, config) {
 
 // Switches: [config key, label key, value when on]; on unless set to false
 // (EDITOR_DEFAULT_ON) or off unless set (the rest).
-const EDITOR_DEFAULT_ON = ["show_solar", "show_battery", "show_chart", "show_weather", "show_self_sufficiency", "show_self_use", "show_savings", "show_co2", "show_yield", "animation"];
+const EDITOR_DEFAULT_ON = ["show_solar", "show_battery", "battery_day", "show_chart", "show_weather", "show_self_sufficiency", "show_self_use", "show_savings", "show_co2", "show_yield", "animation"];
 const EDITOR_SWITCH_GROUPS = {
   look: [["wide", "editorWide"], ["background", "editorGlass", "glass"], ["animation", "editorAnimation"], ["load_fonts", "editorFonts"], ["collapsible", "editorCollapsible"], ["show_chart", "editorShowChart"], ["show_weather", "editorShowWeather"]],
-  install: [["show_solar", "editorSolar"], ["show_battery", "editorBattery"], ["panels_average", "editorPanelsAverage", "per_string"]],
+  install: [["show_solar", "editorSolar"], ["show_battery", "editorBattery"], ["battery_day", "editorBatteryDay"], ["panels_average", "editorPanelsAverage", "per_string"]],
   summary: [["show_self_sufficiency", "editorShowSelfSufficiency"], ["show_self_use", "editorShowSelfUse"], ["show_savings", "editorShowSavings"], ["show_costs", "editorShowCosts"], ["show_co2", "editorShowCo2"], ["show_yield", "editorShowYield"], ["show_insights", "editorInsights"]],
   sensors: [["invert_grid", "editorInvertGrid"], ["invert_battery", "editorInvertBattery"]],
 };
@@ -9829,6 +9866,7 @@ class SolarFlowCardEditor extends HTMLElement {
     else if (group === "pv_forecast") this._setIn("pv_forecast", key, value);
     else if (group === "list") return this._setItem(key, Number(index), path.split(".")[3], value);
     else if (group === "custom") return this._setCustomEntity(Number(key), Number(index), value);
+    else if (group === "ev") this._setIn("ev", key, value);
     else this._set(group, value);
     // The notes under the field follow the new sensor.
     this._render();
@@ -10200,6 +10238,18 @@ class SolarFlowCardEditor extends HTMLElement {
         ["name", "text", t.editorItemName], ["solar_power", "power", t.editorInvSolarPower], ["solar_energy", "energy", t.editorInvSolarEnergy],
         ["power", "power", t.editorInvPower], ["rated_power", "number", t.editorInvRated],
       ])}
+      ${(() => {
+        const ev = this._config.ev && typeof this._config.ev === "object" ? this._config.ev : {};
+        return `<details class="box" data-box="ev" ${this._boxOpen("ev", Boolean(ev.power || ev.soc)) ? "open" : ""}>
+          <summary class="title">${escapeHtml(t.editorEv)}</summary>
+          <p class="hint">${escapeHtml(t.editorEvHint)}</p>
+          <div class="pickers">
+            ${this._picker("ev.power", t.editorEvPower, ev.power, "sensor", { kind: "power" })}
+            ${this._picker("ev.soc", t.editorEvSoc, ev.soc, "sensor", { kind: "soc" })}
+            <label><span>${escapeHtml(t.editorItemName)}</span><input type="text" data-ev-name value="${escapeHtml(ev.name ?? "")}" /></label>
+          </div>
+        </details>`;
+      })()}
       ${this._listHtml(t, "consumers", t.editorConsumers, t.editorConsumersHint, [["name", "text", t.editorItemName], ["power", "power", t.editorConsPower], ["energy", "energy", t.editorConsEnergy]])}
       ${this._listHtml(t, "panels", t.editorPanels, t.editorPanelsHint, [["entity", "energy", t.editorPanelEnergy], ["power", "power", t.editorPanelPower], ["name", "text", t.editorItemName]])}`;
   }
@@ -10484,6 +10534,7 @@ class SolarFlowCardEditor extends HTMLElement {
       this._set("virtual_storage", e.target.checked ? true : undefined);
       this._render();
     });
+    root.querySelector("[data-ev-name]")?.addEventListener("change", (e) => this._setIn("ev", "name", e.target.value.trim() || undefined));
     root.querySelectorAll("[data-payback]").forEach((input) => input.addEventListener("change", (e) => {
       const number = Number.parseFloat(e.target.value);
       // A bare number (payback: 12000) becomes the object form.

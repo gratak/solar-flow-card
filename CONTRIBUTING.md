@@ -26,6 +26,7 @@ With [Node.js](https://nodejs.org) installed:
 
 ```sh
 node scripts/check-translations.mjs   # missing keys, typos, placeholders
+node scripts/check-editor.mjs         # every option in the README is in the editor
 node scripts/build.mjs                # rebuild solar-flow-card.js
 ```
 
