@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.1.0-beta.3
+
+- **Payback** ([#124](https://github.com/gratak/solar-flow-card/issues/124)): `payback: { cost, saved_before }` (or `payback: <cost>`). The energy section shows how much of the system's cost the all-time savings have paid back, with a bar and the estimated payback date at the average rate so far. Needs prices. Also in the editor under Summary and prices.
+- **Dark Diorama** ([#125](https://github.com/gratak/solar-flow-card/issues/125)): `dark_mode: true`, or `auto` to follow Home Assistant's dark mode, puts the card around the Diorama scene in night colours. Also in the editor under Appearance.
+- **An electric car in the Diorama scene** ([#126](https://github.com/gratak/solar-flow-card/issues/126)): `ev: { power, soc, name }` draws the car beside the house with its wall charger, a flow while it charges, and a pill with the power and charge level.
+- **Blueprints for the solar surplus:** two Home Assistant automations to import from the README.
+  - *Switch on with solar surplus*: a heater, air conditioner, water heater or plug goes on while the panels export more than a set power and off when the home imports, with delays and a minimum run time. A device switched on by hand is left on.
+  - *Charge the car with solar surplus*: the wallbox's charging current follows the surplus every minute between a minimum and maximum, and charging starts and stops after a surplus or shortfall lasting a set time.
+
 ## 2.1.0-beta.2
 
 - **Battery and grid power on the 24H and 3D charts** ([#120](https://github.com/gratak/solar-flow-card/issues/120)): with separate charge/discharge (or import/export) power sensors the chart could show too much power and charging as discharging. Such sensors often report nothing while no power flows their way, or report charging as a negative number (DeyeCloud does both); the chart kept the last reading for hours and subtracted it. A one-way sensor now counts by its size, and as 0 while it reports nothing.
