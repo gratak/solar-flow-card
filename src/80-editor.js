@@ -694,7 +694,15 @@ class SolarFlowCardEditor extends HTMLElement {
             ${this._picker("price_export", t.editorPriceExportSensor, sensor("price_export"), "sensor", { kind: "price" })}
           </div>
         </details>` : ""}
-      ${this._switches(t, "summary")}`;
+      ${this._switches(t, "summary")}
+      <div class="box">
+        <span class="title">${escapeHtml(t.paybackTitle)}</span>
+        <div class="grid">${[["cost", t.editorPaybackCost], ["saved_before", t.editorPaybackBefore]].map(([key, label]) => {
+          const value = typeof this._config.payback === "object" && this._config.payback ? this._config.payback[key] : key === "cost" ? this._config.payback : undefined;
+          return `<label><span>${escapeHtml(label)}</span><input data-payback="${key}" type="number" min="0" step="1" inputmode="decimal" value="${escapeHtml(Number.isFinite(Number.parseFloat(value)) ? value : "")}" /></label>`;
+        }).join("")}</div>
+        <p class="hint">${escapeHtml(t.editorPaybackHint)}</p>
+      </div>`;
   }
 
   _vstoreHtml(t) {
@@ -896,6 +904,15 @@ class SolarFlowCardEditor extends HTMLElement {
       this._set("virtual_storage", e.target.checked ? true : undefined);
       this._render();
     });
+    root.querySelectorAll("[data-payback]").forEach((input) => input.addEventListener("change", (e) => {
+      const number = Number.parseFloat(e.target.value);
+      // A bare number (payback: 12000) becomes the object form.
+      if (typeof this._config.payback !== "object" || !this._config.payback) {
+        const cost = positiveNumber(this._config.payback);
+        this._config = { ...this._config, payback: cost ? { cost } : undefined };
+      }
+      this._setIn("payback", input.dataset.payback, number > 0 ? number : undefined);
+    }));
     root.querySelectorAll("[data-period-tab]").forEach((input) => input.addEventListener("change", () => {
       // In the fixed order; the default set is not written, and one tab stays.
       const picked = [...root.querySelectorAll("[data-period-tab]")].filter((el) => el.checked).map((el) => el.dataset.periodTab);

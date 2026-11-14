@@ -64,9 +64,24 @@ function tilesHtml(m) {
     </div>`;
 }
 
-function summaryHtml(m) {
-  if (!m.summary.length) return "";
+// Payback: the share of the system's cost the savings have paid back.
+function paybackHtml(m) {
+  const p = m.payback;
+  if (!p) return "";
+  const { t, locale } = m;
+  const money = (v) => `${formatNumber(v, locale, 0)} ${m.config.currency ?? t.currency}`.trim();
+  const note = p.done ? t.paybackDone : p.at ? fill(t.paybackAt, { date: p.at.toLocaleDateString(locale, { month: "long", year: "numeric" }) }) : "";
   return `
+    <div class="sfc-payback ${p.done ? "done" : ""}">
+      <div><small>${escapeHtml(t.paybackTitle)}</small><strong>${escapeHtml(formatPercent(p.share, locale))}</strong></div>
+      <span class="sfc-pvf-bar"><i style="width:${p.share.toFixed(1)}%"></i></span>
+      <em>${escapeHtml(fill(t.paybackOf, { saved: money(p.saved), cost: money(p.cost) }))}${note ? ` · ${escapeHtml(note)}` : ""}</em>
+    </div>`;
+}
+
+function summaryHtml(m) {
+  if (!m.summary.length) return paybackHtml(m);
+  return `${paybackHtml(m)}
     <div class="sfc-summary">
       ${m.summary.map(([kind, label, value]) => `
         <div class="sfc-summary-item ${kind}">
