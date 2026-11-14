@@ -1012,6 +1012,49 @@ function periodSummaryRest(totals, config, t, locale) {
   return items;
 }
 
+// An electric car (`ev: { power, soc, name }`), drawn in the Diorama scene.
+function evData(hass, config) {
+  const ev = config.ev;
+  if (!ev || typeof ev !== "object") return null;
+  const states = hass?.states || {};
+  const power = typeof ev.power === "string" && states[ev.power] ? wattsOf(states[ev.power]) : null;
+  const soc = typeof ev.soc === "string" && states[ev.soc] ? stateNumber(states[ev.soc]) : null;
+  if (!isNum(power) && !isNum(soc)) return null;
+  return {
+    name: ev.name ? String(ev.name) : null,
+    power: isNum(power) ? Math.max(0, power) : null,
+    soc: isNum(soc) ? clamp(soc, 0, 100) : null,
+    charging: isNum(power) && power > ACTIVE_W,
+    entityId: (states[ev.power] && ev.power) || (states[ev.soc] && ev.soc) || null,
+  };
+}
+
+// Payback (`payback: { cost, saved_before }` or `payback: <cost>`): the
+// all-time savings against what the system cost, and when it is paid back
+// at the average rate so far.
+function paybackConfig(config) {
+  const p = config.payback;
+  const cost = positiveNumber(typeof p === "object" && p ? p.cost : p);
+  if (!cost) return null;
+  const before = Number.parseFloat(typeof p === "object" && p ? p.saved_before : 0);
+  return { cost, before: Number.isFinite(before) && before > 0 ? before : 0 };
+}
+
+function paybackData(setup, saved, since, now = new Date()) {
+  if (!setup || !isNum(saved)) return null;
+  const total = setup.before + Math.max(0, saved);
+  const share = clamp((total / setup.cost) * 100, 0, 100);
+  // The average saving per day since the statistics begin, at least a month.
+  let at = null;
+  if (since && total < setup.cost && saved > 0) {
+    const days = Math.max(30, (now - since) / 864e5);
+    const perDay = saved / days;
+    const left = (setup.cost - total) / perDay;
+    if (left < 365 * 40) at = new Date(now.getTime() + left * 864e5);
+  }
+  return { cost: setup.cost, saved: total, share, done: total >= setup.cost, at };
+}
+
 const FORECAST_MAX_HOURS = 48;
 
 // Time until full while charging, until the reserve while discharging.

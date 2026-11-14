@@ -144,6 +144,9 @@ co2_factor: 0.7
 | `colors` | theme | Your own colours for the charts, tiles and bars: `colors: { solar: "#f5a400", load: "#f26b5b", grid: "#5b8def", battery: "#1fbf86" }` (any of them). Also in the editor under Appearance. The themes' scenes keep their own artwork. |
 | `show_costs` | `false` | With prices set: the summary also shows what the energy bought cost and what the energy sold was worth, next to the savings. |
 | `periods` | `[today, 3d, 7d, month, all]` | The period tabs and their order, from `today`, `3d`, `7d`, `month`, `last_month` (the whole previous month), `year` (this year, month by month) and `all`. Leave one out to hide its tab. Also in the editor under Appearance. |
+| `ev` | – | Diorama: an electric car beside the house with its charger, a flow while it charges and a pill with the power and charge level: `ev: { power: sensor.wallbox_power, soc: sensor.car_battery, name: Model 3 }` (either sensor is enough). |
+| `dark_mode` | `false` | Diorama: the card around the scene in night colours for dark dashboards. `true`, or `auto` to follow Home Assistant's dark mode. Also in the editor under Appearance. |
+| `payback` | – | Payback: `payback: { cost: 42000, saved_before: 3500 }` (or just `payback: 42000`). The energy section shows how much of the system's cost the all-time savings have paid back, with a bar and the estimated payback date at the average rate so far. `saved_before` adds savings from before Home Assistant's statistics begin. Needs prices (`price_import` or a settlement). Also in the editor under Summary and prices. |
 | `inverter_power_rating` | from the inverter | Inverter rated power in kW, for the inverter load. DeyeCloud reports it; set it for other inverters. |
 | `voltage_limit` | `253` | Grid guard: a phase above this voltage (V) is marked in the Installation section with a warning, and the section and "Today at a glance" show the day's highest voltage and the time spent above the limit. Above 253 V (230 V + 10 %) an inverter limits its power or switches off. `false` turns the check off. Needs the phase voltage sensors (`grid_voltage_l1`…; found automatically with DeyeCloud). |
 | `main_fuse` | – | Main fuse per phase in A, e.g. `25`: each phase tile shows its current and share of the fuse (from the phase's grid power and voltage), with a warning from 90 %. |
@@ -501,9 +504,6 @@ Both take the grid power with either sign convention ("+ while importing" is the
 Planned. Ideas and votes are welcome in [issues](https://github.com/gratak/solar-flow-card/issues).
 
 - **2.1.0 out of beta**, after feedback on the Energy dashboard set-up, the grid guard, the Consumers section and the battery's day ahead.
-- **Payback** ([#124](https://github.com/gratak/solar-flow-card/issues/124)): enter what the system cost and see how much of it the savings have paid back, with an estimated payback date.
-- **Dark Diorama** ([#125](https://github.com/gratak/solar-flow-card/issues/125)): the Diorama scene in night colours for dark dashboards.
-- **EV charging in the Diorama scene** ([#126](https://github.com/gratak/solar-flow-card/issues/126)): a car at the house with its own flow while it charges. (The Consumers section can already list a charger.)
 - **Browsing earlier days and months** with arrows.
 
 ## Translations
