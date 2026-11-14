@@ -133,6 +133,15 @@ const BASE_CSS = `
   .sfc-tile small, .sfc-summary-item small { color: var(--sfc-muted); font-size: 11px; line-height: 1.2; overflow: hidden;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
   .sfc-tile strong { color: var(--sfc-text); font-size: 15px; font-family: var(--sfc-num-font, inherit); white-space: nowrap; }
+  /* Payback: share, bar, amounts. */
+  .sfc-payback { display: grid; grid-template-columns: max-content minmax(40px, 1fr); align-items: center; gap: 2px 12px; margin-top: 10px; padding: 9px 11px;
+    border: 1px solid var(--sfc-border); border-radius: var(--sfc-tile-radius, 11px); background: var(--sfc-tile-bg); }
+  .sfc-payback > div { display: flex; align-items: baseline; gap: 8px; }
+  .sfc-payback small { color: var(--sfc-muted); font-size: 11px; }
+  .sfc-payback strong { font-size: 15px; font-family: var(--sfc-num-font, inherit); color: var(--sfc-battery); }
+  .sfc-payback .sfc-pvf-bar i { background: var(--sfc-battery); }
+  .sfc-payback em { grid-column: 1 / -1; font-style: normal; font-size: 11px; color: var(--sfc-muted); }
+  .sfc-payback.done strong { color: var(--sfc-good, #1f9d55); }
   .sfc-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 8px; margin-top: 10px; }
   .sfc-summary-item { min-width: 0; padding: 8px 10px; border-radius: var(--sfc-tile-radius, 11px); border: 1px solid var(--sfc-border);
     background: color-mix(in srgb, var(--sfc-tile-bg) 85%, var(--sfc-c, var(--sfc-accent)) 15%); }

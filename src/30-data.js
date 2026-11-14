@@ -1012,6 +1012,32 @@ function periodSummaryRest(totals, config, t, locale) {
   return items;
 }
 
+// Payback (`payback: { cost, saved_before }` or `payback: <cost>`): the
+// all-time savings against what the system cost, and when it is paid back
+// at the average rate so far.
+function paybackConfig(config) {
+  const p = config.payback;
+  const cost = positiveNumber(typeof p === "object" && p ? p.cost : p);
+  if (!cost) return null;
+  const before = Number.parseFloat(typeof p === "object" && p ? p.saved_before : 0);
+  return { cost, before: Number.isFinite(before) && before > 0 ? before : 0 };
+}
+
+function paybackData(setup, saved, since, now = new Date()) {
+  if (!setup || !isNum(saved)) return null;
+  const total = setup.before + Math.max(0, saved);
+  const share = clamp((total / setup.cost) * 100, 0, 100);
+  // The average saving per day since the statistics begin, at least a month.
+  let at = null;
+  if (since && total < setup.cost && saved > 0) {
+    const days = Math.max(30, (now - since) / 864e5);
+    const perDay = saved / days;
+    const left = (setup.cost - total) / perDay;
+    if (left < 365 * 40) at = new Date(now.getTime() + left * 864e5);
+  }
+  return { cost: setup.cost, saved: total, share, done: total >= setup.cost, at };
+}
+
 const FORECAST_MAX_HOURS = 48;
 
 // Time until full while charging, until the reserve while discharging.
