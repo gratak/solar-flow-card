@@ -343,6 +343,7 @@
   "editorPhaseLoad": "Home {n}",
   "editorPhaseGrid": "Grid {n}",
   "editorPhaseVoltage": "Voltage {n}",
+  "editorPhaseName": "Name of {n}",
   "editorStringPower": "PV{n} power",
   "editorStringVoltage": "PV{n} voltage",
   "editorStringCurrent": "PV{n} current",
