@@ -376,6 +376,8 @@ const FIT_CSS = `
   .dio-chip small, .dio-chip em, .gt-kv small { white-space: normal; overflow-wrap: anywhere; text-overflow: clip; }
   /* The phase tiles follow the width of their row, not of the card. */
   @container (max-width: 290px) { .sfc-phase { padding: 8px 6px; } .sfc-phase strong { font-size: 13px; letter-spacing: 0; } }
+  /* The narrowest Diorama: the house pills show their values only. */
+  @container (max-width: 340px) { .dio-pill.load small { display: none; } }
   @container (max-width: 225px) { .sfc-phase { padding: 7px 4px; } .sfc-phase strong { font-size: 11px; letter-spacing: -.02em; } .sfc-phase small { font-size: 10px; } }
   /* The forecast days share their columns, so the widest day name fits. */
   @supports (grid-template-columns: subgrid) {
@@ -414,6 +416,10 @@ const FIT_CSS = `
   @container (max-width: 370px) {
     .sfc-tab { font-size: 10px; padding-inline: 2px; }
     .theme-lcars .sfc-tab { letter-spacing: 0; font-size: 11px; }
+    /* LCARS: the readout labels and the stored energy keep to the card. */
+    .theme-lcars .lc-readout { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 8px; }
+    .theme-lcars .lc-readout span { font-size: 10px; letter-spacing: 0; overflow-wrap: break-word; }
+    .theme-lcars .sfc-forecast-stored { grid-column: 1 / -1; white-space: nowrap; text-align: left; }
     .sfc-tile { gap: 7px; padding-inline: 8px; }
     .sfc-tile-icon { flex-basis: 28px; width: 28px; height: 28px; }
     .theme-aurora .sfc-tile strong { font-size: 13px; }

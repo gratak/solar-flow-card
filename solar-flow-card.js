@@ -8216,6 +8216,8 @@ const FIT_CSS = `
   .dio-chip small, .dio-chip em, .gt-kv small { white-space: normal; overflow-wrap: anywhere; text-overflow: clip; }
   /* The phase tiles follow the width of their row, not of the card. */
   @container (max-width: 290px) { .sfc-phase { padding: 8px 6px; } .sfc-phase strong { font-size: 13px; letter-spacing: 0; } }
+  /* The narrowest Diorama: the house pills show their values only. */
+  @container (max-width: 340px) { .dio-pill.load small { display: none; } }
   @container (max-width: 225px) { .sfc-phase { padding: 7px 4px; } .sfc-phase strong { font-size: 11px; letter-spacing: -.02em; } .sfc-phase small { font-size: 10px; } }
   /* The forecast days share their columns, so the widest day name fits. */
   @supports (grid-template-columns: subgrid) {
@@ -8254,6 +8256,10 @@ const FIT_CSS = `
   @container (max-width: 370px) {
     .sfc-tab { font-size: 10px; padding-inline: 2px; }
     .theme-lcars .sfc-tab { letter-spacing: 0; font-size: 11px; }
+    /* LCARS: the readout labels and the stored energy keep to the card. */
+    .theme-lcars .lc-readout { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 8px; }
+    .theme-lcars .lc-readout span { font-size: 10px; letter-spacing: 0; overflow-wrap: break-word; }
+    .theme-lcars .sfc-forecast-stored { grid-column: 1 / -1; white-space: nowrap; text-align: left; }
     .sfc-tile { gap: 7px; padding-inline: 8px; }
     .sfc-tile-icon { flex-basis: 28px; width: 28px; height: 28px; }
     .theme-aurora .sfc-tile strong { font-size: 13px; }
@@ -9202,6 +9208,7 @@ class SolarFlowCard extends HTMLElement {
         const width = Math.round(this.getBoundingClientRect().width);
         if (width === this._width) return;
         this._width = width;
+        this._fitPills();
         if (this._config?.wide !== true) return;
         this._signature = "";
         this._html = null;
@@ -9746,6 +9753,7 @@ class SolarFlowCard extends HTMLElement {
       if (!painted) return;
       this._wire(model);
       if (wide) this._balanceWide();
+      if (theme === "diorama") this._fitPills();
     } catch (error) {
       console.error("Home Energy Hub render error", error);
       this._paint(BASE_CSS + THEME_CSS.diorama + FIT_CSS, "sfc", `<div class="sfc-empty"><h2>Home Energy Hub</h2><p>${escapeHtml(error?.message || error)}</p></div>`);
@@ -9796,6 +9804,44 @@ class SolarFlowCard extends HTMLElement {
     cancelAnimationFrame(this._balanceFrame);
     if (balanceWide(this.shadowRoot) || tries > 20) return;
     this._balanceFrame = requestAnimationFrame(() => this._balanceWide(tries + 1));
+  }
+
+  // Diorama: a value pill on the right of the scene is longer than the room
+  // left beside it on a narrow card; move it back inside the scene.
+  _fitPills(tries = 0) {
+    cancelAnimationFrame(this._pillFrame);
+    const scene = this.shadowRoot?.querySelector(".dio-scene");
+    if (!scene) return;
+    const box = scene.getBoundingClientRect();
+    if (!box.width) {
+      if (tries < 20) this._pillFrame = requestAnimationFrame(() => this._fitPills(tries + 1));
+      return;
+    }
+    const pills = [...scene.querySelectorAll(".dio-pill")].map((el) => {
+      el.style.translate = "";
+      const r = el.getBoundingClientRect();
+      const box2 = { el, left: r.left, right: r.right, top: r.top, bottom: r.bottom, dx: 0, dy: 0 };
+      box2.dx = Math.min(0, box.right - 6 - r.right) || Math.max(0, box.left + 6 - r.left);
+      return box2;
+    }).sort((a, b) => a.left - b.left);
+    // A pill moved in from the edge must not cover its neighbour in the
+    // same row: the neighbour moves left as far as there is room, then the
+    // moved pill goes under it.
+    const at = (p) => ({ left: p.left + p.dx, right: p.right + p.dx, top: p.top + p.dy, bottom: p.bottom + p.dy });
+    for (let i = 0; i < pills.length; i++) {
+      for (let j = 0; j < i; j++) {
+        const a = at(pills[j]), b = at(pills[i]);
+        if (a.bottom <= b.top || b.bottom <= a.top || a.right + 6 <= b.left) continue;
+        const room = Math.max(0, a.left - (box.left + 6));
+        const left = Math.min(room, a.right + 6 - b.left);
+        pills[j].dx -= left;
+        if (at(pills[j]).right + 6 <= b.left) continue;
+        // Under the neighbour, or above it when there is no room below.
+        const down = a.bottom - b.top + 4;
+        pills[i].dy += b.bottom + down <= box.bottom - 4 ? down : a.top - b.bottom - 4;
+      }
+    }
+    for (const p of pills) if (p.dx || p.dy) p.el.style.translate = `${Math.round(p.dx)}px ${Math.round(p.dy)}px`;
   }
 
   _wire(model) {
