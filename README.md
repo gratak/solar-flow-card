@@ -90,6 +90,8 @@ Copy `solar-flow-card.js` to `config/www/` and add a dashboard resource `/local/
 
 ## Configuration
 
+**Quick start:** the editor opens a short wizard for a new card (and from its "Quick start" button): pick where the data comes from (DeyeCloud, the Energy dashboard, or your inverter's integration, whose sensors it proposes), the prices and the look.
+
 **Works out of the box in two cases:**
 - **DeyeCloud:** the integration's sensors are found automatically.
 - **Home Assistant's Energy dashboard:** the card uses the sensors set up under *Settings → Dashboards → Energy* (grid, solar, battery, home; several of a kind are added up), including the power sensors and the battery's charge level and capacity where they are set there. Nothing to configure in the card; anything you do set in the card takes precedence. In the editor, **Sensors → "Write them into this card"** copies them into the card's YAML to adjust.
