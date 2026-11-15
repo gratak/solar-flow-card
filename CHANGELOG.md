@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.0-beta.5
+
+- **Payback with a battery and a dynamic tariff** ([#124](https://github.com/gratak/solar-flow-card/issues/124)): it showed 0% for a battery charged from the grid when it is cheap and used when it is dear. With hourly prices, payback is now worked out hour by hour since the statistics begin; whole months hid the gain.
+- **Savings count the cost of charging from the grid:** an hour that charges the battery from the grid now counts as a cost instead of zero, so savings with a dynamic tariff match the bill. During the day, before the battery is used, the day's savings can be negative.
+
 ## 2.1.0-beta.4
 
 - **Every option in the visual editor:** the electric car in the Diorama scene (`ev`, under Installation), the battery's next day (`battery_day`) and the number of PV strings (`panel_strings`) can now be set there too. A check in the repository makes sure every documented option stays in the editor.

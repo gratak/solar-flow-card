@@ -38,7 +38,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "2.1.0-beta.4";
+const CARD_VERSION = "2.1.0-beta.5";
 // The card's type is custom:home-energy-hub since 2.0.0. The old name stays
 // registered so dashboards with custom:solar-flow-card keep working.
 const CARD_TAG = "home-energy-hub";
@@ -3916,7 +3916,9 @@ function pricedSavings(rows, rest, price, net) {
     const exported = h.gridExport || 0;
     const billedImport = net ? Math.max(0, imported - exported) : imported;
     const billedExport = net ? Math.max(0, exported - imported) : exported;
-    saved += Math.max(0, (h.load || 0) - billedImport) * price("import", at) + billedExport * price("export", at);
+    // Not clipped at zero: an hour that charges the battery from the grid
+    // costs money, and later hours earn it back (dynamic tariffs).
+    saved += ((h.load || 0) - billedImport) * price("import", at) + billedExport * price("export", at);
     cost += billedImport * price("import", at);
     sold += billedExport * price("export", at);
   };
@@ -4286,7 +4288,7 @@ function periodSummary(totals, config, t, locale, net = null, money = undefined)
     // Hourly balancing: billed are only the import and export left after it.
     const billedImport = net ? net.gridImport : gridImport;
     const billedExport = net ? net.gridExport : gridExport;
-    const saved = Math.max(0, load - billedImport) * priceImport + (isNum(billedExport) ? billedExport : 0) * priceExport;
+    const saved = (load - billedImport) * priceImport + (isNum(billedExport) ? billedExport : 0) * priceExport;
     const amount = (v) => `${formatNumber(v, locale, 2)} ${config.currency ?? t.currency}`.trim();
     items.push(["money", t.savings, amount(saved)]);
     if (config.show_costs === true) {
@@ -9099,7 +9101,9 @@ class SolarFlowCard extends HTMLElement {
   // Savings when a price comes from a sensor: hour by hour (month by month
   // for all time), each with its mean price. undefined with fixed prices
   // (the summary works them out from the totals), null while loading.
-  _savings(resolved, period, energy, net) {
+  // `since`: hour by hour from that date, whatever the period (payback with
+  // hourly prices).
+  _savings(resolved, period, energy, net, since = null) {
     const config = this._config;
     const prices = effectivePrices(this._hass, config);
     // Net-metering: a kWh sent back is worth `ratio` of a kWh bought.
@@ -9116,7 +9120,7 @@ class SolarFlowCard extends HTMLElement {
       const billedImport = net ? net.gridImport : totals.gridImport;
       const billedExport = net ? net.gridExport : totals.gridExport || 0;
       const sold = billedExport * (prices.export?.value || 0) * prices.factor;
-      return { kind, value: Math.max(0, totals.load - billedImport) * prices.import.value + sold, cost: billedImport * prices.import.value, sold };
+      return { kind, value: (totals.load - billedImport) * prices.import.value + sold, cost: billedImport * prices.import.value, sold };
     }
     if (!prices.import) prices.import = { value: 0 };
     if (typeof this._hass.callWS !== "function") return undefined;
@@ -9128,14 +9132,15 @@ class SolarFlowCard extends HTMLElement {
     let start;
     let statPeriod = "hour";
     const ended = period === "today" ? null : statsSpec(period).end || null;
-    if (MONTHLY_PERIODS.includes(period)) {
+    const monthly = MONTHLY_PERIODS.includes(period) && !since;
+    if (monthly) {
       if (!energy.buckets) return { kind, value: null };
       rows = energy.buckets.map((b) => ({ ...b, at: b.start.getTime() }));
       start = energy.spec.start;
       statPeriod = "month";
     } else {
-      start = period === "today" ? startOfDay(new Date()) : statsSpec(period).start;
-      const hourly = this._fetch(`hourly-energy|${sources}|${start.getTime()}`, 15 * 60000, () => loadHourlyEnergy(this._hass, resolved.energy, start));
+      start = since || (period === "today" ? startOfDay(new Date()) : statsSpec(period).start);
+      const hourly = this._fetch(`hourly-energy|${sources}|${start.getTime()}`, since ? 60 * 60000 : 15 * 60000, () => loadHourlyEnergy(this._hass, resolved.energy, start));
       if (!hourly.data) return { kind, value: null };
       const hours = new Map();
       for (const [name, map] of Object.entries(hourly.data)) {
@@ -9158,7 +9163,7 @@ class SolarFlowCard extends HTMLElement {
     };
     // What the hourly statistics do not cover yet (the current hour).
     let rest = null;
-    if (!MONTHLY_PERIODS.includes(period) && !ended) {
+    if (!monthly && !ended) {
       const total = energy.totals || {};
       const sum = (name) => rows.reduce((acc, r) => acc + (r[name] || 0), 0);
       rest = Object.fromEntries(ENERGY_ORDER.filter((name) => isNum(total[name])).map((name) => [name, Math.max(0, total[name] - sum(name))]));
@@ -9176,16 +9181,21 @@ class SolarFlowCard extends HTMLElement {
     if (!setup) return null;
     const all = this._periodEnergy(resolved, "all", today);
     if (!all.buckets?.length) return null;
-    let money = this._savings(resolved, "all", all, null);
+    const first = all.buckets.find((b) => ENERGY_ORDER.some((name) => isNum(b[name]) && b[name] > 0));
+    // Hourly prices: hour by hour since the statistics begin, so a battery
+    // charged when it is cheap and used when it is dear counts as it does on
+    // the bill. Months would hide that.
+    const prices = effectivePrices(this._hass, this._config);
+    const hourly = Boolean(first && (prices.import?.entity || prices.export?.entity || prices.ratio));
+    let money = this._savings(resolved, "all", all, null, hourly ? startOfDay(first.start) : null);
     if (money === undefined) {
       // Fixed prices: from the totals, as in the summary.
       const totals = all.totals;
       const buy = positiveNumber(this._config.price_import);
       const sell = positiveNumber(this._config.price_export) || 0;
       if (!buy || !isNum(totals.load) || !isNum(totals.gridImport)) return null;
-      money = { value: Math.max(0, totals.load - totals.gridImport) * buy + (totals.gridExport || 0) * sell };
+      money = { value: (totals.load - totals.gridImport) * buy + (totals.gridExport || 0) * sell };
     }
-    const first = all.buckets.find((b) => ENERGY_ORDER.some((name) => isNum(b[name]) && b[name] > 0));
     return paybackData(setup, money?.value, first?.start || null);
   }
 

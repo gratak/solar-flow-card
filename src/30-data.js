@@ -612,7 +612,9 @@ function pricedSavings(rows, rest, price, net) {
     const exported = h.gridExport || 0;
     const billedImport = net ? Math.max(0, imported - exported) : imported;
     const billedExport = net ? Math.max(0, exported - imported) : exported;
-    saved += Math.max(0, (h.load || 0) - billedImport) * price("import", at) + billedExport * price("export", at);
+    // Not clipped at zero: an hour that charges the battery from the grid
+    // costs money, and later hours earn it back (dynamic tariffs).
+    saved += ((h.load || 0) - billedImport) * price("import", at) + billedExport * price("export", at);
     cost += billedImport * price("import", at);
     sold += billedExport * price("export", at);
   };
@@ -982,7 +984,7 @@ function periodSummary(totals, config, t, locale, net = null, money = undefined)
     // Hourly balancing: billed are only the import and export left after it.
     const billedImport = net ? net.gridImport : gridImport;
     const billedExport = net ? net.gridExport : gridExport;
-    const saved = Math.max(0, load - billedImport) * priceImport + (isNum(billedExport) ? billedExport : 0) * priceExport;
+    const saved = (load - billedImport) * priceImport + (isNum(billedExport) ? billedExport : 0) * priceExport;
     const amount = (v) => `${formatNumber(v, locale, 2)} ${config.currency ?? t.currency}`.trim();
     items.push(["money", t.savings, amount(saved)]);
     if (config.show_costs === true) {
