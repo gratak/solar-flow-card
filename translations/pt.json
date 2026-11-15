@@ -343,6 +343,7 @@
   "editorPhaseLoad": "Casa {n}",
   "editorPhaseGrid": "Rede {n}",
   "editorPhaseVoltage": "Tensão {n}",
+  "editorPhaseName": "Nome de {n}",
   "editorStringPower": "Potência FV{n}",
   "editorStringVoltage": "Tensão FV{n}",
   "editorStringCurrent": "Corrente FV{n}",

@@ -343,6 +343,7 @@
   "editorPhaseLoad": "Haus {n}",
   "editorPhaseGrid": "Netz {n}",
   "editorPhaseVoltage": "Spannung {n}",
+  "editorPhaseName": "Name von {n}",
   "editorStringPower": "PV{n} Leistung",
   "editorStringVoltage": "PV{n} Spannung",
   "editorStringCurrent": "PV{n} Strom",

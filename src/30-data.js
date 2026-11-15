@@ -1491,7 +1491,8 @@ function systemData(hass, resolved, config, baseline) {
   const number = (name) => (found[name] ? stateNumber(found[name].stateObj) : null);
   const gridSign = config.invert_grid ? -1 : 1;
   const phases = [1, 2, 3].map((n) => ({
-    name: `L${n}`,
+    // phase_names: your own names, e.g. for three meters that are not phases.
+    name: (Array.isArray(config.phase_names) && String(config.phase_names[n - 1] ?? "").trim()) || `L${n}`,
     load: watts(`loadL${n}`),
     grid: isNum(watts(`gridL${n}`)) ? watts(`gridL${n}`) * gridSign : null,
     voltage: number(`voltL${n}`),

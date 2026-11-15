@@ -343,6 +343,7 @@
   "editorPhaseLoad": "Huis {n}",
   "editorPhaseGrid": "Net {n}",
   "editorPhaseVoltage": "Spanning {n}",
+  "editorPhaseName": "Naam van {n}",
   "editorStringPower": "PV{n} vermogen",
   "editorStringVoltage": "PV{n} spanning",
   "editorStringCurrent": "PV{n} stroom",

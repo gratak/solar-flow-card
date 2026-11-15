@@ -343,6 +343,7 @@
   "editorPhaseLoad": "Dom {n}",
   "editorPhaseGrid": "Sieć {n}",
   "editorPhaseVoltage": "Napięcie {n}",
+  "editorPhaseName": "Nazwa {n}",
   "editorStringPower": "Moc PV{n}",
   "editorStringVoltage": "Napięcie PV{n}",
   "editorStringCurrent": "Prąd PV{n}",

@@ -407,6 +407,7 @@ const TRANSLATIONS = {
     "editorPhaseLoad": "Home {n}",
     "editorPhaseGrid": "Grid {n}",
     "editorPhaseVoltage": "Voltage {n}",
+    "editorPhaseName": "Name of {n}",
     "editorStringPower": "PV{n} power",
     "editorStringVoltage": "PV{n} voltage",
     "editorStringCurrent": "PV{n} current",
@@ -905,6 +906,7 @@ const TRANSLATIONS = {
     "editorPhaseLoad": "Haus {n}",
     "editorPhaseGrid": "Netz {n}",
     "editorPhaseVoltage": "Spannung {n}",
+    "editorPhaseName": "Name von {n}",
     "editorStringPower": "PV{n} Leistung",
     "editorStringVoltage": "PV{n} Spannung",
     "editorStringCurrent": "PV{n} Strom",
@@ -1403,6 +1405,7 @@ const TRANSLATIONS = {
     "editorPhaseLoad": "Maison {n}",
     "editorPhaseGrid": "Réseau {n}",
     "editorPhaseVoltage": "Tension {n}",
+    "editorPhaseName": "Nom de {n}",
     "editorStringPower": "Puissance PV{n}",
     "editorStringVoltage": "Tension PV{n}",
     "editorStringCurrent": "Courant PV{n}",
@@ -1901,6 +1904,7 @@ const TRANSLATIONS = {
     "editorPhaseLoad": "Huis {n}",
     "editorPhaseGrid": "Net {n}",
     "editorPhaseVoltage": "Spanning {n}",
+    "editorPhaseName": "Naam van {n}",
     "editorStringPower": "PV{n} vermogen",
     "editorStringVoltage": "PV{n} spanning",
     "editorStringCurrent": "PV{n} stroom",
@@ -2399,6 +2403,7 @@ const TRANSLATIONS = {
     "editorPhaseLoad": "Dom {n}",
     "editorPhaseGrid": "Sieć {n}",
     "editorPhaseVoltage": "Napięcie {n}",
+    "editorPhaseName": "Nazwa {n}",
     "editorStringPower": "Moc PV{n}",
     "editorStringVoltage": "Napięcie PV{n}",
     "editorStringCurrent": "Prąd PV{n}",
@@ -2897,6 +2902,7 @@ const TRANSLATIONS = {
     "editorPhaseLoad": "Casa {n}",
     "editorPhaseGrid": "Rede {n}",
     "editorPhaseVoltage": "Tensão {n}",
+    "editorPhaseName": "Nome de {n}",
     "editorStringPower": "Potência FV{n}",
     "editorStringVoltage": "Tensão FV{n}",
     "editorStringCurrent": "Corrente FV{n}",
@@ -4795,7 +4801,8 @@ function systemData(hass, resolved, config, baseline) {
   const number = (name) => (found[name] ? stateNumber(found[name].stateObj) : null);
   const gridSign = config.invert_grid ? -1 : 1;
   const phases = [1, 2, 3].map((n) => ({
-    name: `L${n}`,
+    // phase_names: your own names, e.g. for three meters that are not phases.
+    name: (Array.isArray(config.phase_names) && String(config.phase_names[n - 1] ?? "").trim()) || `L${n}`,
     load: watts(`loadL${n}`),
     grid: isNum(watts(`gridL${n}`)) ? watts(`gridL${n}`) * gridSign : null,
     voltage: number(`voltL${n}`),
@@ -10211,6 +10218,7 @@ class SolarFlowCardEditor extends HTMLElement {
         <details class="box" data-box="entities-${group}" ${this._boxOpen(`entities-${group}`, group === "live" || group === "energy" || items.some(([key]) => entities[key])) ? "open" : ""}>
           <summary class="title">${escapeHtml(t.editorEntityGroups[group])}${(() => { const n = items.filter(([key]) => !entities[key] && autoFor(key)).length; return n ? ` <small class="found">${escapeHtml(fill(t.editorFoundN, { n }))}</small>` : ""; })()}</summary>
           <div class="pickers">${items.map(([key, label]) => this._picker(`entities.${key}`, label, entities[key], "sensor", { auto: autoFor(key), extra: extra(key) })).join("")}</div>
+          ${group === "system" ? `<div class="grid">${[0, 1, 2].map((i) => `<label><span>${escapeHtml(fill(t.editorPhaseName, { n: `L${i + 1}` }))}</span><input type="text" data-phase-name="${i}" placeholder="L${i + 1}" value="${escapeHtml(Array.isArray(this._config.phase_names) ? this._config.phase_names[i] ?? "" : "")}" /></label>`).join("")}</div>` : ""}
         </details>`).join("")}
       <details class="box" data-box="history" ${this._boxOpen("history", history.some((key) => entities[`${key}_history`])) ? "open" : ""}>
         <summary class="title">${escapeHtml(t.editorHistoryBox)}</summary>
@@ -10577,6 +10585,11 @@ class SolarFlowCardEditor extends HTMLElement {
       this._set("virtual_storage", e.target.checked ? true : undefined);
       this._render();
     });
+    root.querySelectorAll("[data-phase-name]").forEach((input) => input.addEventListener("change", () => {
+      const names = [...root.querySelectorAll("[data-phase-name]")].map((el) => el.value.trim());
+      while (names.length && !names[names.length - 1]) names.pop();
+      this._set("phase_names", names.length ? names : undefined);
+    }));
     root.querySelector("[data-ev-name]")?.addEventListener("change", (e) => this._setIn("ev", "name", e.target.value.trim() || undefined));
     root.querySelectorAll("[data-payback]").forEach((input) => input.addEventListener("change", (e) => {
       const number = Number.parseFloat(e.target.value);
