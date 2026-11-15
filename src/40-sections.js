@@ -36,7 +36,8 @@ function periodLabels(t) {
 function tabsHtml(m) {
   const labels = periodLabels(m.t);
   return `
-    <div class="sfc-tabs" role="radiogroup" aria-label="${escapeHtml(m.t.energy)}">
+    <div class="sfc-tabs ${m.periods.length > 5 ? "many" : ""}" style="--sfc-tab-cols: ${Math.ceil(m.periods.length / 2)}"
+      role="radiogroup" aria-label="${escapeHtml(m.t.energy)}">
       ${m.periods.map((period) => `
         <button type="button" role="radio" class="sfc-tab ${period === m.period ? "on" : ""}"
           aria-checked="${period === m.period}" title="${escapeHtml(labels[period][1])}"

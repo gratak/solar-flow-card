@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.0-beta.7
+
+- **Period tabs on narrow cards:** with six or seven tabs (e.g. `last_month` and `year` added under `periods`) the tab names were cut to "2…", "3…" on a phone. They now go into two even rows when they do not fit in one. The default five tabs look as before.
+- **Folded section headers:** a long section name, such as "Virtual storage · hourly balance", takes a second line instead of being cut next to its value.
+
 ## 2.1.0-beta.6
 
 - **Quick start in the editor:** a three-step wizard sets up the card: where the data comes from, energy prices, and the look.

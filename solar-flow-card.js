@@ -38,7 +38,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "2.1.0-beta.6";
+const CARD_VERSION = "2.1.0-beta.7";
 // The card's type is custom:home-energy-hub since 2.0.0. The old name stays
 // registered so dashboards with custom:solar-flow-card keep working.
 const CARD_TAG = "home-energy-hub";
@@ -5500,7 +5500,8 @@ function periodLabels(t) {
 function tabsHtml(m) {
   const labels = periodLabels(m.t);
   return `
-    <div class="sfc-tabs" role="radiogroup" aria-label="${escapeHtml(m.t.energy)}">
+    <div class="sfc-tabs ${m.periods.length > 5 ? "many" : ""}" style="--sfc-tab-cols: ${Math.ceil(m.periods.length / 2)}"
+      role="radiogroup" aria-label="${escapeHtml(m.t.energy)}">
       ${m.periods.map((period) => `
         <button type="button" role="radio" class="sfc-tab ${period === m.period ? "on" : ""}"
           aria-checked="${period === m.period}" title="${escapeHtml(labels[period][1])}"
@@ -7894,10 +7895,10 @@ const BASE_CSS = `
   .sfc-badge.offline i { background: #e5484d; }
 
   /* Tabs */
-  .sfc-tabs { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 4px; padding: 4px; margin-bottom: 12px;
+  .sfc-tabs { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px; margin-bottom: 12px;
     border-radius: var(--sfc-tabs-radius, 12px); background: var(--sfc-tab-bg); }
   .sfc-tab { border: 0; background: transparent; color: var(--sfc-muted); padding: 7px 2px; border-radius: var(--sfc-tab-radius, 9px);
-    font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; flex: 1 0 0; min-width: max-content; }
   .sfc-tab.on { background: var(--sfc-tab-on-bg); color: var(--sfc-tab-on); box-shadow: var(--sfc-tab-shadow, none); cursor: default; }
 
   /* Energy tiles */
@@ -7954,7 +7955,8 @@ const BASE_CSS = `
     content: ""; display: inline-block; width: .42em; height: .42em; margin-left: .5em; vertical-align: .18em;
     border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-135deg); opacity: .6; }
   .sfc-fold-head { width: 100%; display: flex; align-items: center; gap: 10px; padding: 0; border: 0; background: none; cursor: pointer; text-align: left; }
-  .sfc-fold-head span { flex: 1; min-width: 0; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--sfc-heading-font, inherit); }
+  .sfc-fold-head span { flex: 1; min-width: 0; font-weight: 700; overflow: hidden; overflow-wrap: break-word;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-family: var(--sfc-heading-font, inherit); }
   .sfc-fold-head b { white-space: nowrap; font-family: var(--sfc-num-font, inherit); }
   .sfc-fold-head b small { color: var(--sfc-muted); font-weight: 500; font-size: .8em; font-family: var(--sfc-font); }
   .sfc-fold-head i::before { transform: rotate(45deg); vertical-align: .3em; }
@@ -8222,10 +8224,11 @@ const FIT_CSS = `
     .sfc-pvf-day small { overflow: visible; }
   }
   @container (max-width: 440px) {
-    /* Period tabs as wide as their words. */
-    .sfc-tabs { display: flex; }
-    .sfc-tab { flex: 1 1 auto; min-width: 0; padding-inline: 3px; letter-spacing: 0; }
-    .theme-paper .sfc-tab { flex: 0 1 auto; }
+    /* Period tabs as wide as their words; the ones that do not fit go to a second row. */
+    .sfc-tab { flex: 1 0 auto; padding-inline: 3px; letter-spacing: 0; }
+    .theme-paper .sfc-tab { flex: 0 0 auto; }
+    /* Six or seven tabs: two even rows. */
+    .sfc-tabs.many { display: grid; grid-template-columns: repeat(var(--sfc-tab-cols), minmax(max-content, 1fr)); }
     /* The comparison fits without scrolling sideways. */
     .sfc-compare-table { font-size: 12px; }
     .sfc-compare-table th, .sfc-compare-table td { padding: 6px 2px; }
@@ -8445,8 +8448,8 @@ const THEME_CSS = {
     .sfc-section { padding: 14px 0 0; border: 0; border-top: 1px solid var(--sfc-border); }
     .sfc-head h3 { font-size: 18px; }
     .sfc-kicker { background: none; padding: 0; min-width: 0; color: var(--sfc-accent); font-size: 11px; }
-    .sfc-tabs { padding: 0; gap: 14px; grid-auto-columns: max-content; }
-    .sfc-tab { padding: 2px 0; border-radius: 0; font-weight: 500; font-size: 12px; }
+    .sfc-tabs { padding: 0; gap: 4px 14px; }
+    .sfc-tab { flex: 0 0 auto; padding: 2px 0; border-radius: 0; font-weight: 500; font-size: 12px; }
     .sfc-tab.on { border-bottom: 1.5px solid var(--sfc-text); }
     .sfc-tiles { gap: 0; border-top: 1px solid var(--sfc-border); }
     .sfc-tile { border: 0; border-bottom: 1px solid var(--sfc-border); padding: 10px 4px; }
