@@ -5,7 +5,7 @@
 - **Period tabs on narrow cards:** with six or seven tabs (e.g. `last_month` and `year` added under `periods`) the tab names were cut to "2…", "3…" on a phone. They now go into two even rows when they do not fit in one. The default five tabs look as before.
 - **Diorama on a phone:** the grid and car value pills went past the right edge of the scene on narrow cards. They are now moved inside it, and a pill moved this way does not cover its neighbour. On the narrowest cards (about 340 px and less) the house pills show the value only.
 - **LCARS on a phone:** the labels of the top readout ("Self-sufficiency today") and the stored energy in the battery forecast no longer run over the edge.
-- **Folded section headers:** a long section name, such as "Virtual storage · hourly balance", takes a second line instead of being cut next to its value.
+- **Folded section headers:** a long section name, such as "Virtual storage · hourly balance", takes a second line instead of being cut next to its value; a long value goes to a second line too, with each number kept beside its unit.
 
 ## 2.1.0-beta.6
 

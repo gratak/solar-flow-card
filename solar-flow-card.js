@@ -6127,7 +6127,7 @@ function foldable(m, id, html) {
     return `
     <section class="sfc-section sfc-folded" data-fold="${id}">
       <button type="button" class="sfc-fold-head" data-fold-toggle="${id}" aria-expanded="false">
-        <span>${escapeHtml(title)}</span>${value ? `<b>${label ? `<small>${escapeHtml(label)}</small> ` : ""}${escapeHtml(value)}</b>` : ""}<i aria-hidden="true"></i>
+        <span>${escapeHtml(title)}</span>${value ? `<b>${label ? `<small>${escapeHtml(label)}</small> ` : ""}<span>${escapeHtml(String(value).replace(/(\d) (?=\S)/g, "$1\u00a0"))}</span></b>` : ""}<i aria-hidden="true"></i>
       </button>
     </section>`;
   }
@@ -7955,9 +7955,9 @@ const BASE_CSS = `
     content: ""; display: inline-block; width: .42em; height: .42em; margin-left: .5em; vertical-align: .18em;
     border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-135deg); opacity: .6; }
   .sfc-fold-head { width: 100%; display: flex; align-items: center; gap: 10px; padding: 0; border: 0; background: none; cursor: pointer; text-align: left; }
-  .sfc-fold-head span { flex: 1; min-width: 0; font-weight: 700; overflow: hidden; overflow-wrap: break-word;
+  .sfc-fold-head > span { flex: 1 1 auto; min-width: min-content; font-weight: 700; overflow: hidden;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-family: var(--sfc-heading-font, inherit); }
-  .sfc-fold-head b { white-space: nowrap; font-family: var(--sfc-num-font, inherit); }
+  .sfc-fold-head b { flex: 0 1 auto; min-width: min-content; text-align: right; font-family: var(--sfc-num-font, inherit); }
   .sfc-fold-head b small { color: var(--sfc-muted); font-weight: 500; font-size: .8em; font-family: var(--sfc-font); }
   .sfc-fold-head i::before { transform: rotate(45deg); vertical-align: .3em; }
   .sfc-section.sfc-folded { padding-top: 12px; padding-bottom: 12px; }

@@ -663,7 +663,7 @@ function foldable(m, id, html) {
     return `
     <section class="sfc-section sfc-folded" data-fold="${id}">
       <button type="button" class="sfc-fold-head" data-fold-toggle="${id}" aria-expanded="false">
-        <span>${escapeHtml(title)}</span>${value ? `<b>${label ? `<small>${escapeHtml(label)}</small> ` : ""}${escapeHtml(value)}</b>` : ""}<i aria-hidden="true"></i>
+        <span>${escapeHtml(title)}</span>${value ? `<b>${label ? `<small>${escapeHtml(label)}</small> ` : ""}<span>${escapeHtml(String(value).replace(/(\d) (?=\S)/g, "$1\u00a0"))}</span></b>` : ""}<i aria-hidden="true"></i>
       </button>
     </section>`;
   }
