@@ -56,6 +56,102 @@ function editorEntityGroups(t) {
   ];
 }
 
+// ---------------------------------------------------------------------------
+// Quick start: a wizard that sets up the card in three steps. It finds the
+// inverter's integration and proposes its sensors by their meaning.
+// ---------------------------------------------------------------------------
+
+const INTEGRATION_NAMES = {
+  solarman: "Solarman (Deye, Sofar… local)", huawei_solar: "Huawei Solar", solaredge: "SolarEdge", solaredge_modbus: "SolarEdge Modbus",
+  fronius: "Fronius", goodwe: "GoodWe", victron: "Victron", victron_ble: "Victron", sma: "SMA", growatt_server: "Growatt", foxess: "FoxESS",
+  foxess_modbus: "FoxESS Modbus", solax: "SolaX", sungrow: "Sungrow", sungrow_modbus: "Sungrow Modbus", enphase_envoy: "Enphase Envoy",
+  powerwall: "Tesla Powerwall", sonnenbatterie: "sonnen", anker_solix: "Anker Solix", givenergy: "GivEnergy", solis: "Solis", soliscloud: "Solis Cloud",
+  saj: "SAJ", kostal_plenticore: "Kostal", sofar: "Sofar", luxpower: "LuxPower", deye_local: "Deye (local)", ecoflow: "EcoFlow", hoymiles: "Hoymiles",
+};
+
+// Integrations whose signs differ from the card's (battery + discharging,
+// grid + importing).
+const INTEGRATION_SIGNS = {
+  huawei_solar: { invert_battery: true, invert_grid: true },
+};
+
+// Integrations with power or energy sensors, the ones with the most first.
+function energyIntegrations(hass) {
+  const counts = new Map();
+  for (const [id, entry] of Object.entries(hass?.entities || {})) {
+    const stateObj = hass.states?.[id];
+    if (!entry?.platform || !id.startsWith("sensor.") || !stateObj) continue;
+    if (!["power", "energy"].includes(stateObj.attributes?.device_class)) continue;
+    counts.set(entry.platform, (counts.get(entry.platform) || 0) + 1);
+  }
+  const skip = ["energy", "utility_meter", "template", "integration", "statistics", "deye_cloud", "group", "min_max"];
+  return [...counts].filter(([platform, n]) => n >= 2 && !skip.includes(platform))
+    .sort((a, b) => b[1] - a[1]).map(([platform]) => ({ platform, name: INTEGRATION_NAMES[platform] || platform }));
+}
+
+// What each card sensor looks like: [device class, words it should have,
+// words it must not have]. The best match wins; today's counters over
+// lifetime ones.
+const SENSOR_GUESSES = {
+  solar_power: ["power", /(pv|solar|photovolt|generation|production|dc_power|input_power|yield)/, /(batter|grid|load|export|import|consum|_l[123](_|$)|phase|string|pv[2-9])/],
+  grid_power: ["power", /(grid|meter|net)/, /(export|import|voltage|current|_l[123](_|$)|phase|frequency|limit)/],
+  load_power: ["power", /(load|consumption|house|home)/, /(_l[123](_|$)|phase|grid|batter|ups|backup|limit)/],
+  battery_power: ["power", /batter/, /(limit|max|_l[123](_|$))/],
+  battery_soc: ["battery", /(soc|state_of_charge|state_of_capacity|batter)/, /(health|soh|cycle|voltage|rated)/],
+  solar_energy: ["energy", /(pv|solar|generation|yield|production)/, /(batter|grid|load|export|import|consum|forecast|pv[2-9])/],
+  grid_import_energy: ["energy", /(import|purchas|bought|from_grid|forward|grid_consum|meter.*consum)/, /(export|feed|sold|reverse|cost|compensation|forecast)/],
+  grid_export_energy: ["energy", /(export|feed|sold|to_grid|reverse|returned)/, /(import|purchas|cost|compensation|forecast)/],
+  load_energy: ["energy", /(load|consumption|house|home)/, /(grid|meter|batter|export|import|forecast)/],
+  battery_charge_energy: ["energy", /charg/, /(discharg|cost|forecast)/],
+  battery_discharge_energy: ["energy", /discharg/, /(cost|forecast)/],
+};
+
+function guessSensors(hass, platform) {
+  const candidates = Object.values(hass?.states || {}).filter((stateObj) => {
+    if (!stateObj.entity_id.startsWith("sensor.")) return false;
+    if (platform && hass.entities?.[stateObj.entity_id]?.platform !== platform) return false;
+    return stateObj.state !== "unavailable" && stateObj.state !== "unknown";
+  });
+  const text = (stateObj) => `${stateObj.entity_id} ${stateObj.attributes?.friendly_name || ""}`.toLowerCase().replace(/[\s-]+/g, "_");
+  const found = {};
+  const used = new Set();
+  for (const [key, [deviceClass, want, avoid]] of Object.entries(SENSOR_GUESSES)) {
+    let best = null;
+    let bestScore = 0;
+    for (const stateObj of candidates) {
+      if (used.has(stateObj.entity_id)) continue;
+      const unit = stateUnit(stateObj).trim().toLowerCase();
+      const fits = stateObj.attributes?.device_class === deviceClass || (deviceClass === "battery" && unit === "%");
+      if (!fits) continue;
+      const words = text(stateObj);
+      if (!want.test(words) || avoid.test(words)) continue;
+      // The battery's power both ways, not a charge-only or discharge-only one.
+      if (key === "battery_power" && /charg/.test(words) && !(/discharg/.test(words) && /(^|_)charg/.test(words.replace(/discharg/g, "")))) continue;
+      let score = 10;
+      if (deviceClass === "energy" && /(today|daily|day)/.test(words)) score += 3;
+      if (deviceClass === "energy" && stateObj.attributes?.state_class === "total_increasing") score += 2;
+      if (deviceClass === "power" && /total/.test(words)) score += 1;
+      if (score > bestScore) [best, bestScore] = [stateObj.entity_id, score];
+    }
+    if (best) {
+      found[key] = best;
+      used.add(best);
+    }
+  }
+  // Daily counters only when every one of them says so; lifetime mode also
+  // reads counters that reset daily, so it is the safe choice for a mix.
+  const counters = Object.entries(found).filter(([key]) => /_energy$/.test(key)).map(([, id]) => text(hass.states[id]));
+  const daily = counters.every((words) => /(today|daily|day)/.test(words));
+  return { entities: found, daily };
+}
+
+const WIZARD_PRESETS = {
+  simple: { sections: ["flow", "today", "energy"] },
+  full: {},
+  battery: { show_solar: false },
+  chart: { sections: ["energy"] },
+};
+
 // The sections in the editor: the configured list, or every section in the
 // default order without the ones a `show_…: false` hides.
 const SECTION_SHOW_KEYS = { energy: "show_energy", forecast: "show_forecast", system: "show_system", panels: "show_panels" };
@@ -138,6 +234,8 @@ class SolarFlowCardEditor extends HTMLElement {
   set hass(hass) {
     const first = !this._hass;
     this._hass = hass;
+    // A new card (nothing set but its type and theme): the quick start first.
+    if (first && this._config && Object.keys(this._config).every((key) => ["type", "theme"].includes(key))) this._startWizard();
     if (first) {
       this._render();
       this._loadPicker();
@@ -251,6 +349,10 @@ class SolarFlowCardEditor extends HTMLElement {
     else if (group === "list") return this._setItem(key, Number(index), path.split(".")[3], value);
     else if (group === "custom") return this._setCustomEntity(Number(key), Number(index), value);
     else if (group === "ev") this._setIn("ev", key, value);
+    else if (group === "wizard") {
+      if (key === "priceSensor") this._wizard.priceSensor = value || "";
+      else this._wizard.entities = { ...this._wizard.entities, [key]: value || undefined };
+    }
     else this._set(group, value);
     // The notes under the field follow the new sensor.
     this._render();
@@ -757,6 +859,102 @@ class SolarFlowCardEditor extends HTMLElement {
       <label><span>${escapeHtml(t.editorFontUrl)}</span><input data-text="font_url" type="text" value="${escapeHtml(this._config.font_url ?? "")}" placeholder="/local/fonts/solar-flow-card.css" /></label>`;
   }
 
+  // The wizard's answers live here until "Finish" writes them all at once.
+  _startWizard() {
+    const integrations = energyIntegrations(this._hass);
+    const energy = SHARED_CACHE.get("energy-prefs")?.data;
+    const source = deyeStations(this._hass).length ? "deye" : energyAuto(energy, this._hass) ? "energy" : integrations.length ? `int:${integrations[0].platform}` : "manual";
+    const importPrice = priceSetting(this._config.price_import);
+    this._wizard = {
+      step: 1, source, entities: null, daily: true,
+      prices: this._config.settlement === "net_billing" ? "billing" : importPrice?.entity ? "sensor" : importPrice ? "fixed" : "none",
+      priceImport: importPrice?.value ?? "", priceExport: priceSetting(this._config.price_export)?.value ?? "", priceSensor: importPrice?.entity || "",
+      theme: this._config.theme || "diorama", preset: Array.isArray(this._config.sections) && this._config.sections.length === 1 ? "chart" : "full",
+    };
+    this._withAuto();
+    this._render();
+  }
+
+  _wizardHtml(t) {
+    const w = this._wizard;
+    const choice = (group, value, title, note, on) => `<button type="button" class="choice ${on ? "on" : ""}" data-wiz="${group}" data-value="${escapeHtml(value)}"><b>${escapeHtml(title)}</b>${note ? `<small>${escapeHtml(note)}</small>` : ""}</button>`;
+    let body = "";
+    if (w.step === 1) {
+      const stations = deyeStations(this._hass);
+      const auto = energyAuto(SHARED_CACHE.get("energy-prefs")?.data, this._hass);
+      const integrations = energyIntegrations(this._hass);
+      body = `<p class="hint">${escapeHtml(t.wizardSourceHint)}</p><div class="choices">
+        ${stations.length ? choice("source", "deye", "DeyeCloud", t.wizardFound, w.source === "deye") : ""}
+        ${auto ? choice("source", "energy", t.wizardEnergy, t.wizardEnergyNote, w.source === "energy") : ""}
+        ${integrations.map((i) => choice("source", `int:${i.platform}`, i.name, t.wizardIntegrationNote, w.source === `int:${i.platform}`)).join("")}
+        ${choice("source", "manual", t.wizardManual, t.wizardManualNote, w.source === "manual")}
+      </div>`;
+      if (w.source.startsWith("int:") || w.source === "manual") {
+        if (!w.entities || w.entitiesFor !== w.source) {
+          const guess = w.source === "manual" ? { entities: {}, daily: true } : guessSensors(this._hass, w.source.slice(4));
+          Object.assign(w, { entities: guess.entities, daily: guess.daily, entitiesFor: w.source });
+        }
+        const names = Object.fromEntries(editorEntityGroups(t).flatMap(([, items]) => items));
+        body += `<p class="hint">${escapeHtml(Object.keys(w.entities).length ? t.wizardGuessed : t.wizardPick)}</p>
+          <div class="pickers">${Object.keys(SENSOR_GUESSES).map((key) => this._picker(`wizard.${key}`, names[key], w.entities[key], "sensor", { kind: fieldKind(key) })).join("")}</div>
+          <label><span>${escapeHtml(t.editorEnergySensors)}</span><select data-wiz-daily>
+            <option value="1" ${w.daily ? "selected" : ""}>${escapeHtml(t.editorEnergyDaily)}</option>
+            <option value="" ${w.daily ? "" : "selected"}>${escapeHtml(t.editorEnergyTotal)}</option></select></label>
+          <p class="hint">${escapeHtml(INTEGRATION_SIGNS[w.source.slice(4)] ? t.wizardSignsSet : t.wizardSignsCheck)}</p>`;
+      }
+    } else if (w.step === 2) {
+      const rce = detectRcePrice(this._hass);
+      body = `<div class="choices">
+        ${choice("prices", "none", t.wizardNoPrices, "", w.prices === "none")}
+        ${choice("prices", "fixed", t.editorSettlementFixed, t.wizardFixedNote, w.prices === "fixed")}
+        ${choice("prices", "billing", t.editorSettlementBilling, rce ? fill(t.editorRceFound, { entity: rce, value: fieldValue(this._hass.states[rce], "any", t.locale) }) : t.wizardBillingNote, w.prices === "billing")}
+        ${choice("prices", "sensor", t.wizardDynamic, t.wizardDynamicNote, w.prices === "sensor")}
+      </div>
+      ${w.prices === "fixed" || w.prices === "billing" ? `<label><span>${escapeHtml(t.editorPriceImport)}</span><input type="number" min="0" step="0.01" data-wiz-input="priceImport" value="${escapeHtml(String(w.priceImport))}" /></label>` : ""}
+      ${w.prices === "fixed" ? `<label><span>${escapeHtml(t.editorPriceExport)}</span><input type="number" min="0" step="0.01" data-wiz-input="priceExport" value="${escapeHtml(String(w.priceExport))}" /></label>` : ""}
+      ${w.prices === "sensor" ? this._picker("wizard.priceSensor", t.editorPriceImportSensor, w.priceSensor, "sensor", { kind: "price" }) : ""}`;
+    } else {
+      const labels = { simple: [t.wizardSimple, t.wizardSimpleNote], full: [t.wizardFull, t.wizardFullNote], battery: [t.wizardBattery, t.wizardBatteryNote], chart: [t.wizardChart, t.wizardChartNote] };
+      body = `<div class="themes">${THEMES.map((theme) => `<button type="button" data-wiz="theme" data-value="${theme}" class="${w.theme === theme ? "on" : ""}">${escapeHtml(t.themeNames[theme])}</button>`).join("")}</div>
+        <div class="choices">${Object.keys(WIZARD_PRESETS).map((key) => choice("preset", key, labels[key][0], labels[key][1], w.preset === key)).join("")}</div>`;
+    }
+    const titles = [t.wizardStepSource, t.wizardStepPrices, t.wizardStepLook];
+    return `<div class="wizard">
+      <div><span class="steps">${escapeHtml(fill(t.wizardStepOf, { n: w.step, total: 3 }))}</span><h3>${escapeHtml(titles[w.step - 1])}</h3></div>
+      ${body}
+      <div class="wiz-nav">
+        <button type="button" data-wiz-nav="${w.step === 1 ? "close" : "back"}">${escapeHtml(w.step === 1 ? t.wizardCancel : t.wizardBack)}</button>
+        <button type="button" class="primary" data-wiz-nav="${w.step === 3 ? "finish" : "next"}">${escapeHtml(w.step === 3 ? t.wizardFinish : t.wizardNext)}</button>
+      </div>
+    </div>`;
+  }
+
+  // Everything the wizard asked, written into the card at once. Options it
+  // does not ask about stay as they are.
+  _finishWizard() {
+    const w = this._wizard;
+    const next = { ...this._config, theme: w.theme };
+    if (w.source.startsWith("int:") || w.source === "manual") {
+      next.entities = { ...(this._config.entities || {}), ...Object.fromEntries(Object.entries(w.entities || {}).filter(([, id]) => id)) };
+      if (!Object.keys(next.entities).length) delete next.entities;
+      if (w.daily) delete next.energy_sensors;
+      else next.energy_sensors = "total";
+      Object.assign(next, INTEGRATION_SIGNS[w.source.slice(4)] || {});
+    }
+    for (const key of ["price_import", "price_export", "settlement"]) delete next[key];
+    const number = (v) => (Number.isFinite(Number.parseFloat(v)) ? Number.parseFloat(v) : undefined);
+    if (w.prices === "fixed") Object.assign(next, { price_import: number(w.priceImport), price_export: number(w.priceExport) });
+    if (w.prices === "billing") Object.assign(next, { settlement: "net_billing", price_import: number(w.priceImport) });
+    if (w.prices === "sensor" && w.priceSensor) next.price_import = w.priceSensor;
+    delete next.sections;
+    delete next.show_solar;
+    Object.assign(next, WIZARD_PRESETS[w.preset] || {});
+    for (const key of Object.keys(next)) if (next[key] === undefined) delete next[key];
+    this._wizard = null;
+    this._emit(next);
+    this._render();
+  }
+
   _render() {
     if (!this.shadowRoot) return;
     const t = stringsFor(languageOf(this._hass, this._config));
@@ -810,12 +1008,27 @@ class SolarFlowCardEditor extends HTMLElement {
         .colors label { display: flex; align-items: center; gap: 6px; font-size: 13px; }
         .colors input[type=color] { width: 34px; height: 26px; padding: 0; border: 1px solid var(--divider-color, rgba(127,127,127,.35)); border-radius: 6px; background: none; }
         .colors input.unset { opacity: .45; }
+        .wiz-open { justify-self: start; padding: 8px 14px; border: 1px solid var(--primary-color, #03a9f4); border-radius: 999px; background: none;
+          color: var(--primary-color, #03a9f4); font: inherit; font-weight: 600; cursor: pointer; }
+        .wizard { display: grid; gap: 12px; padding: 14px; border: 2px solid var(--primary-color, #03a9f4); border-radius: 14px; }
+        .wizard h3 { margin: 0; font-size: 16px; }
+        .wizard .steps { color: var(--secondary-text-color, #727272); font-size: 12px; }
+        .choices { display: grid; gap: 8px; }
+        .choice { display: grid; gap: 2px; padding: 10px 12px; border: 1px solid var(--divider-color, rgba(127,127,127,.35)); border-radius: 10px;
+          background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+        .choice.on { border-color: var(--primary-color, #03a9f4); box-shadow: inset 0 0 0 1px var(--primary-color, #03a9f4); }
+        .choice b { font-size: 14px; } .choice small { color: var(--secondary-text-color, #727272); font-size: 12px; }
+        .wiz-nav { display: flex; justify-content: space-between; gap: 8px; }
+        .wiz-nav button { padding: 8px 16px; border-radius: 999px; border: 1px solid var(--divider-color, rgba(127,127,127,.35)); background: none; color: inherit; font: inherit; cursor: pointer; }
+        .wiz-nav button.primary { border-color: var(--primary-color, #03a9f4); background: var(--primary-color, #03a9f4); color: var(--text-primary-color, #fff); font-weight: 600; }
         .link { justify-self: start; padding: 0; border: 0; background: none; color: var(--primary-color, #03a9f4); font: inherit; font-size: 13px; cursor: pointer; }
       </style>
       <datalist id="sfc-sensor">${ids("sensor").map((id) => `<option value="${escapeHtml(id)}"></option>`).join("")}</datalist>
       <datalist id="sfc-weather">${ids("weather").map((id) => `<option value="${escapeHtml(id)}"></option>`).join("")}</datalist>
       <div class="editor">
         ${this._legacyType ? `<p class="beta">${escapeHtml(t.editorRenamed)}</p>` : ""}
+        ${this._wizard ? this._wizardHtml(t) : `<button type="button" class="wiz-open" data-wizard-open>✨ ${escapeHtml(t.wizardOpen)}</button>`}
+        ${this._wizard ? "" : `
         ${this._group("look", t, () => this._lookHtml(t))}
         ${this._group("sensors", t, () => this._sensorsHtml(t))}
         ${this._group("sections", t, () => this._sectionsHtml(t))}
@@ -823,7 +1036,7 @@ class SolarFlowCardEditor extends HTMLElement {
         ${this._group("summary", t, () => this._summaryHtml(t))}
         ${this._group("vstore", t, () => this._vstoreHtml(t))}
         ${this._group("forecast", t, () => this._forecastHtml(t))}
-        ${this._group("more", t, () => this._moreHtml(t))}
+        ${this._group("more", t, () => this._moreHtml(t))}`}
       </div>`;
     this._wire(this.shadowRoot);
   }
@@ -919,6 +1132,21 @@ class SolarFlowCardEditor extends HTMLElement {
       this._set("virtual_storage", e.target.checked ? true : undefined);
       this._render();
     });
+    root.querySelector("[data-wizard-open]")?.addEventListener("click", () => this._startWizard());
+    root.querySelectorAll("[data-wiz]").forEach((button) => button.addEventListener("click", () => {
+      this._wizard[button.dataset.wiz] = button.dataset.value;
+      this._render();
+    }));
+    root.querySelectorAll("[data-wiz-input]").forEach((input) => input.addEventListener("change", (e) => { this._wizard[input.dataset.wizInput] = e.target.value; }));
+    root.querySelector("[data-wiz-daily]")?.addEventListener("change", (e) => { this._wizard.daily = Boolean(e.target.value); });
+    root.querySelectorAll("[data-wiz-nav]").forEach((button) => button.addEventListener("click", () => {
+      const action = button.dataset.wizNav;
+      if (action === "close") this._wizard = null;
+      else if (action === "back") this._wizard.step -= 1;
+      else if (action === "next") this._wizard.step += 1;
+      else return this._finishWizard();
+      this._render();
+    }));
     root.querySelectorAll("[data-phase-name]").forEach((input) => input.addEventListener("change", () => {
       const names = [...root.querySelectorAll("[data-phase-name]")].map((el) => el.value.trim());
       while (names.length && !names[names.length - 1]) names.pop();

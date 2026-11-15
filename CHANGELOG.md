@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.1.0-beta.6
+
+- **Quick start in the editor:** a three-step wizard sets up the card: where the data comes from, energy prices, and the look.
+  - It opens by itself for a new card, and from the "Quick start" button at the top of the editor.
+  - DeyeCloud and Home Assistant's Energy dashboard are found automatically. For an inverter integration (Huawei Solar, SolarEdge, Fronius, GoodWe, Victron, Solarman and others), its sensors are proposed by their meaning, to check and correct. For Huawei Solar the battery and grid signs are set too.
+  - Prices: none, fixed, net-billing with RCE, or a dynamic tariff from a sensor.
+  - Look: the theme and a preset (simple, everything, battery without panels, chart only).
+  - Nothing is written until "Finish"; options the wizard does not ask about stay as they are.
+- **Phase names** ([#136](https://github.com/gratak/solar-flow-card/issues/136)): `phase_names: [Maison, Gîte, Studio]` names the phase tiles, e.g. when the three "phases" are separate meters. Also in the editor under Sensors → Installation readings.
+
 ## 2.1.0-beta.5
 
 - **Payback with a battery and a dynamic tariff** ([#124](https://github.com/gratak/solar-flow-card/issues/124)): it showed 0% for a battery charged from the grid when it is cheap and used when it is dear. With hourly prices, payback is now worked out hour by hour since the statistics begin; whole months hid the gain.
