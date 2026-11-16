@@ -21,6 +21,7 @@
   "importing": "A importar",
   "exporting": "A exportar",
   "balanced": "Equilibrado",
+  "gridOff": "Sem rede",
   "fromRoof": "do telhado",
   "inHome": "em casa",
   "evCar": "carro",
@@ -371,12 +372,14 @@
     "battery_temperature": "Temperatura da bateria",
     "battery_voltage": "Tensão da bateria",
     "battery_current": "Corrente da bateria",
-    "generator_power": "Potência do gerador"
+    "generator_power": "Potência do gerador",
+    "grid_status": "Estado da ligação à rede (opcional)"
   },
   "editorPhaseLoad": "Casa {n}",
   "editorPhaseGrid": "Rede {n}",
   "editorPhaseVoltage": "Tensão {n}",
   "editorPhaseName": "Nome de {n}",
+  "editorGridOffStates": "Estados que indicam falta de rede (opcional, separados por vírgulas)",
   "editorStringPower": "Potência FV{n}",
   "editorStringVoltage": "Tensão FV{n}",
   "editorStringCurrent": "Corrente FV{n}",

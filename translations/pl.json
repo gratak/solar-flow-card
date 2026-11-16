@@ -21,6 +21,7 @@
   "importing": "Pobór",
   "exporting": "Oddawanie",
   "balanced": "Zbalansowana",
+  "gridOff": "Brak sieci",
   "fromRoof": "z dachu",
   "inHome": "w domu",
   "evCar": "auto",
@@ -371,12 +372,14 @@
     "battery_temperature": "Temperatura magazynu",
     "battery_voltage": "Napięcie magazynu",
     "battery_current": "Prąd magazynu",
-    "generator_power": "Moc generatora"
+    "generator_power": "Moc generatora",
+    "grid_status": "Stan połączenia z siecią (opcjonalnie)"
   },
   "editorPhaseLoad": "Dom {n}",
   "editorPhaseGrid": "Sieć {n}",
   "editorPhaseVoltage": "Napięcie {n}",
   "editorPhaseName": "Nazwa {n}",
+  "editorGridOffStates": "Stany oznaczające brak sieci (opcjonalnie, po przecinku)",
   "editorStringPower": "Moc PV{n}",
   "editorStringVoltage": "Napięcie PV{n}",
   "editorStringCurrent": "Prąd PV{n}",

@@ -21,6 +21,7 @@
   "importing": "Importing",
   "exporting": "Exporting",
   "balanced": "Balanced",
+  "gridOff": "Grid down",
   "fromRoof": "from the roof",
   "inHome": "in the home",
   "evCar": "car",
@@ -371,12 +372,14 @@
     "battery_temperature": "Battery temperature",
     "battery_voltage": "Battery voltage",
     "battery_current": "Battery current",
-    "generator_power": "Generator power"
+    "generator_power": "Generator power",
+    "grid_status": "Grid connection status (optional)"
   },
   "editorPhaseLoad": "Home {n}",
   "editorPhaseGrid": "Grid {n}",
   "editorPhaseVoltage": "Voltage {n}",
   "editorPhaseName": "Name of {n}",
+  "editorGridOffStates": "States meaning the grid is down (optional, comma-separated)",
   "editorStringPower": "PV{n} power",
   "editorStringVoltage": "PV{n} voltage",
   "editorStringCurrent": "PV{n} current",

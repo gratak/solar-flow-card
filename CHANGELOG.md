@@ -2,6 +2,12 @@
 
 ## 2.1.0-beta.7
 
+- **Grid down** ([#140](https://github.com/gratak/solar-flow-card/issues/140)): with a grid status sensor the card shows "Grid down" in place of "Balanced" when the grid is disconnected, in every theme (LCARS: in the status bar too).
+  - `entities.grid_status`: a binary sensor ("on" while connected, or "on" when lost for a "Grid lost" / problem sensor) or a text sensor ("Off-grid", "Disconnected", "Pull-out"…).
+  - `grid_off_states: [Backup]` names the states that mean the grid is down, when the card does not recognise them.
+  - DeyeCloud: the inverter's grid relay status is used automatically.
+  - Both in the editor under Sensors → Installation readings.
+
 - **Period tabs on narrow cards:** with six or seven tabs (e.g. `last_month` and `year` added under `periods`) the tab names were cut to "2…", "3…" on a phone. They now go into two even rows when they do not fit in one. The default five tabs look as before.
 - **Diorama on a phone:** the grid and car value pills went past the right edge of the scene on narrow cards. They are now moved inside it, and a pill moved this way does not cover its neighbour. On the narrowest cards (about 340 px and less) the house pills show the value only.
 - **LCARS on a phone:** the labels of the top readout ("Self-sufficiency today") and the stored energy in the battery forecast no longer run over the edge.

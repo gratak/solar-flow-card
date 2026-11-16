@@ -554,6 +554,7 @@ class SolarFlowCard extends HTMLElement {
       const period = periods.includes(this._period) ? this._period : periods.includes(config.period) ? config.period : periods[0];
       const showSolar = config.show_solar !== false;
       const live = liveValues(resolved, config);
+      live.gridOff = gridOffline(resolved.gridStatus, config) === true;
       if (!showSolar) {
         live.solar = 0;
         live.solarActive = false;
@@ -705,11 +706,11 @@ class SolarFlowCard extends HTMLElement {
         // animation (re-renders continue it), then null.
         intro: introAt,
       };
-      model.systemStatus = systemStatus(status, forecast, panels, system);
+      model.systemStatus = systemStatus(status, forecast, panels, system, live.gridOff);
 
       const painted = this._paint(
         BASE_CSS + THEME_CSS[theme] + FIT_CSS + colorCss(config),
-        ["sfc", `theme-${theme}`, darkMode(config, this._hass) && "dark", config.animation === false && "no-anim", config.background === "glass" && "glass", !flowShown && theme !== "lcars" && theme !== "gate" && "parts", live.exportActive ? "grid-export" : live.importActive && "grid-import"].filter(Boolean).join(" "),
+        ["sfc", `theme-${theme}`, darkMode(config, this._hass) && "dark", config.animation === false && "no-anim", config.background === "glass" && "glass", !flowShown && theme !== "lcars" && theme !== "gate" && "parts", live.gridOff ? "grid-off" : live.exportActive ? "grid-export" : live.importActive && "grid-import"].filter(Boolean).join(" "),
         wide ? wideLayout(theme, THEME_RENDER[theme](model)) : withoutFlow(theme, THEME_RENDER[theme](model), flowShown),
       );
       if (!painted) return;
