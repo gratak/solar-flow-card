@@ -152,6 +152,7 @@ co2_factor: 0.7
 | `inverter_power_rating` | from the inverter | Inverter rated power in kW, for the inverter load. DeyeCloud reports it; set it for other inverters. |
 | `voltage_limit` | `253` | Grid guard: a phase above this voltage (V) is marked in the Installation section with a warning, and the section and "Today at a glance" show the day's highest voltage and the time spent above the limit. Above 253 V (230 V + 10 %) an inverter limits its power or switches off. `false` turns the check off. Needs the phase voltage sensors (`grid_voltage_l1`…; found automatically with DeyeCloud). |
 | `phase_names` | `[L1, L2, L3]` | Your own names for the three phase tiles in the Installation section, e.g. `[Maison, Gîte, Studio]` when the three "phases" are separate meters. Also in the editor under Sensors → Installation readings. |
+| `grid_off_states` | – | The states of `entities.grid_status` that mean the grid is down, e.g. `[Off-grid]`, when the card does not recognise them by itself. Without it: a binary sensor is "on" while connected (or "on" when the grid is lost, for a sensor named "Grid lost" / "Off-grid" or with device class `problem`); a text state is read by its words ("Off-grid", "Disconnected", "Pull-out", "Lost"…). With DeyeCloud the inverter's grid relay status is used automatically. While the grid is down the card shows "Grid down" in place of "Balanced". |
 | `main_fuse` | – | Main fuse per phase in A, e.g. `25`: each phase tile shows its current and share of the fuse (from the phase's grid power and voltage), with a warning from 90 %. |
 | `panels_average` | `all` | `per_string`: the average and the weakest panel for each string on its own, with a summary under each string (useful when the strings face different ways). `all`: over all panels. Also in the editor. |
 | `panels_per_string` | – | Panels on each string, a number or a list (`[11, 7]`). Groups the optimizer tiles into strings in that order, and without optimizers shows one tile per string: the string's power and an estimate per panel (≈ power and today's energy), with a note. The editor shows one field per string the inverter reports, with its current voltage. |
@@ -353,6 +354,7 @@ entities:
   battery_voltage: sensor.battery_voltage      # V
   battery_current: sensor.battery_current      # A
   generator_power: sensor.generator_power      # W
+  grid_status: binary_sensor.grid_connected    # grid connection, see grid_off_states
 panels:                                        # optional, energy today per panel
   - sensor.panel_1_energy_today
   - entity: sensor.panel_2_energy_today

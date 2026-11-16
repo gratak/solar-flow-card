@@ -21,6 +21,7 @@
   "importing": "Importation",
   "exporting": "Exportation",
   "balanced": "Équilibré",
+  "gridOff": "Réseau coupé",
   "fromRoof": "depuis le toit",
   "inHome": "dans la maison",
   "evCar": "voiture",
@@ -371,12 +372,14 @@
     "battery_temperature": "Température de la batterie",
     "battery_voltage": "Tension de la batterie",
     "battery_current": "Courant de la batterie",
-    "generator_power": "Puissance du groupe électrogène"
+    "generator_power": "Puissance du groupe électrogène",
+    "grid_status": "État de la connexion au réseau (facultatif)"
   },
   "editorPhaseLoad": "Maison {n}",
   "editorPhaseGrid": "Réseau {n}",
   "editorPhaseVoltage": "Tension {n}",
   "editorPhaseName": "Nom de {n}",
+  "editorGridOffStates": "États signifiant que le réseau est coupé (facultatif, séparés par des virgules)",
   "editorStringPower": "Puissance PV{n}",
   "editorStringVoltage": "Tension PV{n}",
   "editorStringCurrent": "Courant PV{n}",

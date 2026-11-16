@@ -51,7 +51,7 @@ function editorEntityGroups(t) {
     ["live", named(["solar_power", "load_power", "grid_power", "grid_import_power", "grid_export_power", "battery_power", "battery_charge_power", "battery_discharge_power", "battery_soc"])],
     ["energy", named(["solar_energy", "load_energy", "grid_import_energy", "grid_export_energy", "battery_charge_energy", "battery_discharge_energy"])],
     ["system", [...phases("load_power", t.editorPhaseLoad), ...phases("grid_power", t.editorPhaseGrid), ...phases("grid_voltage", t.editorPhaseVoltage),
-      ...named(["inverter_power", "inverter_rated_power", "battery_temperature", "battery_voltage", "battery_current", "generator_power"])]],
+      ...named(["inverter_power", "inverter_rated_power", "battery_temperature", "battery_voltage", "battery_current", "generator_power", "grid_status"])]],
     ["strings", strings],
   ];
 }
@@ -327,14 +327,14 @@ class SolarFlowCardEditor extends HTMLElement {
       if (selector) {
         const picker = document.createElement("ha-selector");
         picker.hass = this._hass;
-        picker.selector = { entity: domain ? { domain } : {} };
+        picker.selector = { entity: domain ? { domain: domain.includes(",") ? domain.split(",") : domain } : {} };
         picker.label = label;
         picker.value = value || undefined;
         picker.required = false;
         picker.addEventListener("value-changed", (e) => changed(e.detail?.value));
         el.append(picker);
       } else {
-        el.innerHTML = `<label><span>${escapeHtml(label)}</span><input type="text" list="sfc-${domain || "sensor"}" value="${escapeHtml(value)}" placeholder="${domain || "sensor"}.…" /></label>`;
+        el.innerHTML = `<label><span>${escapeHtml(label)}</span><input type="text" list="sfc-${(domain || "sensor").split(",")[0]}" value="${escapeHtml(value)}" placeholder="${(domain || "sensor").split(",")[0]}.…" /></label>`;
         el.querySelector("input").addEventListener("change", (e) => changed(e.target.value));
       }
     }
@@ -631,6 +631,7 @@ class SolarFlowCardEditor extends HTMLElement {
       const pv = key.match(/^pv(\d)_(power|voltage|current)$/);
       const reading = pv && strings.get(Number(pv[1]))?.[{ power: "W", voltage: "V", current: "A" }[pv[2]]];
       const fromReading = reading && this._hass?.states?.[reading.entityId] ? { entityId: reading.entityId, stateObj: this._hass.states[reading.entityId] } : null;
+      if (key === "grid_status") return resolved.gridStatus || null;
       return (live && resolved.live[live[0]]) || (energy && resolved.energy[energy[0]]) || (sys && system[sys[0]]) || fromReading || null;
     };
     const extra = (key) => {
@@ -653,8 +654,9 @@ class SolarFlowCardEditor extends HTMLElement {
       ${editorEntityGroups(t).map(([group, items]) => `
         <details class="box" data-box="entities-${group}" ${this._boxOpen(`entities-${group}`, group === "live" || group === "energy" || items.some(([key]) => entities[key])) ? "open" : ""}>
           <summary class="title">${escapeHtml(t.editorEntityGroups[group])}${(() => { const n = items.filter(([key]) => !entities[key] && autoFor(key)).length; return n ? ` <small class="found">${escapeHtml(fill(t.editorFoundN, { n }))}</small>` : ""; })()}</summary>
-          <div class="pickers">${items.map(([key, label]) => this._picker(`entities.${key}`, label, entities[key], "sensor", { auto: autoFor(key), extra: extra(key) })).join("")}</div>
-          ${group === "system" ? `<div class="grid">${[0, 1, 2].map((i) => `<label><span>${escapeHtml(fill(t.editorPhaseName, { n: `L${i + 1}` }))}</span><input type="text" data-phase-name="${i}" placeholder="L${i + 1}" value="${escapeHtml(Array.isArray(this._config.phase_names) ? this._config.phase_names[i] ?? "" : "")}" /></label>`).join("")}</div>` : ""}
+          <div class="pickers">${items.map(([key, label]) => this._picker(`entities.${key}`, label, entities[key], key === "grid_status" ? "sensor,binary_sensor" : "sensor", { auto: autoFor(key), extra: extra(key) })).join("")}</div>
+          ${group === "system" ? `<div class="grid">${[0, 1, 2].map((i) => `<label><span>${escapeHtml(fill(t.editorPhaseName, { n: `L${i + 1}` }))}</span><input type="text" data-phase-name="${i}" placeholder="L${i + 1}" value="${escapeHtml(Array.isArray(this._config.phase_names) ? this._config.phase_names[i] ?? "" : "")}" /></label>`).join("")}
+            <label><span>${escapeHtml(t.editorGridOffStates)}</span><input type="text" data-text="grid_off_states" placeholder="Off-grid, Pull-out" value="${escapeHtml(String(this._config.grid_off_states ?? ""))}" /></label></div>` : ""}
         </details>`).join("")}
       <details class="box" data-box="history" ${this._boxOpen("history", history.some((key) => entities[`${key}_history`])) ? "open" : ""}>
         <summary class="title">${escapeHtml(t.editorHistoryBox)}</summary>

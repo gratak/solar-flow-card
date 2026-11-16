@@ -198,14 +198,47 @@ function resolveEntities(hass, config) {
   if (solarParts.length && !configured.solar_power) live.solar = combinedEntry(solarParts, "W", wattsOf);
   if (energyParts.length && !configured.solar_energy) energy.solar = combinedEntry(energyParts, "kWh", kwhOf);
   const named = candidates.find(([, s]) => s.attributes?.station_name);
+  // The grid connection: entities.grid_status, or the inverter's grid relay
+  // from DeyeCloud.
+  const relay = devices.find(([, s]) => normalizeKey(deviceKey(s)) === normalizeKey("GridRelayStatus"));
+  const gridStatus = pick(configured.grid_status) || (relay ? { entityId: relay[0], stateObj: relay[1] } : null);
   return {
     station,
     stations,
     candidates,
     live,
     energy,
+    gridStatus,
     name: config.title || named?.[1].attributes.station_name || null,
   };
+}
+
+// Whether the grid is down, from a status sensor (#140). A binary sensor is
+// "on" while connected, unless it reports a problem ("Grid lost", device
+// class problem). A text state is read by its words ("Off-grid", "Pull-out",
+// "Disconnected"…); `grid_off_states` lists the states that mean the grid
+// is down when these words do not fit. Unknown: null.
+const GRID_OFF_WORDS = /(off.?grid|disconnect|not.?connected|lost|loss|island|outage|fail|fault|abnormal|no.?grid|pull.?out|grid.?down|^open$|^down$)/i;
+const GRID_PROBLEM_NAME = /(lost|loss|fail|fault|outage|off.?grid|island|down|alarm)/i;
+
+function gridOffline(entry, config) {
+  const stateObj = entry?.stateObj;
+  if (!stateObj) return null;
+  const state = String(stateObj.state ?? "").trim();
+  if (!state || state === "unknown" || state === "unavailable") return null;
+  const listed = config.grid_off_states;
+  if (listed) {
+    const off = (Array.isArray(listed) ? listed : String(listed).split(",")).map((s) => String(s).trim().toLowerCase()).filter(Boolean);
+    if (off.length) return off.includes(state.toLowerCase());
+  }
+  const lower = state.toLowerCase();
+  const flag = { on: true, off: false, true: true, false: false, 1: true, 0: false }[lower];
+  if (flag !== undefined) {
+    const name = `${entry.entityId} ${stateObj.attributes?.friendly_name || ""}`;
+    const problem = ["problem", "safety"].includes(stateObj.attributes?.device_class) || GRID_PROBLEM_NAME.test(name);
+    return problem ? flag : !flag;
+  }
+  return GRID_OFF_WORDS.test(lower);
 }
 
 function hasAnyEntity(resolved) {
@@ -1948,8 +1981,8 @@ function estimatePanels(readings, config, today) {
 // Status used by themes that show one (LCARS): alert when offline or the
 // battery reached its reserve, caution when delayed, close to the reserve,
 // a panel is underperforming or the battery is too cold or hot.
-function systemStatus(status, forecast, panels, system) {
+function systemStatus(status, forecast, panels, system, gridOff = false) {
   if (status.state === "offline" || (isNum(forecast.soc) && forecast.soc <= forecast.minSoc + 1)) return "alert";
-  if (status.state === "delayed" || (isNum(forecast.soc) && forecast.soc < forecast.minSoc + 15) || panels?.weakest || system?.batteryWarn || system?.voltageOver || system?.fuseHigh) return "warn";
+  if (gridOff || status.state === "delayed" || (isNum(forecast.soc) && forecast.soc < forecast.minSoc + 15) || panels?.weakest || system?.batteryWarn || system?.voltageOver || system?.fuseHigh) return "warn";
   return "nominal";
 }

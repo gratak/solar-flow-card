@@ -21,6 +21,7 @@
   "importing": "Bezug",
   "exporting": "Einspeisung",
   "balanced": "Ausgeglichen",
+  "gridOff": "Netz aus",
   "fromRoof": "vom Dach",
   "inHome": "im Haus",
   "evCar": "Auto",
@@ -371,12 +372,14 @@
     "battery_temperature": "Batterietemperatur",
     "battery_voltage": "Batteriespannung",
     "battery_current": "Batteriestrom",
-    "generator_power": "Generatorleistung"
+    "generator_power": "Generatorleistung",
+    "grid_status": "Netzverbindungsstatus (optional)"
   },
   "editorPhaseLoad": "Haus {n}",
   "editorPhaseGrid": "Netz {n}",
   "editorPhaseVoltage": "Spannung {n}",
   "editorPhaseName": "Name von {n}",
+  "editorGridOffStates": "Zustände für „Netz aus“ (optional, durch Kommas getrennt)",
   "editorStringPower": "PV{n} Leistung",
   "editorStringVoltage": "PV{n} Spannung",
   "editorStringCurrent": "PV{n} Strom",

@@ -85,6 +85,7 @@ const TRANSLATIONS = {
     "importing": "Importing",
     "exporting": "Exporting",
     "balanced": "Balanced",
+    "gridOff": "Grid down",
     "fromRoof": "from the roof",
     "inHome": "in the home",
     "evCar": "car",
@@ -435,12 +436,14 @@ const TRANSLATIONS = {
       "battery_temperature": "Battery temperature",
       "battery_voltage": "Battery voltage",
       "battery_current": "Battery current",
-      "generator_power": "Generator power"
+      "generator_power": "Generator power",
+      "grid_status": "Grid connection status (optional)"
     },
     "editorPhaseLoad": "Home {n}",
     "editorPhaseGrid": "Grid {n}",
     "editorPhaseVoltage": "Voltage {n}",
     "editorPhaseName": "Name of {n}",
+    "editorGridOffStates": "States meaning the grid is down (optional, comma-separated)",
     "editorStringPower": "PV{n} power",
     "editorStringVoltage": "PV{n} voltage",
     "editorStringCurrent": "PV{n} current",
@@ -617,6 +620,7 @@ const TRANSLATIONS = {
     "importing": "Bezug",
     "exporting": "Einspeisung",
     "balanced": "Ausgeglichen",
+    "gridOff": "Netz aus",
     "fromRoof": "vom Dach",
     "inHome": "im Haus",
     "evCar": "Auto",
@@ -967,12 +971,14 @@ const TRANSLATIONS = {
       "battery_temperature": "Batterietemperatur",
       "battery_voltage": "Batteriespannung",
       "battery_current": "Batteriestrom",
-      "generator_power": "Generatorleistung"
+      "generator_power": "Generatorleistung",
+      "grid_status": "Netzverbindungsstatus (optional)"
     },
     "editorPhaseLoad": "Haus {n}",
     "editorPhaseGrid": "Netz {n}",
     "editorPhaseVoltage": "Spannung {n}",
     "editorPhaseName": "Name von {n}",
+    "editorGridOffStates": "Zustände für „Netz aus“ (optional, durch Kommas getrennt)",
     "editorStringPower": "PV{n} Leistung",
     "editorStringVoltage": "PV{n} Spannung",
     "editorStringCurrent": "PV{n} Strom",
@@ -1149,6 +1155,7 @@ const TRANSLATIONS = {
     "importing": "Importation",
     "exporting": "Exportation",
     "balanced": "Équilibré",
+    "gridOff": "Réseau coupé",
     "fromRoof": "depuis le toit",
     "inHome": "dans la maison",
     "evCar": "voiture",
@@ -1499,12 +1506,14 @@ const TRANSLATIONS = {
       "battery_temperature": "Température de la batterie",
       "battery_voltage": "Tension de la batterie",
       "battery_current": "Courant de la batterie",
-      "generator_power": "Puissance du groupe électrogène"
+      "generator_power": "Puissance du groupe électrogène",
+      "grid_status": "État de la connexion au réseau (facultatif)"
     },
     "editorPhaseLoad": "Maison {n}",
     "editorPhaseGrid": "Réseau {n}",
     "editorPhaseVoltage": "Tension {n}",
     "editorPhaseName": "Nom de {n}",
+    "editorGridOffStates": "États signifiant que le réseau est coupé (facultatif, séparés par des virgules)",
     "editorStringPower": "Puissance PV{n}",
     "editorStringVoltage": "Tension PV{n}",
     "editorStringCurrent": "Courant PV{n}",
@@ -1681,6 +1690,7 @@ const TRANSLATIONS = {
     "importing": "Importeren",
     "exporting": "Exporteren",
     "balanced": "In balans",
+    "gridOff": "Net uitgevallen",
     "fromRoof": "van het dak",
     "inHome": "in de woning",
     "evCar": "auto",
@@ -2031,12 +2041,14 @@ const TRANSLATIONS = {
       "battery_temperature": "Batterijtemperatuur",
       "battery_voltage": "Batterijspanning",
       "battery_current": "Batterijstroom",
-      "generator_power": "Generatorvermogen"
+      "generator_power": "Generatorvermogen",
+      "grid_status": "Status netaansluiting (optioneel)"
     },
     "editorPhaseLoad": "Huis {n}",
     "editorPhaseGrid": "Net {n}",
     "editorPhaseVoltage": "Spanning {n}",
     "editorPhaseName": "Naam van {n}",
+    "editorGridOffStates": "Statussen die betekenen dat het net weg is (optioneel, gescheiden door komma's)",
     "editorStringPower": "PV{n} vermogen",
     "editorStringVoltage": "PV{n} spanning",
     "editorStringCurrent": "PV{n} stroom",
@@ -2213,6 +2225,7 @@ const TRANSLATIONS = {
     "importing": "Pobór",
     "exporting": "Oddawanie",
     "balanced": "Zbalansowana",
+    "gridOff": "Brak sieci",
     "fromRoof": "z dachu",
     "inHome": "w domu",
     "evCar": "auto",
@@ -2563,12 +2576,14 @@ const TRANSLATIONS = {
       "battery_temperature": "Temperatura magazynu",
       "battery_voltage": "Napięcie magazynu",
       "battery_current": "Prąd magazynu",
-      "generator_power": "Moc generatora"
+      "generator_power": "Moc generatora",
+      "grid_status": "Stan połączenia z siecią (opcjonalnie)"
     },
     "editorPhaseLoad": "Dom {n}",
     "editorPhaseGrid": "Sieć {n}",
     "editorPhaseVoltage": "Napięcie {n}",
     "editorPhaseName": "Nazwa {n}",
+    "editorGridOffStates": "Stany oznaczające brak sieci (opcjonalnie, po przecinku)",
     "editorStringPower": "Moc PV{n}",
     "editorStringVoltage": "Napięcie PV{n}",
     "editorStringCurrent": "Prąd PV{n}",
@@ -2745,6 +2760,7 @@ const TRANSLATIONS = {
     "importing": "A importar",
     "exporting": "A exportar",
     "balanced": "Equilibrado",
+    "gridOff": "Sem rede",
     "fromRoof": "do telhado",
     "inHome": "em casa",
     "evCar": "carro",
@@ -3095,12 +3111,14 @@ const TRANSLATIONS = {
       "battery_temperature": "Temperatura da bateria",
       "battery_voltage": "Tensão da bateria",
       "battery_current": "Corrente da bateria",
-      "generator_power": "Potência do gerador"
+      "generator_power": "Potência do gerador",
+      "grid_status": "Estado da ligação à rede (opcional)"
     },
     "editorPhaseLoad": "Casa {n}",
     "editorPhaseGrid": "Rede {n}",
     "editorPhaseVoltage": "Tensão {n}",
     "editorPhaseName": "Nome de {n}",
+    "editorGridOffStates": "Estados que indicam falta de rede (opcional, separados por vírgulas)",
     "editorStringPower": "Potência FV{n}",
     "editorStringVoltage": "Tensão FV{n}",
     "editorStringCurrent": "Corrente FV{n}",
@@ -3706,14 +3724,47 @@ function resolveEntities(hass, config) {
   if (solarParts.length && !configured.solar_power) live.solar = combinedEntry(solarParts, "W", wattsOf);
   if (energyParts.length && !configured.solar_energy) energy.solar = combinedEntry(energyParts, "kWh", kwhOf);
   const named = candidates.find(([, s]) => s.attributes?.station_name);
+  // The grid connection: entities.grid_status, or the inverter's grid relay
+  // from DeyeCloud.
+  const relay = devices.find(([, s]) => normalizeKey(deviceKey(s)) === normalizeKey("GridRelayStatus"));
+  const gridStatus = pick(configured.grid_status) || (relay ? { entityId: relay[0], stateObj: relay[1] } : null);
   return {
     station,
     stations,
     candidates,
     live,
     energy,
+    gridStatus,
     name: config.title || named?.[1].attributes.station_name || null,
   };
+}
+
+// Whether the grid is down, from a status sensor (#140). A binary sensor is
+// "on" while connected, unless it reports a problem ("Grid lost", device
+// class problem). A text state is read by its words ("Off-grid", "Pull-out",
+// "Disconnected"…); `grid_off_states` lists the states that mean the grid
+// is down when these words do not fit. Unknown: null.
+const GRID_OFF_WORDS = /(off.?grid|disconnect|not.?connected|lost|loss|island|outage|fail|fault|abnormal|no.?grid|pull.?out|grid.?down|^open$|^down$)/i;
+const GRID_PROBLEM_NAME = /(lost|loss|fail|fault|outage|off.?grid|island|down|alarm)/i;
+
+function gridOffline(entry, config) {
+  const stateObj = entry?.stateObj;
+  if (!stateObj) return null;
+  const state = String(stateObj.state ?? "").trim();
+  if (!state || state === "unknown" || state === "unavailable") return null;
+  const listed = config.grid_off_states;
+  if (listed) {
+    const off = (Array.isArray(listed) ? listed : String(listed).split(",")).map((s) => String(s).trim().toLowerCase()).filter(Boolean);
+    if (off.length) return off.includes(state.toLowerCase());
+  }
+  const lower = state.toLowerCase();
+  const flag = { on: true, off: false, true: true, false: false, 1: true, 0: false }[lower];
+  if (flag !== undefined) {
+    const name = `${entry.entityId} ${stateObj.attributes?.friendly_name || ""}`;
+    const problem = ["problem", "safety"].includes(stateObj.attributes?.device_class) || GRID_PROBLEM_NAME.test(name);
+    return problem ? flag : !flag;
+  }
+  return GRID_OFF_WORDS.test(lower);
 }
 
 function hasAnyEntity(resolved) {
@@ -5456,9 +5507,9 @@ function estimatePanels(readings, config, today) {
 // Status used by themes that show one (LCARS): alert when offline or the
 // battery reached its reserve, caution when delayed, close to the reserve,
 // a panel is underperforming or the battery is too cold or hot.
-function systemStatus(status, forecast, panels, system) {
+function systemStatus(status, forecast, panels, system, gridOff = false) {
   if (status.state === "offline" || (isNum(forecast.soc) && forecast.soc <= forecast.minSoc + 1)) return "alert";
-  if (status.state === "delayed" || (isNum(forecast.soc) && forecast.soc < forecast.minSoc + 15) || panels?.weakest || system?.batteryWarn || system?.voltageOver || system?.fuseHigh) return "warn";
+  if (gridOff || status.state === "delayed" || (isNum(forecast.soc) && forecast.soc < forecast.minSoc + 15) || panels?.weakest || system?.batteryWarn || system?.voltageOver || system?.fuseHigh) return "warn";
   return "nominal";
 }
 
@@ -6539,6 +6590,7 @@ function batteryStatus(m) {
 }
 
 function gridStatus(m) {
+  if (m.live.gridOff) return m.t.gridOff;
   return m.live.importActive ? m.t.importing : m.live.exportActive ? m.t.exporting : m.t.balanced;
 }
 
@@ -6804,7 +6856,7 @@ function renderDiorama(m) {
       <div class="dio-clock">${escapeHtml(clockText(m))}${isNum(m.weather?.temperature) ? ` <button class="dio-temp" ${entityAttr(m.weather.entityId)}>${escapeHtml(`${formatNumber(m.weather.temperature, locale, 0)}${m.weather.unit}`)}</button>` : ""}</div>
       ${m.config.showSolar ? pill(288, 78, "pv", formatPower(live.solar, locale), t.fromRoof, m.ids.live.solar) : ""}
       ${m.config.showBattery ? pill(22, 208, "battery", formatPercent(live.soc, locale), batteryNote, batteryEntityId(m)) : ""}
-      ${pill(378, 240, "grid", formatPower(gridValue, locale), `${live.exportActive ? "↑ " : live.importActive ? "↓ " : ""}${t.grid.toLowerCase()}`, gridEntityId(m))}
+      ${pill(378, 240, "grid", formatPower(gridValue, locale), live.gridOff ? t.gridOff.toLowerCase() : `${live.exportActive ? "↑ " : live.importActive ? "↓ " : ""}${t.grid.toLowerCase()}`, gridEntityId(m))}
       ${pill(m.ev ? 70 : 120, 296, "load", formatPower(live.load, locale), t.inHome, m.ids.live.load)}
       ${m.ev ? pill(342, 294, "load", m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle,
         m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : m.ev.name || t.evCar, m.ev.entityId) : ""}
@@ -6996,6 +7048,7 @@ function liveSentence(m) {
   const f = m.forecast;
   if (f.mode === "discharging") lede += ` ${fill(t.paperLasts, { time: `<em>${formatWhen(f.at, locale)}</em>` })}`;
   if (f.mode === "charging") lede += ` ${fill(t.paperFull, { time: `<em>${formatWhen(f.at, locale)}</em>` })}`;
+  if (live.gridOff) lede += ` <em>${escapeHtml(t.gridOff)}.</em>`;
   if (live.exportActive) lede += ` ${fill(t.paperExport, { power: `<em>${formatPower(live.gridExport, locale)}</em>` })}`;
   return lede.trim().replace(/<(?!\/?em>)/g, "&lt;");
 }
@@ -7057,7 +7110,7 @@ function renderLcars(m) {
         <div class="lc-panel">
         ${m.config.showSolar ? row("pv", t.lcarsPvIn, live.solar, m.ids.live.solar) : ""}
         ${!m.config.showBattery ? "" : row(live.chargeActive ? "battery rev" : "battery", live.chargeActive ? t.lcarsBatIn : t.lcarsBatOut, live.chargeActive ? live.charge : live.discharge, batteryEntityId(m))}
-        ${row(live.exportActive ? "grid rev" : "grid", live.exportActive ? t.lcarsGridOut : t.lcarsGridIn, live.exportActive ? live.gridExport : live.gridImport, gridEntityId(m))}
+        ${row(live.exportActive ? "grid rev" : "grid", live.gridOff ? t.gridOff : live.exportActive ? t.lcarsGridOut : t.lcarsGridIn, live.exportActive ? live.gridExport : live.gridImport, gridEntityId(m))}
         ${row("home", t.lcarsHome, live.load, m.ids.live.load)}
         <div class="lc-soc ${m.config.showBattery ? "" : "no-battery"}">
           ${m.config.showBattery ? `<div class="lc-cells">${Array.from({ length: 10 }, (_, i) => `<i class="${i < cellsOn ? "on" : ""}"></i>`).join("")}</div>` : ""}
@@ -7072,7 +7125,7 @@ function renderLcars(m) {
             <div><span>${escapeHtml(t.autarkyToday)}</span><b>${escapeHtml(autarkyToday)}</b></div>
           </div>
         </div>
-        <div class="lc-status ${status}">${escapeHtml(t[`status${status[0].toUpperCase()}${status.slice(1)}`])}</div>
+        <div class="lc-status ${status}">${escapeHtml(live.gridOff && status === "warn" ? t.gridOff : t[`status${status[0].toUpperCase()}${status.slice(1)}`])}</div>
         </div>
         <div class="sfc-sections">${standardSections(m)}</div>
       </div>
@@ -8163,6 +8216,7 @@ const BASE_CSS = `
   ha-card.grid-export :is(.aur-node, .atl-label, .exp-box, .fnd-node, .gal-readout, .rx-node).grid > :is(em, small:last-child),
   ha-card.grid-export :is(.gt-row.grid em, .dio-pill.grid small) { color: var(--sfc-good, #3fb950); }
   ha-card.grid-import :is(.aur-node, .atl-label, .exp-box, .fnd-node, .gal-readout, .rx-node).grid > :is(em, small:last-child),
+  ha-card.grid-off :is(.gt-row.grid em, .dio-pill.grid small) { color: var(--sfc-bad, #f0524a); }
   ha-card.grid-import :is(.gt-row.grid em, .dio-pill.grid small) { color: var(--sfc-bad, #f0524a); }
   .sfc-bank + .sfc-phases { margin-top: 8px; }
   .sfc-phase.sfc-inv i { --sfc-c: var(--sfc-pv); }
@@ -9592,6 +9646,7 @@ class SolarFlowCard extends HTMLElement {
       const period = periods.includes(this._period) ? this._period : periods.includes(config.period) ? config.period : periods[0];
       const showSolar = config.show_solar !== false;
       const live = liveValues(resolved, config);
+      live.gridOff = gridOffline(resolved.gridStatus, config) === true;
       if (!showSolar) {
         live.solar = 0;
         live.solarActive = false;
@@ -9743,11 +9798,11 @@ class SolarFlowCard extends HTMLElement {
         // animation (re-renders continue it), then null.
         intro: introAt,
       };
-      model.systemStatus = systemStatus(status, forecast, panels, system);
+      model.systemStatus = systemStatus(status, forecast, panels, system, live.gridOff);
 
       const painted = this._paint(
         BASE_CSS + THEME_CSS[theme] + FIT_CSS + colorCss(config),
-        ["sfc", `theme-${theme}`, darkMode(config, this._hass) && "dark", config.animation === false && "no-anim", config.background === "glass" && "glass", !flowShown && theme !== "lcars" && theme !== "gate" && "parts", live.exportActive ? "grid-export" : live.importActive && "grid-import"].filter(Boolean).join(" "),
+        ["sfc", `theme-${theme}`, darkMode(config, this._hass) && "dark", config.animation === false && "no-anim", config.background === "glass" && "glass", !flowShown && theme !== "lcars" && theme !== "gate" && "parts", live.gridOff ? "grid-off" : live.exportActive ? "grid-export" : live.importActive && "grid-import"].filter(Boolean).join(" "),
         wide ? wideLayout(theme, THEME_RENDER[theme](model)) : withoutFlow(theme, THEME_RENDER[theme](model), flowShown),
       );
       if (!painted) return;
@@ -9964,7 +10019,7 @@ function editorEntityGroups(t) {
     ["live", named(["solar_power", "load_power", "grid_power", "grid_import_power", "grid_export_power", "battery_power", "battery_charge_power", "battery_discharge_power", "battery_soc"])],
     ["energy", named(["solar_energy", "load_energy", "grid_import_energy", "grid_export_energy", "battery_charge_energy", "battery_discharge_energy"])],
     ["system", [...phases("load_power", t.editorPhaseLoad), ...phases("grid_power", t.editorPhaseGrid), ...phases("grid_voltage", t.editorPhaseVoltage),
-      ...named(["inverter_power", "inverter_rated_power", "battery_temperature", "battery_voltage", "battery_current", "generator_power"])]],
+      ...named(["inverter_power", "inverter_rated_power", "battery_temperature", "battery_voltage", "battery_current", "generator_power", "grid_status"])]],
     ["strings", strings],
   ];
 }
@@ -10240,14 +10295,14 @@ class SolarFlowCardEditor extends HTMLElement {
       if (selector) {
         const picker = document.createElement("ha-selector");
         picker.hass = this._hass;
-        picker.selector = { entity: domain ? { domain } : {} };
+        picker.selector = { entity: domain ? { domain: domain.includes(",") ? domain.split(",") : domain } : {} };
         picker.label = label;
         picker.value = value || undefined;
         picker.required = false;
         picker.addEventListener("value-changed", (e) => changed(e.detail?.value));
         el.append(picker);
       } else {
-        el.innerHTML = `<label><span>${escapeHtml(label)}</span><input type="text" list="sfc-${domain || "sensor"}" value="${escapeHtml(value)}" placeholder="${domain || "sensor"}.…" /></label>`;
+        el.innerHTML = `<label><span>${escapeHtml(label)}</span><input type="text" list="sfc-${(domain || "sensor").split(",")[0]}" value="${escapeHtml(value)}" placeholder="${(domain || "sensor").split(",")[0]}.…" /></label>`;
         el.querySelector("input").addEventListener("change", (e) => changed(e.target.value));
       }
     }
@@ -10544,6 +10599,7 @@ class SolarFlowCardEditor extends HTMLElement {
       const pv = key.match(/^pv(\d)_(power|voltage|current)$/);
       const reading = pv && strings.get(Number(pv[1]))?.[{ power: "W", voltage: "V", current: "A" }[pv[2]]];
       const fromReading = reading && this._hass?.states?.[reading.entityId] ? { entityId: reading.entityId, stateObj: this._hass.states[reading.entityId] } : null;
+      if (key === "grid_status") return resolved.gridStatus || null;
       return (live && resolved.live[live[0]]) || (energy && resolved.energy[energy[0]]) || (sys && system[sys[0]]) || fromReading || null;
     };
     const extra = (key) => {
@@ -10566,8 +10622,9 @@ class SolarFlowCardEditor extends HTMLElement {
       ${editorEntityGroups(t).map(([group, items]) => `
         <details class="box" data-box="entities-${group}" ${this._boxOpen(`entities-${group}`, group === "live" || group === "energy" || items.some(([key]) => entities[key])) ? "open" : ""}>
           <summary class="title">${escapeHtml(t.editorEntityGroups[group])}${(() => { const n = items.filter(([key]) => !entities[key] && autoFor(key)).length; return n ? ` <small class="found">${escapeHtml(fill(t.editorFoundN, { n }))}</small>` : ""; })()}</summary>
-          <div class="pickers">${items.map(([key, label]) => this._picker(`entities.${key}`, label, entities[key], "sensor", { auto: autoFor(key), extra: extra(key) })).join("")}</div>
-          ${group === "system" ? `<div class="grid">${[0, 1, 2].map((i) => `<label><span>${escapeHtml(fill(t.editorPhaseName, { n: `L${i + 1}` }))}</span><input type="text" data-phase-name="${i}" placeholder="L${i + 1}" value="${escapeHtml(Array.isArray(this._config.phase_names) ? this._config.phase_names[i] ?? "" : "")}" /></label>`).join("")}</div>` : ""}
+          <div class="pickers">${items.map(([key, label]) => this._picker(`entities.${key}`, label, entities[key], key === "grid_status" ? "sensor,binary_sensor" : "sensor", { auto: autoFor(key), extra: extra(key) })).join("")}</div>
+          ${group === "system" ? `<div class="grid">${[0, 1, 2].map((i) => `<label><span>${escapeHtml(fill(t.editorPhaseName, { n: `L${i + 1}` }))}</span><input type="text" data-phase-name="${i}" placeholder="L${i + 1}" value="${escapeHtml(Array.isArray(this._config.phase_names) ? this._config.phase_names[i] ?? "" : "")}" /></label>`).join("")}
+            <label><span>${escapeHtml(t.editorGridOffStates)}</span><input type="text" data-text="grid_off_states" placeholder="Off-grid, Pull-out" value="${escapeHtml(String(this._config.grid_off_states ?? ""))}" /></label></div>` : ""}
         </details>`).join("")}
       <details class="box" data-box="history" ${this._boxOpen("history", history.some((key) => entities[`${key}_history`])) ? "open" : ""}>
         <summary class="title">${escapeHtml(t.editorHistoryBox)}</summary>

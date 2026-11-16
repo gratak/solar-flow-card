@@ -35,6 +35,7 @@ function batteryStatus(m) {
 }
 
 function gridStatus(m) {
+  if (m.live.gridOff) return m.t.gridOff;
   return m.live.importActive ? m.t.importing : m.live.exportActive ? m.t.exporting : m.t.balanced;
 }
 
@@ -300,7 +301,7 @@ function renderDiorama(m) {
       <div class="dio-clock">${escapeHtml(clockText(m))}${isNum(m.weather?.temperature) ? ` <button class="dio-temp" ${entityAttr(m.weather.entityId)}>${escapeHtml(`${formatNumber(m.weather.temperature, locale, 0)}${m.weather.unit}`)}</button>` : ""}</div>
       ${m.config.showSolar ? pill(288, 78, "pv", formatPower(live.solar, locale), t.fromRoof, m.ids.live.solar) : ""}
       ${m.config.showBattery ? pill(22, 208, "battery", formatPercent(live.soc, locale), batteryNote, batteryEntityId(m)) : ""}
-      ${pill(378, 240, "grid", formatPower(gridValue, locale), `${live.exportActive ? "↑ " : live.importActive ? "↓ " : ""}${t.grid.toLowerCase()}`, gridEntityId(m))}
+      ${pill(378, 240, "grid", formatPower(gridValue, locale), live.gridOff ? t.gridOff.toLowerCase() : `${live.exportActive ? "↑ " : live.importActive ? "↓ " : ""}${t.grid.toLowerCase()}`, gridEntityId(m))}
       ${pill(m.ev ? 70 : 120, 296, "load", formatPower(live.load, locale), t.inHome, m.ids.live.load)}
       ${m.ev ? pill(342, 294, "load", m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle,
         m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : m.ev.name || t.evCar, m.ev.entityId) : ""}
@@ -492,6 +493,7 @@ function liveSentence(m) {
   const f = m.forecast;
   if (f.mode === "discharging") lede += ` ${fill(t.paperLasts, { time: `<em>${formatWhen(f.at, locale)}</em>` })}`;
   if (f.mode === "charging") lede += ` ${fill(t.paperFull, { time: `<em>${formatWhen(f.at, locale)}</em>` })}`;
+  if (live.gridOff) lede += ` <em>${escapeHtml(t.gridOff)}.</em>`;
   if (live.exportActive) lede += ` ${fill(t.paperExport, { power: `<em>${formatPower(live.gridExport, locale)}</em>` })}`;
   return lede.trim().replace(/<(?!\/?em>)/g, "&lt;");
 }
@@ -553,7 +555,7 @@ function renderLcars(m) {
         <div class="lc-panel">
         ${m.config.showSolar ? row("pv", t.lcarsPvIn, live.solar, m.ids.live.solar) : ""}
         ${!m.config.showBattery ? "" : row(live.chargeActive ? "battery rev" : "battery", live.chargeActive ? t.lcarsBatIn : t.lcarsBatOut, live.chargeActive ? live.charge : live.discharge, batteryEntityId(m))}
-        ${row(live.exportActive ? "grid rev" : "grid", live.exportActive ? t.lcarsGridOut : t.lcarsGridIn, live.exportActive ? live.gridExport : live.gridImport, gridEntityId(m))}
+        ${row(live.exportActive ? "grid rev" : "grid", live.gridOff ? t.gridOff : live.exportActive ? t.lcarsGridOut : t.lcarsGridIn, live.exportActive ? live.gridExport : live.gridImport, gridEntityId(m))}
         ${row("home", t.lcarsHome, live.load, m.ids.live.load)}
         <div class="lc-soc ${m.config.showBattery ? "" : "no-battery"}">
           ${m.config.showBattery ? `<div class="lc-cells">${Array.from({ length: 10 }, (_, i) => `<i class="${i < cellsOn ? "on" : ""}"></i>`).join("")}</div>` : ""}
@@ -568,7 +570,7 @@ function renderLcars(m) {
             <div><span>${escapeHtml(t.autarkyToday)}</span><b>${escapeHtml(autarkyToday)}</b></div>
           </div>
         </div>
-        <div class="lc-status ${status}">${escapeHtml(t[`status${status[0].toUpperCase()}${status.slice(1)}`])}</div>
+        <div class="lc-status ${status}">${escapeHtml(live.gridOff && status === "warn" ? t.gridOff : t[`status${status[0].toUpperCase()}${status.slice(1)}`])}</div>
         </div>
         <div class="sfc-sections">${standardSections(m)}</div>
       </div>
