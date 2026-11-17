@@ -6650,6 +6650,172 @@ function dioramaSky(now) {
   return { phase: "dusk", sky: ["#e7855c", "#f6c48d"], ground: ["#b3d6b6", "#9bc8a3", "#8bbb94"] };
 }
 
+// The Diorama's electric car: a rounded saloon built as a small 3D model.
+// Cross-sections along its length (rounded below, a dome above that turns
+// into the glass cabin) are joined into faces, lit by their angle to the
+// light and drawn far to near. The model only depends on the time of day,
+// the paint and charging, so it is built once for each.
+const EV_CAR_CACHE = new Map();
+
+function evCarSvg(P, night, color, charging) {
+  const paint = typeof color === "string" && /^#[0-9a-f]{6}$/i.test(color) ? color.toLowerCase() : "#eef1f5";
+  const key = `${night}|${paint}|${charging}`;
+  if (EV_CAR_CACHE.has(key)) return EV_CAR_CACHE.get(key);
+  const [XC, Y0, Y1] = [5.02, 1.7, 3.8];
+  const Y = (u) => Y0 + u * (Y1 - Y0);
+  // A smooth curve through [u, value] points.
+  const curve = (ps) => (u) => {
+    let i = ps.findIndex((p, k) => k < ps.length - 1 && u <= ps[k + 1][0]);
+    if (i < 0) i = ps.length - 2;
+    const [a, b, c, d] = [ps[Math.max(0, i - 1)], ps[i], ps[i + 1], ps[Math.min(ps.length - 1, i + 2)]];
+    const t = (u - b[0]) / (c[0] - b[0] || 1);
+    return 0.5 * (2 * b[1] + (-a[1] + c[1]) * t + (2 * a[1] - 5 * b[1] + 4 * c[1] - d[1]) * t * t + (-a[1] + 3 * b[1] - 3 * c[1] + d[1]) * t * t * t);
+  };
+  // Side view and plan, rear (u = 0) to front (u = 1), in scene units.
+  const top = curve([[0, 0.33], [0.025, 0.44], [0.08, 0.495], [0.18, 0.525], [0.3, 0.615], [0.42, 0.66], [0.52, 0.655], [0.61, 0.605], [0.7, 0.515], [0.8, 0.48], [0.9, 0.43], [0.96, 0.37], [1, 0.27]]);
+  const belt = curve([[0, 0.31], [0.04, 0.42], [0.15, 0.47], [0.5, 0.475], [0.75, 0.465], [0.88, 0.42], [0.96, 0.35], [1, 0.26]]);
+  const bottom = curve([[0, 0.2], [0.04, 0.15], [0.5, 0.14], [0.95, 0.15], [1, 0.19]]);
+  // In plan a rectangle with well rounded corners, a little narrower at the front.
+  const half = (u) => 0.415 * (1 - 0.04 * u) * Math.pow(Math.max(0, 1 - Math.pow(Math.abs(2 * u - 1), 4.5)), 1 / 4.5);
+  const N = 30;
+  const M = 8;
+  const us = Array.from({ length: N }, (_, i) => 0.5 - 0.5 * Math.cos((Math.PI * i) / (N - 1)));
+  // One cross-section: the right half from the bottom centre to the roof
+  // centre, mirrored for the left.
+  const section = (u) => {
+    const [a, zt, zb] = [half(u), top(u), bottom(u)];
+    const zm = Math.min(belt(u), zt - 0.004);
+    const right = [];
+    for (let j = 0; j <= M; j++) {
+      const t = (-Math.PI / 2) * (1 - j / M);
+      const [c, s] = [Math.cos(t), -Math.sin(t)];
+      right.push([a * Math.pow(c, 2 / 3.2), zm - (zm - zb) * Math.pow(s, 2 / 3.2), false, j < M]);
+    }
+    // Above the belt: where there is a cabin, a shoulder of body first and
+    // then the narrower glass dome; elsewhere (bonnet, boot) a low dome.
+    const cabin = clamp((zt - zm - 0.03) / 0.06, 0, 1);
+    const inset = 1 - 0.2 * cabin;
+    const glassy = cabin > 0.5 && u > 0.1 && u < 0.76;
+    right.push([a * (1 - 0.1 * cabin), zm + 0.012 * cabin, false]);
+    for (let j = 1; j <= M; j++) {
+      const t = (Math.PI / 2) * (j / M);
+      const [c, s] = [Math.cos(t), Math.sin(t)];
+      right.push([a * inset * Math.pow(c, 2 / 2.3), zm + 0.012 * cabin + (zt - zm - 0.012 * cabin) * Math.pow(s, 2 / 2.3), glassy]);
+    }
+    const left = right.slice(1, -1).reverse().map(([x, z, g, l]) => [-x, z, g, l]);
+    return [...right, ...left].map(([x, z, g, l]) => Object.assign([XC + x, Y(u), z], { glass: g, lower: Boolean(l) }));
+  };
+  const rings = us.map(section);
+  const norm = (v) => { const l = Math.hypot(...v) || 1; return v.map((c) => c / l); };
+  const sub3 = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+  const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  const VIEW = norm([1, 1, 1]);
+  const LIGHT = norm([-0.4, 0.3, 1]);
+  const HALF = norm([VIEW[0] + LIGHT[0], VIEW[1] + LIGHT[1], VIEW[2] + LIGHT[2]]);
+  const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const blend = (c, to, k) => c.map((v, i) => Math.round(v + (to[i] - v) * Math.max(0, Math.min(1, k))));
+  // Colours a little rounded, so faces of nearly one shade share one path.
+  const css = (c) => `#${c.map((v) => Math.min(255, Math.round(v / 8) * 8).toString(16).padStart(2, "0")).join("")}`;
+  const base = night ? blend(hex(paint), [20, 28, 40], 0.5) : hex(paint);
+  const bright = (base[0] * 0.3 + base[1] * 0.59 + base[2] * 0.11) / 255;
+  const glassBase = night ? [12, 17, 25] : [20, 28, 38];
+  const shadeOf = (kind, n, lower) => {
+    const d = dot(n, LIGHT);
+    const spec = Math.pow(Math.max(0, dot(n, HALF)), 40);
+    if (kind === "glass") {
+      const sky = Math.max(0, n[2]) * (night ? 0.08 : 0.2) + Math.max(0, n[1]) * (night ? 0.04 : 0.12);
+      return css(blend(blend(glassBase, [120, 150, 180], sky), [255, 255, 255], spec * 0.25));
+    }
+    if (kind === "lamp") return night ? "#fff1a8" : "#f4f7fa";
+    if (kind === "tail") return "#d1302a";
+    if (kind === "arch") return night ? "#05070a" : "#0e1217";
+    // Like the house: lit from above and the front left, the sides in
+    // half shade.
+    const f = 0.8 + 0.3 * d;
+    let c = f >= 1 ? blend(base, [255, 255, 255], (f - 1) * 1.5) : blend(base, [20, 26, 36], (1 - f) * (1.1 - bright * 0.3));
+    // The body side under the shoulder a shade darker, so the shape reads.
+    if (lower) c = blend(c, [20, 26, 36], 0.1 + (1 - bright) * 0.05);
+    if (n[2] < -0.2) c = blend(c, [12, 16, 22], 0.35);
+    return css(blend(c, [255, 255, 255], Math.pow(Math.max(0, dot(n, HALF)), 12) * 0.3));
+  };
+  const wheels = [0.185, 0.8].map((u) => ({ u, y: Y(u), z: 0.165, r: 0.165 }));
+  const kindOf = (u, x, y, z, glass, n) => {
+    for (const w of wheels) if (Math.abs(n[0]) > 0.55 && Math.hypot(y - w.y, z - w.z) < w.r + 0.035 && z < belt(u) - 0.05) return "arch";
+    if (glass) return "glass";
+    return "paint";
+  };
+  const faces = [];
+  const addFace = (ps, inside) => {
+    let n = norm(cross(sub3(ps[2], ps[0]), sub3(ps[3] || ps[1], ps[1])));
+    const mid = ps.reduce((a, p) => [a[0] + p[0] / ps.length, a[1] + p[1] / ps.length, a[2] + p[2] / ps.length], [0, 0, 0]);
+    if (dot(n, sub3(mid, inside)) < 0) n = n.map((v) => -v);
+    if (dot(n, VIEW) <= 0.01) return;
+    const u = (mid[1] - Y0) / (Y1 - Y0);
+    const kind = kindOf(u, ...mid, ps.length === 4 && ps.every((p) => p.glass), n);
+    faces.push({ ps, layer: { paint: 0, glass: 1, arch: 2 }[kind] ?? 0, fill: shadeOf(kind, n, ps.length === 4 && ps.every((p) => p.lower)) });
+  };
+  for (let i = 0; i < N - 1; i++) {
+    const [a, b] = [rings[i], rings[i + 1]];
+    const inside = [XC, Y((us[i] + us[i + 1]) / 2), (belt(us[i]) + bottom(us[i])) / 2];
+    for (let j = 0; j < a.length; j++) {
+      const k = (j + 1) % a.length;
+      addFace([a[j], b[j], b[k], a[k]], inside);
+    }
+  }
+  // The nose: the front section closed.
+  addFace(rings[N - 1], [XC, Y(0.9), (belt(1) + bottom(1)) / 2]);
+  const pts = (ps) => ps.map((p) => P(...p).map((v) => v.toFixed(1)).join(",")).join(" ");
+  const disc = (x, y, z, r, n = 18) => Array.from({ length: n }, (_, i) => [x, y + Math.cos((i / n) * Math.PI * 2) * r, z + Math.sin((i / n) * Math.PI * 2) * r]);
+  let out = "";
+  // Shadow, then the far wheels (only their bottoms show under the body).
+  out += `<polygon points="${pts(Array.from({ length: 24 }, (_, i) => [XC + Math.cos((i / 24) * Math.PI * 2) * 0.5, Y(0.5) + Math.sin((i / 24) * Math.PI * 2) * 1.13, 0]))}" fill="rgba(0,0,0,.2)"/>`;
+  for (const w of wheels) out += `<polygon points="${pts(disc(XC - half(w.u) * 0.9, w.y, w.z, w.r))}" fill="#11161c"/>`;
+  // The body is nearly convex, so the faces turned towards the viewer do not
+  // cover each other: all faces of one colour go in one path, the paint
+  // first, then the glass and the wheel arches.
+  // Short path data: the first point, then relative steps.
+  const num = (v) => String(Math.round(v * 10) / 10);
+  const d = (ps) => {
+    const q = ps.map((p) => P(...p));
+    return `M${num(q[0][0])} ${num(q[0][1])}l${q.slice(1).map((p, i) => `${num(p[0] - q[i][0])} ${num(p[1] - q[i][1])}`).join(" ")}z`;
+  };
+  const groups = new Map();
+  for (const f of faces) {
+    const k = `${f.layer}${f.fill}`;
+    groups.set(k, (groups.get(k) || "") + d(f.ps));
+  }
+  for (const k of [...groups.keys()].sort()) out += `<path d="${groups.get(k)}" fill="${k.slice(1)}" stroke="${k.slice(1)}" stroke-width=".5" stroke-linejoin="round"/>`;
+  // The near wheels: tyre, dark aero cover with five spokes, hub.
+  for (const w of wheels) {
+    const x = XC + half(w.u) * 0.93;
+    out += `<polygon points="${pts(disc(x, w.y, w.z, w.r))}" fill="#11161c"/>`;
+    out += `<polygon points="${pts(disc(x + 0.005, w.y, w.z, w.r * 0.76))}" fill="${night ? "#222a33" : "#37414d"}"/>`;
+    for (let k = 0; k < 5; k++) {
+      const a = (k / 5) * Math.PI * 2;
+      out += `<polygon points="${pts([[x + 0.01, w.y + Math.cos(a) * 0.025, w.z + Math.sin(a) * 0.025], [x + 0.01, w.y + Math.cos(a + 0.3) * w.r * 0.72, w.z + Math.sin(a + 0.3) * w.r * 0.72], [x + 0.01, w.y + Math.cos(a + 0.55) * w.r * 0.72, w.z + Math.sin(a + 0.55) * w.r * 0.72]])}" fill="${night ? "#151a21" : "#262e37"}"/>`;
+    }
+    out += `<polygon points="${pts(disc(x + 0.012, w.y, w.z, 0.024, 10))}" fill="${night ? "#3a434f" : "#8a95a2"}"/>`;
+  }
+  // Slim headlights at the front corners, the light bar across the back.
+  const strip = (side, u0, u1, z0, z1, fill) => {
+    const at = (u, z) => [XC + side * half(u) * 0.97, Y(u), z];
+    out += `<polygon points="${pts([at(u0, belt(u0) - z0), at(u1, belt(u1) - z0 - 0.012), at(u1, belt(u1) - z1 - 0.012), at(u0, belt(u0) - z1)])}" fill="${fill}"/>`;
+  };
+  const lamp = night ? "#fff1a8" : "#f7f9fb";
+  strip(1, 0.9, 0.968, 0.025, 0.045, lamp);
+  strip(-1, 0.9, 0.968, 0.025, 0.045, lamp);
+  strip(1, 0.008, 0.07, 0.02, 0.04, "#d1302a");
+  // The charging port by the rear light glows while it charges.
+  if (charging) {
+    const u = 0.07;
+    const x = XC + half(u) * 0.97;
+    out += `<polygon points="${pts([[x, Y(u), belt(u) - 0.07], [x, Y(u + 0.035), belt(u) - 0.07], [x, Y(u + 0.035), belt(u) - 0.035], [x, Y(u), belt(u) - 0.035]])}" fill="#2fd39a"/>`;
+  }
+  EV_CAR_CACHE.set(key, out);
+  return out;
+}
+
 function dioramaScene(m) {
   const S = 26;
   const CX = 250;
@@ -6790,118 +6956,8 @@ function dioramaScene(m) {
     g += `<g class="sfc-click" ${entityAttr(ev.entityId)}>`;
     g += poly("#3a4a5c", [4, 2.35, 0.45], [4, 2.85, 0.45], [4, 2.85, 1.15], [4, 2.35, 1.15]);
     g += poly(ev.charging ? "#2fd39a" : "#8a99aa", [4, 2.5, 0.85], [4, 2.7, 0.85], [4, 2.7, 0.95], [4, 2.5, 0.95]);
-    // A low, rounded electric saloon seen from the front right. Its side
-    // profile (u: 0 rear … 1 front, z up) is a smooth curve sampled into
-    // short segments; the body is that profile drawn across the width, each
-    // segment lit by its slope, with a glass dome on top and rounded
-    // shoulders. The front points towards y+.
-    const [x0, x1, y0, y1] = [4.6, 5.42, 1.7, 3.8];
-    const Y = (u) => y0 + u * (y1 - y0);
-    const rgb = (hex) => { const n = parseInt(hex.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; };
-    const blend = (c, to, k) => c.map((v, i) => Math.round(v + (to[i] - v) * k));
-    const mix = (c, to, k) => `rgb(${blend(c, to, k).join(",")})`;
-    const base = rgb(ev.color && /^#[0-9a-f]{6}$/i.test(ev.color) ? ev.color : "#eef1f5");
-    // At night the paint is in shade; light colours take more highlight.
-    const paintBase = night ? blend(base, [18, 26, 38], 0.5) : base;
-    const bright = (base[0] * 0.3 + base[1] * 0.59 + base[2] * 0.11) / 255;
-    const gain = 0.35 + bright * 0.5;
-    const lit = (k) => (k >= 0 ? mix(paintBase, [255, 255, 255], k * gain) : mix(paintBase, [10, 14, 20], Math.min(0.9, -k)));
-    // Catmull-Rom through the given points, a few samples per span.
-    const smooth = (ps, n = 5) => {
-      const out = [];
-      for (let i = 0; i < ps.length - 1; i++) {
-        const [a, b, c, d] = [ps[Math.max(0, i - 1)], ps[i], ps[i + 1], ps[Math.min(ps.length - 1, i + 2)]];
-        for (let k = 0; k < n; k++) {
-          const t = k / n;
-          const f = (j) => 0.5 * (2 * b[j] + (-a[j] + c[j]) * t + (2 * a[j] - 5 * b[j] + 4 * c[j] - d[j]) * t * t + (-a[j] + 3 * b[j] - 3 * c[j] + d[j]) * t * t * t);
-          out.push([f(0), f(1)]);
-        }
-      }
-      out.push(ps[ps.length - 1]);
-      return out;
-    };
-    const body = smooth([[0.012, 0.13], [0, 0.3], [0.008, 0.42], [0.03, 0.475], [0.09, 0.5], [0.2, 0.515], [0.45, 0.52], [0.7, 0.51], [0.79, 0.49], [0.87, 0.455], [0.93, 0.41], [0.97, 0.35], [0.99, 0.27], [0.995, 0.19], [0.985, 0.12]]);
-    const dome = smooth([[0.13, 0.515], [0.22, 0.585], [0.32, 0.64], [0.43, 0.665], [0.53, 0.657], [0.6, 0.625], [0.665, 0.57], [0.73, 0.51]], 6);
-    const SH = 0.07; // the rounded shoulder, inside the side
-    const DROP = 0.025;
-    // The surfaces of a profile drawn across [xa, xb] that look towards the
-    // viewer, lit by their slope.
-    const sweep = (outline, xa, xb, colour, zb = (z) => z) => {
-      let out = "";
-      for (let i = 0; i < outline.length - 1; i++) {
-        const [[ua, za], [ub, zc]] = [outline[i], outline[i + 1]];
-        const dy = Y(ub) - Y(ua);
-        const dz = zc - za;
-        const len = Math.hypot(dy, dz) || 1;
-        const [ny, nz] = [-dz / len, dy / len];
-        if (ny + nz * 1.2 <= 0.02) continue;
-        // Each piece outlined in its own colour, so no seams show between them.
-        const c = colour(ny, nz);
-        out += `<polygon points="${pts([xa, Y(ua), za], [xb, Y(ua), zb(za)], [xb, Y(ub), zb(zc)], [xa, Y(ub), zc])}" fill="${c}" stroke="${c}" stroke-width=".6" stroke-linejoin="round"/>`;
-      }
-      return out;
-    };
-    const paintLit = (ny, nz) => lit(nz > 0.9 ? 0.45 : nz > 0.5 ? 0.3 : ny > 0.9 ? -0.05 : 0.12);
-    // Shadow under the car.
-    g += poly("rgba(0,0,0,.22)", [x0 - 0.04, Y(0.03), 0], [x1 + 0.1, Y(0.03), 0], [x1 + 0.1, Y(1.01), 0], [x0 - 0.04, Y(1.01), 0]);
-    // Body: the top across most of the width, then the shoulder rolling down
-    // to the side.
-    // The far edge darker where it faces forward, so the nose reads round.
-    g += sweep(body, x0, x0 + 0.08, (ny, nz) => (nz > 0.5 ? paintLit(ny, nz) : lit(-0.16)), (z) => z);
-    g += sweep(body, x0 + 0.08, x1 - SH, paintLit);
-    g += sweep(body, x1 - SH, x1, (ny, nz) => lit(nz > 0.5 ? 0.05 : -0.12), (z) => z - DROP);
-    // The glass dome: rear window, roof and windscreen in one dark sweep.
-    const [c0, c1] = [x0 + 0.1, x1 - 0.12];
-    const glassLit = (ny, nz) => (night ? `rgb(${[14, 20, 30].map((v) => Math.round(v + nz * 8)).join(",")})` : `rgb(${[22, 30, 42].map((v) => Math.round(v + nz * 14 + ny * 10)).join(",")})`);
-    g += sweep(dome, c0, c1, glassLit);
-    // Reflections on the windscreen and the roof.
-    g += poly("rgba(255,255,255,.2)", [c0 + 0.1, Y(0.71), 0.525], [c0 + 0.2, Y(0.715), 0.52], [c0 + 0.42, Y(0.62), 0.62], [c0 + 0.34, Y(0.615), 0.625]);
-    g += poly("rgba(255,255,255,.1)", [c0 + 0.24, Y(0.705), 0.53], [c0 + 0.28, Y(0.705), 0.53], [c0 + 0.5, Y(0.625), 0.617], [c0 + 0.46, Y(0.62), 0.622]);
-    g += poly("rgba(255,255,255,.08)", [c0 + 0.05, Y(0.32), 0.64], [c0 + 0.12, Y(0.34), 0.645], [c0 + 0.3, Y(0.52), 0.656], [c0 + 0.24, Y(0.5), 0.658]);
-    // The dome's side: black frame, two side windows, a slim pillar.
-    g += poly("#0b0f15", ...dome.map(([u, z]) => [c1, Y(u), z]));
-    const sideGlass = night ? "#1f2c3b" : "#34506c";
-    const win1 = smooth([[0.21, 0.535], [0.25, 0.575], [0.33, 0.618], [0.44, 0.635], [0.445, 0.535]], 4);
-    const win2 = smooth([[0.465, 0.535], [0.465, 0.636], [0.53, 0.63], [0.59, 0.6], [0.64, 0.548], [0.655, 0.535]], 4);
-    g += poly(sideGlass, ...win1.map(([u, z]) => [c1, Y(u), z]));
-    g += poly(sideGlass, ...win2.map(([u, z]) => [c1, Y(u), z]));
-    g += poly("rgba(255,255,255,.16)", [c1, Y(0.5), 0.54], [c1, Y(0.56), 0.54], [c1, Y(0.6), 0.6], [c1, Y(0.55), 0.62]);
-    // The side of the body, lighter towards the shoulder.
-    const sideOutline = body.map(([u, z]) => [x1, Y(u), z - DROP]);
-    g += poly(lit(night ? -0.15 : -0.06), ...sideOutline);
-    g += poly(lit(night ? -0.05 : 0.08), ...body.filter(([u]) => u > 0.02 && u < 0.97).map(([u, z]) => [x1, Y(u), z - DROP]), [x1, Y(0.95), 0.34], [x1, Y(0.04), 0.36]);
-    // Wheel arches, cut into the side.
-    const ring = (u, z, r, from = 0, to = 1, steps = 18) => Array.from({ length: steps + 1 }, (_, i) => {
-      const a = (from + (to - from) * (i / steps)) * Math.PI * 2;
-      return [x1 + 0.005, Y(u) + Math.cos(a) * r, z + Math.sin(a) * r];
-    });
-    const wheels = [0.185, 0.8];
-    for (const u of wheels) g += poly(night ? "#05070a" : "#0f141a", ...ring(u, 0.17, 0.205, 0, 0.5));
-    // Door lines and flush handles, the mirror.
-    for (const u of [0.455, 0.69]) g += poly(lit(-0.3), [x1, Y(u), 0.16], [x1, Y(u + 0.005), 0.16], [x1, Y(u + 0.004), 0.49], [x1, Y(u - 0.001), 0.49]);
-    for (const u of [0.38, 0.6]) g += poly(lit(-0.22), [x1, Y(u), 0.43], [x1, Y(u + 0.05), 0.43], [x1, Y(u + 0.05), 0.445], [x1, Y(u), 0.445]);
-    g += poly("#0b0f15", [x1 - 0.02, Y(0.665), 0.5], [x1 + 0.09, Y(0.645), 0.525], [x1 + 0.09, Y(0.675), 0.55], [x1 - 0.02, Y(0.69), 0.53]);
-    // Slim headlights wrapping round the nose; the rear light bar.
-    const lamp = night ? "#fff3b0" : "#f8fafc";
-    const glow = night ? "#ffe680" : "#cfd8e2";
-    g += poly(glow, [x1 - 0.3, Y(0.94), 0.41], [x1 - 0.02, Y(0.955), 0.395], [x1 - 0.02, Y(0.972), 0.365], [x1 - 0.28, Y(0.962), 0.385]);
-    g += poly(lamp, [x1 - 0.26, Y(0.946), 0.402], [x1 - 0.04, Y(0.958), 0.39], [x1 - 0.04, Y(0.966), 0.375], [x1 - 0.24, Y(0.956), 0.39]);
-    g += poly(glow, [x0 + 0.04, Y(0.955), 0.395], [x0 + 0.32, Y(0.94), 0.41], [x0 + 0.3, Y(0.962), 0.385], [x0 + 0.04, Y(0.972), 0.365]);
-    g += poly(lamp, [x1, Y(0.9), 0.43 - DROP], [x1, Y(0.955), 0.395 - DROP], [x1, Y(0.955), 0.375 - DROP], [x1, Y(0.9), 0.41 - DROP]);
-    g += poly(lit(-0.5), [x0 + 0.18, Y(0.994), 0.19], [x1 - 0.2, Y(0.994), 0.19], [x1 - 0.22, Y(0.99), 0.165], [x0 + 0.2, Y(0.99), 0.165]);
-    g += poly("#d6322b", [x1, Y(0.004), 0.41 - DROP], [x1, Y(0.07), 0.46 - DROP], [x1, Y(0.07), 0.43 - DROP], [x1, Y(0.004), 0.38 - DROP]);
-    // Large wheels with dark aero covers.
-    for (const u of wheels) {
-      g += poly("#11161c", ...ring(u, 0.17, 0.17));
-      g += poly(night ? "#1f252d" : "#2f3742", ...ring(u, 0.17, 0.13));
-      g += poly(night ? "#2c343e" : "#48525f", ...ring(u, 0.17, 0.1));
-      for (let k = 0; k < 5; k++) {
-        const a = (k / 5) * Math.PI * 2;
-        g += poly(night ? "#141920" : "#262d36", [x1 + 0.006, Y(u) + Math.cos(a) * 0.03, 0.17 + Math.sin(a) * 0.03], [x1 + 0.006, Y(u) + Math.cos(a + 0.25) * 0.11, 0.17 + Math.sin(a + 0.25) * 0.11], [x1 + 0.006, Y(u) + Math.cos(a + 0.45) * 0.11, 0.17 + Math.sin(a + 0.45) * 0.11]);
-      }
-      g += poly(night ? "#3a434f" : "#7c8794", ...ring(u, 0.17, 0.025, 0, 1, 10));
-    }
-g += "</g>";
+    g += evCarSvg(P, night, ev.color, ev.charging);
+    g += "</g>";
   }
   const tree = ev ? P(3, 5.6) : P(5.6, 4.6);
   g += `<rect x="${tree[0] - 3}" y="${tree[1] - 26}" width="6" height="26" fill="#8a6b4a"/><circle cx="${tree[0]}" cy="${tree[1] - 38}" r="18" fill="${night ? "#3f7a55" : "#5fb878"}"/><circle cx="${tree[0] + 10}" cy="${tree[1] - 30}" r="12" fill="${night ? "#356a49" : "#4fa868"}"/>`;
