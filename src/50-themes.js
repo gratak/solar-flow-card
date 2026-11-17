@@ -88,169 +88,39 @@ function dioramaSky(now) {
   return { phase: "dusk", sky: ["#e7855c", "#f6c48d"], ground: ["#b3d6b6", "#9bc8a3", "#8bbb94"] };
 }
 
-// The Diorama's electric car: a rounded saloon built as a small 3D model.
-// Cross-sections along its length (rounded below, a dome above that turns
-// into the glass cabin) are joined into faces, lit by their angle to the
-// light and drawn far to near. The model only depends on the time of day,
-// the paint and charging, so it is built once for each.
-const EV_CAR_CACHE = new Map();
+// The Diorama's electric car: a picture of a white electric saloon seen from
+// the scene's angle, front to the lower left (a WebP with transparency,
+// 260 × 180). It becomes a blob URL once, so the card's HTML only carries
+// that short address on every refresh.
+const EV_CAR_WEBP = "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";
+let evCarUrl = null;
 
-function evCarSvg(P, night, color, charging) {
-  const paint = typeof color === "string" && /^#[0-9a-f]{6}$/i.test(color) ? color.toLowerCase() : "#eef1f5";
-  const key = `${night}|${paint}|${charging}`;
-  if (EV_CAR_CACHE.has(key)) return EV_CAR_CACHE.get(key);
-  const [XC, Y0, Y1] = [5.02, 1.7, 3.8];
-  const Y = (u) => Y0 + u * (Y1 - Y0);
-  // A smooth curve through [u, value] points.
-  const curve = (ps) => (u) => {
-    let i = ps.findIndex((p, k) => k < ps.length - 1 && u <= ps[k + 1][0]);
-    if (i < 0) i = ps.length - 2;
-    const [a, b, c, d] = [ps[Math.max(0, i - 1)], ps[i], ps[i + 1], ps[Math.min(ps.length - 1, i + 2)]];
-    const t = (u - b[0]) / (c[0] - b[0] || 1);
-    return 0.5 * (2 * b[1] + (-a[1] + c[1]) * t + (2 * a[1] - 5 * b[1] + 4 * c[1] - d[1]) * t * t + (-a[1] + 3 * b[1] - 3 * c[1] + d[1]) * t * t * t);
-  };
-  // Side view and plan, rear (u = 0) to front (u = 1), in scene units.
-  const top = curve([[0, 0.33], [0.025, 0.44], [0.08, 0.495], [0.18, 0.525], [0.3, 0.615], [0.42, 0.66], [0.52, 0.655], [0.61, 0.605], [0.7, 0.515], [0.8, 0.48], [0.9, 0.43], [0.96, 0.37], [1, 0.27]]);
-  const belt = curve([[0, 0.31], [0.04, 0.42], [0.15, 0.47], [0.5, 0.475], [0.75, 0.465], [0.88, 0.42], [0.96, 0.35], [1, 0.26]]);
-  const bottom = curve([[0, 0.2], [0.04, 0.15], [0.5, 0.14], [0.95, 0.15], [1, 0.19]]);
-  // In plan a rectangle with well rounded corners, a little narrower at the front.
-  const half = (u) => 0.415 * (1 - 0.04 * u) * Math.pow(Math.max(0, 1 - Math.pow(Math.abs(2 * u - 1), 4.5)), 1 / 4.5);
-  const N = 30;
-  const M = 8;
-  const us = Array.from({ length: N }, (_, i) => 0.5 - 0.5 * Math.cos((Math.PI * i) / (N - 1)));
-  // One cross-section: the right half from the bottom centre to the roof
-  // centre, mirrored for the left.
-  const section = (u) => {
-    const [a, zt, zb] = [half(u), top(u), bottom(u)];
-    const zm = Math.min(belt(u), zt - 0.004);
-    const right = [];
-    for (let j = 0; j <= M; j++) {
-      const t = (-Math.PI / 2) * (1 - j / M);
-      const [c, s] = [Math.cos(t), -Math.sin(t)];
-      right.push([a * Math.pow(c, 2 / 3.2), zm - (zm - zb) * Math.pow(s, 2 / 3.2), false, j < M]);
-    }
-    // Above the belt: where there is a cabin, a shoulder of body first and
-    // then the narrower glass dome; elsewhere (bonnet, boot) a low dome.
-    const cabin = clamp((zt - zm - 0.03) / 0.06, 0, 1);
-    const inset = 1 - 0.2 * cabin;
-    const glassy = cabin > 0.5 && u > 0.1 && u < 0.76;
-    right.push([a * (1 - 0.1 * cabin), zm + 0.012 * cabin, false]);
-    for (let j = 1; j <= M; j++) {
-      const t = (Math.PI / 2) * (j / M);
-      const [c, s] = [Math.cos(t), Math.sin(t)];
-      right.push([a * inset * Math.pow(c, 2 / 2.3), zm + 0.012 * cabin + (zt - zm - 0.012 * cabin) * Math.pow(s, 2 / 2.3), glassy]);
-    }
-    const left = right.slice(1, -1).reverse().map(([x, z, g, l]) => [-x, z, g, l]);
-    return [...right, ...left].map(([x, z, g, l]) => Object.assign([XC + x, Y(u), z], { glass: g, lower: Boolean(l) }));
-  };
-  const rings = us.map(section);
-  const norm = (v) => { const l = Math.hypot(...v) || 1; return v.map((c) => c / l); };
-  const sub3 = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
-  const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
-  const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-  const VIEW = norm([1, 1, 1]);
-  const LIGHT = norm([-0.4, 0.3, 1]);
-  const HALF = norm([VIEW[0] + LIGHT[0], VIEW[1] + LIGHT[1], VIEW[2] + LIGHT[2]]);
-  const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
-  const blend = (c, to, k) => c.map((v, i) => Math.round(v + (to[i] - v) * Math.max(0, Math.min(1, k))));
-  // Colours a little rounded, so faces of nearly one shade share one path.
-  const css = (c) => `#${c.map((v) => Math.min(255, Math.round(v / 8) * 8).toString(16).padStart(2, "0")).join("")}`;
-  const base = night ? blend(hex(paint), [20, 28, 40], 0.5) : hex(paint);
-  const bright = (base[0] * 0.3 + base[1] * 0.59 + base[2] * 0.11) / 255;
-  const glassBase = night ? [12, 17, 25] : [20, 28, 38];
-  const shadeOf = (kind, n, lower) => {
-    const d = dot(n, LIGHT);
-    const spec = Math.pow(Math.max(0, dot(n, HALF)), 40);
-    if (kind === "glass") {
-      const sky = Math.max(0, n[2]) * (night ? 0.08 : 0.2) + Math.max(0, n[1]) * (night ? 0.04 : 0.12);
-      return css(blend(blend(glassBase, [120, 150, 180], sky), [255, 255, 255], spec * 0.25));
-    }
-    if (kind === "lamp") return night ? "#fff1a8" : "#f4f7fa";
-    if (kind === "tail") return "#d1302a";
-    if (kind === "arch") return night ? "#05070a" : "#0e1217";
-    // Like the house: lit from above and the front left, the sides in
-    // half shade.
-    const f = 0.8 + 0.3 * d;
-    let c = f >= 1 ? blend(base, [255, 255, 255], (f - 1) * 1.5) : blend(base, [20, 26, 36], (1 - f) * (1.1 - bright * 0.3));
-    // The body side under the shoulder a shade darker, so the shape reads.
-    if (lower) c = blend(c, [20, 26, 36], 0.1 + (1 - bright) * 0.05);
-    if (n[2] < -0.2) c = blend(c, [12, 16, 22], 0.35);
-    return css(blend(c, [255, 255, 255], Math.pow(Math.max(0, dot(n, HALF)), 12) * 0.3));
-  };
-  const wheels = [0.185, 0.8].map((u) => ({ u, y: Y(u), z: 0.165, r: 0.165 }));
-  const kindOf = (u, x, y, z, glass, n) => {
-    for (const w of wheels) if (Math.abs(n[0]) > 0.55 && Math.hypot(y - w.y, z - w.z) < w.r + 0.035 && z < belt(u) - 0.05) return "arch";
-    if (glass) return "glass";
-    return "paint";
-  };
-  const faces = [];
-  const addFace = (ps, inside) => {
-    let n = norm(cross(sub3(ps[2], ps[0]), sub3(ps[3] || ps[1], ps[1])));
-    const mid = ps.reduce((a, p) => [a[0] + p[0] / ps.length, a[1] + p[1] / ps.length, a[2] + p[2] / ps.length], [0, 0, 0]);
-    if (dot(n, sub3(mid, inside)) < 0) n = n.map((v) => -v);
-    if (dot(n, VIEW) <= 0.01) return;
-    const u = (mid[1] - Y0) / (Y1 - Y0);
-    const kind = kindOf(u, ...mid, ps.length === 4 && ps.every((p) => p.glass), n);
-    faces.push({ ps, layer: { paint: 0, glass: 1, arch: 2 }[kind] ?? 0, fill: shadeOf(kind, n, ps.length === 4 && ps.every((p) => p.lower)) });
-  };
-  for (let i = 0; i < N - 1; i++) {
-    const [a, b] = [rings[i], rings[i + 1]];
-    const inside = [XC, Y((us[i] + us[i + 1]) / 2), (belt(us[i]) + bottom(us[i])) / 2];
-    for (let j = 0; j < a.length; j++) {
-      const k = (j + 1) % a.length;
-      addFace([a[j], b[j], b[k], a[k]], inside);
-    }
+function evCarImage() {
+  if (evCarUrl) return evCarUrl;
+  try {
+    const bytes = Uint8Array.from(atob(EV_CAR_WEBP), (c) => c.charCodeAt(0));
+    evCarUrl = URL.createObjectURL(new Blob([bytes], { type: "image/webp" }));
+  } catch (error) {
+    evCarUrl = `data:image/webp;base64,${EV_CAR_WEBP}`;
   }
-  // The nose: the front section closed.
-  addFace(rings[N - 1], [XC, Y(0.9), (belt(1) + bottom(1)) / 2]);
-  const pts = (ps) => ps.map((p) => P(...p).map((v) => v.toFixed(1)).join(",")).join(" ");
-  const disc = (x, y, z, r, n = 18) => Array.from({ length: n }, (_, i) => [x, y + Math.cos((i / n) * Math.PI * 2) * r, z + Math.sin((i / n) * Math.PI * 2) * r]);
-  let out = "";
-  // Shadow, then the far wheels (only their bottoms show under the body).
-  out += `<polygon points="${pts(Array.from({ length: 24 }, (_, i) => [XC + Math.cos((i / 24) * Math.PI * 2) * 0.5, Y(0.5) + Math.sin((i / 24) * Math.PI * 2) * 1.13, 0]))}" fill="rgba(0,0,0,.2)"/>`;
-  for (const w of wheels) out += `<polygon points="${pts(disc(XC - half(w.u) * 0.9, w.y, w.z, w.r))}" fill="#11161c"/>`;
-  // The body is nearly convex, so the faces turned towards the viewer do not
-  // cover each other: all faces of one colour go in one path, the paint
-  // first, then the glass and the wheel arches.
-  // Short path data: the first point, then relative steps.
-  const num = (v) => String(Math.round(v * 10) / 10);
-  const d = (ps) => {
-    const q = ps.map((p) => P(...p));
-    return `M${num(q[0][0])} ${num(q[0][1])}l${q.slice(1).map((p, i) => `${num(p[0] - q[i][0])} ${num(p[1] - q[i][1])}`).join(" ")}z`;
-  };
-  const groups = new Map();
-  for (const f of faces) {
-    const k = `${f.layer}${f.fill}`;
-    groups.set(k, (groups.get(k) || "") + d(f.ps));
+  return evCarUrl;
+}
+
+// The car in the scene: its shadow, the picture painted in `ev.color`
+// (multiplied, so the glass and wheels stay dark) and dimmed at night, and a
+// glow at the charging port while it charges.
+function evCarSvg(night, color, charging) {
+  const paint = typeof color === "string" && /^#[0-9a-f]{6}$/i.test(color) ? color : "#ffffff";
+  const rgb = [1, 3, 5].map((i) => parseInt(paint.slice(i, i + 2), 16) / 255);
+  const k = night ? 0.55 : 1;
+  const tint = rgb.some((v) => v < 0.99) || night;
+  const [x, y, w, h] = [244, 274, 84, 58.2];
+  let out = `<ellipse cx="${x + w * 0.5}" cy="${y + h * 0.83}" rx="${w * 0.44}" ry="${h * 0.2}" fill="rgba(0,0,0,.18)" transform="rotate(-22 ${x + w * 0.5} ${y + h * 0.83})"/>`;
+  if (tint) {
+    out += `<filter id="dio-ev-paint" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="${rgb[0] * k} 0 0 0 0  0 ${rgb[1] * k} 0 0 0  0 0 ${rgb[2] * k} 0 0  0 0 0 1 0"/></filter>`;
   }
-  for (const k of [...groups.keys()].sort()) out += `<path d="${groups.get(k)}" fill="${k.slice(1)}" stroke="${k.slice(1)}" stroke-width=".5" stroke-linejoin="round"/>`;
-  // The near wheels: tyre, dark aero cover with five spokes, hub.
-  for (const w of wheels) {
-    const x = XC + half(w.u) * 0.93;
-    out += `<polygon points="${pts(disc(x, w.y, w.z, w.r))}" fill="#11161c"/>`;
-    out += `<polygon points="${pts(disc(x + 0.005, w.y, w.z, w.r * 0.76))}" fill="${night ? "#222a33" : "#37414d"}"/>`;
-    for (let k = 0; k < 5; k++) {
-      const a = (k / 5) * Math.PI * 2;
-      out += `<polygon points="${pts([[x + 0.01, w.y + Math.cos(a) * 0.025, w.z + Math.sin(a) * 0.025], [x + 0.01, w.y + Math.cos(a + 0.3) * w.r * 0.72, w.z + Math.sin(a + 0.3) * w.r * 0.72], [x + 0.01, w.y + Math.cos(a + 0.55) * w.r * 0.72, w.z + Math.sin(a + 0.55) * w.r * 0.72]])}" fill="${night ? "#151a21" : "#262e37"}"/>`;
-    }
-    out += `<polygon points="${pts(disc(x + 0.012, w.y, w.z, 0.024, 10))}" fill="${night ? "#3a434f" : "#8a95a2"}"/>`;
-  }
-  // Slim headlights at the front corners, the light bar across the back.
-  const strip = (side, u0, u1, z0, z1, fill) => {
-    const at = (u, z) => [XC + side * half(u) * 0.97, Y(u), z];
-    out += `<polygon points="${pts([at(u0, belt(u0) - z0), at(u1, belt(u1) - z0 - 0.012), at(u1, belt(u1) - z1 - 0.012), at(u0, belt(u0) - z1)])}" fill="${fill}"/>`;
-  };
-  const lamp = night ? "#fff1a8" : "#f7f9fb";
-  strip(1, 0.9, 0.968, 0.025, 0.045, lamp);
-  strip(-1, 0.9, 0.968, 0.025, 0.045, lamp);
-  strip(1, 0.008, 0.07, 0.02, 0.04, "#d1302a");
-  // The charging port by the rear light glows while it charges.
-  if (charging) {
-    const u = 0.07;
-    const x = XC + half(u) * 0.97;
-    out += `<polygon points="${pts([[x, Y(u), belt(u) - 0.07], [x, Y(u + 0.035), belt(u) - 0.07], [x, Y(u + 0.035), belt(u) - 0.035], [x, Y(u), belt(u) - 0.035]])}" fill="#2fd39a"/>`;
-  }
-  EV_CAR_CACHE.set(key, out);
+  out += `<image href="${evCarImage()}" x="${x}" y="${y}" width="${w}" height="${h}" ${tint ? 'filter="url(#dio-ev-paint)"' : ""}/>`;
+  if (charging) out += `<circle cx="${x + w * 0.935}" cy="${y + h * 0.3}" r="2.2" fill="#2fd39a"/><circle cx="${x + w * 0.935}" cy="${y + h * 0.3}" r="4.6" fill="#2fd39a" opacity=".3"/>`;
   return out;
 }
 
@@ -394,7 +264,7 @@ function dioramaScene(m) {
     g += `<g class="sfc-click" ${entityAttr(ev.entityId)}>`;
     g += poly("#3a4a5c", [4, 2.35, 0.45], [4, 2.85, 0.45], [4, 2.85, 1.15], [4, 2.35, 1.15]);
     g += poly(ev.charging ? "#2fd39a" : "#8a99aa", [4, 2.5, 0.85], [4, 2.7, 0.85], [4, 2.7, 0.95], [4, 2.5, 0.95]);
-    g += evCarSvg(P, night, ev.color, ev.charging);
+    g += evCarSvg(night, ev.color, ev.charging);
     g += "</g>";
   }
   const tree = ev ? P(3, 5.6) : P(5.6, 4.6);

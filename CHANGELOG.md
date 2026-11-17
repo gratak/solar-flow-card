@@ -2,8 +2,8 @@
 
 ## 2.1.0-beta.8
 
-- **A new car in Diorama** ([#126](https://github.com/gratak/solar-flow-card/issues/126)): the electric car is now a rounded saloon in the style of today's electric cars: a smooth body built as a small 3D model and lit like the rest of the scene, a glass dome from the windscreen over the roof, slim headlights and large aero wheels, in place of the boxy hatchback.
-- **Car colour:** `ev: { color: "#b3121b" }` paints it; pearl white by default. Also in the editor under Installation → Electric car.
+- **A new car in Diorama** ([#126](https://github.com/gratak/solar-flow-card/issues/126)): the boxy hatchback is replaced by a picture of a sleek white electric saloon with a glass roof, drawn from the scene's own angle. It is dimmed at night like the rest of the scene.
+- **Car colour:** `ev: { color: "#b3121b" }` paints it (the glass and the wheels stay dark); white by default. Also in the editor under Installation → Electric car.
 
 ## 2.1.0-beta.7
 
