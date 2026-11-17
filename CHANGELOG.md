@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0-beta.11
+
+- **Purchase price from a market price sensor:** for a dynamic tariff in any country, `price_import` can be a market price sensor (spot, Nord Pool, ENTSO-E, RCE…) with what the tariff adds: `price_import_add` per kWh (margin, distribution, taxes) and `price_import_multiplier` (e.g. VAT). The purchase price is (price + surcharge) × multiplier, hour by hour, also in the price chart. The purchase price sensor can now be chosen in the editor with every settlement (net-billing and net-metering too), with both fields beside it.
+
 ## 2.1.0-beta.10
 
 - **Purchase prices by period:** for tariffs whose price depends on the hour, the day or the season, `price_import_periods` lists the prices with their hours, days (every day, working days, weekend) and months, as many periods as the tariff has. Outside them `price_import` applies. Savings, costs and payback are worked out hour by hour at the price of each hour. `holidays_as_weekend: true` counts Poland's public holidays as weekend days. All in the editor under Summary and prices → Purchase prices by period.

@@ -38,7 +38,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "2.1.0-beta.10";
+const CARD_VERSION = "2.1.0-beta.11";
 // The card's type is custom:home-energy-hub since 2.0.0. The old name stays
 // registered so dashboards with custom:solar-flow-card keep working.
 const CARD_TAG = "home-energy-hub";
@@ -591,6 +591,11 @@ const TRANSLATIONS = {
     "editorRcePrice": "RCE price sensor",
     "editorRceMissing": "No RCE price sensor found: pick one (e.g. from the PSE integration or your EMS), otherwise the energy sold has no price.",
     "editorImportPriceHint": "Import price: what each kWh costs, energy plus the distribution charges billed per kWh, without monthly fixed fees.",
+    "editorImportSensorBox": "Purchase price from a sensor (dynamic tariff)",
+    "editorImportSensorHint": "With a tariff that follows the market hour by hour: pick the price sensor (spot, Nord Pool, ENTSO-E, RCE…). It replaces the purchase price above.",
+    "editorPriceImportAdd": "Surcharge per kWh",
+    "editorPriceImportMultiplier": "Multiplier (e.g. VAT 1.23)",
+    "editorPriceImportAddHint": "For a market price sensor: what your tariff adds per kWh (margin, distribution, taxes) is added first, then the multiplier is applied: (price + surcharge) × multiplier. Leave empty for a sensor that already gives the full price.",
     "editorPricePeriods": "Purchase prices by period",
     "editorPricePeriodsHint": "A different price per kWh at chosen hours, e.g. for a tariff with day zones. The first period that fits a moment gives its price; outside every period the purchase price above applies. A period may run past midnight, and its months past the new year.",
     "editorPeriodPrice": "Price per kWh",
@@ -1144,6 +1149,11 @@ const TRANSLATIONS = {
     "editorRcePrice": "RCE-Preissensor",
     "editorRceMissing": "Kein RCE-Preissensor gefunden: einen wählen, sonst bleibt die eingespeiste Energie ohne Preis.",
     "editorImportPriceHint": "Bezugspreis: was jede kWh kostet, Energie plus die Netzentgelte je kWh, ohne monatliche Grundgebühren.",
+    "editorImportSensorBox": "Bezugspreis aus einem Sensor (dynamischer Tarif)",
+    "editorImportSensorHint": "Bei einem Tarif, der stündlich dem Markt folgt: den Preissensor wählen (Börse, Nord Pool, ENTSO-E, RCE…). Er ersetzt den Bezugspreis oben.",
+    "editorPriceImportAdd": "Aufschlag je kWh",
+    "editorPriceImportMultiplier": "Multiplikator (z. B. MwSt. 1,19)",
+    "editorPriceImportAddHint": "Für einen Marktpreis-Sensor: zuerst wird addiert, was dein Tarif je kWh aufschlägt (Marge, Netzentgelt, Steuern), dann der Multiplikator angewandt: (Preis + Aufschlag) × Multiplikator. Leer lassen, wenn der Sensor schon den vollen Preis liefert.",
     "editorPricePeriods": "Bezugspreise nach Zeitraum",
     "editorPricePeriodsHint": "Ein anderer Preis je kWh zu bestimmten Zeiten, z. B. bei einem Tarif mit Tageszonen. Es zählt der erste passende Zeitraum; außerhalb aller Zeiträume gilt der Bezugspreis oben. Ein Zeitraum darf über Mitternacht gehen, seine Monate über den Jahreswechsel.",
     "editorPeriodPrice": "Preis je kWh",
@@ -1697,6 +1707,11 @@ const TRANSLATIONS = {
     "editorRcePrice": "Capteur de prix RCE",
     "editorRceMissing": "Aucun capteur de prix RCE trouvé : choisissez-en un (par ex. de l'intégration PSE ou votre EMS), sinon l'énergie vendue n'a pas de prix.",
     "editorImportPriceHint": "Prix d'achat : ce que coûte chaque kWh, énergie plus charges de distribution facturées par kWh, hors abonnements fixes mensuels.",
+    "editorImportSensorBox": "Prix d'achat depuis un capteur (tarif dynamique)",
+    "editorImportSensorHint": "Avec un tarif qui suit le marché heure par heure : choisissez le capteur de prix (bourse, Nord Pool, ENTSO-E, RCE…). Il remplace le prix d'achat ci-dessus.",
+    "editorPriceImportAdd": "Supplément par kWh",
+    "editorPriceImportMultiplier": "Multiplicateur (p. ex. TVA 1,2)",
+    "editorPriceImportAddHint": "Pour un capteur de prix de marché : ce que votre tarif ajoute par kWh (marge, acheminement, taxes) est ajouté d'abord, puis le multiplicateur s'applique : (prix + supplément) × multiplicateur. Laissez vide si le capteur donne déjà le prix complet.",
     "editorPricePeriods": "Prix d'achat par période",
     "editorPricePeriodsHint": "Un autre prix par kWh à certaines heures, p. ex. pour un tarif à plages horaires. La première période qui correspond donne son prix ; hors de toute période, le prix d'achat ci-dessus s'applique. Une période peut passer minuit, et ses mois le nouvel an.",
     "editorPeriodPrice": "Prix par kWh",
@@ -2250,6 +2265,11 @@ const TRANSLATIONS = {
     "editorRcePrice": "RCE-prijssensor",
     "editorRceMissing": "Geen RCE-prijssensor gevonden: kies er een, anders heeft de teruggeleverde energie geen prijs.",
     "editorImportPriceHint": "Afnameprijs: wat elke kWh kost, energie plus de netkosten per kWh, zonder vaste maandkosten.",
+    "editorImportSensorBox": "Afnameprijs uit een sensor (dynamisch tarief)",
+    "editorImportSensorHint": "Bij een tarief dat elk uur de markt volgt: kies de prijssensor (beurs, Nord Pool, ENTSO-E, RCE…). Die vervangt de afnameprijs hierboven.",
+    "editorPriceImportAdd": "Opslag per kWh",
+    "editorPriceImportMultiplier": "Vermenigvuldiger (bijv. btw 1,21)",
+    "editorPriceImportAddHint": "Voor een marktprijssensor: eerst wordt opgeteld wat je tarief per kWh toevoegt (marge, netkosten, belastingen), daarna de vermenigvuldiger: (prijs + opslag) × vermenigvuldiger. Leeg laten als de sensor al de volledige prijs geeft.",
     "editorPricePeriods": "Afnameprijzen per periode",
     "editorPricePeriodsHint": "Een andere prijs per kWh op gekozen uren, bijv. bij een tarief met dagzones. De eerste periode die past geeft de prijs; buiten alle periodes geldt de afnameprijs hierboven. Een periode mag over middernacht lopen, de maanden over de jaarwisseling.",
     "editorPeriodPrice": "Prijs per kWh",
@@ -2803,6 +2823,11 @@ const TRANSLATIONS = {
     "editorRcePrice": "Czujnik ceny RCE",
     "editorRceMissing": "Nie znaleziono czujnika ceny RCE: wybierz go (np. z integracji PSE albo z EMS), inaczej oddana energia nie zostanie wyceniona.",
     "editorImportPriceHint": "Cena zakupu: koszt każdej kWh, czyli energia i opłaty dystrybucyjne naliczane za kWh, bez stałych opłat miesięcznych.",
+    "editorImportSensorBox": "Cena zakupu z czujnika (taryfa dynamiczna)",
+    "editorImportSensorHint": "Przy taryfie, która co godzinę idzie za rynkiem: wybierz czujnik ceny (giełda, Nord Pool, ENTSO-E, RCE…). Zastępuje cenę zakupu powyżej.",
+    "editorPriceImportAdd": "Dopłata za kWh",
+    "editorPriceImportMultiplier": "Mnożnik (np. VAT 1,23)",
+    "editorPriceImportAddHint": "Dla czujnika ceny rynkowej: najpierw dodawane jest to, co dolicza Twoja taryfa za kWh (marża, dystrybucja, podatki), potem mnożnik: (cena + dopłata) × mnożnik. Zostaw puste, jeśli czujnik podaje już pełną cenę.",
     "editorPricePeriods": "Ceny zakupu w okresach",
     "editorPricePeriodsHint": "Inna cena za kWh w wybranych godzinach, np. przy taryfie ze strefami. Liczy się pierwszy okres, który pasuje do danej chwili; poza wszystkimi okresami obowiązuje cena zakupu powyżej. Okres może przechodzić przez północ, a miesiące przez nowy rok.",
     "editorPeriodPrice": "Cena za kWh",
@@ -3356,6 +3381,11 @@ const TRANSLATIONS = {
     "editorRcePrice": "Sensor de preço RCE",
     "editorRceMissing": "Nenhum sensor de preço RCE encontrado: escolha um (p.ex. da integração PSE ou do seu EMS), caso contrário a energia vendida não tem preço.",
     "editorImportPriceHint": "Preço de importação: o custo de cada kWh, energia mais os encargos de distribuição faturados por kWh, sem taxas fixas mensais.",
+    "editorImportSensorBox": "Preço de compra de um sensor (tarifário dinâmico)",
+    "editorImportSensorHint": "Com um tarifário que segue o mercado hora a hora: escolha o sensor de preço (bolsa, Nord Pool, ENTSO-E, RCE…). Substitui o preço de compra acima.",
+    "editorPriceImportAdd": "Acréscimo por kWh",
+    "editorPriceImportMultiplier": "Multiplicador (p. ex. IVA 1,23)",
+    "editorPriceImportAddHint": "Para um sensor de preço de mercado: primeiro soma-se o que o tarifário acrescenta por kWh (margem, rede, impostos), depois aplica-se o multiplicador: (preço + acréscimo) × multiplicador. Deixe vazio se o sensor já der o preço completo.",
     "editorPricePeriods": "Preços de compra por período",
     "editorPricePeriodsHint": "Um preço diferente por kWh em certas horas, p. ex. num tarifário com períodos horários. Conta o primeiro período que corresponde; fora de todos os períodos aplica-se o preço de compra acima. Um período pode passar a meia-noite, e os meses o ano novo.",
     "editorPeriodPrice": "Preço por kWh",
@@ -4305,13 +4335,21 @@ function periodPrice(setting, at) {
   return setting.value ?? 0;
 }
 
+// A purchase price from a market price sensor (spot, RCE, Nord Pool,
+// ENTSO-E…) with what the tariff adds: `price_import_add` per kWh (margin,
+// distribution, excise) and then `price_import_multiplier` (e.g. VAT 1.23).
+function adjustPrice(setting, value) {
+  if (value === null || value === undefined || !Number.isFinite(value)) return value;
+  return (value + (setting?.add || 0)) * (setting?.mult || 1);
+}
+
 function currentPrice(states, setting) {
   if (!setting) return null;
   if (setting.schedule) return periodPrice(setting, Date.now());
   if (!setting.entity) return setting.value;
   const stateObj = states?.[setting.entity];
   const value = stateNumber(stateObj);
-  return value === null ? null : value * priceScale(stateObj);
+  return value === null ? null : adjustPrice(setting, value * priceScale(stateObj));
 }
 
 // The mean price of each hour (or month) from the price sensors' long-term
@@ -4385,6 +4423,12 @@ function effectivePrices(hass, config) {
   // Purchase prices by period, around a fixed price for the rest of the time.
   const periods = pricePeriods(config);
   if (periods && !prices.import?.entity) prices.import = { schedule: periods, value: prices.import?.value ?? 0, holidays: config.holidays_as_weekend === true };
+  if (prices.import?.entity) {
+    const add = Number.parseFloat(config.price_import_add);
+    const mult = Number.parseFloat(config.price_import_multiplier);
+    if (Number.isFinite(add)) prices.import.add = add;
+    if (mult > 0) prices.import.mult = mult;
+  }
   // Net-billing: the value of the energy sold is credited to the prosumer
   // deposit multiplied by 1.23 (billing_factor: 1 turns that off).
   if (config.settlement === "net_billing") {
@@ -4447,7 +4491,7 @@ function priceChartData(hass, config, now = new Date()) {
   const from = startOfDay(now).getTime();
   const to = startOfDay(addDays(now, 2)).getTime();
   const hours = [...byHour.entries()].filter(([at]) => at >= from && at < to).sort((a, b) => a[0] - b[0])
-    .map(([at, slot]) => ({ at, price: slot.sum / slot.n }));
+    .map(([at, slot]) => ({ at, price: adjustPrice(setting, slot.sum / slot.n) }));
   if (hours.length < 2) return null;
   const hourNow = new Date(now);
   hourNow.setMinutes(0, 0, 0);
@@ -9619,7 +9663,7 @@ class SolarFlowCard extends HTMLElement {
       if (setting.schedule) return periodPrice(setting, at === null ? Date.now() : at);
       if (!setting.entity) return setting.value;
       const mean = at === null ? undefined : stats.data[kind]?.get(at);
-      return mean ?? now[kind] ?? 0;
+      return mean === undefined ? now[kind] ?? 0 : adjustPrice(setting, mean);
     };
     // What the hourly statistics do not cover yet (the current hour).
     let rest = null;
@@ -10931,6 +10975,10 @@ class SolarFlowCardEditor extends HTMLElement {
     const sensor = (key) => priceSetting(this._config[key])?.entity || "";
     const number = (key, label) => this._numbers(t, [[key, label, "0.01"]]);
     const detected = mode === "net_billing" && !priceSetting(this._config.price_export) ? detectRcePrice(this._hass) : null;
+    // What a tariff adds to a market price sensor: per kWh, then a multiplier (VAT).
+    const surcharge = `
+      <div class="grid">${this._numbers(t, [["price_import_add", "editorPriceImportAdd", "0.0001"], ["price_import_multiplier", "editorPriceImportMultiplier", "0.01"]])}</div>
+      <p class="hint">${escapeHtml(t.editorPriceImportAddHint)}</p>`;
     // With fixed prices, an RCE price sensor in Home Assistant is offered.
     const suggested = mode === "" ? detectRcePrice(this._hass) : null;
     const ratio = formatNumber(meteringRatio({ ...this._config, metering_ratio: undefined }), t.locale, 1);
@@ -10974,7 +11022,14 @@ class SolarFlowCardEditor extends HTMLElement {
             ${this._picker("price_import", t.editorPriceImportSensor, sensor("price_import"), "sensor", { kind: "price" })}
             ${this._picker("price_export", t.editorPriceExportSensor, sensor("price_export"), "sensor", { kind: "price" })}
           </div>
-        </details>` : ""}
+          ${surcharge}
+        </details>` : `
+        <details class="box" data-box="import-sensor" ${this._boxOpen("import-sensor", Boolean(sensor("price_import"))) ? "open" : ""}>
+          <summary class="title">${escapeHtml(t.editorImportSensorBox)}</summary>
+          <p class="hint">${escapeHtml(t.editorImportSensorHint)}</p>
+          <div class="pickers">${this._picker("price_import", t.editorPriceImportSensor, sensor("price_import"), "sensor", { kind: "price" })}</div>
+          ${surcharge}
+        </details>`}
       ${this._switches(t, "summary")}
       <div class="box">
         <span class="title">${escapeHtml(t.paybackTitle)}</span>

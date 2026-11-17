@@ -671,13 +671,21 @@ function periodPrice(setting, at) {
   return setting.value ?? 0;
 }
 
+// A purchase price from a market price sensor (spot, RCE, Nord Pool,
+// ENTSO-E…) with what the tariff adds: `price_import_add` per kWh (margin,
+// distribution, excise) and then `price_import_multiplier` (e.g. VAT 1.23).
+function adjustPrice(setting, value) {
+  if (value === null || value === undefined || !Number.isFinite(value)) return value;
+  return (value + (setting?.add || 0)) * (setting?.mult || 1);
+}
+
 function currentPrice(states, setting) {
   if (!setting) return null;
   if (setting.schedule) return periodPrice(setting, Date.now());
   if (!setting.entity) return setting.value;
   const stateObj = states?.[setting.entity];
   const value = stateNumber(stateObj);
-  return value === null ? null : value * priceScale(stateObj);
+  return value === null ? null : adjustPrice(setting, value * priceScale(stateObj));
 }
 
 // The mean price of each hour (or month) from the price sensors' long-term
@@ -751,6 +759,12 @@ function effectivePrices(hass, config) {
   // Purchase prices by period, around a fixed price for the rest of the time.
   const periods = pricePeriods(config);
   if (periods && !prices.import?.entity) prices.import = { schedule: periods, value: prices.import?.value ?? 0, holidays: config.holidays_as_weekend === true };
+  if (prices.import?.entity) {
+    const add = Number.parseFloat(config.price_import_add);
+    const mult = Number.parseFloat(config.price_import_multiplier);
+    if (Number.isFinite(add)) prices.import.add = add;
+    if (mult > 0) prices.import.mult = mult;
+  }
   // Net-billing: the value of the energy sold is credited to the prosumer
   // deposit multiplied by 1.23 (billing_factor: 1 turns that off).
   if (config.settlement === "net_billing") {
@@ -813,7 +827,7 @@ function priceChartData(hass, config, now = new Date()) {
   const from = startOfDay(now).getTime();
   const to = startOfDay(addDays(now, 2)).getTime();
   const hours = [...byHour.entries()].filter(([at]) => at >= from && at < to).sort((a, b) => a[0] - b[0])
-    .map(([at, slot]) => ({ at, price: slot.sum / slot.n }));
+    .map(([at, slot]) => ({ at, price: adjustPrice(setting, slot.sum / slot.n) }));
   if (hours.length < 2) return null;
   const hourNow = new Date(now);
   hourNow.setMinutes(0, 0, 0);
