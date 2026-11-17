@@ -38,7 +38,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "2.1.0-beta.7";
+const CARD_VERSION = "2.1.0-beta.8";
 // The card's type is custom:home-energy-hub since 2.0.0. The old name stays
 // registered so dashboards with custom:solar-flow-card keep working.
 const CARD_TAG = "home-energy-hub";
@@ -524,6 +524,7 @@ const TRANSLATIONS = {
     "editorEvHint": "The car beside the house in the Diorama scene, with a flow while it charges. Either sensor is enough.",
     "editorEvPower": "Charging power",
     "editorEvSoc": "Car battery level (optional)",
+    "editorEvColor": "Paint colour",
     "editorAdd": "Add",
     "editorRemove": "Remove",
     "editorConfirmRemove": "Remove this item and its settings?",
@@ -1059,6 +1060,7 @@ const TRANSLATIONS = {
     "editorEvHint": "Das Auto neben dem Haus in der Diorama-Szene, mit einem Fluss während des Ladens. Ein Sensor genügt.",
     "editorEvPower": "Ladeleistung",
     "editorEvSoc": "Akkustand des Autos (optional)",
+    "editorEvColor": "Lackfarbe",
     "editorAdd": "Hinzufügen",
     "editorRemove": "Entfernen",
     "editorConfirmRemove": "Diesen Eintrag mit seinen Einstellungen entfernen?",
@@ -1594,6 +1596,7 @@ const TRANSLATIONS = {
     "editorEvHint": "La voiture à côté de la maison dans la scène Diorama, avec un flux pendant la recharge. Un seul capteur suffit.",
     "editorEvPower": "Puissance de recharge",
     "editorEvSoc": "Niveau de batterie de la voiture (optionnel)",
+    "editorEvColor": "Couleur de la peinture",
     "editorAdd": "Ajouter",
     "editorRemove": "Supprimer",
     "editorConfirmRemove": "Supprimer cet élément et ses réglages ?",
@@ -2129,6 +2132,7 @@ const TRANSLATIONS = {
     "editorEvHint": "De auto naast het huis in de Diorama-scène, met een stroom tijdens het laden. Eén sensor is genoeg.",
     "editorEvPower": "Laadvermogen",
     "editorEvSoc": "Accuniveau van de auto (optioneel)",
+    "editorEvColor": "Lakkleur",
     "editorAdd": "Toevoegen",
     "editorRemove": "Verwijderen",
     "editorConfirmRemove": "Dit item met zijn instellingen verwijderen?",
@@ -2664,6 +2668,7 @@ const TRANSLATIONS = {
     "editorEvHint": "Auto obok domu w scenie Dioramy, z przepływem w trakcie ładowania. Wystarczy jeden z czujników.",
     "editorEvPower": "Moc ładowania",
     "editorEvSoc": "Poziom baterii auta (opcjonalnie)",
+    "editorEvColor": "Kolor lakieru",
     "editorAdd": "Dodaj",
     "editorRemove": "Usuń",
     "editorConfirmRemove": "Usunąć ten element razem z ustawieniami?",
@@ -3199,6 +3204,7 @@ const TRANSLATIONS = {
     "editorEvHint": "O carro ao lado da casa na cena Diorama, com um fluxo durante o carregamento. Basta um dos sensores.",
     "editorEvPower": "Potência de carregamento",
     "editorEvSoc": "Nível da bateria do carro (opcional)",
+    "editorEvColor": "Cor da pintura",
     "editorAdd": "Adicionar",
     "editorRemove": "Remover",
     "editorConfirmRemove": "Remover este item e as suas configurações?",
@@ -4573,7 +4579,7 @@ function periodSummaryRest(totals, config, t, locale) {
   return items;
 }
 
-// An electric car (`ev: { power, soc, name }`), drawn in the Diorama scene.
+// An electric car (`ev: { power, soc, name, color }`), drawn in the Diorama scene.
 function evData(hass, config) {
   const ev = config.ev;
   if (!ev || typeof ev !== "object") return null;
@@ -4583,6 +4589,7 @@ function evData(hass, config) {
   if (!isNum(power) && !isNum(soc)) return null;
   return {
     name: ev.name ? String(ev.name) : null,
+    color: typeof ev.color === "string" ? ev.color : null,
     power: isNum(power) ? Math.max(0, power) : null,
     soc: isNum(soc) ? clamp(soc, 0, 100) : null,
     charging: isNum(power) && power > ACTIVE_W,
@@ -6773,7 +6780,7 @@ function dioramaScene(m) {
   g += flowPath(`M${pole} Q${(pole[0] + wallR[0]) / 2} ${pole[1] + 30} ${wallR}`, L.importActive || L.exportActive, L.exportActive, "grid");
   if (m.ev) {
     const plug = P(4, 2.6, 0.7);
-    const port = P(4.45, 2.4, 0.42);
+    const port = P(4.5, 2.05, 0.42);
     g += flowPath(`M${plug} Q${(plug[0] + port[0]) / 2 + 6} ${Math.max(plug[1], port[1]) + 10} ${port}`, m.ev.charging, false, "load");
   }
   g += "</g>";
@@ -6783,42 +6790,76 @@ function dioramaScene(m) {
     g += `<g class="sfc-click" ${entityAttr(ev.entityId)}>`;
     g += poly("#3a4a5c", [4, 2.35, 0.45], [4, 2.85, 0.45], [4, 2.85, 1.15], [4, 2.35, 1.15]);
     g += poly(ev.charging ? "#2fd39a" : "#8a99aa", [4, 2.5, 0.85], [4, 2.7, 0.85], [4, 2.7, 0.95], [4, 2.5, 0.95]);
-    // A hatchback seen from the front left: body, cabin with windows,
-    // windscreen, lights and wheels. Length along y, the front towards y+.
-    const [x0, x1, y0, y1] = [4.45, 5.55, 1.7, 3.8];
-    const paint = ["#3f86d6", "#2f6fb8", "#5a9ee6"];
-    const glass = night ? "#2a3c55" : "#9dc6ea";
-    const wheel = (x, y) => {
-      const pts = Array.from({ length: 14 }, (_, i) => {
-        const a = (i / 14) * Math.PI * 2;
-        return [x, y + Math.cos(a) * 0.22, 0.22 + Math.sin(a) * 0.22];
-      });
-      return poly("#1b2129", ...pts) + poly("#9aa6b3", ...pts.map(([px, py, pz]) => [px, y + (py - y) * 0.45, 0.22 + (pz - 0.22) * 0.45]));
+    // A low electric fastback saloon seen from the front right: a side
+    // profile along y (the front towards y+), extruded across x, with a
+    // narrower glass cabin on top. u runs from the rear (0) to the front (1).
+    const [x0, x1, y0, y1] = [4.58, 5.44, 1.7, 3.8];
+    const Y = (u) => y0 + u * (y1 - y0);
+    const shade = (hex, k) => {
+      const n = parseInt(hex.slice(1), 16);
+      const c = [n >> 16, (n >> 8) & 255, n & 255].map((v) => Math.round(k > 0 ? v + (255 - v) * k : v * (1 + k)));
+      return `rgb(${c.join(",")})`;
     };
-    // Shadow under the car.
-    g += poly("rgba(0,0,0,.18)", [x0 - 0.05, y0 - 0.05, 0], [x1 + 0.1, y0 - 0.05, 0], [x1 + 0.1, y1 + 0.1, 0], [x0 - 0.05, y1 + 0.1, 0]);
-    // Lower body.
-    g += box(x0, y0, x1 - x0, y1 - y0, 0.36, paint[2], paint[0], paint[1], 0.16);
-    // Bonnet slope at the front, boot slope at the back.
-    const zb = 0.52;
-    const zt = 0.92;
-    const [ca, cb] = [2.05, 3.05];
-    // Cabin sides (the right side shows), roof, windscreen.
-    g += poly(paint[1], [x1 - 0.06, ca - 0.25, zb], [x1 - 0.06, cb + 0.35, zb], [x1 - 0.14, cb, zt], [x1 - 0.14, ca, zt]);
-    g += poly(glass, [x1 - 0.07, ca - 0.1, zb + 0.06], [x1 - 0.07, cb + 0.2, zb + 0.06], [x1 - 0.13, cb - 0.02, zt - 0.06], [x1 - 0.13, ca + 0.04, zt - 0.06]);
-    g += poly(paint[1], [x1 - 0.07, 2.58, zb + 0.05], [x1 - 0.07, 2.63, zb + 0.05], [x1 - 0.13, 2.63, zt - 0.05], [x1 - 0.13, 2.58, zt - 0.05]);
-    g += poly(paint[2], [x0 + 0.14, ca, zt], [x1 - 0.14, ca, zt], [x1 - 0.14, cb, zt], [x0 + 0.14, cb, zt]);
-    g += poly(glass, [x0 + 0.06, cb + 0.35, zb], [x1 - 0.06, cb + 0.35, zb], [x1 - 0.14, cb, zt], [x0 + 0.14, cb, zt]);
-    g += poly("rgba(255,255,255,.35)", [x0 + 0.25, cb + 0.28, zb + 0.07], [x0 + 0.4, cb + 0.28, zb + 0.07], [x0 + 0.42, cb + 0.04, zt - 0.03], [x0 + 0.3, cb + 0.04, zt - 0.03]);
-    // Front: headlights and the number plate.
-    g += poly(night ? "#fff3b0" : "#f4f7fb", [x0 + 0.08, y1, 0.36], [x0 + 0.3, y1, 0.36], [x0 + 0.3, y1, 0.46], [x0 + 0.08, y1, 0.46]);
-    g += poly(night ? "#fff3b0" : "#f4f7fb", [x1 - 0.3, y1, 0.36], [x1 - 0.08, y1, 0.36], [x1 - 0.08, y1, 0.46], [x1 - 0.3, y1, 0.46]);
-    g += poly("#eef2f6", [x0 + 0.38, y1, 0.22], [x1 - 0.38, y1, 0.22], [x1 - 0.38, y1, 0.3], [x0 + 0.38, y1, 0.3]);
-    // Rear light on the side, wheels.
-    g += poly("#e2463a", [x1, y0 + 0.02, 0.36], [x1, y0 + 0.14, 0.36], [x1, y0 + 0.14, 0.46], [x1, y0 + 0.02, 0.46]);
-    g += wheel(x1 + 0.01, y0 + 0.45) + wheel(x1 + 0.01, y1 - 0.45);
-    // The charging port glows while it charges.
-    if (ev.charging) g += poly("#2fd39a", [x1, y0 + 0.3, 0.42], [x1, y0 + 0.42, 0.42], [x1, y0 + 0.42, 0.5], [x1, y0 + 0.3, 0.5]);
+    const base = ev.color && /^#[0-9a-f]{6}$/i.test(ev.color) ? ev.color : "#e8ecf1";
+    const paint = { side: shade(base, night ? -0.45 : -0.08), top: shade(base, night ? -0.3 : 0.25), front: shade(base, night ? -0.38 : 0.08), dark: shade(base, night ? -0.6 : -0.3) };
+    const glass = night ? "#1a2533" : "#2b3d52";
+    const glassSide = night ? "#22303f" : "#3d5873";
+    const glassTop = night ? "#0c1118" : "#111820";
+    const body = [[0, 0.15], [0, 0.39], [0.03, 0.46], [0.15, 0.49], [0.45, 0.5], [0.72, 0.48], [0.86, 0.44], [0.96, 0.37], [1, 0.27], [0.99, 0.15]];
+    const cabin = [[0.15, 0.49], [0.3, 0.64], [0.42, 0.71], [0.53, 0.71], [0.58, 0.69], [0.73, 0.48]];
+    // The faces of an extruded outline that look towards the viewer, rear
+    // to front, so the nearer ones come later.
+    const extrude = (outline, xa, xb, fill) => {
+      let out = "";
+      for (let i = 0; i < outline.length - 1; i++) {
+        const [[ua, za], [ub, zb]] = [outline[i], outline[i + 1]];
+        const dy = Y(ub) - Y(ua);
+        const dz = zb - za;
+        if (-dz + dy * 1.2 <= 0) continue;
+        out += poly(fill(dy, dz, i), [xa, Y(ua), za], [xb, Y(ua), za], [xb, Y(ub), zb], [xa, Y(ub), zb]);
+      }
+      return out;
+    };
+    // Shadow, then the body's bonnet, boot and nose.
+    g += poly("rgba(0,0,0,.2)", [x0 - 0.05, Y(0.02), 0], [x1 + 0.12, Y(0.02), 0], [x1 + 0.12, Y(1.02), 0], [x0 - 0.05, Y(1.02), 0]);
+    g += extrude(body, x0, x1, (dy, dz) => (dz < -0.06 && Math.abs(dz) > dy * 0.8 ? paint.front : paint.top));
+    // The glass cabin: rear window, glass roof, raked windscreen.
+    const [c0, c1] = [x0 + 0.09, x1 - 0.09];
+    g += extrude(cabin, c0, c1, (dy, dz, i) => (i === cabin.length - 2 ? glass : glassTop));
+    // A soft reflection across the windscreen and the roof.
+    g += poly("rgba(255,255,255,.16)", [c0 + 0.15, Y(0.69), 0.52], [c0 + 0.32, Y(0.69), 0.52], [c0 + 0.38, Y(0.58), 0.68], [c0 + 0.22, Y(0.58), 0.68]);
+    g += poly("rgba(255,255,255,.1)", [c0 + 0.12, Y(0.36), 0.68], [c0 + 0.24, Y(0.36), 0.68], [c0 + 0.24, Y(0.52), 0.71], [c0 + 0.12, Y(0.52), 0.71]);
+    // Side of the body and of the cabin (dark windows, a slim pillar).
+    g += poly("#0d1218", ...cabin.map(([u, z]) => [c1, Y(u), z]));
+    // The side windows inside a black frame, with a slim pillar between.
+    const win = [[0.2, 0.52], [0.31, 0.62], [0.42, 0.675], [0.53, 0.675], [0.58, 0.655], [0.69, 0.515]];
+    g += poly(glassSide, ...win.map(([u, z]) => [c1, Y(u), z]));
+    g += poly("rgba(255,255,255,.18)", [c1, Y(0.27), 0.53], [c1, Y(0.36), 0.53], [c1, Y(0.44), 0.66], [c1, Y(0.37), 0.66]);
+    g += poly("#0d1218", [c1, Y(0.445), 0.5], [c1, Y(0.47), 0.5], [c1, Y(0.47), 0.69], [c1, Y(0.445), 0.69]);
+    g += poly(paint.side, ...body.map(([u, z]) => [x1, Y(u), z]));
+    // A crease along the side, door lines, the mirror.
+    g += poly(paint.top, [x1, Y(0.06), 0.42], [x1, Y(0.9), 0.4], [x1, Y(0.9), 0.415], [x1, Y(0.06), 0.435]);
+    for (const u of [0.43, 0.68]) g += poly(paint.dark, [x1, Y(u), 0.2], [x1, Y(u + 0.006), 0.2], [x1, Y(u + 0.006), 0.48], [x1, Y(u), 0.48]);
+    g += poly(paint.dark, [x1, Y(0.66), 0.5], [x1 + 0.1, Y(0.64), 0.53], [x1 + 0.1, Y(0.68), 0.56], [x1, Y(0.7), 0.53]);
+    // Slim headlights at the corners of the nose, a light bar at the back.
+    const lamp = night ? "#fff3b0" : "#f6f8fb";
+    g += poly(lamp, [x1 - 0.32, Y(0.965), 0.36], [x1 - 0.02, Y(0.975), 0.34], [x1 - 0.02, Y(0.985), 0.31], [x1 - 0.3, Y(0.975), 0.33]);
+    g += poly(lamp, [x0 + 0.04, Y(0.975), 0.34], [x0 + 0.32, Y(0.965), 0.36], [x0 + 0.3, Y(0.975), 0.33], [x0 + 0.04, Y(0.985), 0.31]);
+    g += poly(lamp, [x1, Y(0.9), 0.4], [x1, Y(0.97), 0.35], [x1, Y(0.97), 0.33], [x1, Y(0.9), 0.38]);
+    g += poly("#d83a33", [x1, Y(0.0), 0.37], [x1, Y(0.09), 0.43], [x1, Y(0.09), 0.4], [x1, Y(0.0), 0.34]);
+    // Wheel arches and aero wheels.
+    const ring = (u, z, r, k = 1) => Array.from({ length: 16 }, (_, i) => {
+      const a = (i / 16) * Math.PI * 2;
+      return [x1 + 0.01, Y(u) + Math.cos(a) * r, z + Math.sin(a) * r * k];
+    });
+    for (const u of [0.19, 0.8]) {
+      g += poly(night ? "#05070a" : "#121820", ...ring(u, 0.18, 0.21).filter(([, , z]) => z >= 0.12));
+      g += poly("#14191f", ...ring(u, 0.17, 0.17));
+      g += poly(night ? "#5b6572" : "#b9c2cc", ...ring(u, 0.17, 0.12));
+      g += poly(night ? "#3c4450" : "#8c97a3", ...ring(u, 0.17, 0.05));
+    }
+    // The charging port by the rear light glows while it charges.
+    if (ev.charging) g += poly("#2fd39a", [x1, Y(0.1), 0.38], [x1, Y(0.15), 0.38], [x1, Y(0.15), 0.43], [x1, Y(0.1), 0.43]);
     g += "</g>";
   }
   const tree = ev ? P(3, 5.6) : P(5.6, 4.6);
@@ -10704,6 +10745,7 @@ class SolarFlowCardEditor extends HTMLElement {
             ${this._picker("ev.power", t.editorEvPower, ev.power, "sensor", { kind: "power" })}
             ${this._picker("ev.soc", t.editorEvSoc, ev.soc, "sensor", { kind: "soc" })}
             <label><span>${escapeHtml(t.editorItemName)}</span><input type="text" data-ev-name value="${escapeHtml(ev.name ?? "")}" /></label>
+            <label><span>${escapeHtml(t.editorEvColor)}</span><input type="color" data-ev-color value="${escapeHtml(/^#[0-9a-f]{6}$/i.test(ev.color || "") ? ev.color : "#e8ecf1")}" /></label>
           </div>
         </details>`;
       })()}
@@ -11123,6 +11165,7 @@ class SolarFlowCardEditor extends HTMLElement {
       this._set("phase_names", names.length ? names : undefined);
     }));
     root.querySelector("[data-ev-name]")?.addEventListener("change", (e) => this._setIn("ev", "name", e.target.value.trim() || undefined));
+    root.querySelector("[data-ev-color]")?.addEventListener("change", (e) => this._setIn("ev", "color", e.target.value.toLowerCase() === "#e8ecf1" ? undefined : e.target.value));
     root.querySelectorAll("[data-payback]").forEach((input) => input.addEventListener("change", (e) => {
       const number = Number.parseFloat(e.target.value);
       // A bare number (payback: 12000) becomes the object form.

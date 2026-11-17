@@ -460,6 +460,7 @@
   "editorEvHint": "The car beside the house in the Diorama scene, with a flow while it charges. Either sensor is enough.",
   "editorEvPower": "Charging power",
   "editorEvSoc": "Car battery level (optional)",
+  "editorEvColor": "Paint colour",
   "editorAdd": "Add",
   "editorRemove": "Remove",
   "editorConfirmRemove": "Remove this item and its settings?",

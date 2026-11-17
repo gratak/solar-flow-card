@@ -736,6 +736,7 @@ class SolarFlowCardEditor extends HTMLElement {
             ${this._picker("ev.power", t.editorEvPower, ev.power, "sensor", { kind: "power" })}
             ${this._picker("ev.soc", t.editorEvSoc, ev.soc, "sensor", { kind: "soc" })}
             <label><span>${escapeHtml(t.editorItemName)}</span><input type="text" data-ev-name value="${escapeHtml(ev.name ?? "")}" /></label>
+            <label><span>${escapeHtml(t.editorEvColor)}</span><input type="color" data-ev-color value="${escapeHtml(/^#[0-9a-f]{6}$/i.test(ev.color || "") ? ev.color : "#e8ecf1")}" /></label>
           </div>
         </details>`;
       })()}
@@ -1155,6 +1156,7 @@ class SolarFlowCardEditor extends HTMLElement {
       this._set("phase_names", names.length ? names : undefined);
     }));
     root.querySelector("[data-ev-name]")?.addEventListener("change", (e) => this._setIn("ev", "name", e.target.value.trim() || undefined));
+    root.querySelector("[data-ev-color]")?.addEventListener("change", (e) => this._setIn("ev", "color", e.target.value.toLowerCase() === "#e8ecf1" ? undefined : e.target.value));
     root.querySelectorAll("[data-payback]").forEach((input) => input.addEventListener("change", (e) => {
       const number = Number.parseFloat(e.target.value);
       // A bare number (payback: 12000) becomes the object form.

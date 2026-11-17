@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.0-beta.8
+
+- **A new car in Diorama** ([#126](https://github.com/gratak/solar-flow-card/issues/126)): the electric car is now a low, sleek fastback saloon with a glass roof, a raked windscreen, slim headlights, a light bar at the back and aero wheels, in place of the boxy hatchback.
+- **Car colour:** `ev: { color: "#b3121b" }` paints it; pearl white by default. Also in the editor under Installation → Electric car.
+
 ## 2.1.0-beta.7
 
 - **Grid down** ([#140](https://github.com/gratak/solar-flow-card/issues/140)): with a grid status sensor the card shows "Grid down" in place of "Balanced" when the grid is disconnected, in every theme (LCARS: in the status bar too).

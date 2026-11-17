@@ -460,6 +460,7 @@
   "editorEvHint": "O carro ao lado da casa na cena Diorama, com um fluxo durante o carregamento. Basta um dos sensores.",
   "editorEvPower": "Potência de carregamento",
   "editorEvSoc": "Nível da bateria do carro (opcional)",
+  "editorEvColor": "Cor da pintura",
   "editorAdd": "Adicionar",
   "editorRemove": "Remover",
   "editorConfirmRemove": "Remover este item e as suas configurações?",
