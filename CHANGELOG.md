@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0-beta.10
+
+- **Purchase prices by period:** for tariffs whose price depends on the hour, the day or the season, `price_import_periods` lists the prices with their hours, days (every day, working days, weekend) and months, as many periods as the tariff has. Outside them `price_import` applies. Savings, costs and payback are worked out hour by hour at the price of each hour. `holidays_as_weekend: true` counts Poland's public holidays as weekend days. All in the editor under Summary and prices → Purchase prices by period.
+
 ## 2.1.0-beta.9
 
 - **Quick start on request:** a new card no longer opens the quick start by itself. The editor first asks how to set the card up: with the quick start, or by hand in the usual editor. The quick start can still be opened later from the button at the top of the editor.

@@ -38,7 +38,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "2.1.0-beta.9";
+const CARD_VERSION = "2.1.0-beta.10";
 // The card's type is custom:home-energy-hub since 2.0.0. The old name stays
 // registered so dashboards with custom:solar-flow-card keep working.
 const CARD_TAG = "home-energy-hub";
@@ -591,6 +591,19 @@ const TRANSLATIONS = {
     "editorRcePrice": "RCE price sensor",
     "editorRceMissing": "No RCE price sensor found: pick one (e.g. from the PSE integration or your EMS), otherwise the energy sold has no price.",
     "editorImportPriceHint": "Import price: what each kWh costs, energy plus the distribution charges billed per kWh, without monthly fixed fees.",
+    "editorPricePeriods": "Purchase prices by period",
+    "editorPricePeriodsHint": "A different price per kWh at chosen hours, e.g. for a tariff with day zones. The first period that fits a moment gives its price; outside every period the purchase price above applies. A period may run past midnight, and its months past the new year.",
+    "editorPeriodPrice": "Price per kWh",
+    "editorPeriodDays": "Days",
+    "editorDaysAll": "Every day",
+    "editorDaysWorkdays": "Working days",
+    "editorDaysWeekend": "Weekend",
+    "editorPeriodFrom": "From",
+    "editorPeriodTo": "To",
+    "editorPeriodMonthFrom": "From month",
+    "editorPeriodMonthTo": "To month",
+    "editorMonthsAll": "All year",
+    "editorHolidaysWeekend": "Public holidays in Poland count as weekend",
     "editorRceFound": "RCE price sensor found: {entity} · {value}.",
     "editorUseBilling": "I'm on net-billing: value the energy sold at the RCE price",
     "editorBillingFactor": "Deposit factor (1.23)",
@@ -1131,6 +1144,19 @@ const TRANSLATIONS = {
     "editorRcePrice": "RCE-Preissensor",
     "editorRceMissing": "Kein RCE-Preissensor gefunden: einen wählen, sonst bleibt die eingespeiste Energie ohne Preis.",
     "editorImportPriceHint": "Bezugspreis: was jede kWh kostet, Energie plus die Netzentgelte je kWh, ohne monatliche Grundgebühren.",
+    "editorPricePeriods": "Bezugspreise nach Zeitraum",
+    "editorPricePeriodsHint": "Ein anderer Preis je kWh zu bestimmten Zeiten, z. B. bei einem Tarif mit Tageszonen. Es zählt der erste passende Zeitraum; außerhalb aller Zeiträume gilt der Bezugspreis oben. Ein Zeitraum darf über Mitternacht gehen, seine Monate über den Jahreswechsel.",
+    "editorPeriodPrice": "Preis je kWh",
+    "editorPeriodDays": "Tage",
+    "editorDaysAll": "Alle Tage",
+    "editorDaysWorkdays": "Werktage",
+    "editorDaysWeekend": "Wochenende",
+    "editorPeriodFrom": "Von",
+    "editorPeriodTo": "Bis",
+    "editorPeriodMonthFrom": "Ab Monat",
+    "editorPeriodMonthTo": "Bis Monat",
+    "editorMonthsAll": "Ganzes Jahr",
+    "editorHolidaysWeekend": "Gesetzliche Feiertage in Polen zählen als Wochenende",
     "editorRceFound": "RCE-Preissensor gefunden: {entity} · {value}.",
     "editorUseBilling": "Ich rechne per Net-Billing ab: Einspeisung zum RCE-Preis bewerten",
     "editorBillingFactor": "Depotfaktor (1,23)",
@@ -1671,6 +1697,19 @@ const TRANSLATIONS = {
     "editorRcePrice": "Capteur de prix RCE",
     "editorRceMissing": "Aucun capteur de prix RCE trouvé : choisissez-en un (par ex. de l'intégration PSE ou votre EMS), sinon l'énergie vendue n'a pas de prix.",
     "editorImportPriceHint": "Prix d'achat : ce que coûte chaque kWh, énergie plus charges de distribution facturées par kWh, hors abonnements fixes mensuels.",
+    "editorPricePeriods": "Prix d'achat par période",
+    "editorPricePeriodsHint": "Un autre prix par kWh à certaines heures, p. ex. pour un tarif à plages horaires. La première période qui correspond donne son prix ; hors de toute période, le prix d'achat ci-dessus s'applique. Une période peut passer minuit, et ses mois le nouvel an.",
+    "editorPeriodPrice": "Prix par kWh",
+    "editorPeriodDays": "Jours",
+    "editorDaysAll": "Tous les jours",
+    "editorDaysWorkdays": "Jours ouvrés",
+    "editorDaysWeekend": "Week-end",
+    "editorPeriodFrom": "De",
+    "editorPeriodTo": "À",
+    "editorPeriodMonthFrom": "Du mois",
+    "editorPeriodMonthTo": "Au mois",
+    "editorMonthsAll": "Toute l'année",
+    "editorHolidaysWeekend": "Les jours fériés en Pologne comptent comme le week-end",
     "editorRceFound": "Capteur de prix RCE trouvé : {entity} · {value}.",
     "editorUseBilling": "Je suis en vente au réseau : valoriser l'énergie vendue au prix RCE",
     "editorBillingFactor": "Facteur de dépôt (1,23)",
@@ -2211,6 +2250,19 @@ const TRANSLATIONS = {
     "editorRcePrice": "RCE-prijssensor",
     "editorRceMissing": "Geen RCE-prijssensor gevonden: kies er een, anders heeft de teruggeleverde energie geen prijs.",
     "editorImportPriceHint": "Afnameprijs: wat elke kWh kost, energie plus de netkosten per kWh, zonder vaste maandkosten.",
+    "editorPricePeriods": "Afnameprijzen per periode",
+    "editorPricePeriodsHint": "Een andere prijs per kWh op gekozen uren, bijv. bij een tarief met dagzones. De eerste periode die past geeft de prijs; buiten alle periodes geldt de afnameprijs hierboven. Een periode mag over middernacht lopen, de maanden over de jaarwisseling.",
+    "editorPeriodPrice": "Prijs per kWh",
+    "editorPeriodDays": "Dagen",
+    "editorDaysAll": "Alle dagen",
+    "editorDaysWorkdays": "Werkdagen",
+    "editorDaysWeekend": "Weekend",
+    "editorPeriodFrom": "Van",
+    "editorPeriodTo": "Tot",
+    "editorPeriodMonthFrom": "Vanaf maand",
+    "editorPeriodMonthTo": "Tot maand",
+    "editorMonthsAll": "Heel het jaar",
+    "editorHolidaysWeekend": "Feestdagen in Polen tellen als weekend",
     "editorRceFound": "RCE-prijssensor gevonden: {entity} · {value}.",
     "editorUseBilling": "Ik heb net-billing: teruglevering waarderen tegen de RCE-prijs",
     "editorBillingFactor": "Depositofactor (1,23)",
@@ -2751,6 +2803,19 @@ const TRANSLATIONS = {
     "editorRcePrice": "Czujnik ceny RCE",
     "editorRceMissing": "Nie znaleziono czujnika ceny RCE: wybierz go (np. z integracji PSE albo z EMS), inaczej oddana energia nie zostanie wyceniona.",
     "editorImportPriceHint": "Cena zakupu: koszt każdej kWh, czyli energia i opłaty dystrybucyjne naliczane za kWh, bez stałych opłat miesięcznych.",
+    "editorPricePeriods": "Ceny zakupu w okresach",
+    "editorPricePeriodsHint": "Inna cena za kWh w wybranych godzinach, np. przy taryfie ze strefami. Liczy się pierwszy okres, który pasuje do danej chwili; poza wszystkimi okresami obowiązuje cena zakupu powyżej. Okres może przechodzić przez północ, a miesiące przez nowy rok.",
+    "editorPeriodPrice": "Cena za kWh",
+    "editorPeriodDays": "Dni",
+    "editorDaysAll": "Wszystkie dni",
+    "editorDaysWorkdays": "Dni robocze",
+    "editorDaysWeekend": "Weekend",
+    "editorPeriodFrom": "Od godziny",
+    "editorPeriodTo": "Do godziny",
+    "editorPeriodMonthFrom": "Od miesiąca",
+    "editorPeriodMonthTo": "Do miesiąca",
+    "editorMonthsAll": "Cały rok",
+    "editorHolidaysWeekend": "Święta państwowe w Polsce liczone jak weekend",
     "editorRceFound": "Znaleziono czujnik ceny RCE: {entity} · {value}.",
     "editorUseBilling": "Rozliczam się w net-billingu: wyceniaj oddaną energię po cenie RCE",
     "editorBillingFactor": "Mnożnik depozytu (1,23)",
@@ -3291,6 +3356,19 @@ const TRANSLATIONS = {
     "editorRcePrice": "Sensor de preço RCE",
     "editorRceMissing": "Nenhum sensor de preço RCE encontrado: escolha um (p.ex. da integração PSE ou do seu EMS), caso contrário a energia vendida não tem preço.",
     "editorImportPriceHint": "Preço de importação: o custo de cada kWh, energia mais os encargos de distribuição faturados por kWh, sem taxas fixas mensais.",
+    "editorPricePeriods": "Preços de compra por período",
+    "editorPricePeriodsHint": "Um preço diferente por kWh em certas horas, p. ex. num tarifário com períodos horários. Conta o primeiro período que corresponde; fora de todos os períodos aplica-se o preço de compra acima. Um período pode passar a meia-noite, e os meses o ano novo.",
+    "editorPeriodPrice": "Preço por kWh",
+    "editorPeriodDays": "Dias",
+    "editorDaysAll": "Todos os dias",
+    "editorDaysWorkdays": "Dias úteis",
+    "editorDaysWeekend": "Fim de semana",
+    "editorPeriodFrom": "Das",
+    "editorPeriodTo": "Às",
+    "editorPeriodMonthFrom": "Do mês",
+    "editorPeriodMonthTo": "Ao mês",
+    "editorMonthsAll": "Todo o ano",
+    "editorHolidaysWeekend": "Os feriados na Polónia contam como fim de semana",
     "editorRceFound": "Sensor de preço RCE encontrado: {entity} · {value}.",
     "editorUseBilling": "Estou em net-billing: valorizar a energia vendida ao preço RCE",
     "editorBillingFactor": "Fator de depósito (1,23)",
@@ -4160,8 +4238,76 @@ function priceScale(stateObj) {
   return unit.includes("mwh") ? 0.001 : /\/wh$/.test(unit) ? 1000 : 1;
 }
 
+// Purchase prices by period (`price_import_periods`): a list of
+// { price, from: "07:00", to: "13:00", days: "all" | "workdays" | "weekend",
+// months: "4-9" }. The first period that covers a moment gives its price;
+// outside every period `price_import` applies. A period may run past
+// midnight (22:00–06:00) and its months may run past the new year (10-3).
+// With `holidays_as_weekend` Poland's public holidays count as weekend days.
+function clockMinutes(value) {
+  const m = String(value ?? "").trim().match(/^(\d{1,2})(?::(\d{2}))?$/);
+  if (!m) return null;
+  const minutes = Number(m[1]) * 60 + Number(m[2] || 0);
+  return minutes >= 0 && minutes <= 24 * 60 ? minutes : null;
+}
+
+function monthSet(value) {
+  if (Array.isArray(value)) return new Set(value.map(Number).filter((n) => n >= 1 && n <= 12));
+  const m = String(value ?? "").trim().match(/^(\d{1,2})\s*-\s*(\d{1,2})$/);
+  if (!m) return null;
+  const [a, b] = [Number(m[1]), Number(m[2])];
+  if (a < 1 || a > 12 || b < 1 || b > 12) return null;
+  const out = new Set();
+  for (let k = a; ; k = (k % 12) + 1) { out.add(k); if (k === b) break; }
+  return out;
+}
+
+function pricePeriods(config) {
+  const list = Array.isArray(config.price_import_periods) ? config.price_import_periods : [];
+  const periods = list.map((p) => {
+    const price = Number.parseFloat(p?.price);
+    const from = clockMinutes(p?.from ?? "0:00");
+    const to = clockMinutes(p?.to ?? "24:00");
+    if (!Number.isFinite(price) || from === null || to === null) return null;
+    return { price, from, to, days: ["workdays", "weekend"].includes(p.days) ? p.days : "all", months: monthSet(p.months) };
+  }).filter(Boolean);
+  return periods.length ? periods : null;
+}
+
+// Poland's public holidays of a year as "month-day" keys.
+const HOLIDAYS = new Map();
+function polishHolidays(year) {
+  if (HOLIDAYS.has(year)) return HOLIDAYS.get(year);
+  // Easter Sunday (anonymous Gregorian algorithm).
+  const a = year % 19, b = Math.floor(year / 100), c = year % 100, d = Math.floor(b / 4), e = b % 4;
+  const f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const easter = new Date(year, Math.floor((h + l - 7 * m + 114) / 31) - 1, ((h + l - 7 * m + 114) % 31) + 1);
+  const key = (date) => `${date.getMonth() + 1}-${date.getDate()}`;
+  const set = new Set(["1-1", "1-6", "5-1", "5-3", "8-15", "11-1", "11-11", "12-25", "12-26", ...(year >= 2025 ? ["12-24"] : [])]);
+  for (const offset of [0, 1, 49, 60]) set.add(key(addDays(easter, offset)));
+  HOLIDAYS.set(year, set);
+  return set;
+}
+
+function periodPrice(setting, at) {
+  const date = new Date(at);
+  const minutes = date.getHours() * 60 + date.getMinutes();
+  const holiday = setting.holidays && polishHolidays(date.getFullYear()).has(`${date.getMonth() + 1}-${date.getDate()}`);
+  const weekend = date.getDay() === 0 || date.getDay() === 6 || holiday;
+  for (const p of setting.schedule) {
+    if (p.days === "workdays" && weekend) continue;
+    if (p.days === "weekend" && !weekend) continue;
+    if (p.months && !p.months.has(date.getMonth() + 1)) continue;
+    const inside = p.from <= p.to ? minutes >= p.from && minutes < p.to : minutes >= p.from || minutes < p.to;
+    if (inside) return p.price;
+  }
+  return setting.value ?? 0;
+}
+
 function currentPrice(states, setting) {
   if (!setting) return null;
+  if (setting.schedule) return periodPrice(setting, Date.now());
   if (!setting.entity) return setting.value;
   const stateObj = states?.[setting.entity];
   const value = stateNumber(stateObj);
@@ -4236,6 +4382,9 @@ function meteringRatio(config) {
 
 function effectivePrices(hass, config) {
   const prices = { import: priceSetting(config.price_import), export: priceSetting(config.price_export), ratio: null, detected: null, factor: 1 };
+  // Purchase prices by period, around a fixed price for the rest of the time.
+  const periods = pricePeriods(config);
+  if (periods && !prices.import?.entity) prices.import = { schedule: periods, value: prices.import?.value ?? 0, holidays: config.holidays_as_weekend === true };
   // Net-billing: the value of the energy sold is credited to the prosumer
   // deposit multiplied by 1.23 (billing_factor: 1 turns that off).
   if (config.settlement === "net_billing") {
@@ -9408,11 +9557,13 @@ class SolarFlowCard extends HTMLElement {
     const config = this._config;
     const prices = effectivePrices(this._hass, config);
     // Net-metering: a kWh sent back is worth `ratio` of a kWh bought.
-    if (prices.ratio && prices.import) prices.export = prices.import.entity ? { entity: prices.import.entity, ratio: prices.ratio } : { value: prices.import.value * prices.ratio };
+    if (prices.ratio && prices.import) prices.export = prices.import.entity || prices.import.schedule ? { entity: prices.import.entity, ratio: prices.ratio } : { value: prices.import.value * prices.ratio };
     // Only an export price: the value of the energy sold.
     const kind = prices.import ? "savings" : "exportValue";
     if (!prices.import && !prices.export) return undefined;
-    if (!prices.import?.entity && !prices.export?.entity) {
+    // Prices that change over time: from a sensor, or by period.
+    const changing = (setting) => Boolean(setting?.entity || setting?.schedule);
+    if (!changing(prices.import) && !changing(prices.export)) {
       const totals = energy.totals || {};
       if (!prices.import) return isNum(totals.gridExport) ? { kind, value: totals.gridExport * prices.export.value * prices.factor } : undefined;
       // Fixed prices as given: the summary works them out from the totals.
@@ -9433,6 +9584,13 @@ class SolarFlowCard extends HTMLElement {
     let start;
     let statPeriod = "hour";
     const ended = period === "today" ? null : statsSpec(period).end || null;
+    // Prices by period need the hours, also for the year and all time.
+    if (MONTHLY_PERIODS.includes(period) && !since && prices.import?.schedule) {
+      if (!energy.buckets) return { kind, value: null };
+      const first = energy.buckets.find((b) => ENERGY_ORDER.some((name) => isNum(b[name]) && b[name] > 0));
+      if (!first) return { kind, value: 0, cost: 0, sold: 0 };
+      since = startOfDay(first.start);
+    }
     const monthly = MONTHLY_PERIODS.includes(period) && !since;
     if (monthly) {
       if (!energy.buckets) return { kind, value: null };
@@ -9458,6 +9616,7 @@ class SolarFlowCard extends HTMLElement {
       const setting = prices[kind];
       if (!setting) return 0;
       if (setting.ratio) return setting.ratio * basePrice("import", at);
+      if (setting.schedule) return periodPrice(setting, at === null ? Date.now() : at);
       if (!setting.entity) return setting.value;
       const mean = at === null ? undefined : stats.data[kind]?.get(at);
       return mean ?? now[kind] ?? 0;
@@ -9487,7 +9646,7 @@ class SolarFlowCard extends HTMLElement {
     // charged when it is cheap and used when it is dear counts as it does on
     // the bill. Months would hide that.
     const prices = effectivePrices(this._hass, this._config);
-    const hourly = Boolean(first && (prices.import?.entity || prices.export?.entity || prices.ratio));
+    const hourly = Boolean(first && (prices.import?.entity || prices.import?.schedule || prices.export?.entity || prices.ratio));
     let money = this._savings(resolved, "all", all, null, hourly ? startOfDay(first.start) : null);
     if (money === undefined) {
       // Fixed prices: from the totals, as in the summary.
@@ -10797,6 +10956,7 @@ class SolarFlowCardEditor extends HTMLElement {
         <label><span>${escapeHtml(t.editorCurrency)}</span><input data-text="currency" type="text" value="${escapeHtml(this._config.currency ?? "")}" placeholder="${escapeHtml(t.currency)}" /></label>
       </div>
       <p class="hint">${escapeHtml(t.editorImportPriceHint)}</p>
+      ${this._periodsHtml(t)}
       ${mode !== "net_metering" && !priceSetting(this._config.price_import) && (mode === "net_billing" || priceSetting(this._config.price_export)) ? `<p class="warn">${escapeHtml(t.editorNoImportPrice)}</p>` : ""}
       ${mode === "net_billing" ? `
         ${this._picker("price_export", t.editorRcePrice, sensor("price_export"), "sensor", { kind: "price", auto: detected ? { entityId: detected, stateObj: this._hass.states[detected] } : null })}
@@ -10824,6 +10984,63 @@ class SolarFlowCardEditor extends HTMLElement {
         }).join("")}</div>
         <p class="hint">${escapeHtml(t.editorPaybackHint)}</p>
       </div>`;
+  }
+
+  // Purchase prices by period: price, hours, days and months of each.
+  _periodsHtml(t) {
+    const list = Array.isArray(this._config.price_import_periods) ? this._config.price_import_periods : [];
+    const monthName = (n) => new Date(2024, n - 1, 1).toLocaleString(t.locale, { month: "long" });
+    const months = (item) => {
+      const m = String(item.months ?? "").match(/^(\d{1,2})\s*-\s*(\d{1,2})$/);
+      return m ? [Number(m[1]), Number(m[2])] : [0, 0];
+    };
+    const select = (path, value, options) => `<select data-period="${path}">${options.map(([v, label]) => `<option value="${v}" ${String(value) === String(v) ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>`;
+    const monthOptions = (all) => [[0, all], ...Array.from({ length: 12 }, (_, i) => [i + 1, monthName(i + 1)])];
+    return `
+      <details class="box" data-box="periods" ${this._boxOpen("periods", list.length > 0) ? "open" : ""}>
+        <summary class="title">${escapeHtml(t.editorPricePeriods)}${list.length ? ` (${list.length})` : ""}</summary>
+        <p class="hint">${escapeHtml(t.editorPricePeriodsHint)}</p>
+        ${list.map((item, i) => {
+          const [m1, m2] = months(item);
+          return `
+          <div class="item">
+            <div class="grid pairs">
+              <label><span>${escapeHtml(t.editorPeriodPrice)}</span><input type="number" step="0.0001" min="0" inputmode="decimal" data-period="${i}.price" value="${escapeHtml(item.price ?? "")}" /></label>
+              <label><span>${escapeHtml(t.editorPeriodDays)}</span>${select(`${i}.days`, item.days || "all", [["all", t.editorDaysAll], ["workdays", t.editorDaysWorkdays], ["weekend", t.editorDaysWeekend]])}</label>
+              <label><span>${escapeHtml(t.editorPeriodFrom)}</span><input type="time" data-period="${i}.from" value="${escapeHtml(item.from ?? "")}" /></label>
+              <label><span>${escapeHtml(t.editorPeriodTo)}</span><input type="time" data-period="${i}.to" value="${escapeHtml(item.to ?? "")}" /></label>
+              <label><span>${escapeHtml(t.editorPeriodMonthFrom)}</span>${select(`${i}.month_from`, m1, monthOptions(t.editorMonthsAll))}</label>
+              <label><span>${escapeHtml(t.editorPeriodMonthTo)}</span>${select(`${i}.month_to`, m2, monthOptions(t.editorMonthsAll))}</label>
+            </div>
+            <button type="button" class="link danger" data-period-remove="${i}">${escapeHtml(t.editorRemove)}</button>
+          </div>`;
+        }).join("")}
+        <button type="button" class="link" data-period-add>+ ${escapeHtml(t.editorAdd)}</button>
+        <div class="switch"><label for="holidays_as_weekend">${escapeHtml(t.editorHolidaysWeekend)}</label><input id="holidays_as_weekend" type="checkbox" data-period-holidays ${this._config.holidays_as_weekend === true ? "checked" : ""} /></div>
+      </details>`;
+  }
+
+  _setPeriod(index, field, value) {
+    const list = (Array.isArray(this._config.price_import_periods) ? this._config.price_import_periods : []).map((p) => ({ ...p }));
+    const item = list[index] || {};
+    if (field === "month_from" || field === "month_to") {
+      const m = String(item.months ?? "").match(/^(\d{1,2})\s*-\s*(\d{1,2})$/);
+      let [a, b] = m ? [Number(m[1]), Number(m[2])] : [0, 0];
+      if (field === "month_from") a = Number(value); else b = Number(value);
+      // One month chosen: from it to itself, or to the other end.
+      if (a && !b) b = a;
+      if (b && !a) a = b;
+      item.months = a && b ? `${a}-${b}` : undefined;
+    } else if (field === "price") {
+      const n = Number.parseFloat(value);
+      item.price = Number.isFinite(n) ? n : undefined;
+    } else {
+      item[field] = value || undefined;
+    }
+    if (item.days === "all") delete item.days;
+    list[index] = Object.fromEntries(Object.entries(item).filter(([, v]) => v !== undefined));
+    this._set("price_import_periods", list);
+    this._render();
   }
 
   _vstoreHtml(t) {
@@ -10972,7 +11189,7 @@ class SolarFlowCardEditor extends HTMLElement {
         summary { padding: 12px 14px; cursor: pointer; font-weight: 600; font-size: 15px; }
         .body { display: grid; gap: 12px; padding: 4px 14px 14px; }
         label { display: grid; gap: 6px; font-size: 13px; color: var(--secondary-text-color, #727272); }
-        input[type="text"], input[type="number"], select {
+        input[type="text"], input[type="number"], input[type="time"], select {
           width: 100%; min-height: 40px; box-sizing: border-box; padding: 8px 11px; font: inherit;
           color: var(--primary-text-color); background: var(--card-background-color, transparent);
           border: 1px solid var(--divider-color, rgba(127,127,127,.35)); border-radius: 10px;
@@ -10982,6 +11199,7 @@ class SolarFlowCardEditor extends HTMLElement {
           color: var(--primary-text-color); font: inherit; font-size: 12px; cursor: pointer; }
         .themes button.on { border-color: var(--primary-color, #03a9f4); box-shadow: inset 0 0 0 1px var(--primary-color, #03a9f4); font-weight: 700; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+        .grid.pairs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .pickers { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
         .switch { display: flex; justify-content: space-between; align-items: center; gap: 12px; color: var(--primary-text-color); font-size: 14px; }
         .switch label { color: inherit; font-size: inherit; }
@@ -11109,6 +11327,23 @@ class SolarFlowCardEditor extends HTMLElement {
           : e.target.value.trim();
       this._setItem(group, Number(index), field, value);
     }));
+    root.querySelectorAll("[data-period]").forEach((input) => input.addEventListener("change", (e) => {
+      const [index, field] = input.dataset.period.split(".");
+      this._setPeriod(Number(index), field, e.target.value);
+    }));
+    root.querySelector("[data-period-add]")?.addEventListener("click", () => {
+      this._boxes.set("periods", true);
+      const list = Array.isArray(this._config.price_import_periods) ? this._config.price_import_periods : [];
+      this._set("price_import_periods", [...list, { from: "07:00", to: "13:00" }]);
+      this._render();
+    });
+    root.querySelectorAll("[data-period-remove]").forEach((button) => button.addEventListener("click", () => {
+      const list = [...(Array.isArray(this._config.price_import_periods) ? this._config.price_import_periods : [])];
+      list.splice(Number(button.dataset.periodRemove), 1);
+      this._set("price_import_periods", list.length ? list : undefined);
+      this._render();
+    }));
+    root.querySelector("[data-period-holidays]")?.addEventListener("change", (e) => this._set("holidays_as_weekend", e.target.checked || undefined));
     root.querySelectorAll("[data-add]").forEach((button) => button.addEventListener("click", () => {
       this._boxes.set(`list-${button.dataset.add}`, true);
       this._writeItems(button.dataset.add, [...this._items(button.dataset.add), {}]);

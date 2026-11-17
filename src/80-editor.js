@@ -797,6 +797,7 @@ class SolarFlowCardEditor extends HTMLElement {
         <label><span>${escapeHtml(t.editorCurrency)}</span><input data-text="currency" type="text" value="${escapeHtml(this._config.currency ?? "")}" placeholder="${escapeHtml(t.currency)}" /></label>
       </div>
       <p class="hint">${escapeHtml(t.editorImportPriceHint)}</p>
+      ${this._periodsHtml(t)}
       ${mode !== "net_metering" && !priceSetting(this._config.price_import) && (mode === "net_billing" || priceSetting(this._config.price_export)) ? `<p class="warn">${escapeHtml(t.editorNoImportPrice)}</p>` : ""}
       ${mode === "net_billing" ? `
         ${this._picker("price_export", t.editorRcePrice, sensor("price_export"), "sensor", { kind: "price", auto: detected ? { entityId: detected, stateObj: this._hass.states[detected] } : null })}
@@ -824,6 +825,63 @@ class SolarFlowCardEditor extends HTMLElement {
         }).join("")}</div>
         <p class="hint">${escapeHtml(t.editorPaybackHint)}</p>
       </div>`;
+  }
+
+  // Purchase prices by period: price, hours, days and months of each.
+  _periodsHtml(t) {
+    const list = Array.isArray(this._config.price_import_periods) ? this._config.price_import_periods : [];
+    const monthName = (n) => new Date(2024, n - 1, 1).toLocaleString(t.locale, { month: "long" });
+    const months = (item) => {
+      const m = String(item.months ?? "").match(/^(\d{1,2})\s*-\s*(\d{1,2})$/);
+      return m ? [Number(m[1]), Number(m[2])] : [0, 0];
+    };
+    const select = (path, value, options) => `<select data-period="${path}">${options.map(([v, label]) => `<option value="${v}" ${String(value) === String(v) ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>`;
+    const monthOptions = (all) => [[0, all], ...Array.from({ length: 12 }, (_, i) => [i + 1, monthName(i + 1)])];
+    return `
+      <details class="box" data-box="periods" ${this._boxOpen("periods", list.length > 0) ? "open" : ""}>
+        <summary class="title">${escapeHtml(t.editorPricePeriods)}${list.length ? ` (${list.length})` : ""}</summary>
+        <p class="hint">${escapeHtml(t.editorPricePeriodsHint)}</p>
+        ${list.map((item, i) => {
+          const [m1, m2] = months(item);
+          return `
+          <div class="item">
+            <div class="grid pairs">
+              <label><span>${escapeHtml(t.editorPeriodPrice)}</span><input type="number" step="0.0001" min="0" inputmode="decimal" data-period="${i}.price" value="${escapeHtml(item.price ?? "")}" /></label>
+              <label><span>${escapeHtml(t.editorPeriodDays)}</span>${select(`${i}.days`, item.days || "all", [["all", t.editorDaysAll], ["workdays", t.editorDaysWorkdays], ["weekend", t.editorDaysWeekend]])}</label>
+              <label><span>${escapeHtml(t.editorPeriodFrom)}</span><input type="time" data-period="${i}.from" value="${escapeHtml(item.from ?? "")}" /></label>
+              <label><span>${escapeHtml(t.editorPeriodTo)}</span><input type="time" data-period="${i}.to" value="${escapeHtml(item.to ?? "")}" /></label>
+              <label><span>${escapeHtml(t.editorPeriodMonthFrom)}</span>${select(`${i}.month_from`, m1, monthOptions(t.editorMonthsAll))}</label>
+              <label><span>${escapeHtml(t.editorPeriodMonthTo)}</span>${select(`${i}.month_to`, m2, monthOptions(t.editorMonthsAll))}</label>
+            </div>
+            <button type="button" class="link danger" data-period-remove="${i}">${escapeHtml(t.editorRemove)}</button>
+          </div>`;
+        }).join("")}
+        <button type="button" class="link" data-period-add>+ ${escapeHtml(t.editorAdd)}</button>
+        <div class="switch"><label for="holidays_as_weekend">${escapeHtml(t.editorHolidaysWeekend)}</label><input id="holidays_as_weekend" type="checkbox" data-period-holidays ${this._config.holidays_as_weekend === true ? "checked" : ""} /></div>
+      </details>`;
+  }
+
+  _setPeriod(index, field, value) {
+    const list = (Array.isArray(this._config.price_import_periods) ? this._config.price_import_periods : []).map((p) => ({ ...p }));
+    const item = list[index] || {};
+    if (field === "month_from" || field === "month_to") {
+      const m = String(item.months ?? "").match(/^(\d{1,2})\s*-\s*(\d{1,2})$/);
+      let [a, b] = m ? [Number(m[1]), Number(m[2])] : [0, 0];
+      if (field === "month_from") a = Number(value); else b = Number(value);
+      // One month chosen: from it to itself, or to the other end.
+      if (a && !b) b = a;
+      if (b && !a) a = b;
+      item.months = a && b ? `${a}-${b}` : undefined;
+    } else if (field === "price") {
+      const n = Number.parseFloat(value);
+      item.price = Number.isFinite(n) ? n : undefined;
+    } else {
+      item[field] = value || undefined;
+    }
+    if (item.days === "all") delete item.days;
+    list[index] = Object.fromEntries(Object.entries(item).filter(([, v]) => v !== undefined));
+    this._set("price_import_periods", list);
+    this._render();
   }
 
   _vstoreHtml(t) {
@@ -972,7 +1030,7 @@ class SolarFlowCardEditor extends HTMLElement {
         summary { padding: 12px 14px; cursor: pointer; font-weight: 600; font-size: 15px; }
         .body { display: grid; gap: 12px; padding: 4px 14px 14px; }
         label { display: grid; gap: 6px; font-size: 13px; color: var(--secondary-text-color, #727272); }
-        input[type="text"], input[type="number"], select {
+        input[type="text"], input[type="number"], input[type="time"], select {
           width: 100%; min-height: 40px; box-sizing: border-box; padding: 8px 11px; font: inherit;
           color: var(--primary-text-color); background: var(--card-background-color, transparent);
           border: 1px solid var(--divider-color, rgba(127,127,127,.35)); border-radius: 10px;
@@ -982,6 +1040,7 @@ class SolarFlowCardEditor extends HTMLElement {
           color: var(--primary-text-color); font: inherit; font-size: 12px; cursor: pointer; }
         .themes button.on { border-color: var(--primary-color, #03a9f4); box-shadow: inset 0 0 0 1px var(--primary-color, #03a9f4); font-weight: 700; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+        .grid.pairs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .pickers { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
         .switch { display: flex; justify-content: space-between; align-items: center; gap: 12px; color: var(--primary-text-color); font-size: 14px; }
         .switch label { color: inherit; font-size: inherit; }
@@ -1109,6 +1168,23 @@ class SolarFlowCardEditor extends HTMLElement {
           : e.target.value.trim();
       this._setItem(group, Number(index), field, value);
     }));
+    root.querySelectorAll("[data-period]").forEach((input) => input.addEventListener("change", (e) => {
+      const [index, field] = input.dataset.period.split(".");
+      this._setPeriod(Number(index), field, e.target.value);
+    }));
+    root.querySelector("[data-period-add]")?.addEventListener("click", () => {
+      this._boxes.set("periods", true);
+      const list = Array.isArray(this._config.price_import_periods) ? this._config.price_import_periods : [];
+      this._set("price_import_periods", [...list, { from: "07:00", to: "13:00" }]);
+      this._render();
+    });
+    root.querySelectorAll("[data-period-remove]").forEach((button) => button.addEventListener("click", () => {
+      const list = [...(Array.isArray(this._config.price_import_periods) ? this._config.price_import_periods : [])];
+      list.splice(Number(button.dataset.periodRemove), 1);
+      this._set("price_import_periods", list.length ? list : undefined);
+      this._render();
+    }));
+    root.querySelector("[data-period-holidays]")?.addEventListener("change", (e) => this._set("holidays_as_weekend", e.target.checked || undefined));
     root.querySelectorAll("[data-add]").forEach((button) => button.addEventListener("click", () => {
       this._boxes.set(`list-${button.dataset.add}`, true);
       this._writeItems(button.dataset.add, [...this._items(button.dataset.add), {}]);
