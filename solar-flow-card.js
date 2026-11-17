@@ -38,7 +38,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "2.1.0-beta.7";
+const CARD_VERSION = "2.1.0-beta.8";
 // The card's type is custom:home-energy-hub since 2.0.0. The old name stays
 // registered so dashboards with custom:solar-flow-card keep working.
 const CARD_TAG = "home-energy-hub";
@@ -524,6 +524,7 @@ const TRANSLATIONS = {
     "editorEvHint": "The car beside the house in the Diorama scene, with a flow while it charges. Either sensor is enough.",
     "editorEvPower": "Charging power",
     "editorEvSoc": "Car battery level (optional)",
+    "editorEvColor": "Paint colour",
     "editorAdd": "Add",
     "editorRemove": "Remove",
     "editorConfirmRemove": "Remove this item and its settings?",
@@ -1059,6 +1060,7 @@ const TRANSLATIONS = {
     "editorEvHint": "Das Auto neben dem Haus in der Diorama-Szene, mit einem Fluss während des Ladens. Ein Sensor genügt.",
     "editorEvPower": "Ladeleistung",
     "editorEvSoc": "Akkustand des Autos (optional)",
+    "editorEvColor": "Lackfarbe",
     "editorAdd": "Hinzufügen",
     "editorRemove": "Entfernen",
     "editorConfirmRemove": "Diesen Eintrag mit seinen Einstellungen entfernen?",
@@ -1594,6 +1596,7 @@ const TRANSLATIONS = {
     "editorEvHint": "La voiture à côté de la maison dans la scène Diorama, avec un flux pendant la recharge. Un seul capteur suffit.",
     "editorEvPower": "Puissance de recharge",
     "editorEvSoc": "Niveau de batterie de la voiture (optionnel)",
+    "editorEvColor": "Couleur de la peinture",
     "editorAdd": "Ajouter",
     "editorRemove": "Supprimer",
     "editorConfirmRemove": "Supprimer cet élément et ses réglages ?",
@@ -2129,6 +2132,7 @@ const TRANSLATIONS = {
     "editorEvHint": "De auto naast het huis in de Diorama-scène, met een stroom tijdens het laden. Eén sensor is genoeg.",
     "editorEvPower": "Laadvermogen",
     "editorEvSoc": "Accuniveau van de auto (optioneel)",
+    "editorEvColor": "Lakkleur",
     "editorAdd": "Toevoegen",
     "editorRemove": "Verwijderen",
     "editorConfirmRemove": "Dit item met zijn instellingen verwijderen?",
@@ -2664,6 +2668,7 @@ const TRANSLATIONS = {
     "editorEvHint": "Auto obok domu w scenie Dioramy, z przepływem w trakcie ładowania. Wystarczy jeden z czujników.",
     "editorEvPower": "Moc ładowania",
     "editorEvSoc": "Poziom baterii auta (opcjonalnie)",
+    "editorEvColor": "Kolor lakieru",
     "editorAdd": "Dodaj",
     "editorRemove": "Usuń",
     "editorConfirmRemove": "Usunąć ten element razem z ustawieniami?",
@@ -3199,6 +3204,7 @@ const TRANSLATIONS = {
     "editorEvHint": "O carro ao lado da casa na cena Diorama, com um fluxo durante o carregamento. Basta um dos sensores.",
     "editorEvPower": "Potência de carregamento",
     "editorEvSoc": "Nível da bateria do carro (opcional)",
+    "editorEvColor": "Cor da pintura",
     "editorAdd": "Adicionar",
     "editorRemove": "Remover",
     "editorConfirmRemove": "Remover este item e as suas configurações?",
@@ -4573,7 +4579,7 @@ function periodSummaryRest(totals, config, t, locale) {
   return items;
 }
 
-// An electric car (`ev: { power, soc, name }`), drawn in the Diorama scene.
+// An electric car (`ev: { power, soc, name, color }`), drawn in the Diorama scene.
 function evData(hass, config) {
   const ev = config.ev;
   if (!ev || typeof ev !== "object") return null;
@@ -4583,6 +4589,7 @@ function evData(hass, config) {
   if (!isNum(power) && !isNum(soc)) return null;
   return {
     name: ev.name ? String(ev.name) : null,
+    color: typeof ev.color === "string" ? ev.color : null,
     power: isNum(power) ? Math.max(0, power) : null,
     soc: isNum(soc) ? clamp(soc, 0, 100) : null,
     charging: isNum(power) && power > ACTIVE_W,
@@ -6643,6 +6650,42 @@ function dioramaSky(now) {
   return { phase: "dusk", sky: ["#e7855c", "#f6c48d"], ground: ["#b3d6b6", "#9bc8a3", "#8bbb94"] };
 }
 
+// The Diorama's electric car: a picture of a white electric saloon seen from
+// the scene's angle, front to the lower left (a WebP with transparency,
+// 200 × 139). It becomes a blob URL once, so the card's HTML only carries
+// that short address on every refresh.
+const EV_CAR_WEBP = "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";
+let evCarUrl = null;
+
+function evCarImage() {
+  if (evCarUrl) return evCarUrl;
+  try {
+    const bytes = Uint8Array.from(atob(EV_CAR_WEBP), (c) => c.charCodeAt(0));
+    evCarUrl = URL.createObjectURL(new Blob([bytes], { type: "image/webp" }));
+  } catch (error) {
+    evCarUrl = `data:image/webp;base64,${EV_CAR_WEBP}`;
+  }
+  return evCarUrl;
+}
+
+// The car in the scene: its shadow, the picture painted in `ev.color`
+// (multiplied, so the glass and wheels stay dark) and dimmed at night, and a
+// glow at the charging port while it charges.
+function evCarSvg(night, color, charging) {
+  const paint = typeof color === "string" && /^#[0-9a-f]{6}$/i.test(color) ? color : "#ffffff";
+  const rgb = [1, 3, 5].map((i) => parseInt(paint.slice(i, i + 2), 16) / 255);
+  const k = night ? 0.55 : 1;
+  const tint = rgb.some((v) => v < 0.99) || night;
+  const [x, y, w, h] = [244, 274, 84, 58.2];
+  let out = `<ellipse cx="${x + w * 0.5}" cy="${y + h * 0.83}" rx="${w * 0.44}" ry="${h * 0.2}" fill="rgba(0,0,0,.18)" transform="rotate(-22 ${x + w * 0.5} ${y + h * 0.83})"/>`;
+  if (tint) {
+    out += `<filter id="dio-ev-paint" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="${rgb[0] * k} 0 0 0 0  0 ${rgb[1] * k} 0 0 0  0 0 ${rgb[2] * k} 0 0  0 0 0 1 0"/></filter>`;
+  }
+  out += `<image href="${evCarImage()}" x="${x}" y="${y}" width="${w}" height="${h}" ${tint ? 'filter="url(#dio-ev-paint)"' : ""}/>`;
+  if (charging) out += `<circle cx="${x + w * 0.935}" cy="${y + h * 0.3}" r="2.2" fill="#2fd39a"/><circle cx="${x + w * 0.935}" cy="${y + h * 0.3}" r="4.6" fill="#2fd39a" opacity=".3"/>`;
+  return out;
+}
+
 function dioramaScene(m) {
   const S = 26;
   const CX = 250;
@@ -6773,7 +6816,7 @@ function dioramaScene(m) {
   g += flowPath(`M${pole} Q${(pole[0] + wallR[0]) / 2} ${pole[1] + 30} ${wallR}`, L.importActive || L.exportActive, L.exportActive, "grid");
   if (m.ev) {
     const plug = P(4, 2.6, 0.7);
-    const port = P(4.45, 2.4, 0.42);
+    const port = P(4.5, 2.05, 0.42);
     g += flowPath(`M${plug} Q${(plug[0] + port[0]) / 2 + 6} ${Math.max(plug[1], port[1]) + 10} ${port}`, m.ev.charging, false, "load");
   }
   g += "</g>";
@@ -6783,42 +6826,7 @@ function dioramaScene(m) {
     g += `<g class="sfc-click" ${entityAttr(ev.entityId)}>`;
     g += poly("#3a4a5c", [4, 2.35, 0.45], [4, 2.85, 0.45], [4, 2.85, 1.15], [4, 2.35, 1.15]);
     g += poly(ev.charging ? "#2fd39a" : "#8a99aa", [4, 2.5, 0.85], [4, 2.7, 0.85], [4, 2.7, 0.95], [4, 2.5, 0.95]);
-    // A hatchback seen from the front left: body, cabin with windows,
-    // windscreen, lights and wheels. Length along y, the front towards y+.
-    const [x0, x1, y0, y1] = [4.45, 5.55, 1.7, 3.8];
-    const paint = ["#3f86d6", "#2f6fb8", "#5a9ee6"];
-    const glass = night ? "#2a3c55" : "#9dc6ea";
-    const wheel = (x, y) => {
-      const pts = Array.from({ length: 14 }, (_, i) => {
-        const a = (i / 14) * Math.PI * 2;
-        return [x, y + Math.cos(a) * 0.22, 0.22 + Math.sin(a) * 0.22];
-      });
-      return poly("#1b2129", ...pts) + poly("#9aa6b3", ...pts.map(([px, py, pz]) => [px, y + (py - y) * 0.45, 0.22 + (pz - 0.22) * 0.45]));
-    };
-    // Shadow under the car.
-    g += poly("rgba(0,0,0,.18)", [x0 - 0.05, y0 - 0.05, 0], [x1 + 0.1, y0 - 0.05, 0], [x1 + 0.1, y1 + 0.1, 0], [x0 - 0.05, y1 + 0.1, 0]);
-    // Lower body.
-    g += box(x0, y0, x1 - x0, y1 - y0, 0.36, paint[2], paint[0], paint[1], 0.16);
-    // Bonnet slope at the front, boot slope at the back.
-    const zb = 0.52;
-    const zt = 0.92;
-    const [ca, cb] = [2.05, 3.05];
-    // Cabin sides (the right side shows), roof, windscreen.
-    g += poly(paint[1], [x1 - 0.06, ca - 0.25, zb], [x1 - 0.06, cb + 0.35, zb], [x1 - 0.14, cb, zt], [x1 - 0.14, ca, zt]);
-    g += poly(glass, [x1 - 0.07, ca - 0.1, zb + 0.06], [x1 - 0.07, cb + 0.2, zb + 0.06], [x1 - 0.13, cb - 0.02, zt - 0.06], [x1 - 0.13, ca + 0.04, zt - 0.06]);
-    g += poly(paint[1], [x1 - 0.07, 2.58, zb + 0.05], [x1 - 0.07, 2.63, zb + 0.05], [x1 - 0.13, 2.63, zt - 0.05], [x1 - 0.13, 2.58, zt - 0.05]);
-    g += poly(paint[2], [x0 + 0.14, ca, zt], [x1 - 0.14, ca, zt], [x1 - 0.14, cb, zt], [x0 + 0.14, cb, zt]);
-    g += poly(glass, [x0 + 0.06, cb + 0.35, zb], [x1 - 0.06, cb + 0.35, zb], [x1 - 0.14, cb, zt], [x0 + 0.14, cb, zt]);
-    g += poly("rgba(255,255,255,.35)", [x0 + 0.25, cb + 0.28, zb + 0.07], [x0 + 0.4, cb + 0.28, zb + 0.07], [x0 + 0.42, cb + 0.04, zt - 0.03], [x0 + 0.3, cb + 0.04, zt - 0.03]);
-    // Front: headlights and the number plate.
-    g += poly(night ? "#fff3b0" : "#f4f7fb", [x0 + 0.08, y1, 0.36], [x0 + 0.3, y1, 0.36], [x0 + 0.3, y1, 0.46], [x0 + 0.08, y1, 0.46]);
-    g += poly(night ? "#fff3b0" : "#f4f7fb", [x1 - 0.3, y1, 0.36], [x1 - 0.08, y1, 0.36], [x1 - 0.08, y1, 0.46], [x1 - 0.3, y1, 0.46]);
-    g += poly("#eef2f6", [x0 + 0.38, y1, 0.22], [x1 - 0.38, y1, 0.22], [x1 - 0.38, y1, 0.3], [x0 + 0.38, y1, 0.3]);
-    // Rear light on the side, wheels.
-    g += poly("#e2463a", [x1, y0 + 0.02, 0.36], [x1, y0 + 0.14, 0.36], [x1, y0 + 0.14, 0.46], [x1, y0 + 0.02, 0.46]);
-    g += wheel(x1 + 0.01, y0 + 0.45) + wheel(x1 + 0.01, y1 - 0.45);
-    // The charging port glows while it charges.
-    if (ev.charging) g += poly("#2fd39a", [x1, y0 + 0.3, 0.42], [x1, y0 + 0.42, 0.42], [x1, y0 + 0.42, 0.5], [x1, y0 + 0.3, 0.5]);
+    g += evCarSvg(night, ev.color, ev.charging);
     g += "</g>";
   }
   const tree = ev ? P(3, 5.6) : P(5.6, 4.6);
@@ -10704,6 +10712,7 @@ class SolarFlowCardEditor extends HTMLElement {
             ${this._picker("ev.power", t.editorEvPower, ev.power, "sensor", { kind: "power" })}
             ${this._picker("ev.soc", t.editorEvSoc, ev.soc, "sensor", { kind: "soc" })}
             <label><span>${escapeHtml(t.editorItemName)}</span><input type="text" data-ev-name value="${escapeHtml(ev.name ?? "")}" /></label>
+            <label><span>${escapeHtml(t.editorEvColor)}</span><input type="color" data-ev-color value="${escapeHtml(/^#[0-9a-f]{6}$/i.test(ev.color || "") ? ev.color : "#e8ecf1")}" /></label>
           </div>
         </details>`;
       })()}
@@ -11123,6 +11132,7 @@ class SolarFlowCardEditor extends HTMLElement {
       this._set("phase_names", names.length ? names : undefined);
     }));
     root.querySelector("[data-ev-name]")?.addEventListener("change", (e) => this._setIn("ev", "name", e.target.value.trim() || undefined));
+    root.querySelector("[data-ev-color]")?.addEventListener("change", (e) => this._setIn("ev", "color", e.target.value.toLowerCase() === "#e8ecf1" ? undefined : e.target.value));
     root.querySelectorAll("[data-payback]").forEach((input) => input.addEventListener("change", (e) => {
       const number = Number.parseFloat(e.target.value);
       // A bare number (payback: 12000) becomes the object form.

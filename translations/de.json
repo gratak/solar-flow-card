@@ -460,6 +460,7 @@
   "editorEvHint": "Das Auto neben dem Haus in der Diorama-Szene, mit einem Fluss während des Ladens. Ein Sensor genügt.",
   "editorEvPower": "Ladeleistung",
   "editorEvSoc": "Akkustand des Autos (optional)",
+  "editorEvColor": "Lackfarbe",
   "editorAdd": "Hinzufügen",
   "editorRemove": "Entfernen",
   "editorConfirmRemove": "Diesen Eintrag mit seinen Einstellungen entfernen?",

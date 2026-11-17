@@ -460,6 +460,7 @@
   "editorEvHint": "De auto naast het huis in de Diorama-scène, met een stroom tijdens het laden. Eén sensor is genoeg.",
   "editorEvPower": "Laadvermogen",
   "editorEvSoc": "Accuniveau van de auto (optioneel)",
+  "editorEvColor": "Lakkleur",
   "editorAdd": "Toevoegen",
   "editorRemove": "Verwijderen",
   "editorConfirmRemove": "Dit item met zijn instellingen verwijderen?",

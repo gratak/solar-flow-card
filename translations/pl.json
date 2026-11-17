@@ -460,6 +460,7 @@
   "editorEvHint": "Auto obok domu w scenie Dioramy, z przepływem w trakcie ładowania. Wystarczy jeden z czujników.",
   "editorEvPower": "Moc ładowania",
   "editorEvSoc": "Poziom baterii auta (opcjonalnie)",
+  "editorEvColor": "Kolor lakieru",
   "editorAdd": "Dodaj",
   "editorRemove": "Usuń",
   "editorConfirmRemove": "Usunąć ten element razem z ustawieniami?",

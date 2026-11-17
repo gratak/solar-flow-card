@@ -1047,7 +1047,7 @@ function periodSummaryRest(totals, config, t, locale) {
   return items;
 }
 
-// An electric car (`ev: { power, soc, name }`), drawn in the Diorama scene.
+// An electric car (`ev: { power, soc, name, color }`), drawn in the Diorama scene.
 function evData(hass, config) {
   const ev = config.ev;
   if (!ev || typeof ev !== "object") return null;
@@ -1057,6 +1057,7 @@ function evData(hass, config) {
   if (!isNum(power) && !isNum(soc)) return null;
   return {
     name: ev.name ? String(ev.name) : null,
+    color: typeof ev.color === "string" ? ev.color : null,
     power: isNum(power) ? Math.max(0, power) : null,
     soc: isNum(soc) ? clamp(soc, 0, 100) : null,
     charging: isNum(power) && power > ACTIVE_W,

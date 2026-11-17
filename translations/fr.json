@@ -460,6 +460,7 @@
   "editorEvHint": "La voiture à côté de la maison dans la scène Diorama, avec un flux pendant la recharge. Un seul capteur suffit.",
   "editorEvPower": "Puissance de recharge",
   "editorEvSoc": "Niveau de batterie de la voiture (optionnel)",
+  "editorEvColor": "Couleur de la peinture",
   "editorAdd": "Ajouter",
   "editorRemove": "Supprimer",
   "editorConfirmRemove": "Supprimer cet élément et ses réglages ?",
