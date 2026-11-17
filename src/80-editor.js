@@ -772,6 +772,10 @@ class SolarFlowCardEditor extends HTMLElement {
     const sensor = (key) => priceSetting(this._config[key])?.entity || "";
     const number = (key, label) => this._numbers(t, [[key, label, "0.01"]]);
     const detected = mode === "net_billing" && !priceSetting(this._config.price_export) ? detectRcePrice(this._hass) : null;
+    // What a tariff adds to a market price sensor: per kWh, then a multiplier (VAT).
+    const surcharge = `
+      <div class="grid">${this._numbers(t, [["price_import_add", "editorPriceImportAdd", "0.0001"], ["price_import_multiplier", "editorPriceImportMultiplier", "0.01"]])}</div>
+      <p class="hint">${escapeHtml(t.editorPriceImportAddHint)}</p>`;
     // With fixed prices, an RCE price sensor in Home Assistant is offered.
     const suggested = mode === "" ? detectRcePrice(this._hass) : null;
     const ratio = formatNumber(meteringRatio({ ...this._config, metering_ratio: undefined }), t.locale, 1);
@@ -815,7 +819,14 @@ class SolarFlowCardEditor extends HTMLElement {
             ${this._picker("price_import", t.editorPriceImportSensor, sensor("price_import"), "sensor", { kind: "price" })}
             ${this._picker("price_export", t.editorPriceExportSensor, sensor("price_export"), "sensor", { kind: "price" })}
           </div>
-        </details>` : ""}
+          ${surcharge}
+        </details>` : `
+        <details class="box" data-box="import-sensor" ${this._boxOpen("import-sensor", Boolean(sensor("price_import"))) ? "open" : ""}>
+          <summary class="title">${escapeHtml(t.editorImportSensorBox)}</summary>
+          <p class="hint">${escapeHtml(t.editorImportSensorHint)}</p>
+          <div class="pickers">${this._picker("price_import", t.editorPriceImportSensor, sensor("price_import"), "sensor", { kind: "price" })}</div>
+          ${surcharge}
+        </details>`}
       ${this._switches(t, "summary")}
       <div class="box">
         <span class="title">${escapeHtml(t.paybackTitle)}</span>

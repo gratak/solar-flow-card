@@ -346,7 +346,7 @@ class SolarFlowCard extends HTMLElement {
       if (setting.schedule) return periodPrice(setting, at === null ? Date.now() : at);
       if (!setting.entity) return setting.value;
       const mean = at === null ? undefined : stats.data[kind]?.get(at);
-      return mean ?? now[kind] ?? 0;
+      return mean === undefined ? now[kind] ?? 0 : adjustPrice(setting, mean);
     };
     // What the hourly statistics do not cover yet (the current hour).
     let rest = null;
