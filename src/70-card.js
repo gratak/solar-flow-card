@@ -284,11 +284,13 @@ class SolarFlowCard extends HTMLElement {
     const config = this._config;
     const prices = effectivePrices(this._hass, config);
     // Net-metering: a kWh sent back is worth `ratio` of a kWh bought.
-    if (prices.ratio && prices.import) prices.export = prices.import.entity ? { entity: prices.import.entity, ratio: prices.ratio } : { value: prices.import.value * prices.ratio };
+    if (prices.ratio && prices.import) prices.export = prices.import.entity || prices.import.schedule ? { entity: prices.import.entity, ratio: prices.ratio } : { value: prices.import.value * prices.ratio };
     // Only an export price: the value of the energy sold.
     const kind = prices.import ? "savings" : "exportValue";
     if (!prices.import && !prices.export) return undefined;
-    if (!prices.import?.entity && !prices.export?.entity) {
+    // Prices that change over time: from a sensor, or by period.
+    const changing = (setting) => Boolean(setting?.entity || setting?.schedule);
+    if (!changing(prices.import) && !changing(prices.export)) {
       const totals = energy.totals || {};
       if (!prices.import) return isNum(totals.gridExport) ? { kind, value: totals.gridExport * prices.export.value * prices.factor } : undefined;
       // Fixed prices as given: the summary works them out from the totals.
@@ -309,6 +311,13 @@ class SolarFlowCard extends HTMLElement {
     let start;
     let statPeriod = "hour";
     const ended = period === "today" ? null : statsSpec(period).end || null;
+    // Prices by period need the hours, also for the year and all time.
+    if (MONTHLY_PERIODS.includes(period) && !since && prices.import?.schedule) {
+      if (!energy.buckets) return { kind, value: null };
+      const first = energy.buckets.find((b) => ENERGY_ORDER.some((name) => isNum(b[name]) && b[name] > 0));
+      if (!first) return { kind, value: 0, cost: 0, sold: 0 };
+      since = startOfDay(first.start);
+    }
     const monthly = MONTHLY_PERIODS.includes(period) && !since;
     if (monthly) {
       if (!energy.buckets) return { kind, value: null };
@@ -334,6 +343,7 @@ class SolarFlowCard extends HTMLElement {
       const setting = prices[kind];
       if (!setting) return 0;
       if (setting.ratio) return setting.ratio * basePrice("import", at);
+      if (setting.schedule) return periodPrice(setting, at === null ? Date.now() : at);
       if (!setting.entity) return setting.value;
       const mean = at === null ? undefined : stats.data[kind]?.get(at);
       return mean ?? now[kind] ?? 0;
@@ -363,7 +373,7 @@ class SolarFlowCard extends HTMLElement {
     // charged when it is cheap and used when it is dear counts as it does on
     // the bill. Months would hide that.
     const prices = effectivePrices(this._hass, this._config);
-    const hourly = Boolean(first && (prices.import?.entity || prices.export?.entity || prices.ratio));
+    const hourly = Boolean(first && (prices.import?.entity || prices.import?.schedule || prices.export?.entity || prices.ratio));
     let money = this._savings(resolved, "all", all, null, hourly ? startOfDay(first.start) : null);
     if (money === undefined) {
       // Fixed prices: from the totals, as in the summary.

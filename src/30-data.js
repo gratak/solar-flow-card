@@ -604,8 +604,76 @@ function priceScale(stateObj) {
   return unit.includes("mwh") ? 0.001 : /\/wh$/.test(unit) ? 1000 : 1;
 }
 
+// Purchase prices by period (`price_import_periods`): a list of
+// { price, from: "07:00", to: "13:00", days: "all" | "workdays" | "weekend",
+// months: "4-9" }. The first period that covers a moment gives its price;
+// outside every period `price_import` applies. A period may run past
+// midnight (22:00–06:00) and its months may run past the new year (10-3).
+// With `holidays_as_weekend` Poland's public holidays count as weekend days.
+function clockMinutes(value) {
+  const m = String(value ?? "").trim().match(/^(\d{1,2})(?::(\d{2}))?$/);
+  if (!m) return null;
+  const minutes = Number(m[1]) * 60 + Number(m[2] || 0);
+  return minutes >= 0 && minutes <= 24 * 60 ? minutes : null;
+}
+
+function monthSet(value) {
+  if (Array.isArray(value)) return new Set(value.map(Number).filter((n) => n >= 1 && n <= 12));
+  const m = String(value ?? "").trim().match(/^(\d{1,2})\s*-\s*(\d{1,2})$/);
+  if (!m) return null;
+  const [a, b] = [Number(m[1]), Number(m[2])];
+  if (a < 1 || a > 12 || b < 1 || b > 12) return null;
+  const out = new Set();
+  for (let k = a; ; k = (k % 12) + 1) { out.add(k); if (k === b) break; }
+  return out;
+}
+
+function pricePeriods(config) {
+  const list = Array.isArray(config.price_import_periods) ? config.price_import_periods : [];
+  const periods = list.map((p) => {
+    const price = Number.parseFloat(p?.price);
+    const from = clockMinutes(p?.from ?? "0:00");
+    const to = clockMinutes(p?.to ?? "24:00");
+    if (!Number.isFinite(price) || from === null || to === null) return null;
+    return { price, from, to, days: ["workdays", "weekend"].includes(p.days) ? p.days : "all", months: monthSet(p.months) };
+  }).filter(Boolean);
+  return periods.length ? periods : null;
+}
+
+// Poland's public holidays of a year as "month-day" keys.
+const HOLIDAYS = new Map();
+function polishHolidays(year) {
+  if (HOLIDAYS.has(year)) return HOLIDAYS.get(year);
+  // Easter Sunday (anonymous Gregorian algorithm).
+  const a = year % 19, b = Math.floor(year / 100), c = year % 100, d = Math.floor(b / 4), e = b % 4;
+  const f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const easter = new Date(year, Math.floor((h + l - 7 * m + 114) / 31) - 1, ((h + l - 7 * m + 114) % 31) + 1);
+  const key = (date) => `${date.getMonth() + 1}-${date.getDate()}`;
+  const set = new Set(["1-1", "1-6", "5-1", "5-3", "8-15", "11-1", "11-11", "12-25", "12-26", ...(year >= 2025 ? ["12-24"] : [])]);
+  for (const offset of [0, 1, 49, 60]) set.add(key(addDays(easter, offset)));
+  HOLIDAYS.set(year, set);
+  return set;
+}
+
+function periodPrice(setting, at) {
+  const date = new Date(at);
+  const minutes = date.getHours() * 60 + date.getMinutes();
+  const holiday = setting.holidays && polishHolidays(date.getFullYear()).has(`${date.getMonth() + 1}-${date.getDate()}`);
+  const weekend = date.getDay() === 0 || date.getDay() === 6 || holiday;
+  for (const p of setting.schedule) {
+    if (p.days === "workdays" && weekend) continue;
+    if (p.days === "weekend" && !weekend) continue;
+    if (p.months && !p.months.has(date.getMonth() + 1)) continue;
+    const inside = p.from <= p.to ? minutes >= p.from && minutes < p.to : minutes >= p.from || minutes < p.to;
+    if (inside) return p.price;
+  }
+  return setting.value ?? 0;
+}
+
 function currentPrice(states, setting) {
   if (!setting) return null;
+  if (setting.schedule) return periodPrice(setting, Date.now());
   if (!setting.entity) return setting.value;
   const stateObj = states?.[setting.entity];
   const value = stateNumber(stateObj);
@@ -680,6 +748,9 @@ function meteringRatio(config) {
 
 function effectivePrices(hass, config) {
   const prices = { import: priceSetting(config.price_import), export: priceSetting(config.price_export), ratio: null, detected: null, factor: 1 };
+  // Purchase prices by period, around a fixed price for the rest of the time.
+  const periods = pricePeriods(config);
+  if (periods && !prices.import?.entity) prices.import = { schedule: periods, value: prices.import?.value ?? 0, holidays: config.holidays_as_weekend === true };
   // Net-billing: the value of the energy sold is credited to the prosumer
   // deposit multiplied by 1.23 (billing_factor: 1 turns that off).
   if (config.settlement === "net_billing") {
