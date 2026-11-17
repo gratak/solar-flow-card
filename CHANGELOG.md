@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0-beta.9
+
+- **Quick start on request:** a new card no longer opens the quick start by itself. The editor first asks how to set the card up: with the quick start, or by hand in the usual editor. The quick start can still be opened later from the button at the top of the editor.
+
 ## 2.1.0-beta.8
 
 - **A new car in Diorama** ([#126](https://github.com/gratak/solar-flow-card/issues/126)): the boxy hatchback is replaced by a picture of a sleek white electric saloon with a glass roof, drawn from the scene's own angle. It is dimmed at night like the rest of the scene.

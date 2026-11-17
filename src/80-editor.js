@@ -234,8 +234,9 @@ class SolarFlowCardEditor extends HTMLElement {
   set hass(hass) {
     const first = !this._hass;
     this._hass = hass;
-    // A new card (nothing set but its type and theme): the quick start first.
-    if (first && this._config && Object.keys(this._config).every((key) => ["type", "theme"].includes(key))) this._startWizard();
+    // A new card (nothing set but its type and theme): ask whether to use
+    // the quick start or to set the card up by hand.
+    if (first && this._config && Object.keys(this._config).every((key) => ["type", "theme"].includes(key))) this._askWizard = true;
     if (first) {
       this._render();
       this._loadPicker();
@@ -1030,8 +1031,16 @@ class SolarFlowCardEditor extends HTMLElement {
       <datalist id="sfc-weather">${ids("weather").map((id) => `<option value="${escapeHtml(id)}"></option>`).join("")}</datalist>
       <div class="editor">
         ${this._legacyType ? `<p class="beta">${escapeHtml(t.editorRenamed)}</p>` : ""}
-        ${this._wizard ? this._wizardHtml(t) : `<button type="button" class="wiz-open" data-wizard-open>✨ ${escapeHtml(t.wizardOpen)}</button>`}
-        ${this._wizard ? "" : `
+        ${this._askWizard ? `
+        <div class="wizard ask">
+          <h3>${escapeHtml(t.wizardAsk)}</h3>
+          <p class="note">${escapeHtml(t.wizardAskNote)}</p>
+          <div class="wiz-nav">
+            <button type="button" data-wiz-ask="no">${escapeHtml(t.wizardAskNo)}</button>
+            <button type="button" class="primary" data-wiz-ask="yes">✨ ${escapeHtml(t.wizardAskYes)}</button>
+          </div>
+        </div>` : this._wizard ? this._wizardHtml(t) : `<button type="button" class="wiz-open" data-wizard-open>✨ ${escapeHtml(t.wizardOpen)}</button>`}
+        ${this._wizard || this._askWizard ? "" : `
         ${this._group("look", t, () => this._lookHtml(t))}
         ${this._group("sensors", t, () => this._sensorsHtml(t))}
         ${this._group("sections", t, () => this._sectionsHtml(t))}
@@ -1136,6 +1145,11 @@ class SolarFlowCardEditor extends HTMLElement {
       this._render();
     });
     root.querySelector("[data-wizard-open]")?.addEventListener("click", () => this._startWizard());
+    root.querySelectorAll("[data-wiz-ask]").forEach((button) => button.addEventListener("click", () => {
+      this._askWizard = false;
+      if (button.dataset.wizAsk === "yes") this._startWizard();
+      else this._render();
+    }));
     root.querySelectorAll("[data-wiz]").forEach((button) => button.addEventListener("click", () => {
       this._wizard[button.dataset.wiz] = button.dataset.value;
       this._render();
