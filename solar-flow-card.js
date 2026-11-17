@@ -38,7 +38,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "2.1.0-beta.8";
+const CARD_VERSION = "2.1.0-beta.9";
 // The card's type is custom:home-energy-hub since 2.0.0. The old name stays
 // registered so dashboards with custom:solar-flow-card keep working.
 const CARD_TAG = "home-energy-hub";
@@ -364,6 +364,10 @@ const TRANSLATIONS = {
     "chartNoHistory": "No history for: {sensors}. Excluded from the recorder?",
     "editorRenamed": "This card is now called Home Energy Hub. Its type changes from custom:solar-flow-card to custom:home-energy-hub with your next change here; the old type keeps working too.",
     "wizardOpen": "Quick start",
+    "wizardAsk": "How do you want to set up the card?",
+    "wizardAskNote": "The quick start finds your sensors and asks three questions. You can also set every option yourself, and open the quick start later from the top of the editor.",
+    "wizardAskYes": "Quick start",
+    "wizardAskNo": "Set up myself",
     "wizardStepOf": "Step {n} of {total}",
     "wizardStepSource": "Where the data comes from",
     "wizardStepPrices": "Energy prices",
@@ -900,6 +904,10 @@ const TRANSLATIONS = {
     "chartNoHistory": "Kein Verlauf für: {sensors}. Vom Recorder ausgeschlossen?",
     "editorRenamed": "Diese Karte heißt jetzt Home Energy Hub. Mit deiner nächsten Änderung hier wird ihr Typ von custom:solar-flow-card zu custom:home-energy-hub; der alte Typ funktioniert weiterhin.",
     "wizardOpen": "Schnellstart",
+    "wizardAsk": "Wie möchtest du die Karte einrichten?",
+    "wizardAskNote": "Der Schnellstart findet deine Sensoren und stellt drei Fragen. Du kannst auch alles selbst einstellen und den Schnellstart später oben im Editor öffnen.",
+    "wizardAskYes": "Schnellstart",
+    "wizardAskNo": "Selbst einrichten",
     "wizardStepOf": "Schritt {n} von {total}",
     "wizardStepSource": "Woher die Daten kommen",
     "wizardStepPrices": "Energiepreise",
@@ -1436,6 +1444,10 @@ const TRANSLATIONS = {
     "chartNoHistory": "Aucun historique pour : {sensors}. Exclu de l'enregistreur ?",
     "editorRenamed": "Cette carte s'appelle désormais Home Energy Hub. Son type passe de custom:solar-flow-card à custom:home-energy-hub lors de votre prochaine modification ici ; l'ancien type continue aussi de fonctionner.",
     "wizardOpen": "Démarrage rapide",
+    "wizardAsk": "Comment voulez-vous configurer la carte ?",
+    "wizardAskNote": "Le démarrage rapide trouve vos capteurs et pose trois questions. Vous pouvez aussi tout régler vous-même et ouvrir le démarrage rapide plus tard en haut de l'éditeur.",
+    "wizardAskYes": "Démarrage rapide",
+    "wizardAskNo": "Je configure moi-même",
     "wizardStepOf": "Étape {n} sur {total}",
     "wizardStepSource": "D'où viennent les données",
     "wizardStepPrices": "Prix de l'énergie",
@@ -1972,6 +1984,10 @@ const TRANSLATIONS = {
     "chartNoHistory": "Geen historie voor: {sensors}. Uitgesloten van de recorder?",
     "editorRenamed": "Deze kaart heet nu Home Energy Hub. Bij je volgende wijziging hier verandert het type van custom:solar-flow-card naar custom:home-energy-hub; het oude type blijft ook werken.",
     "wizardOpen": "Snelle start",
+    "wizardAsk": "Hoe wil je de kaart instellen?",
+    "wizardAskNote": "De snelle start zoekt je sensoren en stelt drie vragen. Je kunt ook alles zelf instellen en de snelle start later bovenaan de editor openen.",
+    "wizardAskYes": "Snelle start",
+    "wizardAskNo": "Zelf instellen",
     "wizardStepOf": "Stap {n} van {total}",
     "wizardStepSource": "Waar de gegevens vandaan komen",
     "wizardStepPrices": "Energieprijzen",
@@ -2508,6 +2524,10 @@ const TRANSLATIONS = {
     "chartNoHistory": "Brak historii dla: {sensors}. Czy nie są wyłączone z recordera?",
     "editorRenamed": "Ta karta nazywa się teraz Home Energy Hub. Przy następnej zmianie tutaj jej typ zmieni się z custom:solar-flow-card na custom:home-energy-hub; stary typ też dalej działa.",
     "wizardOpen": "Szybki start",
+    "wizardAsk": "Jak chcesz ustawić kartę?",
+    "wizardAskNote": "Szybki start sam znajdzie czujniki i zada trzy pytania. Możesz też ustawić wszystko samodzielnie, a szybki start otworzyć później z góry edytora.",
+    "wizardAskYes": "Szybki start",
+    "wizardAskNo": "Ustawię sam",
     "wizardStepOf": "Krok {n} z {total}",
     "wizardStepSource": "Skąd są dane",
     "wizardStepPrices": "Ceny energii",
@@ -3044,6 +3064,10 @@ const TRANSLATIONS = {
     "chartNoHistory": "Sem histórico para: {sensors}. Excluído do gravador?",
     "editorRenamed": "Este cartão agora chama-se Home Energy Hub. O seu tipo muda de custom:solar-flow-card para custom:home-energy-hub com a próxima alteração aqui; o tipo antigo continua a funcionar.",
     "wizardOpen": "Início rápido",
+    "wizardAsk": "Como quer configurar o cartão?",
+    "wizardAskNote": "O início rápido encontra os seus sensores e faz três perguntas. Também pode configurar tudo sozinho e abrir o início rápido mais tarde no topo do editor.",
+    "wizardAskYes": "Início rápido",
+    "wizardAskNo": "Configurar eu mesmo",
     "wizardStepOf": "Passo {n} de {total}",
     "wizardStepSource": "De onde vêm os dados",
     "wizardStepPrices": "Preços de energia",
@@ -10210,8 +10234,9 @@ class SolarFlowCardEditor extends HTMLElement {
   set hass(hass) {
     const first = !this._hass;
     this._hass = hass;
-    // A new card (nothing set but its type and theme): the quick start first.
-    if (first && this._config && Object.keys(this._config).every((key) => ["type", "theme"].includes(key))) this._startWizard();
+    // A new card (nothing set but its type and theme): ask whether to use
+    // the quick start or to set the card up by hand.
+    if (first && this._config && Object.keys(this._config).every((key) => ["type", "theme"].includes(key))) this._askWizard = true;
     if (first) {
       this._render();
       this._loadPicker();
@@ -11006,8 +11031,16 @@ class SolarFlowCardEditor extends HTMLElement {
       <datalist id="sfc-weather">${ids("weather").map((id) => `<option value="${escapeHtml(id)}"></option>`).join("")}</datalist>
       <div class="editor">
         ${this._legacyType ? `<p class="beta">${escapeHtml(t.editorRenamed)}</p>` : ""}
-        ${this._wizard ? this._wizardHtml(t) : `<button type="button" class="wiz-open" data-wizard-open>✨ ${escapeHtml(t.wizardOpen)}</button>`}
-        ${this._wizard ? "" : `
+        ${this._askWizard ? `
+        <div class="wizard ask">
+          <h3>${escapeHtml(t.wizardAsk)}</h3>
+          <p class="note">${escapeHtml(t.wizardAskNote)}</p>
+          <div class="wiz-nav">
+            <button type="button" data-wiz-ask="no">${escapeHtml(t.wizardAskNo)}</button>
+            <button type="button" class="primary" data-wiz-ask="yes">✨ ${escapeHtml(t.wizardAskYes)}</button>
+          </div>
+        </div>` : this._wizard ? this._wizardHtml(t) : `<button type="button" class="wiz-open" data-wizard-open>✨ ${escapeHtml(t.wizardOpen)}</button>`}
+        ${this._wizard || this._askWizard ? "" : `
         ${this._group("look", t, () => this._lookHtml(t))}
         ${this._group("sensors", t, () => this._sensorsHtml(t))}
         ${this._group("sections", t, () => this._sectionsHtml(t))}
@@ -11112,6 +11145,11 @@ class SolarFlowCardEditor extends HTMLElement {
       this._render();
     });
     root.querySelector("[data-wizard-open]")?.addEventListener("click", () => this._startWizard());
+    root.querySelectorAll("[data-wiz-ask]").forEach((button) => button.addEventListener("click", () => {
+      this._askWizard = false;
+      if (button.dataset.wizAsk === "yes") this._startWizard();
+      else this._render();
+    }));
     root.querySelectorAll("[data-wiz]").forEach((button) => button.addEventListener("click", () => {
       this._wizard[button.dataset.wiz] = button.dataset.value;
       this._render();

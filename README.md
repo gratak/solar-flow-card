@@ -90,7 +90,7 @@ Copy `solar-flow-card.js` to `config/www/` and add a dashboard resource `/local/
 
 ## Configuration
 
-**Quick start:** the editor opens a short wizard for a new card (and from its "Quick start" button): pick where the data comes from (DeyeCloud, the Energy dashboard, or your inverter's integration, whose sensors it proposes), the prices and the look.
+**Quick start:** for a new card the editor asks whether to use a short wizard or to set the card up by hand (the wizard is also behind its "Quick start" button): pick where the data comes from (DeyeCloud, the Energy dashboard, or your inverter's integration, whose sensors it proposes), the prices and the look.
 
 **Works out of the box in two cases:**
 - **DeyeCloud:** the integration's sensors are found automatically.
