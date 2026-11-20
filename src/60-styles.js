@@ -388,6 +388,11 @@ const FIT_CSS = `
   @container (max-width: 290px) { .sfc-phase { padding: 8px 6px; } .sfc-phase strong { font-size: 13px; letter-spacing: 0; } }
   /* The narrowest Diorama: the house pills show their values only. */
   @container (max-width: 340px) { .dio-pill.load small { display: none; } }
+  /* The showroom picture leaves less room for the pills: values only below the house. */
+  @container (max-width: 420px) {
+    .dio-scene.showroom .dio-pill.load small { display: none; }
+    .dio-scene.showroom .dio-pill.pv { top: 19% !important; }
+  }
   @container (max-width: 225px) { .sfc-phase { padding: 7px 4px; } .sfc-phase strong { font-size: 11px; letter-spacing: -.02em; } .sfc-phase small { font-size: 10px; } }
   /* The forecast days share their columns, so the widest day name fits. */
   @supports (grid-template-columns: subgrid) {
@@ -472,6 +477,19 @@ const THEME_CSS = {
     }
     .dio-scene { position: relative; aspect-ratio: 520 / 360; background: linear-gradient(180deg, var(--sky-a) 0%, var(--sky-b) 70%); }
     .dio-scene svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    /* Showroom style: the rendered house fills the scene, flows glow on it. */
+    .dio-scene.showroom { aspect-ratio: 2000 / 1342; background: #f5f5f5; }
+    .dio-scene.showroom.night { background: #18191d; }
+    .dio-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .dio-scene.showroom .sfc-flow { filter: drop-shadow(0 0 3px currentColor); }
+    .dio-scene.showroom .sfc-flow-base { stroke: rgba(255,255,255,.18); }
+    .dio-scene.showroom.day .sfc-flow-base { stroke: rgba(30,40,55,.08); }
+    .dio-scene.showroom.day .dio-title { color: #1d2733; text-shadow: none; }
+    .dio-scene.showroom.day .dio-title .sfc-badge { --sfc-badge-bg: rgba(30,40,55,.07); --sfc-badge-text: #1d2733; }
+    .dio-scene.showroom.day .dio-clock { background: rgba(30,40,55,.07); color: #1d2733; }
+    .dio-scene.showroom .dio-cloud, .dio-scene.showroom .dio-flash { display: none; }
+    .dio-scene.showroom.night .dio-pill { background: rgba(28,32,40,.82); color: #e6edf5; box-shadow: 0 6px 18px rgba(0,0,0,.45); backdrop-filter: blur(6px); }
+    .dio-scene.showroom.night .dio-pill small { color: #93a4b8; }
     .dio-title { position: absolute; left: 4%; top: 4.5%; color: #fff; text-shadow: 0 1px 8px rgba(20,60,100,.35); }
     .dio-title h1 { margin: 0 0 4px; font-size: clamp(18px, 4.6cqw, 26px); font-weight: 800; }
     .dio-title .sfc-badge { --sfc-badge-bg: rgba(255,255,255,.28); --sfc-badge-text: #fff; text-shadow: none; backdrop-filter: blur(6px); }
