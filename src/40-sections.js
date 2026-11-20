@@ -35,6 +35,8 @@ function periodLabels(t) {
 
 function tabsHtml(m) {
   const labels = periodLabels(m.t);
+  // A single period has nothing to choose from: no tabs (#151).
+  if (m.periods.length < 2) return browseHtml(m);
   return `
     <div class="sfc-tabs ${m.periods.length > 5 ? "many" : ""}" style="--sfc-tab-cols: ${Math.ceil(m.periods.length / 2)}"
       role="radiogroup" aria-label="${escapeHtml(m.t.energy)}">
@@ -113,9 +115,10 @@ function energySectionHtml(m, { title = true } = {}) {
   // An earlier period is named by its dates.
   const label = m.browse?.offset ? m.browse.label : current;
   const hint = m.period === "all" && m.since ? fill(m.t.since, { date: m.since }) : "";
+  // `energy_title: false`: no heading, for a compact card (#151).
   return `
     <section class="sfc-section sfc-energy">
-      ${title ? `
+      ${title && m.config.energy_title !== false ? `
         <div class="sfc-head">
           <div><span class="sfc-kicker">${escapeHtml(kicker)}</span><h3>${escapeHtml(label)}</h3></div>
           ${hint ? `<span class="sfc-hint">${escapeHtml(hint)}</span>` : ""}

@@ -438,6 +438,8 @@
   "editorDarkOn": "Escuro",
   "editorPeriods": "Separadores de período",
   "editorPeriodBrowse": "Setas para percorrer dias, meses e anos anteriores",
+  "editorEnergyTitle": "Título da secção de energia",
+  "editorEnergyTitleHint": "Com um só período os separadores desaparecem; sem título nem setas, a secção de energia mostra só o gráfico, os blocos e o resumo.",
   "editorFontUrl": "Folha de estilo de tipo de letra própria (URL)",
   "editorNow": "agora: {value}",
   "editorAuto": "encontrado automaticamente: {entity} · {value}",

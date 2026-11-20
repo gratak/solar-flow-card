@@ -438,6 +438,8 @@
   "editorDarkOn": "Dunkel",
   "editorPeriods": "Zeitraum-Tabs",
   "editorPeriodBrowse": "Pfeile zum Blättern in früheren Tagen, Monaten und Jahren",
+  "editorEnergyTitle": "Überschrift des Energiebereichs",
+  "editorEnergyTitleHint": "Mit nur einem Zeitraum werden die Reiter ausgeblendet; ohne Überschrift und Pfeile zeigt der Energiebereich nur Diagramm, Kacheln und Zusammenfassung.",
   "editorFontUrl": "Eigenes Schrift-Stylesheet (URL)",
   "editorNow": "jetzt: {value}",
   "editorAuto": "automatisch gefunden: {entity} · {value}",

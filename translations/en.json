@@ -438,6 +438,8 @@
   "editorDarkOn": "Dark",
   "editorPeriods": "Period tabs",
   "editorPeriodBrowse": "Arrows to browse earlier days, months and years",
+  "editorEnergyTitle": "Heading of the energy section",
+  "editorEnergyTitleHint": "With a single period tab the tabs are hidden; without the heading and the arrows the energy section shows just the chart, tiles and summary.",
   "editorFontUrl": "Own font stylesheet (URL)",
   "editorNow": "now: {value}",
   "editorAuto": "found automatically: {entity} · {value}",

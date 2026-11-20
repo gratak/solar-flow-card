@@ -438,6 +438,8 @@
   "editorDarkOn": "Sombre",
   "editorPeriods": "Onglets de période",
   "editorPeriodBrowse": "Flèches pour parcourir les jours, mois et années précédents",
+  "editorEnergyTitle": "Titre de la section énergie",
+  "editorEnergyTitleHint": "Avec une seule période, les onglets disparaissent ; sans titre ni flèches, la section énergie n'affiche que le graphique, les tuiles et le résumé.",
   "editorFontUrl": "Feuille de style de polices personnalisée (URL)",
   "editorNow": "maintenant : {value}",
   "editorAuto": "détecté automatiquement : {entity} · {value}",

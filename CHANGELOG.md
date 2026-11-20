@@ -2,6 +2,7 @@
 
 ## 2.1.1
 
+- **A compact energy section** ([#151](https://github.com/gratak/solar-flow-card/issues/151)): with a single period under `periods` the tab bar is hidden, as there is nothing to choose; `energy_title: false` hides the section's heading. With `period_browse: false` too, the section shows just the chart (or not, with `show_chart: false`), the tiles and the summary. In the editor under Look → Period tabs.
 - **Atlantis on a phone:** the battery label on the left ("Storage 96%") was cut at the card's edge on narrow cards; its letters are set closer there now.
 
 ## 2.1.0

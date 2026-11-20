@@ -502,6 +502,8 @@ const TRANSLATIONS = {
     "editorDarkOn": "Dark",
     "editorPeriods": "Period tabs",
     "editorPeriodBrowse": "Arrows to browse earlier days, months and years",
+    "editorEnergyTitle": "Heading of the energy section",
+    "editorEnergyTitleHint": "With a single period tab the tabs are hidden; without the heading and the arrows the energy section shows just the chart, tiles and summary.",
     "editorFontUrl": "Own font stylesheet (URL)",
     "editorNow": "now: {value}",
     "editorAuto": "found automatically: {entity} · {value}",
@@ -1064,6 +1066,8 @@ const TRANSLATIONS = {
     "editorDarkOn": "Dunkel",
     "editorPeriods": "Zeitraum-Tabs",
     "editorPeriodBrowse": "Pfeile zum Blättern in früheren Tagen, Monaten und Jahren",
+    "editorEnergyTitle": "Überschrift des Energiebereichs",
+    "editorEnergyTitleHint": "Mit nur einem Zeitraum werden die Reiter ausgeblendet; ohne Überschrift und Pfeile zeigt der Energiebereich nur Diagramm, Kacheln und Zusammenfassung.",
     "editorFontUrl": "Eigenes Schrift-Stylesheet (URL)",
     "editorNow": "jetzt: {value}",
     "editorAuto": "automatisch gefunden: {entity} · {value}",
@@ -1626,6 +1630,8 @@ const TRANSLATIONS = {
     "editorDarkOn": "Oscuro",
     "editorPeriods": "Pestañas de periodo",
     "editorPeriodBrowse": "Flechas para recorrer días, meses y años anteriores",
+    "editorEnergyTitle": "Título de la sección de energía",
+    "editorEnergyTitleHint": "Con un solo periodo las pestañas desaparecen; sin título ni flechas, la sección de energía muestra solo el gráfico, los mosaicos y el resumen.",
     "editorFontUrl": "Hoja de estilos de fuentes propia (URL)",
     "editorNow": "ahora: {value}",
     "editorAuto": "detectado automáticamente: {entity} · {value}",
@@ -2188,6 +2194,8 @@ const TRANSLATIONS = {
     "editorDarkOn": "Sombre",
     "editorPeriods": "Onglets de période",
     "editorPeriodBrowse": "Flèches pour parcourir les jours, mois et années précédents",
+    "editorEnergyTitle": "Titre de la section énergie",
+    "editorEnergyTitleHint": "Avec une seule période, les onglets disparaissent ; sans titre ni flèches, la section énergie n'affiche que le graphique, les tuiles et le résumé.",
     "editorFontUrl": "Feuille de style de polices personnalisée (URL)",
     "editorNow": "maintenant : {value}",
     "editorAuto": "détecté automatiquement : {entity} · {value}",
@@ -2750,6 +2758,8 @@ const TRANSLATIONS = {
     "editorDarkOn": "Donker",
     "editorPeriods": "Periodetabs",
     "editorPeriodBrowse": "Pijlen om door eerdere dagen, maanden en jaren te bladeren",
+    "editorEnergyTitle": "Kop van de energiesectie",
+    "editorEnergyTitleHint": "Met één periode verdwijnen de tabbladen; zonder kop en pijlen toont de energiesectie alleen grafiek, tegels en samenvatting.",
     "editorFontUrl": "Eigen lettertype-stylesheet (URL)",
     "editorNow": "nu: {value}",
     "editorAuto": "automatisch gevonden: {entity} · {value}",
@@ -3312,6 +3322,8 @@ const TRANSLATIONS = {
     "editorDarkOn": "Ciemne",
     "editorPeriods": "Zakładki okresów",
     "editorPeriodBrowse": "Strzałki do przeglądania wcześniejszych dni, miesięcy i lat",
+    "editorEnergyTitle": "Nagłówek sekcji energii",
+    "editorEnergyTitleHint": "Przy jednej zakładce okresu zakładki znikają; bez nagłówka i strzałek sekcja energii pokazuje sam wykres, kafelki i podsumowanie.",
     "editorFontUrl": "Własny arkusz czcionek (URL)",
     "editorNow": "teraz: {value}",
     "editorAuto": "wykryty automatycznie: {entity} · {value}",
@@ -3874,6 +3886,8 @@ const TRANSLATIONS = {
     "editorDarkOn": "Escuro",
     "editorPeriods": "Separadores de período",
     "editorPeriodBrowse": "Setas para percorrer dias, meses e anos anteriores",
+    "editorEnergyTitle": "Título da secção de energia",
+    "editorEnergyTitleHint": "Com um só período os separadores desaparecem; sem título nem setas, a secção de energia mostra só o gráfico, os blocos e o resumo.",
     "editorFontUrl": "Folha de estilo de tipo de letra própria (URL)",
     "editorNow": "agora: {value}",
     "editorAuto": "encontrado automaticamente: {entity} · {value}",
@@ -6378,6 +6392,8 @@ function periodLabels(t) {
 
 function tabsHtml(m) {
   const labels = periodLabels(m.t);
+  // A single period has nothing to choose from: no tabs (#151).
+  if (m.periods.length < 2) return browseHtml(m);
   return `
     <div class="sfc-tabs ${m.periods.length > 5 ? "many" : ""}" style="--sfc-tab-cols: ${Math.ceil(m.periods.length / 2)}"
       role="radiogroup" aria-label="${escapeHtml(m.t.energy)}">
@@ -6456,9 +6472,10 @@ function energySectionHtml(m, { title = true } = {}) {
   // An earlier period is named by its dates.
   const label = m.browse?.offset ? m.browse.label : current;
   const hint = m.period === "all" && m.since ? fill(m.t.since, { date: m.since }) : "";
+  // `energy_title: false`: no heading, for a compact card (#151).
   return `
     <section class="sfc-section sfc-energy">
-      ${title ? `
+      ${title && m.config.energy_title !== false ? `
         <div class="sfc-head">
           <div><span class="sfc-kicker">${escapeHtml(kicker)}</span><h3>${escapeHtml(label)}</h3></div>
           ${hint ? `<span class="sfc-hint">${escapeHtml(hint)}</span>` : ""}
@@ -11416,6 +11433,8 @@ class SolarFlowCardEditor extends HTMLElement {
         <span class="title">${escapeHtml(t.editorPeriods)}</span>
         <div class="colors">${PERIODS.map((p) => `<label><input type="checkbox" data-period-tab="${p}" ${periodList(this._config).includes(p) ? "checked" : ""} /><span>${escapeHtml(labels[p][1])}</span></label>`).join("")}</div>
         <div class="switch"><label for="period_browse">${escapeHtml(t.editorPeriodBrowse)}</label><input id="period_browse" type="checkbox" data-browse-switch ${this._config.period_browse !== false ? "checked" : ""} /></div>
+        <div class="switch"><label for="energy_title">${escapeHtml(t.editorEnergyTitle)}</label><input id="energy_title" type="checkbox" data-energy-title ${this._config.energy_title !== false ? "checked" : ""} /></div>
+        <p class="hint">${escapeHtml(t.editorEnergyTitleHint)}</p>
       </div>
       <div class="box">
         <span class="title">${escapeHtml(t.editorColors)}</span>
@@ -12055,6 +12074,7 @@ class SolarFlowCardEditor extends HTMLElement {
       this._set("price_import_periods", list.length ? list : undefined);
       this._render();
     }));
+    root.querySelector("[data-energy-title]")?.addEventListener("change", (e) => this._set("energy_title", e.target.checked ? undefined : false));
     root.querySelector("[data-browse-switch]")?.addEventListener("change", (e) => this._set("period_browse", e.target.checked ? undefined : false));
     root.querySelector("[data-period-holidays]")?.addEventListener("change", (e) => this._set("holidays_as_weekend", e.target.checked || undefined));
     root.querySelectorAll("[data-add]").forEach((button) => button.addEventListener("click", () => {
