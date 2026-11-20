@@ -7,6 +7,7 @@
 [![HACS Default](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://hacs.xyz/)
 [![Release](https://img.shields.io/github/v/release/gratak/solar-flow-card?label=version)](https://github.com/gratak/solar-flow-card/releases)
 [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/gratak)
 
 [![Open your Home Assistant instance and open this repository in the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=gratak&repository=solar-flow-card&category=plugin)
 
@@ -531,6 +532,12 @@ node scripts/build.mjs
 ```
 
 `demo/index.html` (also [online](https://gratak.github.io/solar-flow-card/demo/)) runs the card against a stand-in Home Assistant (`demo/mock-hass.js`) with DeyeCloud-style data; serve the repository root and open it to try themes, scenarios and languages. `node scripts/screenshots.mjs` (needs Playwright) renders the screenshots in `docs/`.
+
+## Support
+
+The card is free and stays free. If it is useful to you and you would like to say thanks, you can [buy me a coffee](https://buymeacoffee.com/gratak) ☕. Bug reports, ideas and translations help just as much.
+
+<a href="https://buymeacoffee.com/gratak"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" height="48"></a>
 
 ## License
 
