@@ -272,7 +272,8 @@ function dioramaScene(m) {
   return { svg: g, sky };
 }
 
-// Diorama's showroom style (`diorama_style: showroom`, #150): a rendered
+// Diorama's showroom style (the default since 2.2.0, #150; `diorama_style:
+// classic` brings back the drawn scene): a rendered
 // house in the style of an EV maker's app, by day and by night (WebP,
 // 1000 × 671, blob URLs as for the car). Flows run over the picture; the
 // points below are in the picture's own pixels (2000 × 1342).
@@ -355,7 +356,7 @@ function showroomScene(m, night) {
 function renderDiorama(m) {
   const { t, locale, live } = m;
   const { svg, sky } = dioramaScene(m);
-  const showroom = m.config.diorama_style === "showroom";
+  const showroom = m.config.diorama_style !== "classic";
   const photoNight = showroom && (sky.phase === "night" || m.dark);
   const room = showroom ? showroomScene(m, photoNight) : null;
   const pill = (x, y, cls, value, note, entityId) => `
