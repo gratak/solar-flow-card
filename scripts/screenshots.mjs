@@ -26,7 +26,7 @@ for (const theme of (process.env.THEMES || "diorama,aurora,paper,lcars,atlantis,
   const page = await browser.newPage({ viewport: { width: Number(process.env.WIDTH ?? 520) + 80, height: 1200 }, deviceScaleFactor: 2 });
   page.on("pageerror", (e) => errors.push(`${theme}: ${e.message}`));
   page.on("console", (m) => { if (m.type() === "error") errors.push(`${theme}: ${m.text()}`); });
-  await page.goto(`http://localhost:${port}/demo/index.html?theme=${theme}&scenario=${scenario}&language=${language}&period=${period}&solar=${process.env.SOLAR ?? "1"}&battery=${process.env.BATTERY ?? "1"}&weather=${process.env.WEATHER ?? ""}&wide=${process.env.WIDE ?? "0"}&panels=${process.env.PANELS ?? "opt"}&width=${process.env.WIDTH ?? "520"}`);
+  await page.goto(`http://localhost:${port}/demo/index.html?theme=${theme}&scenario=${scenario}&language=${language}&period=${period}&solar=${process.env.SOLAR ?? "1"}&battery=${process.env.BATTERY ?? "1"}&weather=${process.env.WEATHER ?? ""}&wide=${process.env.WIDE ?? "0"}&panels=${process.env.PANELS ?? "opt"}&style=${process.env.STYLE ?? ""}&labels=${process.env.LABELS ?? ""}&ev=${process.env.EV ?? ""}&width=${process.env.WIDTH ?? "520"}`);
   await page.waitForFunction(() => window.demoReady);
   await page.waitForTimeout(1500);
   const card = page.locator("home-energy-hub").first();

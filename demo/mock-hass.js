@@ -32,7 +32,7 @@ function profile(t) {
   };
 }
 
-export function createHass({ scenario = "afternoon", language = "pl", weather, optimizers = true } = {}) {
+export function createHass({ scenario = "afternoon", language = "pl", weather, optimizers = true, ev = "" } = {}) {
   const live = SCENARIOS[scenario] || SCENARIOS.afternoon;
   const states = {};
   const now = new Date().toISOString();
@@ -52,6 +52,12 @@ export function createHass({ scenario = "afternoon", language = "pl", weather, o
     plain("power", live.batteryPower * share, "W");
     plain("voltage", voltage, "V");
     plain("temperature", temp, "°C");
+  }
+  // An electric car for the "EV" demo: charging (part of the home's use) or parked.
+  if (ev) {
+    const plain = (id, value, unit) => { states[id] = { entity_id: id, state: String(value), attributes: { unit_of_measurement: unit }, last_updated: now, last_changed: now }; };
+    plain("sensor.ev_power", ev === "charging" ? Math.min(2200, live.consumptionPower * 0.8) : 0, "W");
+    plain("sensor.ev_soc", ev === "charging" ? 64 : 80, "%");
   }
   const units = { batterySOC: "%" };
   for (const key of ["generationPower", "consumptionPower", "gridPower", "purchasePower", "wirePower", "chargePower", "dischargePower", "batteryPower", "batterySOC"]) {
