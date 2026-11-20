@@ -64,7 +64,7 @@ History comes from Home Assistant itself (recorder history and long-term statist
 
 | Theme | Look |
 |---|---|
-| `diorama` | An isometric house with your panels on the roof; the sky follows the time of day and the weather (drifting clouds, rain, snow, fog, lightning), windows light up at night. |
+| `diorama` | An isometric house with your panels on the roof; the sky follows the time of day and the weather (drifting clouds, rain, snow, fog, lightning), windows light up at night. Or, with `diorama_style: showroom` (pictured), a rendered house in the style of an EV maker's app, with glowing flows and your car on the driveway. |
 | `aurora` | Neon rings and glowing flows on a night sky. |
 | `paper` | An editorial page: a sentence that explains the moment and a Sankey diagram of where the power goes. |
 | `lcars` | A starship operations panel with segment bars, a battery cell gauge and a status line. |
