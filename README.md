@@ -513,8 +513,7 @@ Both take the grid power with either sign convention ("+ while importing" is the
 
 Planned. Ideas and votes are welcome in [issues](https://github.com/gratak/solar-flow-card/issues).
 
-- **2.1.0 out of beta**, after feedback on the Energy dashboard set-up, the grid guard, the Consumers section, the battery's day ahead, payback and the blueprints.
-- **Browsing earlier days and months** with arrows.
+- Nothing fixed for now: 2.1.0 is out. Tell us what you would like next.
 
 ## Translations
 
