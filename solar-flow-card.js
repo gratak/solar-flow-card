@@ -499,7 +499,7 @@ const TRANSLATIONS = {
     "editorPeriod": "Starting period",
     "editorDarkMode": "Dark colours",
     "editorDioramaStyle": "Scene",
-    "editorStyleDrawn": "Drawn",
+    "editorStyleDrawn": "Classic (drawn)",
     "editorStyleShowroom": "Showroom (a rendered house)",
     "editorShowroomLabels": "Values",
     "editorLabelsBar": "A strip along the bottom",
@@ -1070,7 +1070,7 @@ const TRANSLATIONS = {
     "editorPeriod": "Startzeitraum",
     "editorDarkMode": "Dunkle Farben",
     "editorDioramaStyle": "Szene",
-    "editorStyleDrawn": "Gezeichnet",
+    "editorStyleDrawn": "Klassisch (gezeichnet)",
     "editorStyleShowroom": "Showroom (gerendertes Haus)",
     "editorShowroomLabels": "Werte",
     "editorLabelsBar": "Leiste am unteren Rand",
@@ -1641,7 +1641,7 @@ const TRANSLATIONS = {
     "editorPeriod": "Periodo inicial",
     "editorDarkMode": "Colores oscuros",
     "editorDioramaStyle": "Escena",
-    "editorStyleDrawn": "Dibujada",
+    "editorStyleDrawn": "Clásica (dibujada)",
     "editorStyleShowroom": "Showroom (casa renderizada)",
     "editorShowroomLabels": "Valores",
     "editorLabelsBar": "Franja abajo",
@@ -2212,7 +2212,7 @@ const TRANSLATIONS = {
     "editorPeriod": "Période de départ",
     "editorDarkMode": "Couleurs sombres",
     "editorDioramaStyle": "Scène",
-    "editorStyleDrawn": "Dessinée",
+    "editorStyleDrawn": "Classique (dessinée)",
     "editorStyleShowroom": "Showroom (maison en rendu 3D)",
     "editorShowroomLabels": "Valeurs",
     "editorLabelsBar": "Bandeau en bas",
@@ -2783,7 +2783,7 @@ const TRANSLATIONS = {
     "editorPeriod": "Startperiode",
     "editorDarkMode": "Donkere kleuren",
     "editorDioramaStyle": "Scène",
-    "editorStyleDrawn": "Getekend",
+    "editorStyleDrawn": "Klassiek (getekend)",
     "editorStyleShowroom": "Showroom (gerenderd huis)",
     "editorShowroomLabels": "Waarden",
     "editorLabelsBar": "Strook onderaan",
@@ -3354,7 +3354,7 @@ const TRANSLATIONS = {
     "editorPeriod": "Okres na start",
     "editorDarkMode": "Ciemne kolory",
     "editorDioramaStyle": "Scena",
-    "editorStyleDrawn": "Rysunek",
+    "editorStyleDrawn": "Klasyczna (rysunek)",
     "editorStyleShowroom": "Showroom (render domu)",
     "editorShowroomLabels": "Opisy wartości",
     "editorLabelsBar": "Pasek na dole",
@@ -3925,7 +3925,7 @@ const TRANSLATIONS = {
     "editorPeriod": "Período inicial",
     "editorDarkMode": "Cores escuras",
     "editorDioramaStyle": "Cena",
-    "editorStyleDrawn": "Desenhada",
+    "editorStyleDrawn": "Clássica (desenhada)",
     "editorStyleShowroom": "Showroom (casa em render)",
     "editorShowroomLabels": "Valores",
     "editorLabelsBar": "Faixa em baixo",
@@ -7743,7 +7743,8 @@ function dioramaScene(m) {
   return { svg: g, sky };
 }
 
-// Diorama's showroom style (`diorama_style: showroom`, #150): a rendered
+// Diorama's showroom style (the default since 2.2.0, #150; `diorama_style:
+// classic` brings back the drawn scene): a rendered
 // house in the style of an EV maker's app, by day and by night (WebP,
 // 1000 × 671, blob URLs as for the car). Flows run over the picture; the
 // points below are in the picture's own pixels (2000 × 1342).
@@ -7826,7 +7827,7 @@ function showroomScene(m, night) {
 function renderDiorama(m) {
   const { t, locale, live } = m;
   const { svg, sky } = dioramaScene(m);
-  const showroom = m.config.diorama_style === "showroom";
+  const showroom = m.config.diorama_style !== "classic";
   const photoNight = showroom && (sky.phase === "night" || m.dark);
   const room = showroom ? showroomScene(m, photoNight) : null;
   const pill = (x, y, cls, value, note, entityId) => `
@@ -11596,9 +11597,9 @@ class SolarFlowCardEditor extends HTMLElement {
           </select>
         </label>
         ${(this._config.theme || "diorama") === "diorama" ? `<label><span>${escapeHtml(t.editorDioramaStyle)}</span>
-          <select data-select="diorama_style">${[["", t.editorStyleDrawn], ["showroom", t.editorStyleShowroom]].map(([value, label]) => `<option value="${value}" ${(this._config.diorama_style || "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
+          <select data-select="diorama_style">${[["", t.editorStyleShowroom], ["classic", t.editorStyleDrawn]].map(([value, label]) => `<option value="${value}" ${(this._config.diorama_style === "classic" ? "classic" : "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
         </label>` : ""}
-        ${(this._config.theme || "diorama") === "diorama" && this._config.diorama_style === "showroom" ? `<label><span>${escapeHtml(t.editorShowroomLabels)}</span>
+        ${(this._config.theme || "diorama") === "diorama" && this._config.diorama_style !== "classic" ? `<label><span>${escapeHtml(t.editorShowroomLabels)}</span>
           <select data-select="showroom_labels">${[["", t.editorLabelsBar], ["icons", t.editorLabelsIcons]].map(([value, label]) => `<option value="${value}" ${(this._config.showroom_labels || "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
         </label>` : ""}
         ${DARK_THEMES.includes(this._config.theme || "diorama") ? `<label><span>${escapeHtml(t.editorDarkMode)}</span>
