@@ -798,7 +798,7 @@ class SolarFlowCard extends HTMLElement {
       if (tries < 20) this._pillFrame = requestAnimationFrame(() => this._fitPills(tries + 1));
       return;
     }
-    const pills = [...scene.querySelectorAll(".dio-pill")].map((el) => {
+    const pills = [...scene.querySelectorAll(".dio-pill, .sr-chip")].map((el) => {
       el.style.translate = "";
       const r = el.getBoundingClientRect();
       const box2 = { el, left: r.left, right: r.right, top: r.top, bottom: r.bottom, dx: 0, dy: 0 };

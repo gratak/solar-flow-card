@@ -38,7 +38,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "2.2.0-beta.2";
+const CARD_VERSION = "2.2.0-beta.3";
 // The card's type is custom:home-energy-hub since 2.0.0. The old name stays
 // registered so dashboards with custom:solar-flow-card keep working.
 const CARD_TAG = "home-energy-hub";
@@ -89,6 +89,7 @@ const TRANSLATIONS = {
     "fromRoof": "from the roof",
     "inHome": "in the home",
     "evCar": "car",
+    "evShort": "EV",
     "periodToday": "Today",
     "period3d": "Last 3 days",
     "period7d": "Last 7 days",
@@ -500,6 +501,9 @@ const TRANSLATIONS = {
     "editorDioramaStyle": "Scene",
     "editorStyleDrawn": "Drawn",
     "editorStyleShowroom": "Showroom (a rendered house)",
+    "editorShowroomLabels": "Values",
+    "editorLabelsBar": "A strip along the bottom",
+    "editorLabelsIcons": "Icons beside each element",
     "editorDarkOff": "Light",
     "editorDarkAuto": "Like Home Assistant",
     "editorDarkOn": "Dark",
@@ -656,6 +660,7 @@ const TRANSLATIONS = {
     "fromRoof": "vom Dach",
     "inHome": "im Haus",
     "evCar": "Auto",
+    "evShort": "EV",
     "periodToday": "Heute",
     "period3d": "Letzte 3 Tage",
     "period7d": "Letzte 7 Tage",
@@ -1067,6 +1072,9 @@ const TRANSLATIONS = {
     "editorDioramaStyle": "Szene",
     "editorStyleDrawn": "Gezeichnet",
     "editorStyleShowroom": "Showroom (gerendertes Haus)",
+    "editorShowroomLabels": "Werte",
+    "editorLabelsBar": "Leiste am unteren Rand",
+    "editorLabelsIcons": "Symbole neben jedem Element",
     "editorDarkOff": "Hell",
     "editorDarkAuto": "Wie Home Assistant",
     "editorDarkOn": "Dunkel",
@@ -1223,6 +1231,7 @@ const TRANSLATIONS = {
     "fromRoof": "del tejado",
     "inHome": "en casa",
     "evCar": "coche",
+    "evShort": "EV",
     "periodToday": "Hoy",
     "period3d": "Últimos 3 días",
     "period7d": "Últimos 7 días",
@@ -1634,6 +1643,9 @@ const TRANSLATIONS = {
     "editorDioramaStyle": "Escena",
     "editorStyleDrawn": "Dibujada",
     "editorStyleShowroom": "Showroom (casa renderizada)",
+    "editorShowroomLabels": "Valores",
+    "editorLabelsBar": "Franja abajo",
+    "editorLabelsIcons": "Iconos junto a cada elemento",
     "editorDarkOff": "Claro",
     "editorDarkAuto": "Como Home Assistant",
     "editorDarkOn": "Oscuro",
@@ -1790,6 +1802,7 @@ const TRANSLATIONS = {
     "fromRoof": "depuis le toit",
     "inHome": "dans la maison",
     "evCar": "voiture",
+    "evShort": "EV",
     "periodToday": "Aujourd'hui",
     "period3d": "3 derniers jours",
     "period7d": "7 derniers jours",
@@ -2201,6 +2214,9 @@ const TRANSLATIONS = {
     "editorDioramaStyle": "Scène",
     "editorStyleDrawn": "Dessinée",
     "editorStyleShowroom": "Showroom (maison en rendu 3D)",
+    "editorShowroomLabels": "Valeurs",
+    "editorLabelsBar": "Bandeau en bas",
+    "editorLabelsIcons": "Icônes près de chaque élément",
     "editorDarkOff": "Clair",
     "editorDarkAuto": "Comme Home Assistant",
     "editorDarkOn": "Sombre",
@@ -2357,6 +2373,7 @@ const TRANSLATIONS = {
     "fromRoof": "van het dak",
     "inHome": "in de woning",
     "evCar": "auto",
+    "evShort": "EV",
     "periodToday": "Vandaag",
     "period3d": "Afgelopen 3 dagen",
     "period7d": "Afgelopen 7 dagen",
@@ -2768,6 +2785,9 @@ const TRANSLATIONS = {
     "editorDioramaStyle": "Scène",
     "editorStyleDrawn": "Getekend",
     "editorStyleShowroom": "Showroom (gerenderd huis)",
+    "editorShowroomLabels": "Waarden",
+    "editorLabelsBar": "Strook onderaan",
+    "editorLabelsIcons": "Pictogrammen bij elk onderdeel",
     "editorDarkOff": "Licht",
     "editorDarkAuto": "Zoals Home Assistant",
     "editorDarkOn": "Donker",
@@ -2924,6 +2944,7 @@ const TRANSLATIONS = {
     "fromRoof": "z dachu",
     "inHome": "w domu",
     "evCar": "auto",
+    "evShort": "EV",
     "periodToday": "Dziś",
     "period3d": "Ostatnie 3 dni",
     "period7d": "Ostatnie 7 dni",
@@ -3335,6 +3356,9 @@ const TRANSLATIONS = {
     "editorDioramaStyle": "Scena",
     "editorStyleDrawn": "Rysunek",
     "editorStyleShowroom": "Showroom (render domu)",
+    "editorShowroomLabels": "Opisy wartości",
+    "editorLabelsBar": "Pasek na dole",
+    "editorLabelsIcons": "Ikony przy elementach",
     "editorDarkOff": "Jasne",
     "editorDarkAuto": "Jak w Home Assistant",
     "editorDarkOn": "Ciemne",
@@ -3491,6 +3515,7 @@ const TRANSLATIONS = {
     "fromRoof": "do telhado",
     "inHome": "em casa",
     "evCar": "carro",
+    "evShort": "EV",
     "periodToday": "Hoje",
     "period3d": "Últimos 3 dias",
     "period7d": "Últimos 7 dias",
@@ -3902,6 +3927,9 @@ const TRANSLATIONS = {
     "editorDioramaStyle": "Cena",
     "editorStyleDrawn": "Desenhada",
     "editorStyleShowroom": "Showroom (casa em render)",
+    "editorShowroomLabels": "Valores",
+    "editorLabelsBar": "Faixa em baixo",
+    "editorLabelsIcons": "Ícones junto a cada elemento",
     "editorDarkOff": "Claro",
     "editorDarkAuto": "Como o Home Assistant",
     "editorDarkOn": "Escuro",
@@ -7563,7 +7591,7 @@ function evCarSvg(night, color, charging, box = [244, 274, 84, 58.2]) {
     out += `<filter id="dio-ev-paint" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="${rgb[0] * k} 0 0 0 0  0 ${rgb[1] * k} 0 0 0  0 0 ${rgb[2] * k} 0 0  0 0 0 1 0"/></filter>`;
   }
   out += `<image href="${evCarImage()}" x="${x}" y="${y}" width="${w}" height="${h}" ${tint ? 'filter="url(#dio-ev-paint)"' : ""}/>`;
-  if (charging) out += `<circle cx="${x + w * 0.935}" cy="${y + h * 0.3}" r="2.2" fill="#2fd39a"/><circle cx="${x + w * 0.935}" cy="${y + h * 0.3}" r="4.6" fill="#2fd39a" opacity=".3"/>`;
+  if (charging) out += `<circle cx="${x + w * 0.935}" cy="${y + h * 0.3}" r="${(w * 0.026).toFixed(1)}" fill="#2fd39a"/><circle cx="${x + w * 0.935}" cy="${y + h * 0.3}" r="${(w * 0.055).toFixed(1)}" fill="#2fd39a" opacity=".3"/>`;
   return out;
 }
 
@@ -7736,20 +7764,63 @@ function showroomImage(kind) {
   return showroomUrls[kind];
 }
 
+// The showroom scene in the picture's own pixels (2000 × 1342), cropped to
+// the house. Live flows are thin glowing lines with a running pulse. The
+// values (`showroom_labels`) are either a strip along the bottom of the
+// picture (`bar`, the default) or small chips with an icon beside each
+// element (`icons`).
+const SR_VIEW = [140, 30, 1720, 1312];
+const SR_ICONS = {
+  pylon: '<svg viewBox="0 0 24 24"><path d="M12 2 7.5 22M12 2l4.5 20M7 7h10M5.5 12h13M9.2 7l6.3 5M14.8 7l-6.3 5M8.4 12l7.6 6M15.6 12 8 18"/></svg>',
+  car: '<svg viewBox="0 0 24 24"><path d="M3 17v-4.5L5.5 7h13l2.5 5.5V17"/><path d="M3 13h18M5 17h2M17 17h2"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>',
+};
+
 function showroomScene(m, night) {
-  const L = m.live;
-  // From the picture's pixels to the drawing's units (520 wide).
-  const k = 520 / 2000;
-  const d = (path) => path.replace(/-?\d+(\.\d+)?/g, (n) => (Number(n) * k).toFixed(1));
-  let g = '<g fill="none" stroke-linecap="round">';
-  if (m.config.showSolar) g += flowPath(d("M1080 470 Q1150 620 1135 790"), L.solarActive, false, "pv");
-  if (m.config.showBattery) g += flowPath(d("M845 930 Q990 985 1120 905"), L.chargeActive || L.dischargeActive, L.chargeActive, "battery");
-  g += flowPath(d("M1683 388 Q1560 560 1412 566 Q1300 700 1150 830"), L.importActive || L.exportActive, L.exportActive, "grid");
-  if (m.ev) g += flowPath(d("M1165 905 Q1270 975 1370 960"), m.ev.charging, false, "load");
-  g += "</g>";
-  if (m.ev) g += evCarSvg(night, m.ev.color, m.ev.charging, [1330 * k, 805 * k, 380 * k, 264 * k]);
-  return `<img class="dio-photo" src="${showroomImage(night ? "night" : "day")}" alt="" aria-hidden="true">
-      <svg viewBox="0 0 520 349" aria-hidden="true">${g}</svg>`;
+  const { t, locale, live: L } = m;
+  const icons = m.config.showroom_labels === "icons";
+  const [X0, Y0, W, H] = SR_VIEW;
+  const pos = (x, y) => `left:${(((x - X0) / W) * 100).toFixed(2)}%;top:${(((y - Y0) / H) * 100).toFixed(2)}%`;
+  let flows = "";
+  // A route carrying power: a faint line and a pulse running the way it flows.
+  const flow = (cls, d, active, reverse) => {
+    if (!active) return;
+    flows += `<path class="sr-line ${cls}" d="${d}"/><path class="sr-pulse ${cls} ${reverse ? "rev" : ""}" d="${d}" pathLength="100" filter="url(#sr-glow)"/>`;
+  };
+  // [class, icon, name, value, note, entity, chip anchor [x, y], chip placement]
+  const items = [];
+  if (m.config.showSolar) {
+    flow("pv", "M1060 440 Q1150 620 1135 870", L.solarActive, false);
+    items.push(["pv", MINI_ICONS.sun, t.solar, formatPower(L.solar, locale), "", m.ids.live.solar, [1000, 285], "u"]);
+  }
+  if (m.config.showBattery) {
+    flow("battery", "M840 935 Q990 990 1125 910", L.chargeActive || L.dischargeActive, L.chargeActive);
+    const note = L.dischargeActive ? `−${formatPower(L.discharge, locale)}` : L.chargeActive ? `+${formatPower(L.charge, locale)}` : t.idle.toLowerCase();
+    items.push(["battery", L.chargeActive ? MINI_ICONS.charge : MINI_ICONS.discharge, t.battery, formatPercent(L.soc, locale), note, batteryEntityId(m), [770, 935], "l"]);
+  }
+  flow("grid", "M1683 392 Q1560 560 1412 566 Q1300 700 1140 880", L.importActive || L.exportActive, L.exportActive);
+  const gridValue = L.importActive ? L.gridImport : L.exportActive ? L.gridExport : Math.abs(L.grid);
+  items.push(["grid", SR_ICONS.pylon, t.grid, formatPower(gridValue, locale), gridStatus(m).toLowerCase(), gridEntityId(m), [1740, 330], "ul"]);
+  items.push(["load", MINI_ICONS.home, t.home, formatPower(L.load, locale), "", m.ids.live.load, [1050, 1060], "d"]);
+  let car = "";
+  if (m.ev) {
+    flow("load", "M1150 910 Q1270 985 1400 960", m.ev.charging, false);
+    const value = m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle;
+    // Always "EV" beside the others' kinds; a name of the car is its tooltip.
+    items.push(["ev", SR_ICONS.car, t.evShort, value, m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : "", m.ev.entityId, [1580, 1110], "d", m.ev.name]);
+    car = evCarSvg(night, m.ev.color, m.ev.charging, [1330, 805, 380, 264]);
+  }
+  const tip = (name, extra) => escapeHtml(extra ? `${name} · ${extra}` : name);
+  const tags = icons
+    ? items.map(([cls, icon, name, value, note, id, [x, y], place, extra]) => `
+      <button class="sr-chip ${cls} at-${place}" style="${pos(x, y)}" title="${tip(name, extra)}" ${entityAttr(id)}><span class="sr-ic">${icon}</span><b>${escapeHtml(value)}</b>${note ? `<em>${escapeHtml(note)}</em>` : ""}</button>`).join("")
+    : `<div class="sr-strip">${items.map(([cls, icon, name, value, note, id, , , extra]) => `
+      <button class="sr-cell ${cls}" title="${tip(name, extra)}" ${entityAttr(id)}><span class="sr-ic">${icon}</span><small>${escapeHtml(name)}</small><b>${escapeHtml(value)}</b>${note ? `<em>${escapeHtml(note)}</em>` : ""}</button>`).join("")}</div>`;
+  const svg = `<svg viewBox="${SR_VIEW.join(" ")}" aria-hidden="true">
+      <defs><filter id="sr-glow" filterUnits="userSpaceOnUse" x="0" y="0" width="2000" height="1342"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <image href="${showroomImage(night ? "night" : "day")}" x="0" y="0" width="2000" height="1342" preserveAspectRatio="none"/>
+      ${car}<g fill="none">${flows}</g>
+    </svg>`;
+  return { svg, tags };
 }
 
 function renderDiorama(m) {
@@ -7757,11 +7828,9 @@ function renderDiorama(m) {
   const { svg, sky } = dioramaScene(m);
   const showroom = m.config.diorama_style === "showroom";
   const photoNight = showroom && (sky.phase === "night" || m.dark);
-  // The showroom picture is 2000 × 1342: its pills are placed in its pixels.
-  const [PW, PH] = showroom ? [2000, 1342] : [520, 360];
-  const at = (x, y, sx, sy) => (showroom ? [sx, sy] : [x, y]);
+  const room = showroom ? showroomScene(m, photoNight) : null;
   const pill = (x, y, cls, value, note, entityId) => `
-    <button class="dio-pill ${cls}" style="left:${((x / PW) * 100).toFixed(1)}%;top:${((y / PH) * 100).toFixed(1)}%" ${entityAttr(entityId)}>
+    <button class="dio-pill ${cls}" style="left:${((x / 520) * 100).toFixed(1)}%;top:${((y / 360) * 100).toFixed(1)}%" ${entityAttr(entityId)}>
       <i class="${cls}"></i>${escapeHtml(value)} <small>${escapeHtml(note)}</small>
     </button>`;
   const batteryNote = live.dischargeActive ? `−${formatPower(live.discharge, locale)}` : live.chargeActive ? `+${formatPower(live.charge, locale)}` : t.idle;
@@ -7782,15 +7851,16 @@ function renderDiorama(m) {
   const showShare = Boolean(shares) && sectionShown(m, "sources");
   return `
     ${sectionShown(m, "flow") ? `<div class="dio-scene ${showroom ? `showroom ${photoNight ? "night" : "day"}` : ""}" style="--sky-a:${sky.sky[0]};--sky-b:${sky.sky[1]}">
-      ${showroom ? showroomScene(m, photoNight) : `<svg viewBox="0 0 520 360" aria-hidden="true">${svg}</svg>`}
-      <div class="dio-title"><h1>${escapeHtml(m.name)}</h1>${liveBadge(m)}</div>
-      <div class="dio-clock">${escapeHtml(clockText(m))}${isNum(m.weather?.temperature) ? ` <button class="dio-temp" ${entityAttr(m.weather.entityId)}>${escapeHtml(`${formatNumber(m.weather.temperature, locale, 0)}${m.weather.unit}`)}</button>` : ""}</div>
-      ${m.config.showSolar ? pill(...at(288, 78, 640, 90), "pv", formatPower(live.solar, locale), t.fromRoof, m.ids.live.solar) : ""}
-      ${m.config.showBattery ? pill(...at(22, 208, 300, 1000), "battery", formatPercent(live.soc, locale), showroom ? `${t.battery.toLowerCase()} ${batteryNote}` : batteryNote, batteryEntityId(m)) : ""}
-      ${pill(...at(378, 240, 1560, 640), "grid", formatPower(gridValue, locale), live.gridOff ? t.gridOff.toLowerCase() : `${live.exportActive ? "↑ " : live.importActive ? "↓ " : ""}${t.grid.toLowerCase()}`, gridEntityId(m))}
-      ${pill(...at(m.ev ? 70 : 120, 296, m.ev ? 300 : 520, 1170), "load", formatPower(live.load, locale), t.inHome, m.ids.live.load)}
-      ${m.ev ? pill(...at(342, 294, 1460, 1170), "load", m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle,
-        m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : m.ev.name || t.evCar, m.ev.entityId) : ""}
+      ${room ? room.svg : `<svg viewBox="0 0 520 360" aria-hidden="true">${svg}</svg>`}
+      ${room ? '<div class="dio-head">' : ""}<div class="dio-title"><h1>${escapeHtml(m.name)}</h1>${liveBadge(m)}</div>
+      <div class="dio-clock">${escapeHtml(clockText(m))}${isNum(m.weather?.temperature) ? ` <button class="dio-temp" ${entityAttr(m.weather.entityId)}>${escapeHtml(`${formatNumber(m.weather.temperature, locale, 0)}${m.weather.unit}`)}</button>` : ""}</div>${room ? "</div>" : ""}
+      ${room ? room.tags : `
+      ${m.config.showSolar ? pill(288, 78, "pv", formatPower(live.solar, locale), t.fromRoof, m.ids.live.solar) : ""}
+      ${m.config.showBattery ? pill(22, 208, "battery", formatPercent(live.soc, locale), batteryNote, batteryEntityId(m)) : ""}
+      ${pill(378, 240, "grid", formatPower(gridValue, locale), live.gridOff ? t.gridOff.toLowerCase() : `${live.exportActive ? "↑ " : live.importActive ? "↓ " : ""}${t.grid.toLowerCase()}`, gridEntityId(m))}
+      ${pill(m.ev ? 70 : 120, 296, "load", formatPower(live.load, locale), t.inHome, m.ids.live.load)}
+      ${m.ev ? pill(342, 294, "load", m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle,
+        m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : m.ev.name || t.evCar, m.ev.entityId) : ""}`}
     </div>` : ""}
     ${showChips || showShare ? `<div class="dio-bottom">
       ${showChips ? `<div class="dio-chips">
@@ -9154,10 +9224,10 @@ const BASE_CSS = `
   .sfc-phase.import { --sfc-c: var(--sfc-bad, #f0524a); }
   /* The grid's status in the themes' flow views. */
   ha-card.grid-export :is(.aur-node, .atl-label, .exp-box, .fnd-node, .gal-readout, .rx-node).grid > :is(em, small:last-child),
-  ha-card.grid-export :is(.gt-row.grid em, .dio-pill.grid small) { color: var(--sfc-good, #3fb950); }
+  ha-card.grid-export :is(.gt-row.grid em, .dio-pill.grid small, .sr-cell.grid em, .sr-chip.grid em) { color: var(--sfc-good, #3fb950); }
   ha-card.grid-import :is(.aur-node, .atl-label, .exp-box, .fnd-node, .gal-readout, .rx-node).grid > :is(em, small:last-child),
-  ha-card.grid-off :is(.gt-row.grid em, .dio-pill.grid small) { color: var(--sfc-bad, #f0524a); }
-  ha-card.grid-import :is(.gt-row.grid em, .dio-pill.grid small) { color: var(--sfc-bad, #f0524a); }
+  ha-card.grid-off :is(.gt-row.grid em, .dio-pill.grid small, .sr-cell.grid em, .sr-chip.grid em) { color: var(--sfc-bad, #f0524a); }
+  ha-card.grid-import :is(.gt-row.grid em, .dio-pill.grid small, .sr-cell.grid em, .sr-chip.grid em) { color: var(--sfc-bad, #f0524a); }
   .sfc-bank + .sfc-phases { margin-top: 8px; }
   .sfc-phase.sfc-inv i { --sfc-c: var(--sfc-pv); }
   .sfc-bat { --sfc-c: var(--sfc-battery); }
@@ -9191,6 +9261,7 @@ const BASE_CSS = `
   /* Reduced motion: flows keep moving, slower; decorative effects stop. */
   @media (prefers-reduced-motion: reduce) {
     .sfc-flow { animation-duration: calc(var(--sfc-dash-time, 18s) * 3); }
+    .sr-pulse { animation-duration: 7s; }
     .atl-pulse, .aur-ring, .lc-track i, .lc-status, .exp-spin, .fnd-orbit, .fnd-sphere, .gal-warp, .gal-target, .gal-cross,
     .dio-cloud, .dio-star, .dio-glow, .dio-rain line, .dio-snow circle, .dio-fog rect, .dio-flash, .gt-ripples circle, .gt-glyphs, .gt-status, .gt-chevron-light,
     .rx-ticks, .rx-seg, .rx-holes rect, .rx-arcs, .rx-core, .rx-halo, .rx-rays, .rx-star, .rx-sun, .rx-fog > *, .rx-rain line, .rx-drops g, .rx-snow circle, .rx-flash, .rx-mode, .boot :is(.rx-frame, .rx-reactor, .rx-boot-ticks, .rx-gauge, .rx-node, .rx-inv, .rx-gtext), .boot .rx-scan p, .rx-bootseg path { animation: none !important; }
@@ -9212,11 +9283,6 @@ const FIT_CSS = `
   @container (max-width: 290px) { .sfc-phase { padding: 8px 6px; } .sfc-phase strong { font-size: 13px; letter-spacing: 0; } }
   /* The narrowest Diorama: the house pills show their values only. */
   @container (max-width: 340px) { .dio-pill.load small { display: none; } }
-  /* The showroom picture leaves less room for the pills: values only below the house. */
-  @container (max-width: 420px) {
-    .dio-scene.showroom .dio-pill.load small { display: none; }
-    .dio-scene.showroom .dio-pill.pv { top: 19% !important; }
-  }
   @container (max-width: 225px) { .sfc-phase { padding: 7px 4px; } .sfc-phase strong { font-size: 11px; letter-spacing: -.02em; } .sfc-phase small { font-size: 10px; } }
   /* The forecast days share their columns, so the widest day name fits. */
   @supports (grid-template-columns: subgrid) {
@@ -9300,26 +9366,51 @@ const THEME_CSS = {
       --sfc-radius: 28px; --sfc-shadow: 0 18px 50px rgba(30,70,110,.18); --sfc-frame: transparent;
     }
     .dio-scene { position: relative; aspect-ratio: 520 / 360; background: linear-gradient(180deg, var(--sky-a) 0%, var(--sky-b) 70%); }
-    .dio-scene svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-    /* Showroom style: the rendered house fills the scene, flows glow on it. */
-    .dio-scene.showroom { aspect-ratio: 2000 / 1342; background: #f5f5f5; }
+    .dio-scene > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    /* Showroom style: a rendered house; live flows as thin glowing lines with a
+       running pulse; each value a label tied to a dot on its element. */
+    .dio-scene.showroom { aspect-ratio: 1720 / 1312; background: #f5f5f5; }
     .dio-scene.showroom.night { background: #18191d; }
-    .dio-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-    /* Flows: the idle routes barely there, the live ones thicker and glowing. */
-    .dio-scene.showroom { --sfc-flow-w: 5; }
-    .dio-scene.showroom .sfc-flow { filter: drop-shadow(0 0 4px currentColor) drop-shadow(0 0 8px currentColor); }
-    .dio-scene.showroom .sfc-flow-base { stroke: rgba(255,255,255,.06); stroke-width: 2.5; }
-    .dio-scene.showroom.day .sfc-flow-base { stroke: rgba(30,40,55,.07); }
-    /* Pills a little larger than in the drawn scene. */
-    .dio-scene.showroom .dio-pill { font-size: clamp(11px, 2.8cqw, 15px); padding: 7px 13px 7px 10px; }
-    .dio-scene.showroom .dio-pill small { font-size: .82em; }
+    .dio-scene.showroom .pv { --sr-c: var(--sfc-pv); } .dio-scene.showroom .battery { --sr-c: var(--sfc-battery); }
+    .dio-scene.showroom .grid { --sr-c: var(--sfc-grid); } .dio-scene.showroom .load { --sr-c: var(--sfc-load); }
+    .sr-line { fill: none; stroke: var(--sr-c); stroke-width: 1.5px; vector-effect: non-scaling-stroke; opacity: .5; }
+    .sr-pulse { fill: none; stroke: var(--sr-c); stroke-width: 3px; vector-effect: non-scaling-stroke; stroke-linecap: round;
+      stroke-dasharray: 9 41; animation: sr-run 2.4s linear infinite; }
+    .sr-pulse.rev { animation-direction: reverse; }
+    @keyframes sr-run { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -50; } }
+    .dio-scene.showroom .ev { --sr-c: var(--sfc-load); }
+    .sr-ic svg { display: block; width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    /* Values as a strip along the bottom of the picture. */
+    .sr-strip { position: absolute; left: 0; right: 0; bottom: 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
+      padding: 34px 10px 12px; background: linear-gradient(to top, rgba(12,13,17,.92) 35%, rgba(12,13,17,0)); }
+    .day .sr-strip { background: linear-gradient(to top, rgba(246,246,247,.97) 35%, rgba(246,246,247,0)); }
+    .dio-scene.showroom .sr-cell { display: grid; justify-items: center; align-content: start; gap: 1px; min-width: 0; padding: 0 2px; border: 0; background: none;
+      color: #fff; font: inherit; cursor: pointer; }
+    .dio-scene.showroom.day .sr-cell { color: #17202b; }
+    .sr-cell .sr-ic { display: block; width: 18px; height: 18px; margin-bottom: 2px; color: var(--sr-c); }
+    .sr-cell small { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: clamp(9px, 2.3cqw, 11px); opacity: .62; }
+    .sr-cell b { font-size: clamp(13px, 3.6cqw, 18px); font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .sr-cell em { font-size: clamp(9px, 2.2cqw, 11px); font-style: normal; white-space: nowrap; opacity: .7; }
+    /* Values as glass chips with an icon beside each element. */
+    .dio-scene.showroom .sr-chip { position: absolute; display: flex; align-items: center; gap: 6px; padding: 5px 11px 5px 5px; border: 0; border-radius: 999px;
+      color: #fff; background: rgba(22,24,30,.55); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14), 0 6px 16px rgba(0,0,0,.35); backdrop-filter: blur(10px);
+      font: inherit; white-space: nowrap; cursor: pointer; }
+    .dio-scene.showroom.day .sr-chip { color: #17202b; background: rgba(255,255,255,.78); box-shadow: inset 0 0 0 1px rgba(20,30,45,.06), 0 6px 16px rgba(20,30,45,.12); }
+    .sr-chip .sr-ic { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; color: var(--sr-c); background: color-mix(in srgb, var(--sr-c) 20%, transparent); }
+    .sr-chip .sr-ic svg { width: 15px; height: 15px; }
+    .sr-chip b { font-size: clamp(12px, 3.1cqw, 15px); font-weight: 600; font-variant-numeric: tabular-nums; }
+    .sr-chip em { font-size: .78em; font-style: normal; opacity: .7; }
+    .sr-chip.at-u { transform: translate(-50%, -100%); } .sr-chip.at-ul { transform: translate(-100%, -100%); }
+    .sr-chip.at-l { transform: translate(-100%, -50%); } .sr-chip.at-d { transform: translate(-50%, 0); }
+    .no-anim .sr-pulse { animation: none; }
     .dio-scene.showroom.day .dio-title { color: #1d2733; text-shadow: none; }
     .dio-scene.showroom.day .dio-title .sfc-badge { --sfc-badge-bg: rgba(30,40,55,.07); --sfc-badge-text: #1d2733; }
     .dio-scene.showroom.day .dio-clock { background: rgba(30,40,55,.07); color: #1d2733; }
     .dio-scene.showroom .dio-cloud, .dio-scene.showroom .dio-flash { display: none; }
-    /* At night: light glass pills with a rim, white values. */
-    .dio-scene.showroom.night .dio-pill { background: rgba(255,255,255,.16); color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.22), 0 8px 22px rgba(0,0,0,.45); backdrop-filter: blur(10px); }
-    .dio-scene.showroom.night .dio-pill small { color: rgba(255,255,255,.72); }
+    /* The clock under the title: the corner above the pole is the grid's label. */
+    .dio-scene.showroom .dio-clock { right: auto; left: 4%; top: auto; bottom: auto; margin-top: 6px; position: static; display: inline-block; }
+    .dio-scene.showroom .dio-head { position: absolute; left: 4%; top: 4.5%; display: grid; justify-items: start; gap: 6px; }
+    .dio-scene.showroom .dio-head .dio-title { position: static; }
     .dio-title { position: absolute; left: 4%; top: 4.5%; color: #fff; text-shadow: 0 1px 8px rgba(20,60,100,.35); }
     .dio-title h1 { margin: 0 0 4px; font-size: clamp(18px, 4.6cqw, 26px); font-weight: 800; }
     .dio-title .sfc-badge { --sfc-badge-bg: rgba(255,255,255,.28); --sfc-badge-text: #fff; text-shadow: none; backdrop-filter: blur(6px); }
@@ -10856,7 +10947,7 @@ class SolarFlowCard extends HTMLElement {
       if (tries < 20) this._pillFrame = requestAnimationFrame(() => this._fitPills(tries + 1));
       return;
     }
-    const pills = [...scene.querySelectorAll(".dio-pill")].map((el) => {
+    const pills = [...scene.querySelectorAll(".dio-pill, .sr-chip")].map((el) => {
       el.style.translate = "";
       const r = el.getBoundingClientRect();
       const box2 = { el, left: r.left, right: r.right, top: r.top, bottom: r.bottom, dx: 0, dy: 0 };
@@ -11507,6 +11598,9 @@ class SolarFlowCardEditor extends HTMLElement {
         ${(this._config.theme || "diorama") === "diorama" ? `<label><span>${escapeHtml(t.editorDioramaStyle)}</span>
           <select data-select="diorama_style">${[["", t.editorStyleDrawn], ["showroom", t.editorStyleShowroom]].map(([value, label]) => `<option value="${value}" ${(this._config.diorama_style || "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
         </label>` : ""}
+        ${(this._config.theme || "diorama") === "diorama" && this._config.diorama_style === "showroom" ? `<label><span>${escapeHtml(t.editorShowroomLabels)}</span>
+          <select data-select="showroom_labels">${[["", t.editorLabelsBar], ["icons", t.editorLabelsIcons]].map(([value, label]) => `<option value="${value}" ${(this._config.showroom_labels || "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
+        </label>` : ""}
         ${DARK_THEMES.includes(this._config.theme || "diorama") ? `<label><span>${escapeHtml(t.editorDarkMode)}</span>
           <select data-select="dark_mode">${[["", t.editorDarkOff], ["auto", t.editorDarkAuto], ["on", t.editorDarkOn]].map(([value, label]) => `<option value="${value}" ${String(this._config.dark_mode === true ? "on" : this._config.dark_mode ?? "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
         </label>` : ""}
@@ -12110,7 +12204,7 @@ class SolarFlowCardEditor extends HTMLElement {
     root.querySelectorAll("[data-text]").forEach((input) => input.addEventListener("change", (e) => this._set(input.dataset.text, e.target.value.trim() || undefined)));
     root.querySelectorAll("[data-select]").forEach((select) => select.addEventListener("change", (e) => {
       this._set(select.dataset.select, e.target.value || undefined);
-      if (select.dataset.select === "language" || select.dataset.select === "settlement") this._render();
+      if (["language", "settlement", "diorama_style"].includes(select.dataset.select)) this._render();
     }));
     root.querySelectorAll("[data-number]").forEach((input) => input.addEventListener("change", (e) => {
       const number = Number.parseFloat(e.target.value);

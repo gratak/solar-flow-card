@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.2.0-beta.3
+
+- **Showroom redesigned, closer to an EV maker's app:**
+  - Flows are thin glowing lines with a pulse of light running the way the power flows, shown only while power flows; no more dotted lines or faint idle streaks.
+  - The values come in two styles, to choose with `showroom_labels` (in the editor under Appearance → Values): `bar`, a strip along the bottom of the picture with each value's icon and name (the default), or `icons`, small glass chips with an icon beside the roof, the battery, the pole, the house and the car.
+  - The car is labelled "EV"; a name set for it shows as its tooltip.
+  - The picture is cropped to the house, so the house is larger; the clock moves under the title.
+  - The values stay readable in every combination of day/night and a light or dark card, and the chips keep inside narrow cards.
+
 ## 2.2.0-beta.2
 
 - **Showroom easier to read:** at night the pills are light glass with white values and a rim instead of dark on dark, and a little larger in the showroom scene by day too. The flows that carry power are thicker and glow more; the idle routes are a faint line instead of a white streak across the house. The battery's pill sits under the battery cabinet and says what it is ("55% battery −1.32 kW") instead of floating at the side.
