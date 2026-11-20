@@ -7786,7 +7786,7 @@ function renderDiorama(m) {
       <div class="dio-title"><h1>${escapeHtml(m.name)}</h1>${liveBadge(m)}</div>
       <div class="dio-clock">${escapeHtml(clockText(m))}${isNum(m.weather?.temperature) ? ` <button class="dio-temp" ${entityAttr(m.weather.entityId)}>${escapeHtml(`${formatNumber(m.weather.temperature, locale, 0)}${m.weather.unit}`)}</button>` : ""}</div>
       ${m.config.showSolar ? pill(...at(288, 78, 640, 90), "pv", formatPower(live.solar, locale), t.fromRoof, m.ids.live.solar) : ""}
-      ${m.config.showBattery ? pill(...at(22, 208, 90, 980), "battery", formatPercent(live.soc, locale), batteryNote, batteryEntityId(m)) : ""}
+      ${m.config.showBattery ? pill(...at(22, 208, 300, 1000), "battery", formatPercent(live.soc, locale), showroom ? `${t.battery.toLowerCase()} ${batteryNote}` : batteryNote, batteryEntityId(m)) : ""}
       ${pill(...at(378, 240, 1560, 640), "grid", formatPower(gridValue, locale), live.gridOff ? t.gridOff.toLowerCase() : `${live.exportActive ? "↑ " : live.importActive ? "↓ " : ""}${t.grid.toLowerCase()}`, gridEntityId(m))}
       ${pill(...at(m.ev ? 70 : 120, 296, m.ev ? 300 : 520, 1170), "load", formatPower(live.load, locale), t.inHome, m.ids.live.load)}
       ${m.ev ? pill(...at(342, 294, 1460, 1170), "load", m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle,

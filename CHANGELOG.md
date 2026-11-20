@@ -2,7 +2,7 @@
 
 ## 2.2.0-beta.2
 
-- **Showroom easier to read:** at night the pills are light glass with white values and a rim instead of dark on dark, and a little larger in the showroom scene by day too. The flows that carry power are thicker and glow more; the idle routes are a faint line instead of a white streak across the house.
+- **Showroom easier to read:** at night the pills are light glass with white values and a rim instead of dark on dark, and a little larger in the showroom scene by day too. The flows that carry power are thicker and glow more; the idle routes are a faint line instead of a white streak across the house. The battery's pill sits under the battery cabinet and says what it is ("55% battery −1.32 kW") instead of floating at the side.
 
 ## 2.2.0-beta.1
 
