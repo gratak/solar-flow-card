@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.1
+
+- **Atlantis on a phone:** the battery label on the left ("Storage 96%") was cut at the card's edge on narrow cards; its letters are set closer there now.
+
 ## 2.1.0
 
 The biggest update since 2.0: a quick start in the editor, browsing earlier periods, time-of-use and dynamic tariffs, payback, and much more. Nothing to change when upgrading from 2.0.x: every new option is optional and in the visual editor. The details of each step are in the betas below.

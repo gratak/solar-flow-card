@@ -413,6 +413,8 @@ const FIT_CSS = `
     .sfc-head { flex-wrap: wrap; row-gap: 4px; }
     .sfc-compare-table tbody th i { margin-right: 4px; }
     .sfc-compare-table td.good, .sfc-compare-table td.bad { font-size: 10px; }
+    /* Atlantis: the side labels ("Storage 96%") keep inside the card. */
+    .theme-atlantis .atl-label small { letter-spacing: .1em; }
     /* Titles: the name alone. */
     .lc-topbar h1 .extra, .gt-title h1 .extra { display: none; }
     .lc-topbar .b2 { display: none; }
