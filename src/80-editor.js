@@ -540,6 +540,9 @@ class SolarFlowCardEditor extends HTMLElement {
             ${Object.entries(LANGUAGE_NAMES).map(([code, name]) => `<option value="${code}" ${this._config.language === code ? "selected" : ""}>${escapeHtml(name)}</option>`).join("")}
           </select>
         </label>
+        ${(this._config.theme || "diorama") === "diorama" ? `<label><span>${escapeHtml(t.editorDioramaStyle)}</span>
+          <select data-select="diorama_style">${[["", t.editorStyleDrawn], ["showroom", t.editorStyleShowroom]].map(([value, label]) => `<option value="${value}" ${(this._config.diorama_style || "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
+        </label>` : ""}
         ${DARK_THEMES.includes(this._config.theme || "diorama") ? `<label><span>${escapeHtml(t.editorDarkMode)}</span>
           <select data-select="dark_mode">${[["", t.editorDarkOff], ["auto", t.editorDarkAuto], ["on", t.editorDarkOn]].map(([value, label]) => `<option value="${value}" ${String(this._config.dark_mode === true ? "on" : this._config.dark_mode ?? "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
         </label>` : ""}

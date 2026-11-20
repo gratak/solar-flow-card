@@ -671,6 +671,7 @@ class SolarFlowCard extends HTMLElement {
         locale,
         now,
         theme,
+        dark: darkMode(config, this._hass),
         station: resolved.station,
         name: resolved.name || t.defaultTitle,
         config: {
