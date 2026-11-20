@@ -517,7 +517,7 @@ Both take the grid power with either sign convention ("+ while importing" is the
 
 Planned. Ideas and votes are welcome in [issues](https://github.com/gratak/solar-flow-card/issues).
 
-- Nothing fixed for now: 2.1.0 is out. Tell us what you would like next.
+- Nothing fixed for now: 2.2.0 is out. Tell us what you would like next.
 
 ## Translations
 
