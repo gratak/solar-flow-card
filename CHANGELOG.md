@@ -2,13 +2,14 @@
 
 ## 2.2.0
 
-**A showroom scene for Diorama** ([#150](https://github.com/gratak/solar-flow-card/issues/150)), in the style of an EV maker's app. Nothing to change when upgrading from 2.1.x: the drawn scene stays the default. The details of each step are in the betas below.
+**A new Diorama** ([#150](https://github.com/gratak/solar-flow-card/issues/150)), in the style of an EV maker's app. The details of each step are in the betas below.
 
-- `diorama_style: showroom` replaces the drawn scene with a rendered modern house with a solar roof, a home battery, a power line and your car on the driveway, by day on a light studio background, at night (and with `dark_mode`) on a dark one with lit windows.
+- **The showroom scene is Diorama's new default:** a rendered modern house with a solar roof, a home battery, a power line and your car on the driveway, by day on a light studio background, at night (and with `dark_mode`) on a dark one with lit windows.
 - The flows are thin glowing lines with a pulse of light running the way the power flows, shown only while power flows.
 - The values come in two styles, chosen with `showroom_labels`: a strip along the bottom of the picture (`bar`, the default) or small glass chips with an icon beside each element (`icons`).
 - The car is labelled "EV"; a name set for it shows as its tooltip.
 - Readable by day and by night, on a light or a dark card, and on narrow cards.
+- **Prefer the drawn house?** `diorama_style: classic` (in the editor: Appearance → Scene → Classic) brings back the drawn isometric scene, with its sky following the time of day and the weather.
 - In the editor under Appearance → Scene and Appearance → Values. The two pictures add about 26 KB to the card.
 
 ## 2.2.0-beta.4
