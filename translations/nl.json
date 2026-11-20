@@ -438,6 +438,8 @@
   "editorDarkOn": "Donker",
   "editorPeriods": "Periodetabs",
   "editorPeriodBrowse": "Pijlen om door eerdere dagen, maanden en jaren te bladeren",
+  "editorEnergyTitle": "Kop van de energiesectie",
+  "editorEnergyTitleHint": "Met één periode verdwijnen de tabbladen; zonder kop en pijlen toont de energiesectie alleen grafiek, tegels en samenvatting.",
   "editorFontUrl": "Eigen lettertype-stylesheet (URL)",
   "editorNow": "nu: {value}",
   "editorAuto": "automatisch gevonden: {entity} · {value}",

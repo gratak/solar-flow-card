@@ -438,6 +438,8 @@
   "editorDarkOn": "Ciemne",
   "editorPeriods": "Zakładki okresów",
   "editorPeriodBrowse": "Strzałki do przeglądania wcześniejszych dni, miesięcy i lat",
+  "editorEnergyTitle": "Nagłówek sekcji energii",
+  "editorEnergyTitleHint": "Przy jednej zakładce okresu zakładki znikają; bez nagłówka i strzałek sekcja energii pokazuje sam wykres, kafelki i podsumowanie.",
   "editorFontUrl": "Własny arkusz czcionek (URL)",
   "editorNow": "teraz: {value}",
   "editorAuto": "wykryty automatycznie: {entity} · {value}",

@@ -557,6 +557,8 @@ class SolarFlowCardEditor extends HTMLElement {
         <span class="title">${escapeHtml(t.editorPeriods)}</span>
         <div class="colors">${PERIODS.map((p) => `<label><input type="checkbox" data-period-tab="${p}" ${periodList(this._config).includes(p) ? "checked" : ""} /><span>${escapeHtml(labels[p][1])}</span></label>`).join("")}</div>
         <div class="switch"><label for="period_browse">${escapeHtml(t.editorPeriodBrowse)}</label><input id="period_browse" type="checkbox" data-browse-switch ${this._config.period_browse !== false ? "checked" : ""} /></div>
+        <div class="switch"><label for="energy_title">${escapeHtml(t.editorEnergyTitle)}</label><input id="energy_title" type="checkbox" data-energy-title ${this._config.energy_title !== false ? "checked" : ""} /></div>
+        <p class="hint">${escapeHtml(t.editorEnergyTitleHint)}</p>
       </div>
       <div class="box">
         <span class="title">${escapeHtml(t.editorColors)}</span>
@@ -1196,6 +1198,7 @@ class SolarFlowCardEditor extends HTMLElement {
       this._set("price_import_periods", list.length ? list : undefined);
       this._render();
     }));
+    root.querySelector("[data-energy-title]")?.addEventListener("change", (e) => this._set("energy_title", e.target.checked ? undefined : false));
     root.querySelector("[data-browse-switch]")?.addEventListener("change", (e) => this._set("period_browse", e.target.checked ? undefined : false));
     root.querySelector("[data-period-holidays]")?.addEventListener("change", (e) => this._set("holidays_as_weekend", e.target.checked || undefined));
     root.querySelectorAll("[data-add]").forEach((button) => button.addEventListener("click", () => {
