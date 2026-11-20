@@ -1,13 +1,20 @@
 # Changelog
 
+## 2.2.0-beta.4
+
+- **Showroom values in two styles**, chosen with `showroom_labels` (in the editor under Appearance → Values):
+  - `bar` (the default): a strip along the bottom of the picture with each value's icon and name;
+  - `icons`: small glass chips with an icon beside the roof, the battery, the pole, the house and the car, kept inside narrow cards.
+- The car is labelled "EV"; a name set for it shows as its tooltip.
+- The labels with leader lines from beta.3 are gone.
+
 ## 2.2.0-beta.3
 
 - **Showroom redesigned, closer to an EV maker's app:**
   - Flows are thin glowing lines with a pulse of light running the way the power flows, shown only while power flows; no more dotted lines or faint idle streaks.
-  - The values come in two styles, to choose with `showroom_labels` (in the editor under Appearance → Values): `bar`, a strip along the bottom of the picture with each value's icon and name (the default), or `icons`, small glass chips with an icon beside the roof, the battery, the pole, the house and the car.
-  - The car is labelled "EV"; a name set for it shows as its tooltip.
+  - The pills are replaced by labels: the name in the element's colour above a large value, tied by a fine line to a dot on what it measures (the roof, the battery cabinet, the pole, the house, the car), so it is clear which value belongs where.
   - The picture is cropped to the house, so the house is larger; the clock moves under the title.
-  - The values stay readable in every combination of day/night and a light or dark card, and the chips keep inside narrow cards.
+  - Labels stay readable in every combination of day/night and a light or dark card.
 
 ## 2.2.0-beta.2
 
