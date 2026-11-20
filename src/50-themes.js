@@ -294,54 +294,60 @@ function showroomImage(kind) {
 }
 
 // The showroom scene in the picture's own pixels (2000 × 1342), cropped to
-// the house: live flows as thin glowing lines with a running pulse, and each
-// value as a label tied by a fine line to a dot on what it measures.
+// the house. Live flows are thin glowing lines with a running pulse. The
+// values (`showroom_labels`) are either a strip along the bottom of the
+// picture (`bar`, the default) or small chips with an icon beside each
+// element (`icons`).
 const SR_VIEW = [140, 30, 1720, 1312];
+const SR_ICONS = {
+  pylon: '<svg viewBox="0 0 24 24"><path d="M12 2 7.5 22M12 2l4.5 20M7 7h10M5.5 12h13M9.2 7l6.3 5M14.8 7l-6.3 5M8.4 12l7.6 6M15.6 12 8 18"/></svg>',
+  car: '<svg viewBox="0 0 24 24"><path d="M3 17v-4.5L5.5 7h13l2.5 5.5V17"/><path d="M3 13h18M5 17h2M17 17h2"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>',
+};
 
 function showroomScene(m, night) {
   const { t, locale, live: L } = m;
+  const icons = m.config.showroom_labels === "icons";
   const [X0, Y0, W, H] = SR_VIEW;
   const pos = (x, y) => `left:${(((x - X0) / W) * 100).toFixed(2)}%;top:${(((y - Y0) / H) * 100).toFixed(2)}%`;
   let flows = "";
-  let leads = "";
-  let tags = "";
   // A route carrying power: a faint line and a pulse running the way it flows.
   const flow = (cls, d, active, reverse) => {
     if (!active) return;
     flows += `<path class="sr-line ${cls}" d="${d}"/><path class="sr-pulse ${cls} ${reverse ? "rev" : ""}" d="${d}" pathLength="100" filter="url(#sr-glow)"/>`;
   };
-  // A value: a dot on its element, a fine line, and the label.
-  const tag = (cls, [ex, ey], [ax, ay], align, label, value, note, entityId) => {
-    leads += `<path class="sr-lead" d="M${ex} ${ey} L${ax} ${ay}"/><circle class="sr-halo ${cls}" cx="${ex}" cy="${ey}" r="20"/><circle class="sr-dot ${cls}" cx="${ex}" cy="${ey}" r="8"/>`;
-    tags += `<button class="sr-tag ${cls} ${align}" style="${pos(ax, ay)}" ${entityAttr(entityId)}>
-        <small>${escapeHtml(label)}</small><b>${escapeHtml(value)}${note ? ` <em>${escapeHtml(note)}</em>` : ""}</b>
-      </button>`;
-  };
-  const hub = [1135, 900];
+  // [class, icon, name, value, note, entity, chip anchor [x, y], chip placement]
+  const items = [];
   if (m.config.showSolar) {
     flow("pv", "M1060 440 Q1150 620 1135 870", L.solarActive, false);
-    tag("pv", [1060, 440], [1000, 300], "up", t.solar, formatPower(L.solar, locale), "", m.ids.live.solar);
+    items.push(["pv", MINI_ICONS.sun, t.solar, formatPower(L.solar, locale), "", m.ids.live.solar, [1000, 285], "u"]);
   }
   if (m.config.showBattery) {
     flow("battery", "M840 935 Q990 990 1125 910", L.chargeActive || L.dischargeActive, L.chargeActive);
     const note = L.dischargeActive ? `−${formatPower(L.discharge, locale)}` : L.chargeActive ? `+${formatPower(L.charge, locale)}` : t.idle.toLowerCase();
-    tag("battery", [815, 935], [650, 1000], "left", t.battery, formatPercent(L.soc, locale), note, batteryEntityId(m));
+    items.push(["battery", L.chargeActive ? MINI_ICONS.charge : MINI_ICONS.discharge, t.battery, formatPercent(L.soc, locale), note, batteryEntityId(m), [770, 935], "l"]);
   }
   flow("grid", "M1683 392 Q1560 560 1412 566 Q1300 700 1140 880", L.importActive || L.exportActive, L.exportActive);
   const gridValue = L.importActive ? L.gridImport : L.exportActive ? L.gridExport : Math.abs(L.grid);
-  tag("grid", [1683, 392], [1640, 372], "up", t.grid, formatPower(gridValue, locale), gridStatus(m).toLowerCase(), gridEntityId(m));
-  tag("load", hub, [980, 1105], "down", t.home, formatPower(L.load, locale), "", m.ids.live.load);
+  items.push(["grid", SR_ICONS.pylon, t.grid, formatPower(gridValue, locale), gridStatus(m).toLowerCase(), gridEntityId(m), [1740, 330], "ul"]);
+  items.push(["load", MINI_ICONS.home, t.home, formatPower(L.load, locale), "", m.ids.live.load, [1050, 1060], "d"]);
   let car = "";
   if (m.ev) {
     flow("load", "M1150 910 Q1270 985 1400 960", m.ev.charging, false);
     const value = m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle;
-    tag("load", [1520, 990], [1600, 1105], "down", m.ev.name || t.evCar, value, m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : "", m.ev.entityId);
+    // Always "EV" beside the others' kinds; a name of the car is its tooltip.
+    items.push(["ev", SR_ICONS.car, t.evShort, value, m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : "", m.ev.entityId, [1580, 1110], "d", m.ev.name]);
     car = evCarSvg(night, m.ev.color, m.ev.charging, [1330, 805, 380, 264]);
   }
+  const tip = (name, extra) => escapeHtml(extra ? `${name} · ${extra}` : name);
+  const tags = icons
+    ? items.map(([cls, icon, name, value, note, id, [x, y], place, extra]) => `
+      <button class="sr-chip ${cls} at-${place}" style="${pos(x, y)}" title="${tip(name, extra)}" ${entityAttr(id)}><span class="sr-ic">${icon}</span><b>${escapeHtml(value)}</b>${note ? `<em>${escapeHtml(note)}</em>` : ""}</button>`).join("")
+    : `<div class="sr-strip">${items.map(([cls, icon, name, value, note, id, , , extra]) => `
+      <button class="sr-cell ${cls}" title="${tip(name, extra)}" ${entityAttr(id)}><span class="sr-ic">${icon}</span><small>${escapeHtml(name)}</small><b>${escapeHtml(value)}</b>${note ? `<em>${escapeHtml(note)}</em>` : ""}</button>`).join("")}</div>`;
   const svg = `<svg viewBox="${SR_VIEW.join(" ")}" aria-hidden="true">
       <defs><filter id="sr-glow" filterUnits="userSpaceOnUse" x="0" y="0" width="2000" height="1342"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
       <image href="${showroomImage(night ? "night" : "day")}" x="0" y="0" width="2000" height="1342" preserveAspectRatio="none"/>
-      ${car}<g fill="none">${flows}</g><g>${leads}</g>
+      ${car}<g fill="none">${flows}</g>
     </svg>`;
   return { svg, tags };
 }

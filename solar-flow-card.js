@@ -89,6 +89,7 @@ const TRANSLATIONS = {
     "fromRoof": "from the roof",
     "inHome": "in the home",
     "evCar": "car",
+    "evShort": "EV",
     "periodToday": "Today",
     "period3d": "Last 3 days",
     "period7d": "Last 7 days",
@@ -500,6 +501,9 @@ const TRANSLATIONS = {
     "editorDioramaStyle": "Scene",
     "editorStyleDrawn": "Drawn",
     "editorStyleShowroom": "Showroom (a rendered house)",
+    "editorShowroomLabels": "Values",
+    "editorLabelsBar": "A strip along the bottom",
+    "editorLabelsIcons": "Icons beside each element",
     "editorDarkOff": "Light",
     "editorDarkAuto": "Like Home Assistant",
     "editorDarkOn": "Dark",
@@ -656,6 +660,7 @@ const TRANSLATIONS = {
     "fromRoof": "vom Dach",
     "inHome": "im Haus",
     "evCar": "Auto",
+    "evShort": "EV",
     "periodToday": "Heute",
     "period3d": "Letzte 3 Tage",
     "period7d": "Letzte 7 Tage",
@@ -1067,6 +1072,9 @@ const TRANSLATIONS = {
     "editorDioramaStyle": "Szene",
     "editorStyleDrawn": "Gezeichnet",
     "editorStyleShowroom": "Showroom (gerendertes Haus)",
+    "editorShowroomLabels": "Werte",
+    "editorLabelsBar": "Leiste am unteren Rand",
+    "editorLabelsIcons": "Symbole neben jedem Element",
     "editorDarkOff": "Hell",
     "editorDarkAuto": "Wie Home Assistant",
     "editorDarkOn": "Dunkel",
@@ -1223,6 +1231,7 @@ const TRANSLATIONS = {
     "fromRoof": "del tejado",
     "inHome": "en casa",
     "evCar": "coche",
+    "evShort": "EV",
     "periodToday": "Hoy",
     "period3d": "Últimos 3 días",
     "period7d": "Últimos 7 días",
@@ -1634,6 +1643,9 @@ const TRANSLATIONS = {
     "editorDioramaStyle": "Escena",
     "editorStyleDrawn": "Dibujada",
     "editorStyleShowroom": "Showroom (casa renderizada)",
+    "editorShowroomLabels": "Valores",
+    "editorLabelsBar": "Franja abajo",
+    "editorLabelsIcons": "Iconos junto a cada elemento",
     "editorDarkOff": "Claro",
     "editorDarkAuto": "Como Home Assistant",
     "editorDarkOn": "Oscuro",
@@ -1790,6 +1802,7 @@ const TRANSLATIONS = {
     "fromRoof": "depuis le toit",
     "inHome": "dans la maison",
     "evCar": "voiture",
+    "evShort": "EV",
     "periodToday": "Aujourd'hui",
     "period3d": "3 derniers jours",
     "period7d": "7 derniers jours",
@@ -2201,6 +2214,9 @@ const TRANSLATIONS = {
     "editorDioramaStyle": "Scène",
     "editorStyleDrawn": "Dessinée",
     "editorStyleShowroom": "Showroom (maison en rendu 3D)",
+    "editorShowroomLabels": "Valeurs",
+    "editorLabelsBar": "Bandeau en bas",
+    "editorLabelsIcons": "Icônes près de chaque élément",
     "editorDarkOff": "Clair",
     "editorDarkAuto": "Comme Home Assistant",
     "editorDarkOn": "Sombre",
@@ -2357,6 +2373,7 @@ const TRANSLATIONS = {
     "fromRoof": "van het dak",
     "inHome": "in de woning",
     "evCar": "auto",
+    "evShort": "EV",
     "periodToday": "Vandaag",
     "period3d": "Afgelopen 3 dagen",
     "period7d": "Afgelopen 7 dagen",
@@ -2768,6 +2785,9 @@ const TRANSLATIONS = {
     "editorDioramaStyle": "Scène",
     "editorStyleDrawn": "Getekend",
     "editorStyleShowroom": "Showroom (gerenderd huis)",
+    "editorShowroomLabels": "Waarden",
+    "editorLabelsBar": "Strook onderaan",
+    "editorLabelsIcons": "Pictogrammen bij elk onderdeel",
     "editorDarkOff": "Licht",
     "editorDarkAuto": "Zoals Home Assistant",
     "editorDarkOn": "Donker",
@@ -2924,6 +2944,7 @@ const TRANSLATIONS = {
     "fromRoof": "z dachu",
     "inHome": "w domu",
     "evCar": "auto",
+    "evShort": "EV",
     "periodToday": "Dziś",
     "period3d": "Ostatnie 3 dni",
     "period7d": "Ostatnie 7 dni",
@@ -3335,6 +3356,9 @@ const TRANSLATIONS = {
     "editorDioramaStyle": "Scena",
     "editorStyleDrawn": "Rysunek",
     "editorStyleShowroom": "Showroom (render domu)",
+    "editorShowroomLabels": "Opisy wartości",
+    "editorLabelsBar": "Pasek na dole",
+    "editorLabelsIcons": "Ikony przy elementach",
     "editorDarkOff": "Jasne",
     "editorDarkAuto": "Jak w Home Assistant",
     "editorDarkOn": "Ciemne",
@@ -3491,6 +3515,7 @@ const TRANSLATIONS = {
     "fromRoof": "do telhado",
     "inHome": "em casa",
     "evCar": "carro",
+    "evShort": "EV",
     "periodToday": "Hoje",
     "period3d": "Últimos 3 dias",
     "period7d": "Últimos 7 dias",
@@ -3902,6 +3927,9 @@ const TRANSLATIONS = {
     "editorDioramaStyle": "Cena",
     "editorStyleDrawn": "Desenhada",
     "editorStyleShowroom": "Showroom (casa em render)",
+    "editorShowroomLabels": "Valores",
+    "editorLabelsBar": "Faixa em baixo",
+    "editorLabelsIcons": "Ícones junto a cada elemento",
     "editorDarkOff": "Claro",
     "editorDarkAuto": "Como o Home Assistant",
     "editorDarkOn": "Escuro",
@@ -7737,54 +7765,60 @@ function showroomImage(kind) {
 }
 
 // The showroom scene in the picture's own pixels (2000 × 1342), cropped to
-// the house: live flows as thin glowing lines with a running pulse, and each
-// value as a label tied by a fine line to a dot on what it measures.
+// the house. Live flows are thin glowing lines with a running pulse. The
+// values (`showroom_labels`) are either a strip along the bottom of the
+// picture (`bar`, the default) or small chips with an icon beside each
+// element (`icons`).
 const SR_VIEW = [140, 30, 1720, 1312];
+const SR_ICONS = {
+  pylon: '<svg viewBox="0 0 24 24"><path d="M12 2 7.5 22M12 2l4.5 20M7 7h10M5.5 12h13M9.2 7l6.3 5M14.8 7l-6.3 5M8.4 12l7.6 6M15.6 12 8 18"/></svg>',
+  car: '<svg viewBox="0 0 24 24"><path d="M3 17v-4.5L5.5 7h13l2.5 5.5V17"/><path d="M3 13h18M5 17h2M17 17h2"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>',
+};
 
 function showroomScene(m, night) {
   const { t, locale, live: L } = m;
+  const icons = m.config.showroom_labels === "icons";
   const [X0, Y0, W, H] = SR_VIEW;
   const pos = (x, y) => `left:${(((x - X0) / W) * 100).toFixed(2)}%;top:${(((y - Y0) / H) * 100).toFixed(2)}%`;
   let flows = "";
-  let leads = "";
-  let tags = "";
   // A route carrying power: a faint line and a pulse running the way it flows.
   const flow = (cls, d, active, reverse) => {
     if (!active) return;
     flows += `<path class="sr-line ${cls}" d="${d}"/><path class="sr-pulse ${cls} ${reverse ? "rev" : ""}" d="${d}" pathLength="100" filter="url(#sr-glow)"/>`;
   };
-  // A value: a dot on its element, a fine line, and the label.
-  const tag = (cls, [ex, ey], [ax, ay], align, label, value, note, entityId) => {
-    leads += `<path class="sr-lead" d="M${ex} ${ey} L${ax} ${ay}"/><circle class="sr-halo ${cls}" cx="${ex}" cy="${ey}" r="20"/><circle class="sr-dot ${cls}" cx="${ex}" cy="${ey}" r="8"/>`;
-    tags += `<button class="sr-tag ${cls} ${align}" style="${pos(ax, ay)}" ${entityAttr(entityId)}>
-        <small>${escapeHtml(label)}</small><b>${escapeHtml(value)}${note ? ` <em>${escapeHtml(note)}</em>` : ""}</b>
-      </button>`;
-  };
-  const hub = [1135, 900];
+  // [class, icon, name, value, note, entity, chip anchor [x, y], chip placement]
+  const items = [];
   if (m.config.showSolar) {
     flow("pv", "M1060 440 Q1150 620 1135 870", L.solarActive, false);
-    tag("pv", [1060, 440], [1000, 300], "up", t.solar, formatPower(L.solar, locale), "", m.ids.live.solar);
+    items.push(["pv", MINI_ICONS.sun, t.solar, formatPower(L.solar, locale), "", m.ids.live.solar, [1000, 285], "u"]);
   }
   if (m.config.showBattery) {
     flow("battery", "M840 935 Q990 990 1125 910", L.chargeActive || L.dischargeActive, L.chargeActive);
     const note = L.dischargeActive ? `−${formatPower(L.discharge, locale)}` : L.chargeActive ? `+${formatPower(L.charge, locale)}` : t.idle.toLowerCase();
-    tag("battery", [815, 935], [650, 1000], "left", t.battery, formatPercent(L.soc, locale), note, batteryEntityId(m));
+    items.push(["battery", L.chargeActive ? MINI_ICONS.charge : MINI_ICONS.discharge, t.battery, formatPercent(L.soc, locale), note, batteryEntityId(m), [770, 935], "l"]);
   }
   flow("grid", "M1683 392 Q1560 560 1412 566 Q1300 700 1140 880", L.importActive || L.exportActive, L.exportActive);
   const gridValue = L.importActive ? L.gridImport : L.exportActive ? L.gridExport : Math.abs(L.grid);
-  tag("grid", [1683, 392], [1640, 372], "up", t.grid, formatPower(gridValue, locale), gridStatus(m).toLowerCase(), gridEntityId(m));
-  tag("load", hub, [980, 1105], "down", t.home, formatPower(L.load, locale), "", m.ids.live.load);
+  items.push(["grid", SR_ICONS.pylon, t.grid, formatPower(gridValue, locale), gridStatus(m).toLowerCase(), gridEntityId(m), [1740, 330], "ul"]);
+  items.push(["load", MINI_ICONS.home, t.home, formatPower(L.load, locale), "", m.ids.live.load, [1050, 1060], "d"]);
   let car = "";
   if (m.ev) {
     flow("load", "M1150 910 Q1270 985 1400 960", m.ev.charging, false);
     const value = m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle;
-    tag("load", [1520, 990], [1600, 1105], "down", m.ev.name || t.evCar, value, m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : "", m.ev.entityId);
+    // Always "EV" beside the others' kinds; a name of the car is its tooltip.
+    items.push(["ev", SR_ICONS.car, t.evShort, value, m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : "", m.ev.entityId, [1580, 1110], "d", m.ev.name]);
     car = evCarSvg(night, m.ev.color, m.ev.charging, [1330, 805, 380, 264]);
   }
+  const tip = (name, extra) => escapeHtml(extra ? `${name} · ${extra}` : name);
+  const tags = icons
+    ? items.map(([cls, icon, name, value, note, id, [x, y], place, extra]) => `
+      <button class="sr-chip ${cls} at-${place}" style="${pos(x, y)}" title="${tip(name, extra)}" ${entityAttr(id)}><span class="sr-ic">${icon}</span><b>${escapeHtml(value)}</b>${note ? `<em>${escapeHtml(note)}</em>` : ""}</button>`).join("")
+    : `<div class="sr-strip">${items.map(([cls, icon, name, value, note, id, , , extra]) => `
+      <button class="sr-cell ${cls}" title="${tip(name, extra)}" ${entityAttr(id)}><span class="sr-ic">${icon}</span><small>${escapeHtml(name)}</small><b>${escapeHtml(value)}</b>${note ? `<em>${escapeHtml(note)}</em>` : ""}</button>`).join("")}</div>`;
   const svg = `<svg viewBox="${SR_VIEW.join(" ")}" aria-hidden="true">
       <defs><filter id="sr-glow" filterUnits="userSpaceOnUse" x="0" y="0" width="2000" height="1342"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
       <image href="${showroomImage(night ? "night" : "day")}" x="0" y="0" width="2000" height="1342" preserveAspectRatio="none"/>
-      ${car}<g fill="none">${flows}</g><g>${leads}</g>
+      ${car}<g fill="none">${flows}</g>
     </svg>`;
   return { svg, tags };
 }
@@ -9190,10 +9224,10 @@ const BASE_CSS = `
   .sfc-phase.import { --sfc-c: var(--sfc-bad, #f0524a); }
   /* The grid's status in the themes' flow views. */
   ha-card.grid-export :is(.aur-node, .atl-label, .exp-box, .fnd-node, .gal-readout, .rx-node).grid > :is(em, small:last-child),
-  ha-card.grid-export :is(.gt-row.grid em, .dio-pill.grid small, .sr-tag.grid em) { color: var(--sfc-good, #3fb950); }
+  ha-card.grid-export :is(.gt-row.grid em, .dio-pill.grid small, .sr-cell.grid em, .sr-chip.grid em) { color: var(--sfc-good, #3fb950); }
   ha-card.grid-import :is(.aur-node, .atl-label, .exp-box, .fnd-node, .gal-readout, .rx-node).grid > :is(em, small:last-child),
-  ha-card.grid-off :is(.gt-row.grid em, .dio-pill.grid small, .sr-tag.grid em) { color: var(--sfc-bad, #f0524a); }
-  ha-card.grid-import :is(.gt-row.grid em, .dio-pill.grid small, .sr-tag.grid em) { color: var(--sfc-bad, #f0524a); }
+  ha-card.grid-off :is(.gt-row.grid em, .dio-pill.grid small, .sr-cell.grid em, .sr-chip.grid em) { color: var(--sfc-bad, #f0524a); }
+  ha-card.grid-import :is(.gt-row.grid em, .dio-pill.grid small, .sr-cell.grid em, .sr-chip.grid em) { color: var(--sfc-bad, #f0524a); }
   .sfc-bank + .sfc-phases { margin-top: 8px; }
   .sfc-phase.sfc-inv i { --sfc-c: var(--sfc-pv); }
   .sfc-bat { --sfc-c: var(--sfc-battery); }
@@ -9332,7 +9366,7 @@ const THEME_CSS = {
       --sfc-radius: 28px; --sfc-shadow: 0 18px 50px rgba(30,70,110,.18); --sfc-frame: transparent;
     }
     .dio-scene { position: relative; aspect-ratio: 520 / 360; background: linear-gradient(180deg, var(--sky-a) 0%, var(--sky-b) 70%); }
-    .dio-scene svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .dio-scene > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
     /* Showroom style: a rendered house; live flows as thin glowing lines with a
        running pulse; each value a label tied to a dot on its element. */
     .dio-scene.showroom { aspect-ratio: 1720 / 1312; background: #f5f5f5; }
@@ -9344,20 +9378,30 @@ const THEME_CSS = {
       stroke-dasharray: 9 41; animation: sr-run 2.4s linear infinite; }
     .sr-pulse.rev { animation-direction: reverse; }
     @keyframes sr-run { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -50; } }
-    .sr-lead { fill: none; stroke: rgba(255,255,255,.38); stroke-width: 1px; vector-effect: non-scaling-stroke; }
-    .sr-dot { fill: var(--sr-c); stroke: rgba(255,255,255,.85); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
-    .sr-halo { fill: var(--sr-c); opacity: .22; }
-    .day .sr-lead { stroke: rgba(20,30,45,.32); }
-    .day .sr-dot { stroke: #fff; }
-    .dio-scene.showroom .sr-tag { position: absolute; display: grid; gap: 1px; padding: 0; border: 0; background: none; color: #fff; font: inherit; cursor: pointer;
-      white-space: nowrap; text-shadow: 0 1px 10px rgba(0,0,0,.65); }
-    .sr-tag.up { transform: translate(-50%, -100%); text-align: center; justify-items: center; }
-    .sr-tag.down { transform: translate(-50%, 4px); text-align: center; justify-items: center; }
-    .sr-tag.left { transform: translate(calc(-100% - 6px), -50%); text-align: right; justify-items: end; }
-    .sr-tag small { color: var(--sr-c); font-size: clamp(9px, 2.3cqw, 11px); font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
-    .sr-tag b { font-size: clamp(16px, 4.6cqw, 24px); font-weight: 600; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
-    .sr-tag em { font-style: normal; font-size: .6em; font-weight: 500; opacity: .78; letter-spacing: 0; }
-    .dio-scene.showroom.day .sr-tag { color: #17202b; text-shadow: 0 1px 8px rgba(255,255,255,.9); }
+    .dio-scene.showroom .ev { --sr-c: var(--sfc-load); }
+    .sr-ic svg { display: block; width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    /* Values as a strip along the bottom of the picture. */
+    .sr-strip { position: absolute; left: 0; right: 0; bottom: 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
+      padding: 34px 10px 12px; background: linear-gradient(to top, rgba(12,13,17,.92) 35%, rgba(12,13,17,0)); }
+    .day .sr-strip { background: linear-gradient(to top, rgba(246,246,247,.97) 35%, rgba(246,246,247,0)); }
+    .dio-scene.showroom .sr-cell { display: grid; justify-items: center; align-content: start; gap: 1px; min-width: 0; padding: 0 2px; border: 0; background: none;
+      color: #fff; font: inherit; cursor: pointer; }
+    .dio-scene.showroom.day .sr-cell { color: #17202b; }
+    .sr-cell .sr-ic { display: block; width: 18px; height: 18px; margin-bottom: 2px; color: var(--sr-c); }
+    .sr-cell small { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: clamp(9px, 2.3cqw, 11px); opacity: .62; }
+    .sr-cell b { font-size: clamp(13px, 3.6cqw, 18px); font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .sr-cell em { font-size: clamp(9px, 2.2cqw, 11px); font-style: normal; white-space: nowrap; opacity: .7; }
+    /* Values as glass chips with an icon beside each element. */
+    .dio-scene.showroom .sr-chip { position: absolute; display: flex; align-items: center; gap: 6px; padding: 5px 11px 5px 5px; border: 0; border-radius: 999px;
+      color: #fff; background: rgba(22,24,30,.55); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14), 0 6px 16px rgba(0,0,0,.35); backdrop-filter: blur(10px);
+      font: inherit; white-space: nowrap; cursor: pointer; }
+    .dio-scene.showroom.day .sr-chip { color: #17202b; background: rgba(255,255,255,.78); box-shadow: inset 0 0 0 1px rgba(20,30,45,.06), 0 6px 16px rgba(20,30,45,.12); }
+    .sr-chip .sr-ic { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; color: var(--sr-c); background: color-mix(in srgb, var(--sr-c) 20%, transparent); }
+    .sr-chip .sr-ic svg { width: 15px; height: 15px; }
+    .sr-chip b { font-size: clamp(12px, 3.1cqw, 15px); font-weight: 600; font-variant-numeric: tabular-nums; }
+    .sr-chip em { font-size: .78em; font-style: normal; opacity: .7; }
+    .sr-chip.at-u { transform: translate(-50%, -100%); } .sr-chip.at-ul { transform: translate(-100%, -100%); }
+    .sr-chip.at-l { transform: translate(-100%, -50%); } .sr-chip.at-d { transform: translate(-50%, 0); }
     .no-anim .sr-pulse { animation: none; }
     .dio-scene.showroom.day .dio-title { color: #1d2733; text-shadow: none; }
     .dio-scene.showroom.day .dio-title .sfc-badge { --sfc-badge-bg: rgba(30,40,55,.07); --sfc-badge-text: #1d2733; }
@@ -10903,7 +10947,7 @@ class SolarFlowCard extends HTMLElement {
       if (tries < 20) this._pillFrame = requestAnimationFrame(() => this._fitPills(tries + 1));
       return;
     }
-    const pills = [...scene.querySelectorAll(".dio-pill")].map((el) => {
+    const pills = [...scene.querySelectorAll(".dio-pill, .sr-chip")].map((el) => {
       el.style.translate = "";
       const r = el.getBoundingClientRect();
       const box2 = { el, left: r.left, right: r.right, top: r.top, bottom: r.bottom, dx: 0, dy: 0 };
@@ -11554,6 +11598,9 @@ class SolarFlowCardEditor extends HTMLElement {
         ${(this._config.theme || "diorama") === "diorama" ? `<label><span>${escapeHtml(t.editorDioramaStyle)}</span>
           <select data-select="diorama_style">${[["", t.editorStyleDrawn], ["showroom", t.editorStyleShowroom]].map(([value, label]) => `<option value="${value}" ${(this._config.diorama_style || "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
         </label>` : ""}
+        ${(this._config.theme || "diorama") === "diorama" && this._config.diorama_style === "showroom" ? `<label><span>${escapeHtml(t.editorShowroomLabels)}</span>
+          <select data-select="showroom_labels">${[["", t.editorLabelsBar], ["icons", t.editorLabelsIcons]].map(([value, label]) => `<option value="${value}" ${(this._config.showroom_labels || "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
+        </label>` : ""}
         ${DARK_THEMES.includes(this._config.theme || "diorama") ? `<label><span>${escapeHtml(t.editorDarkMode)}</span>
           <select data-select="dark_mode">${[["", t.editorDarkOff], ["auto", t.editorDarkAuto], ["on", t.editorDarkOn]].map(([value, label]) => `<option value="${value}" ${String(this._config.dark_mode === true ? "on" : this._config.dark_mode ?? "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
         </label>` : ""}
@@ -12157,7 +12204,7 @@ class SolarFlowCardEditor extends HTMLElement {
     root.querySelectorAll("[data-text]").forEach((input) => input.addEventListener("change", (e) => this._set(input.dataset.text, e.target.value.trim() || undefined)));
     root.querySelectorAll("[data-select]").forEach((select) => select.addEventListener("change", (e) => {
       this._set(select.dataset.select, e.target.value || undefined);
-      if (select.dataset.select === "language" || select.dataset.select === "settlement") this._render();
+      if (["language", "settlement", "diorama_style"].includes(select.dataset.select)) this._render();
     }));
     root.querySelectorAll("[data-number]").forEach((input) => input.addEventListener("change", (e) => {
       const number = Number.parseFloat(e.target.value);

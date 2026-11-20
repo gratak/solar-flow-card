@@ -543,6 +543,9 @@ class SolarFlowCardEditor extends HTMLElement {
         ${(this._config.theme || "diorama") === "diorama" ? `<label><span>${escapeHtml(t.editorDioramaStyle)}</span>
           <select data-select="diorama_style">${[["", t.editorStyleDrawn], ["showroom", t.editorStyleShowroom]].map(([value, label]) => `<option value="${value}" ${(this._config.diorama_style || "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
         </label>` : ""}
+        ${(this._config.theme || "diorama") === "diorama" && this._config.diorama_style === "showroom" ? `<label><span>${escapeHtml(t.editorShowroomLabels)}</span>
+          <select data-select="showroom_labels">${[["", t.editorLabelsBar], ["icons", t.editorLabelsIcons]].map(([value, label]) => `<option value="${value}" ${(this._config.showroom_labels || "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
+        </label>` : ""}
         ${DARK_THEMES.includes(this._config.theme || "diorama") ? `<label><span>${escapeHtml(t.editorDarkMode)}</span>
           <select data-select="dark_mode">${[["", t.editorDarkOff], ["auto", t.editorDarkAuto], ["on", t.editorDarkOn]].map(([value, label]) => `<option value="${value}" ${String(this._config.dark_mode === true ? "on" : this._config.dark_mode ?? "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
         </label>` : ""}
@@ -1146,7 +1149,7 @@ class SolarFlowCardEditor extends HTMLElement {
     root.querySelectorAll("[data-text]").forEach((input) => input.addEventListener("change", (e) => this._set(input.dataset.text, e.target.value.trim() || undefined)));
     root.querySelectorAll("[data-select]").forEach((select) => select.addEventListener("change", (e) => {
       this._set(select.dataset.select, e.target.value || undefined);
-      if (select.dataset.select === "language" || select.dataset.select === "settlement") this._render();
+      if (["language", "settlement", "diorama_style"].includes(select.dataset.select)) this._render();
     }));
     root.querySelectorAll("[data-number]").forEach((input) => input.addEventListener("change", (e) => {
       const number = Number.parseFloat(e.target.value);

@@ -330,10 +330,10 @@ const BASE_CSS = `
   .sfc-phase.import { --sfc-c: var(--sfc-bad, #f0524a); }
   /* The grid's status in the themes' flow views. */
   ha-card.grid-export :is(.aur-node, .atl-label, .exp-box, .fnd-node, .gal-readout, .rx-node).grid > :is(em, small:last-child),
-  ha-card.grid-export :is(.gt-row.grid em, .dio-pill.grid small, .sr-tag.grid em) { color: var(--sfc-good, #3fb950); }
+  ha-card.grid-export :is(.gt-row.grid em, .dio-pill.grid small, .sr-cell.grid em, .sr-chip.grid em) { color: var(--sfc-good, #3fb950); }
   ha-card.grid-import :is(.aur-node, .atl-label, .exp-box, .fnd-node, .gal-readout, .rx-node).grid > :is(em, small:last-child),
-  ha-card.grid-off :is(.gt-row.grid em, .dio-pill.grid small, .sr-tag.grid em) { color: var(--sfc-bad, #f0524a); }
-  ha-card.grid-import :is(.gt-row.grid em, .dio-pill.grid small, .sr-tag.grid em) { color: var(--sfc-bad, #f0524a); }
+  ha-card.grid-off :is(.gt-row.grid em, .dio-pill.grid small, .sr-cell.grid em, .sr-chip.grid em) { color: var(--sfc-bad, #f0524a); }
+  ha-card.grid-import :is(.gt-row.grid em, .dio-pill.grid small, .sr-cell.grid em, .sr-chip.grid em) { color: var(--sfc-bad, #f0524a); }
   .sfc-bank + .sfc-phases { margin-top: 8px; }
   .sfc-phase.sfc-inv i { --sfc-c: var(--sfc-pv); }
   .sfc-bat { --sfc-c: var(--sfc-battery); }
@@ -472,7 +472,7 @@ const THEME_CSS = {
       --sfc-radius: 28px; --sfc-shadow: 0 18px 50px rgba(30,70,110,.18); --sfc-frame: transparent;
     }
     .dio-scene { position: relative; aspect-ratio: 520 / 360; background: linear-gradient(180deg, var(--sky-a) 0%, var(--sky-b) 70%); }
-    .dio-scene svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .dio-scene > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
     /* Showroom style: a rendered house; live flows as thin glowing lines with a
        running pulse; each value a label tied to a dot on its element. */
     .dio-scene.showroom { aspect-ratio: 1720 / 1312; background: #f5f5f5; }
@@ -484,20 +484,30 @@ const THEME_CSS = {
       stroke-dasharray: 9 41; animation: sr-run 2.4s linear infinite; }
     .sr-pulse.rev { animation-direction: reverse; }
     @keyframes sr-run { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -50; } }
-    .sr-lead { fill: none; stroke: rgba(255,255,255,.38); stroke-width: 1px; vector-effect: non-scaling-stroke; }
-    .sr-dot { fill: var(--sr-c); stroke: rgba(255,255,255,.85); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
-    .sr-halo { fill: var(--sr-c); opacity: .22; }
-    .day .sr-lead { stroke: rgba(20,30,45,.32); }
-    .day .sr-dot { stroke: #fff; }
-    .dio-scene.showroom .sr-tag { position: absolute; display: grid; gap: 1px; padding: 0; border: 0; background: none; color: #fff; font: inherit; cursor: pointer;
-      white-space: nowrap; text-shadow: 0 1px 10px rgba(0,0,0,.65); }
-    .sr-tag.up { transform: translate(-50%, -100%); text-align: center; justify-items: center; }
-    .sr-tag.down { transform: translate(-50%, 4px); text-align: center; justify-items: center; }
-    .sr-tag.left { transform: translate(calc(-100% - 6px), -50%); text-align: right; justify-items: end; }
-    .sr-tag small { color: var(--sr-c); font-size: clamp(9px, 2.3cqw, 11px); font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
-    .sr-tag b { font-size: clamp(16px, 4.6cqw, 24px); font-weight: 600; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
-    .sr-tag em { font-style: normal; font-size: .6em; font-weight: 500; opacity: .78; letter-spacing: 0; }
-    .dio-scene.showroom.day .sr-tag { color: #17202b; text-shadow: 0 1px 8px rgba(255,255,255,.9); }
+    .dio-scene.showroom .ev { --sr-c: var(--sfc-load); }
+    .sr-ic svg { display: block; width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    /* Values as a strip along the bottom of the picture. */
+    .sr-strip { position: absolute; left: 0; right: 0; bottom: 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
+      padding: 34px 10px 12px; background: linear-gradient(to top, rgba(12,13,17,.92) 35%, rgba(12,13,17,0)); }
+    .day .sr-strip { background: linear-gradient(to top, rgba(246,246,247,.97) 35%, rgba(246,246,247,0)); }
+    .dio-scene.showroom .sr-cell { display: grid; justify-items: center; align-content: start; gap: 1px; min-width: 0; padding: 0 2px; border: 0; background: none;
+      color: #fff; font: inherit; cursor: pointer; }
+    .dio-scene.showroom.day .sr-cell { color: #17202b; }
+    .sr-cell .sr-ic { display: block; width: 18px; height: 18px; margin-bottom: 2px; color: var(--sr-c); }
+    .sr-cell small { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: clamp(9px, 2.3cqw, 11px); opacity: .62; }
+    .sr-cell b { font-size: clamp(13px, 3.6cqw, 18px); font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .sr-cell em { font-size: clamp(9px, 2.2cqw, 11px); font-style: normal; white-space: nowrap; opacity: .7; }
+    /* Values as glass chips with an icon beside each element. */
+    .dio-scene.showroom .sr-chip { position: absolute; display: flex; align-items: center; gap: 6px; padding: 5px 11px 5px 5px; border: 0; border-radius: 999px;
+      color: #fff; background: rgba(22,24,30,.55); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14), 0 6px 16px rgba(0,0,0,.35); backdrop-filter: blur(10px);
+      font: inherit; white-space: nowrap; cursor: pointer; }
+    .dio-scene.showroom.day .sr-chip { color: #17202b; background: rgba(255,255,255,.78); box-shadow: inset 0 0 0 1px rgba(20,30,45,.06), 0 6px 16px rgba(20,30,45,.12); }
+    .sr-chip .sr-ic { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; color: var(--sr-c); background: color-mix(in srgb, var(--sr-c) 20%, transparent); }
+    .sr-chip .sr-ic svg { width: 15px; height: 15px; }
+    .sr-chip b { font-size: clamp(12px, 3.1cqw, 15px); font-weight: 600; font-variant-numeric: tabular-nums; }
+    .sr-chip em { font-size: .78em; font-style: normal; opacity: .7; }
+    .sr-chip.at-u { transform: translate(-50%, -100%); } .sr-chip.at-ul { transform: translate(-100%, -100%); }
+    .sr-chip.at-l { transform: translate(-100%, -50%); } .sr-chip.at-d { transform: translate(-50%, 0); }
     .no-anim .sr-pulse { animation: none; }
     .dio-scene.showroom.day .dio-title { color: #1d2733; text-shadow: none; }
     .dio-scene.showroom.day .dio-title .sfc-badge { --sfc-badge-bg: rgba(30,40,55,.07); --sfc-badge-text: #1d2733; }
