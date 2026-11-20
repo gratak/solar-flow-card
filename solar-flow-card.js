@@ -38,7 +38,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "2.1.1";
+const CARD_VERSION = "2.2.0";
 // The card's type is custom:home-energy-hub since 2.0.0. The old name stays
 // registered so dashboards with custom:solar-flow-card keep working.
 const CARD_TAG = "home-energy-hub";
@@ -497,6 +497,9 @@ const TRANSLATIONS = {
     "editorWeather": "Weather",
     "editorPeriod": "Starting period",
     "editorDarkMode": "Dark colours",
+    "editorDioramaStyle": "Scene",
+    "editorStyleDrawn": "Drawn",
+    "editorStyleShowroom": "Showroom (a rendered house)",
     "editorDarkOff": "Light",
     "editorDarkAuto": "Like Home Assistant",
     "editorDarkOn": "Dark",
@@ -1061,6 +1064,9 @@ const TRANSLATIONS = {
     "editorWeather": "Wetter",
     "editorPeriod": "Startzeitraum",
     "editorDarkMode": "Dunkle Farben",
+    "editorDioramaStyle": "Szene",
+    "editorStyleDrawn": "Gezeichnet",
+    "editorStyleShowroom": "Showroom (gerendertes Haus)",
     "editorDarkOff": "Hell",
     "editorDarkAuto": "Wie Home Assistant",
     "editorDarkOn": "Dunkel",
@@ -1625,6 +1631,9 @@ const TRANSLATIONS = {
     "editorWeather": "Tiempo",
     "editorPeriod": "Periodo inicial",
     "editorDarkMode": "Colores oscuros",
+    "editorDioramaStyle": "Escena",
+    "editorStyleDrawn": "Dibujada",
+    "editorStyleShowroom": "Showroom (casa renderizada)",
     "editorDarkOff": "Claro",
     "editorDarkAuto": "Como Home Assistant",
     "editorDarkOn": "Oscuro",
@@ -2189,6 +2198,9 @@ const TRANSLATIONS = {
     "editorWeather": "Météo",
     "editorPeriod": "Période de départ",
     "editorDarkMode": "Couleurs sombres",
+    "editorDioramaStyle": "Scène",
+    "editorStyleDrawn": "Dessinée",
+    "editorStyleShowroom": "Showroom (maison en rendu 3D)",
     "editorDarkOff": "Clair",
     "editorDarkAuto": "Comme Home Assistant",
     "editorDarkOn": "Sombre",
@@ -2753,6 +2765,9 @@ const TRANSLATIONS = {
     "editorWeather": "Weer",
     "editorPeriod": "Startperiode",
     "editorDarkMode": "Donkere kleuren",
+    "editorDioramaStyle": "Scène",
+    "editorStyleDrawn": "Getekend",
+    "editorStyleShowroom": "Showroom (gerenderd huis)",
     "editorDarkOff": "Licht",
     "editorDarkAuto": "Zoals Home Assistant",
     "editorDarkOn": "Donker",
@@ -3317,6 +3332,9 @@ const TRANSLATIONS = {
     "editorWeather": "Pogoda",
     "editorPeriod": "Okres na start",
     "editorDarkMode": "Ciemne kolory",
+    "editorDioramaStyle": "Scena",
+    "editorStyleDrawn": "Rysunek",
+    "editorStyleShowroom": "Showroom (render domu)",
     "editorDarkOff": "Jasne",
     "editorDarkAuto": "Jak w Home Assistant",
     "editorDarkOn": "Ciemne",
@@ -3881,6 +3899,9 @@ const TRANSLATIONS = {
     "editorWeather": "Tempo",
     "editorPeriod": "Período inicial",
     "editorDarkMode": "Cores escuras",
+    "editorDioramaStyle": "Cena",
+    "editorStyleDrawn": "Desenhada",
+    "editorStyleShowroom": "Showroom (casa em render)",
     "editorDarkOff": "Claro",
     "editorDarkAuto": "Como o Home Assistant",
     "editorDarkOn": "Escuro",
@@ -11477,6 +11498,9 @@ class SolarFlowCardEditor extends HTMLElement {
             ${Object.entries(LANGUAGE_NAMES).map(([code, name]) => `<option value="${code}" ${this._config.language === code ? "selected" : ""}>${escapeHtml(name)}</option>`).join("")}
           </select>
         </label>
+        ${(this._config.theme || "diorama") === "diorama" ? `<label><span>${escapeHtml(t.editorDioramaStyle)}</span>
+          <select data-select="diorama_style">${[["", t.editorStyleDrawn], ["showroom", t.editorStyleShowroom]].map(([value, label]) => `<option value="${value}" ${(this._config.diorama_style || "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
+        </label>` : ""}
         ${DARK_THEMES.includes(this._config.theme || "diorama") ? `<label><span>${escapeHtml(t.editorDarkMode)}</span>
           <select data-select="dark_mode">${[["", t.editorDarkOff], ["auto", t.editorDarkAuto], ["on", t.editorDarkOn]].map(([value, label]) => `<option value="${value}" ${String(this._config.dark_mode === true ? "on" : this._config.dark_mode ?? "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
         </label>` : ""}
