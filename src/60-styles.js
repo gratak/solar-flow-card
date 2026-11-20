@@ -60,6 +60,15 @@ const BASE_CSS = `
   .sfc-tab { border: 0; background: transparent; color: var(--sfc-muted); padding: 7px 2px; border-radius: var(--sfc-tab-radius, 9px);
     font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; flex: 1 0 0; min-width: max-content; }
   .sfc-tab.on { background: var(--sfc-tab-on-bg); color: var(--sfc-tab-on); box-shadow: var(--sfc-tab-shadow, none); cursor: default; }
+  /* Browsing: the period before, its dates, the period after. */
+  .sfc-browse { display: flex; align-items: center; justify-content: center; gap: 6px; margin: -6px 0 10px; }
+  .sfc-browse button { border: 0; background: none; color: var(--sfc-muted); font: inherit; cursor: pointer; border-radius: 8px; }
+  .sfc-browse button:not(.sfc-browse-label) { width: 30px; height: 26px; font-size: 20px; line-height: 1; }
+  .sfc-browse button:not(:disabled):hover { background: var(--sfc-tab-bg); color: var(--sfc-text); }
+  .sfc-browse button:disabled { opacity: .3; cursor: default; }
+  .sfc-browse-label { min-width: 0; padding: 3px 8px; font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sfc-browse-label:disabled { opacity: 1 !important; }
+  .sfc-browse-label.past { color: var(--sfc-text); text-decoration: underline dotted; text-underline-offset: 3px; }
 
   /* Energy tiles */
   .sfc-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }

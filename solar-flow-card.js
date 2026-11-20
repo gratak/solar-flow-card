@@ -38,7 +38,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "2.1.0-beta.11";
+const CARD_VERSION = "2.1.0-beta.12";
 // The card's type is custom:home-energy-hub since 2.0.0. The old name stays
 // registered so dashboards with custom:solar-flow-card keep working.
 const CARD_TAG = "home-energy-hub";
@@ -94,6 +94,9 @@ const TRANSLATIONS = {
     "period7d": "Last 7 days",
     "periodMonth": "This month",
     "periodAll": "All time",
+    "browseBack": "Earlier",
+    "browseForward": "Later",
+    "browseNow": "Back to now",
     "periodMonthShort": "Month",
     "periodAllShort": "All",
     "periodLastMonth": "Last month",
@@ -498,6 +501,7 @@ const TRANSLATIONS = {
     "editorDarkAuto": "Like Home Assistant",
     "editorDarkOn": "Dark",
     "editorPeriods": "Period tabs",
+    "editorPeriodBrowse": "Arrows to browse earlier days, months and years",
     "editorFontUrl": "Own font stylesheet (URL)",
     "editorNow": "now: {value}",
     "editorAuto": "found automatically: {entity} · {value}",
@@ -652,6 +656,9 @@ const TRANSLATIONS = {
     "period7d": "Letzte 7 Tage",
     "periodMonth": "Dieser Monat",
     "periodAll": "Gesamt",
+    "browseBack": "Früher",
+    "browseForward": "Später",
+    "browseNow": "Zurück zu jetzt",
     "periodMonthShort": "Monat",
     "periodAllShort": "Gesamt",
     "periodLastMonth": "Letzter Monat",
@@ -1056,6 +1063,7 @@ const TRANSLATIONS = {
     "editorDarkAuto": "Wie Home Assistant",
     "editorDarkOn": "Dunkel",
     "editorPeriods": "Zeitraum-Tabs",
+    "editorPeriodBrowse": "Pfeile zum Blättern in früheren Tagen, Monaten und Jahren",
     "editorFontUrl": "Eigenes Schrift-Stylesheet (URL)",
     "editorNow": "jetzt: {value}",
     "editorAuto": "automatisch gefunden: {entity} · {value}",
@@ -1210,6 +1218,9 @@ const TRANSLATIONS = {
     "period7d": "7 derniers jours",
     "periodMonth": "Ce mois-ci",
     "periodAll": "Depuis toujours",
+    "browseBack": "Plus tôt",
+    "browseForward": "Plus tard",
+    "browseNow": "Revenir à maintenant",
     "periodMonthShort": "Mois",
     "periodAllShort": "Total",
     "periodLastMonth": "Mois dernier",
@@ -1614,6 +1625,7 @@ const TRANSLATIONS = {
     "editorDarkAuto": "Comme Home Assistant",
     "editorDarkOn": "Sombre",
     "editorPeriods": "Onglets de période",
+    "editorPeriodBrowse": "Flèches pour parcourir les jours, mois et années précédents",
     "editorFontUrl": "Feuille de style de polices personnalisée (URL)",
     "editorNow": "maintenant : {value}",
     "editorAuto": "détecté automatiquement : {entity} · {value}",
@@ -1768,6 +1780,9 @@ const TRANSLATIONS = {
     "period7d": "Afgelopen 7 dagen",
     "periodMonth": "Deze maand",
     "periodAll": "Alles",
+    "browseBack": "Eerder",
+    "browseForward": "Later",
+    "browseNow": "Terug naar nu",
     "periodMonthShort": "Maand",
     "periodAllShort": "Alles",
     "periodLastMonth": "Vorige maand",
@@ -2172,6 +2187,7 @@ const TRANSLATIONS = {
     "editorDarkAuto": "Zoals Home Assistant",
     "editorDarkOn": "Donker",
     "editorPeriods": "Periodetabs",
+    "editorPeriodBrowse": "Pijlen om door eerdere dagen, maanden en jaren te bladeren",
     "editorFontUrl": "Eigen lettertype-stylesheet (URL)",
     "editorNow": "nu: {value}",
     "editorAuto": "automatisch gevonden: {entity} · {value}",
@@ -2326,6 +2342,9 @@ const TRANSLATIONS = {
     "period7d": "Ostatnie 7 dni",
     "periodMonth": "Ten miesiąc",
     "periodAll": "Cały okres",
+    "browseBack": "Wcześniej",
+    "browseForward": "Później",
+    "browseNow": "Wróć do teraz",
     "periodMonthShort": "Mies.",
     "periodAllShort": "Całość",
     "periodLastMonth": "Poprzedni miesiąc",
@@ -2730,6 +2749,7 @@ const TRANSLATIONS = {
     "editorDarkAuto": "Jak w Home Assistant",
     "editorDarkOn": "Ciemne",
     "editorPeriods": "Zakładki okresów",
+    "editorPeriodBrowse": "Strzałki do przeglądania wcześniejszych dni, miesięcy i lat",
     "editorFontUrl": "Własny arkusz czcionek (URL)",
     "editorNow": "teraz: {value}",
     "editorAuto": "wykryty automatycznie: {entity} · {value}",
@@ -2884,6 +2904,9 @@ const TRANSLATIONS = {
     "period7d": "Últimos 7 dias",
     "periodMonth": "Este mês",
     "periodAll": "Desde sempre",
+    "browseBack": "Antes",
+    "browseForward": "Depois",
+    "browseNow": "Voltar a agora",
     "periodMonthShort": "Mês",
     "periodAllShort": "Tudo",
     "periodLastMonth": "Mês passado",
@@ -3288,6 +3311,7 @@ const TRANSLATIONS = {
     "editorDarkAuto": "Como o Home Assistant",
     "editorDarkOn": "Escuro",
     "editorPeriods": "Separadores de período",
+    "editorPeriodBrowse": "Setas para percorrer dias, meses e anos anteriores",
     "editorFontUrl": "Folha de estilo de tipo de letra própria (URL)",
     "editorNow": "agora: {value}",
     "editorAuto": "encontrado automaticamente: {entity} · {value}",
@@ -4635,24 +4659,42 @@ function pvForecastNote(m) {
 }
 
 // Long-term statistics query for a period other than today.
-function statsSpec(period) {
+// The statistics behind a period. `offset` steps back by whole periods
+// (browsing with the arrows): a day, three days, a week, a month or a year;
+// a period in the past has an end.
+function statsSpec(period, offset = 0) {
   const now = new Date();
-  if (period === "3d") return { period, start: startOfDay(addDays(now, -2)), statPeriod: "day", ttl: 15 * 60000 };
-  if (period === "7d") return { period, start: startOfDay(addDays(now, -6)), statPeriod: "day", ttl: 15 * 60000 };
-  if (period === "month") {
-    const start = startOfDay(now);
-    start.setDate(1);
-    return { period, start, statPeriod: "day", ttl: 15 * 60000 };
+  const k = Math.max(0, Math.round(Number(offset)) || 0);
+  const span = (start, days) => ({ start, end: k ? addDays(start, days) : undefined });
+  if (period === "today") return { period, ...span(startOfDay(addDays(now, -k)), 1), statPeriod: "hour", ttl: k ? 60 * 60000 : 5 * 60000 };
+  if (period === "3d") return { period, ...span(startOfDay(addDays(now, -2 - 3 * k)), 3), statPeriod: "day", ttl: k ? 60 * 60000 : 15 * 60000 };
+  if (period === "7d") return { period, ...span(startOfDay(addDays(now, -6 - 7 * k)), 7), statPeriod: "day", ttl: k ? 60 * 60000 : 15 * 60000 };
+  if (period === "month" || period === "last_month") {
+    // The previous month is the current one a month back, and always ended.
+    const back = k + (period === "last_month" ? 1 : 0);
+    const start = new Date(now.getFullYear(), now.getMonth() - back, 1);
+    const end = back ? new Date(now.getFullYear(), now.getMonth() - back + 1, 1) : undefined;
+    return { period, start, end, statPeriod: "day", ttl: back ? 60 * 60000 : 15 * 60000 };
   }
-  if (period === "last_month") {
-    // The whole previous month: it has an end.
-    const end = startOfDay(now);
-    end.setDate(1);
-    const start = new Date(end.getFullYear(), end.getMonth() - 1, 1);
-    return { period, start, end, statPeriod: "day", ttl: 60 * 60000 };
+  if (period === "year") {
+    const start = new Date(now.getFullYear() - k, 0, 1);
+    return { period, start, end: k ? new Date(now.getFullYear() - k + 1, 0, 1) : undefined, statPeriod: "month", ttl: 60 * 60000 };
   }
-  if (period === "year") return { period, start: new Date(now.getFullYear(), 0, 1), statPeriod: "month", ttl: 60 * 60000 };
   return { period, start: new Date(2015, 0, 1), statPeriod: "month", ttl: 60 * 60000 };
+}
+
+// The dates a period covers, for the line between the arrows.
+function periodRangeLabel(spec, locale) {
+  const last = addDays(spec.end || new Date(), spec.end ? -1 : 0);
+  const day = (d, opts) => d.toLocaleDateString(locale, opts);
+  if (spec.period === "today") return day(spec.start, { weekday: "short", day: "numeric", month: "short" });
+  if (spec.period === "3d" || spec.period === "7d") {
+    const sameMonth = spec.start.getMonth() === last.getMonth();
+    return `${day(spec.start, sameMonth ? { day: "numeric" } : { day: "numeric", month: "short" })} – ${day(last, { day: "numeric", month: "short", year: last.getFullYear() !== new Date().getFullYear() ? "numeric" : undefined })}`;
+  }
+  if (spec.period === "month" || spec.period === "last_month") return day(spec.start, { month: "long", year: "numeric" });
+  if (spec.period === "year") return String(spec.start.getFullYear());
+  return "";
 }
 
 async function loadStatistics(hass, spec, energy) {
@@ -4670,7 +4712,7 @@ async function loadStatistics(hass, spec, energy) {
   for (const [name, ids] of Object.entries(sources)) {
     for (const row of statRows(response, ids)) {
       const start = new Date(statStart(row.start));
-      const key = spec.statPeriod === "month" ? `${start.getFullYear()}-${start.getMonth()}` : start.toDateString();
+      const key = spec.statPeriod === "month" ? `${start.getFullYear()}-${start.getMonth()}` : spec.statPeriod === "hour" ? String(start.getTime()) : start.toDateString();
       const bucket = byKey.get(key) || { start };
       bucket[name] = Math.max(0, Number(row.change) || 0);
       byKey.set(key, bucket);
@@ -5781,6 +5823,21 @@ function tabsHtml(m) {
         <button type="button" role="radio" class="sfc-tab ${period === m.period ? "on" : ""}"
           aria-checked="${period === m.period}" title="${escapeHtml(labels[period][1])}"
           data-period="${period}">${escapeHtml(labels[period][0])}</button>`).join("")}
+    </div>
+    ${browseHtml(m)}`;
+}
+
+// The arrows under the tabs: the period before, the dates shown (a click
+// returns to the current period) and the period after.
+function browseHtml(m) {
+  const b = m.browse;
+  if (!b) return "";
+  const latest = b.offset === 0;
+  return `
+    <div class="sfc-browse">
+      <button type="button" data-browse="1" aria-label="${escapeHtml(m.t.browseBack)}" title="${escapeHtml(m.t.browseBack)}">‹</button>
+      <button type="button" class="sfc-browse-label ${latest ? "" : "past"}" data-browse="now" ${latest ? "disabled" : `title="${escapeHtml(m.t.browseNow)}"`}>${escapeHtml(b.label)}</button>
+      <button type="button" data-browse="-1" ${latest ? "disabled" : ""} aria-label="${escapeHtml(m.t.browseForward)}" title="${escapeHtml(m.t.browseForward)}">›</button>
     </div>`;
 }
 
@@ -5833,7 +5890,9 @@ function summaryHtml(m) {
 
 function energySectionHtml(m, { title = true } = {}) {
   if (!m.config.showEnergy) return "";
-  const [kicker, label] = periodLabels(m.t)[m.period];
+  const [kicker, current] = periodLabels(m.t)[m.period];
+  // An earlier period is named by its dates.
+  const label = m.browse?.offset ? m.browse.label : current;
   const hint = m.period === "all" && m.since ? fill(m.t.since, { date: m.since }) : "";
   return `
     <section class="sfc-section sfc-energy">
@@ -6361,7 +6420,7 @@ function foldSummary(m, id) {
   const { t, locale } = m;
   if (id === "energy") {
     const solar = m.config.showSolar && isNum(m.totals.solar);
-    return [periodLabels(t)[m.period][1], solar ? t.pvProduction : t.consumption, formatEnergy(solar ? m.totals.solar : m.totals.load, locale)];
+    return [m.browse?.offset ? m.browse.label : periodLabels(t)[m.period][1], solar ? t.pvProduction : t.consumption, formatEnergy(solar ? m.totals.solar : m.totals.load, locale)];
   }
   if (id === "forecast") return [t.batteryForecast, t.battery, formatPercent(m.forecast.soc, locale)];
   if (id === "pv_forecast") return [t.pvForecastTitle, "", pvForecastNote(m)];
@@ -6680,12 +6739,16 @@ function wireChart(root, data, t, locale, hidden) {
   plot.addEventListener("pointerleave", hide);
 }
 
-function powerSpec(period) {
+// The power chart's time axis: today (5-minute buckets) or the last three
+// days (15 minutes); `offset` steps back by whole periods, and a period in
+// the past has an end.
+function powerSpec(period, offset = 0) {
   const now = new Date();
-  const start = startOfDay(period === "3d" ? addDays(now, -2) : now);
-  const axisEnd = period === "3d" ? now : addDays(start, 1);
+  const k = Math.max(0, Math.round(Number(offset)) || 0);
+  const start = startOfDay(addDays(now, period === "3d" ? -2 - 3 * k : -k));
+  const axisEnd = period === "3d" ? (k ? addDays(start, 3) : now) : addDays(start, 1);
   const bucketMs = (period === "3d" ? 15 : 5) * 60000;
-  return { period, start, axisEnd, bucketMs, count: Math.max(1, Math.ceil((axisEnd - start) / bucketMs)), ttl: 5 * 60000 };
+  return { period, start, axisEnd, end: k ? axisEnd : null, bucketMs, count: Math.max(1, Math.ceil((axisEnd - start) / bucketMs)), ttl: k ? 60 * 60000 : 5 * 60000 };
 }
 
 const ONE_WAY = ["charge", "discharge", "gridImport", "gridExport"];
@@ -6696,7 +6759,8 @@ async function loadPowerHistory(hass, spec, live) {
       .map((name) => [name, live[name]])
       .filter(([, entry]) => entry?.entityId)
   );
-  const nowMs = Date.now();
+  // A period in the past ends there; today ends now.
+  const nowMs = spec.end ? spec.end.getTime() : Date.now();
   const response = await hass.callWS({
     type: "history/history_during_period",
     start_time: spec.start.toISOString(),
@@ -8178,6 +8242,15 @@ const BASE_CSS = `
   .sfc-tab { border: 0; background: transparent; color: var(--sfc-muted); padding: 7px 2px; border-radius: var(--sfc-tab-radius, 9px);
     font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; flex: 1 0 0; min-width: max-content; }
   .sfc-tab.on { background: var(--sfc-tab-on-bg); color: var(--sfc-tab-on); box-shadow: var(--sfc-tab-shadow, none); cursor: default; }
+  /* Browsing: the period before, its dates, the period after. */
+  .sfc-browse { display: flex; align-items: center; justify-content: center; gap: 6px; margin: -6px 0 10px; }
+  .sfc-browse button { border: 0; background: none; color: var(--sfc-muted); font: inherit; cursor: pointer; border-radius: 8px; }
+  .sfc-browse button:not(.sfc-browse-label) { width: 30px; height: 26px; font-size: 20px; line-height: 1; }
+  .sfc-browse button:not(:disabled):hover { background: var(--sfc-tab-bg); color: var(--sfc-text); }
+  .sfc-browse button:disabled { opacity: .3; cursor: default; }
+  .sfc-browse-label { min-width: 0; padding: 3px 8px; font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sfc-browse-label:disabled { opacity: 1 !important; }
+  .sfc-browse-label.past { color: var(--sfc-text); text-decoration: underline dotted; text-underline-offset: 3px; }
 
   /* Energy tiles */
   .sfc-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
@@ -9448,6 +9521,8 @@ class SolarFlowCard extends HTMLElement {
     this._config = { ...DEFAULT_CONFIG };
     this._hass = null;
     this._period = null;
+    // Browsing with the arrows: how many periods back (0 = the current one).
+    this._offset = 0;
     this._inverterOpen = false;
     this._hiddenSeries = loadHiddenSeries();
     this._collapsed = new Set();
@@ -9540,12 +9615,12 @@ class SolarFlowCard extends HTMLElement {
     return entry;
   }
 
-  _periodEnergy(resolved, period, today) {
-    if (period === "today") return { totals: today, buckets: null, spec: null };
+  _periodEnergy(resolved, period, today, offset = 0) {
+    if (period === "today" && !offset) return { totals: today, buckets: null, spec: null };
     const ids = ENERGY_ORDER.map((name) => resolved.energy[name]?.entityId).filter(Boolean);
     if (!ids.length || typeof this._hass.callWS !== "function") return { totals: {}, error: true };
-    const spec = statsSpec(period);
-    const entry = this._fetch(`stats|${period}|${sourcesKey(resolved.energy)}|${spec.start.toDateString()}`, spec.ttl, () =>
+    const spec = statsSpec(period, offset);
+    const entry = this._fetch(`stats|${period}|${sourcesKey(resolved.energy)}|${spec.start.toDateString()}|${spec.end ? spec.end.getTime() : ""}`, spec.ttl, () =>
       loadStatistics(this._hass, spec, resolved.energy)
     );
     if (!entry.data) return { totals: {}, loading: entry.loading, error: entry.error, spec };
@@ -9565,7 +9640,7 @@ class SolarFlowCard extends HTMLElement {
 
   // Virtual storage (#43): the current hour, the full hours of today, and the
   // import left after hourly balancing for the selected period.
-  _virtualStorage(resolved, config, period, now, totals) {
+  _virtualStorage(resolved, config, period, now, totals, offset = 0) {
     const vs = virtualStorageConfig(config);
     if (!vs) return { store: null, net: null };
     const ids = GRID_COUNTERS.map((name) => resolved.energy[name]?.entityId);
@@ -9579,14 +9654,14 @@ class SolarFlowCard extends HTMLElement {
       const hourly = (start) => this._fetch(`vs-hours|${ids.join(",")}|${start.getTime()}`, 5 * 60000, () => loadHourlyGrid(this._hass, resolved.energy, start)).data || null;
       const today = startOfDay(now);
       todayHours = hourly(today);
-      if (period !== "today" && !MONTHLY_PERIODS.includes(period) && !statsSpec(period).end) {
+      if (period !== "today" && !MONTHLY_PERIODS.includes(period) && !statsSpec(period, offset).end) {
         const start = statsSpec(period).start;
         net = hourlyNet(hourly(start), start.getTime(), current);
       }
     }
     const store = virtualStorage(this._hass, resolved, vs, todayHours, current, now);
     // Today: the same counters as the rest of the card, less what was balanced.
-    if (period === "today" && store.day && isNum(totals.gridImport)) {
+    if (period === "today" && !offset && store.day && isNum(totals.gridImport)) {
       net = { gridImport: Math.max(0, totals.gridImport - store.day.balanced), gridExport: isNum(totals.gridExport) ? Math.max(0, totals.gridExport - store.day.balanced) : null };
     }
     return { store, net };
@@ -9597,7 +9672,7 @@ class SolarFlowCard extends HTMLElement {
   // (the summary works them out from the totals), null while loading.
   // `since`: hour by hour from that date, whatever the period (payback with
   // hourly prices).
-  _savings(resolved, period, energy, net, since = null) {
+  _savings(resolved, period, energy, net, since = null, offset = 0) {
     const config = this._config;
     const prices = effectivePrices(this._hass, config);
     // Net-metering: a kWh sent back is worth `ratio` of a kWh bought.
@@ -9627,7 +9702,7 @@ class SolarFlowCard extends HTMLElement {
     let rows;
     let start;
     let statPeriod = "hour";
-    const ended = period === "today" ? null : statsSpec(period).end || null;
+    const ended = period === "today" && !offset ? null : statsSpec(period, offset).end || null;
     // Prices by period need the hours, also for the year and all time.
     if (MONTHLY_PERIODS.includes(period) && !since && prices.import?.schedule) {
       if (!energy.buckets) return { kind, value: null };
@@ -9642,7 +9717,7 @@ class SolarFlowCard extends HTMLElement {
       start = energy.spec.start;
       statPeriod = "month";
     } else {
-      start = since || (period === "today" ? startOfDay(new Date()) : statsSpec(period).start);
+      start = since || (period === "today" && !offset ? startOfDay(new Date()) : statsSpec(period, offset).start);
       const hourly = this._fetch(`hourly-energy|${sources}|${start.getTime()}`, since ? 60 * 60000 : 15 * 60000, () => loadHourlyEnergy(this._hass, resolved.energy, start));
       if (!hourly.data) return { kind, value: null };
       const hours = new Map();
@@ -9705,7 +9780,7 @@ class SolarFlowCard extends HTMLElement {
 
   // Recorder history of the power sensors for today or the last 3 days,
   // shared by the chart and the day's highlights.
-  _powerHistory(resolved, period) {
+  _powerHistory(resolved, period, offset = 0) {
     const live = { ...resolved.live, ...bankHistorySources(this._hass, this._config) };
     // `<key>_history` under entities: a recorded twin of a live sensor (e.g.
     // a 5-minute copy of a sensor kept out of the recorder) for the charts.
@@ -9716,8 +9791,8 @@ class SolarFlowCard extends HTMLElement {
     }
     const ids = Object.values(live).filter(Boolean).map((entry) => entry.entityId);
     if (!ids.length || typeof this._hass.callWS !== "function") return null;
-    const spec = powerSpec(period);
-    const entry = this._fetch(`history|${period}|${sourcesKey(live)}|${spec.start.toDateString()}`, spec.ttl, () =>
+    const spec = powerSpec(period, offset);
+    const entry = this._fetch(`history|${period}|${sourcesKey(live)}|${spec.start.toDateString()}|${spec.end ? spec.end.getTime() : ""}`, spec.ttl, () =>
       loadPowerHistory(this._hass, spec, live)
     );
     return { entry, spec };
@@ -9743,9 +9818,9 @@ class SolarFlowCard extends HTMLElement {
     return { day, compare, at: [history?.entry.at, week.buckets?.length, month.buckets?.length, Boolean(yearAgo)] };
   }
 
-  _chartState(resolved, period, energy) {
-    const chart = this._chartStateBase(resolved, period, energy);
-    if (period !== "today" || chart?.data?.kind !== "power" || this._config.show_solar === false) return chart;
+  _chartState(resolved, period, energy, offset = 0) {
+    const chart = this._chartStateBase(resolved, period, energy, offset);
+    if (period !== "today" || offset || chart?.data?.kind !== "power" || this._config.show_solar === false) return chart;
     // The hourly PV forecast as a line next to the production.
     const forecast = this._forecastHours();
     const series = forecastSeries(forecast.hours, chart.data.spec);
@@ -9781,10 +9856,10 @@ class SolarFlowCard extends HTMLElement {
     return simulateBattery(forecast, pv, loadProfile(history.data));
   }
 
-  _chartStateBase(resolved, period, energy) {
+  _chartStateBase(resolved, period, energy, offset = 0) {
     if (this._config.show_chart === false) return null;
     if (period === "today" || period === "3d") {
-      const history = this._powerHistory(resolved, period);
+      const history = this._powerHistory(resolved, period, offset);
       if (!history) return null;
       const { entry, spec } = history;
       const data = entry.data ? this._powerChartData(entry.data.series, spec) : null;
@@ -9879,6 +9954,9 @@ class SolarFlowCard extends HTMLElement {
       }
       const periods = periodList(config);
       const period = periods.includes(this._period) ? this._period : periods.includes(config.period) ? config.period : periods[0];
+      // All time has nothing before it; `period_browse: false` hides the arrows.
+      const browse = config.period_browse !== false && period !== "all";
+      const offset = browse ? this._offset || 0 : 0;
       const showSolar = config.show_solar !== false;
       const live = liveValues(resolved, config);
       live.gridOff = gridOffline(resolved.gridStatus, config) === true;
@@ -9904,12 +9982,12 @@ class SolarFlowCard extends HTMLElement {
       }
       const status = liveStatus(resolved);
       const today = todayEnergy(resolved, this._energyBaseline(resolved));
-      const energy = this._periodEnergy(resolved, period, today);
-      const chart = this._chartState(resolved, period, energy);
+      const energy = this._periodEnergy(resolved, period, today, offset);
+      const chart = this._chartState(resolved, period, energy, offset);
       const forecast = batteryForecast(live, bank?.capacity && !positiveNumber(config.battery_capacity) ? { ...config, battery_capacity: bank.capacity } : config);
       const batteryDay = showBattery && config.show_forecast !== false ? this._batteryDay(resolved, forecast, showSolar) : null;
       forecast.day = batteryDay;
-      if (batteryDay && period === "today" && chart?.data?.kind === "power" && chart.data.soc) {
+      if (batteryDay && period === "today" && !offset && chart?.data?.kind === "power" && chart.data.soc) {
         chart.data = { ...chart.data, socAhead: socAheadSeries(batteryDay, chart.data.spec) };
       }
       const readings = inverterReadings(resolved, this._hass, config);
@@ -9951,14 +10029,14 @@ class SolarFlowCard extends HTMLElement {
       };
       if (bank && !ids.live.soc && !ids.live.battery) ids.live.soc = bank.items[0].entityId;
       const now = new Date();
-      const vstore = this._virtualStorage(resolved, config, period, now, today);
-      const money = this._savings(resolved, period, energy, vstore.net);
+      const vstore = this._virtualStorage(resolved, config, period, now, today, offset);
+      const money = this._savings(resolved, period, energy, vstore.net, null, offset);
       const payback = this._payback(resolved, today);
       this._introAt ??= Date.now();
       const introElapsed = (Date.now() - this._introAt) / 1000;
       const introAt = introElapsed < 2.6 ? introElapsed : null;
       const signature = JSON.stringify([
-        language, config, darkMode(config, this._hass), period, [...this._hiddenSeries], live, status.state, today, energy.totals, Boolean(energy.loading),
+        language, config, darkMode(config, this._hass), period, offset, [...this._hiddenSeries], live, status.state, today, energy.totals, Boolean(energy.loading),
         chart && [Boolean(chart.loading), Boolean(chart.error), chart.at], forecast.mode, Math.round(forecast.hours * 60 || 0),
         panels?.panels.map((p) => [p.today, p.power]), system, bank, insights && [insights.loading, insights.at, insights.day?.offGridMinutes], weather && [weather.condition, weather.temperature], inverterOpen,
         inverter?.map((d) => [[...d.strings.values()].map((s) => Object.values(s).map((r) => r.value)), d.temperatures.map((r) => r.value), d.battery.map((r) => r.value), d.grid.map((r) => r.value)]),
@@ -10003,6 +10081,8 @@ class SolarFlowCard extends HTMLElement {
         today,
         period,
         periods,
+        // The period shown, when the arrows browse: its dates and how far back.
+        browse: browse ? { offset, label: periodRangeLabel(energy.spec || statsSpec(period, offset), locale) } : null,
         totals: energy.totals || {},
         energyLoading: Boolean(energy.loading),
         payback,
@@ -10166,6 +10246,18 @@ class SolarFlowCard extends HTMLElement {
       element.addEventListener("click", () => {
         if (element.dataset.period === model.period) return;
         this._period = element.dataset.period;
+        this._offset = 0;
+        this._render();
+      });
+    });
+    // The arrows: a period back or forward; the dates between them return to
+    // the current period.
+    root.querySelectorAll("[data-browse]").forEach((element) => {
+      element.addEventListener("click", () => {
+        const step = element.dataset.browse;
+        const next = step === "now" ? 0 : Math.max(0, (this._offset || 0) + Number(step));
+        if (next === this._offset) return;
+        this._offset = next;
         this._render();
       });
     });
@@ -10759,6 +10851,7 @@ class SolarFlowCardEditor extends HTMLElement {
       <div class="box">
         <span class="title">${escapeHtml(t.editorPeriods)}</span>
         <div class="colors">${PERIODS.map((p) => `<label><input type="checkbox" data-period-tab="${p}" ${periodList(this._config).includes(p) ? "checked" : ""} /><span>${escapeHtml(labels[p][1])}</span></label>`).join("")}</div>
+        <div class="switch"><label for="period_browse">${escapeHtml(t.editorPeriodBrowse)}</label><input id="period_browse" type="checkbox" data-browse-switch ${this._config.period_browse !== false ? "checked" : ""} /></div>
       </div>
       <div class="box">
         <span class="title">${escapeHtml(t.editorColors)}</span>
@@ -11398,6 +11491,7 @@ class SolarFlowCardEditor extends HTMLElement {
       this._set("price_import_periods", list.length ? list : undefined);
       this._render();
     }));
+    root.querySelector("[data-browse-switch]")?.addEventListener("change", (e) => this._set("period_browse", e.target.checked ? undefined : false));
     root.querySelector("[data-period-holidays]")?.addEventListener("change", (e) => this._set("holidays_as_weekend", e.target.checked || undefined));
     root.querySelectorAll("[data-add]").forEach((button) => button.addEventListener("click", () => {
       this._boxes.set(`list-${button.dataset.add}`, true);

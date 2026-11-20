@@ -42,6 +42,21 @@ function tabsHtml(m) {
         <button type="button" role="radio" class="sfc-tab ${period === m.period ? "on" : ""}"
           aria-checked="${period === m.period}" title="${escapeHtml(labels[period][1])}"
           data-period="${period}">${escapeHtml(labels[period][0])}</button>`).join("")}
+    </div>
+    ${browseHtml(m)}`;
+}
+
+// The arrows under the tabs: the period before, the dates shown (a click
+// returns to the current period) and the period after.
+function browseHtml(m) {
+  const b = m.browse;
+  if (!b) return "";
+  const latest = b.offset === 0;
+  return `
+    <div class="sfc-browse">
+      <button type="button" data-browse="1" aria-label="${escapeHtml(m.t.browseBack)}" title="${escapeHtml(m.t.browseBack)}">‹</button>
+      <button type="button" class="sfc-browse-label ${latest ? "" : "past"}" data-browse="now" ${latest ? "disabled" : `title="${escapeHtml(m.t.browseNow)}"`}>${escapeHtml(b.label)}</button>
+      <button type="button" data-browse="-1" ${latest ? "disabled" : ""} aria-label="${escapeHtml(m.t.browseForward)}" title="${escapeHtml(m.t.browseForward)}">›</button>
     </div>`;
 }
 
@@ -94,7 +109,9 @@ function summaryHtml(m) {
 
 function energySectionHtml(m, { title = true } = {}) {
   if (!m.config.showEnergy) return "";
-  const [kicker, label] = periodLabels(m.t)[m.period];
+  const [kicker, current] = periodLabels(m.t)[m.period];
+  // An earlier period is named by its dates.
+  const label = m.browse?.offset ? m.browse.label : current;
   const hint = m.period === "all" && m.since ? fill(m.t.since, { date: m.since }) : "";
   return `
     <section class="sfc-section sfc-energy">
@@ -622,7 +639,7 @@ function foldSummary(m, id) {
   const { t, locale } = m;
   if (id === "energy") {
     const solar = m.config.showSolar && isNum(m.totals.solar);
-    return [periodLabels(t)[m.period][1], solar ? t.pvProduction : t.consumption, formatEnergy(solar ? m.totals.solar : m.totals.load, locale)];
+    return [m.browse?.offset ? m.browse.label : periodLabels(t)[m.period][1], solar ? t.pvProduction : t.consumption, formatEnergy(solar ? m.totals.solar : m.totals.load, locale)];
   }
   if (id === "forecast") return [t.batteryForecast, t.battery, formatPercent(m.forecast.soc, locale)];
   if (id === "pv_forecast") return [t.pvForecastTitle, "", pvForecastNote(m)];
@@ -941,12 +958,16 @@ function wireChart(root, data, t, locale, hidden) {
   plot.addEventListener("pointerleave", hide);
 }
 
-function powerSpec(period) {
+// The power chart's time axis: today (5-minute buckets) or the last three
+// days (15 minutes); `offset` steps back by whole periods, and a period in
+// the past has an end.
+function powerSpec(period, offset = 0) {
   const now = new Date();
-  const start = startOfDay(period === "3d" ? addDays(now, -2) : now);
-  const axisEnd = period === "3d" ? now : addDays(start, 1);
+  const k = Math.max(0, Math.round(Number(offset)) || 0);
+  const start = startOfDay(addDays(now, period === "3d" ? -2 - 3 * k : -k));
+  const axisEnd = period === "3d" ? (k ? addDays(start, 3) : now) : addDays(start, 1);
   const bucketMs = (period === "3d" ? 15 : 5) * 60000;
-  return { period, start, axisEnd, bucketMs, count: Math.max(1, Math.ceil((axisEnd - start) / bucketMs)), ttl: 5 * 60000 };
+  return { period, start, axisEnd, end: k ? axisEnd : null, bucketMs, count: Math.max(1, Math.ceil((axisEnd - start) / bucketMs)), ttl: k ? 60 * 60000 : 5 * 60000 };
 }
 
 const ONE_WAY = ["charge", "discharge", "gridImport", "gridExport"];
@@ -957,7 +978,8 @@ async function loadPowerHistory(hass, spec, live) {
       .map((name) => [name, live[name]])
       .filter(([, entry]) => entry?.entityId)
   );
-  const nowMs = Date.now();
+  // A period in the past ends there; today ends now.
+  const nowMs = spec.end ? spec.end.getTime() : Date.now();
   const response = await hass.callWS({
     type: "history/history_during_period",
     start_time: spec.start.toISOString(),

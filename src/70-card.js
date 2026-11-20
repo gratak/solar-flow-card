@@ -131,6 +131,8 @@ class SolarFlowCard extends HTMLElement {
     this._config = { ...DEFAULT_CONFIG };
     this._hass = null;
     this._period = null;
+    // Browsing with the arrows: how many periods back (0 = the current one).
+    this._offset = 0;
     this._inverterOpen = false;
     this._hiddenSeries = loadHiddenSeries();
     this._collapsed = new Set();
@@ -223,12 +225,12 @@ class SolarFlowCard extends HTMLElement {
     return entry;
   }
 
-  _periodEnergy(resolved, period, today) {
-    if (period === "today") return { totals: today, buckets: null, spec: null };
+  _periodEnergy(resolved, period, today, offset = 0) {
+    if (period === "today" && !offset) return { totals: today, buckets: null, spec: null };
     const ids = ENERGY_ORDER.map((name) => resolved.energy[name]?.entityId).filter(Boolean);
     if (!ids.length || typeof this._hass.callWS !== "function") return { totals: {}, error: true };
-    const spec = statsSpec(period);
-    const entry = this._fetch(`stats|${period}|${sourcesKey(resolved.energy)}|${spec.start.toDateString()}`, spec.ttl, () =>
+    const spec = statsSpec(period, offset);
+    const entry = this._fetch(`stats|${period}|${sourcesKey(resolved.energy)}|${spec.start.toDateString()}|${spec.end ? spec.end.getTime() : ""}`, spec.ttl, () =>
       loadStatistics(this._hass, spec, resolved.energy)
     );
     if (!entry.data) return { totals: {}, loading: entry.loading, error: entry.error, spec };
@@ -248,7 +250,7 @@ class SolarFlowCard extends HTMLElement {
 
   // Virtual storage (#43): the current hour, the full hours of today, and the
   // import left after hourly balancing for the selected period.
-  _virtualStorage(resolved, config, period, now, totals) {
+  _virtualStorage(resolved, config, period, now, totals, offset = 0) {
     const vs = virtualStorageConfig(config);
     if (!vs) return { store: null, net: null };
     const ids = GRID_COUNTERS.map((name) => resolved.energy[name]?.entityId);
@@ -262,14 +264,14 @@ class SolarFlowCard extends HTMLElement {
       const hourly = (start) => this._fetch(`vs-hours|${ids.join(",")}|${start.getTime()}`, 5 * 60000, () => loadHourlyGrid(this._hass, resolved.energy, start)).data || null;
       const today = startOfDay(now);
       todayHours = hourly(today);
-      if (period !== "today" && !MONTHLY_PERIODS.includes(period) && !statsSpec(period).end) {
+      if (period !== "today" && !MONTHLY_PERIODS.includes(period) && !statsSpec(period, offset).end) {
         const start = statsSpec(period).start;
         net = hourlyNet(hourly(start), start.getTime(), current);
       }
     }
     const store = virtualStorage(this._hass, resolved, vs, todayHours, current, now);
     // Today: the same counters as the rest of the card, less what was balanced.
-    if (period === "today" && store.day && isNum(totals.gridImport)) {
+    if (period === "today" && !offset && store.day && isNum(totals.gridImport)) {
       net = { gridImport: Math.max(0, totals.gridImport - store.day.balanced), gridExport: isNum(totals.gridExport) ? Math.max(0, totals.gridExport - store.day.balanced) : null };
     }
     return { store, net };
@@ -280,7 +282,7 @@ class SolarFlowCard extends HTMLElement {
   // (the summary works them out from the totals), null while loading.
   // `since`: hour by hour from that date, whatever the period (payback with
   // hourly prices).
-  _savings(resolved, period, energy, net, since = null) {
+  _savings(resolved, period, energy, net, since = null, offset = 0) {
     const config = this._config;
     const prices = effectivePrices(this._hass, config);
     // Net-metering: a kWh sent back is worth `ratio` of a kWh bought.
@@ -310,7 +312,7 @@ class SolarFlowCard extends HTMLElement {
     let rows;
     let start;
     let statPeriod = "hour";
-    const ended = period === "today" ? null : statsSpec(period).end || null;
+    const ended = period === "today" && !offset ? null : statsSpec(period, offset).end || null;
     // Prices by period need the hours, also for the year and all time.
     if (MONTHLY_PERIODS.includes(period) && !since && prices.import?.schedule) {
       if (!energy.buckets) return { kind, value: null };
@@ -325,7 +327,7 @@ class SolarFlowCard extends HTMLElement {
       start = energy.spec.start;
       statPeriod = "month";
     } else {
-      start = since || (period === "today" ? startOfDay(new Date()) : statsSpec(period).start);
+      start = since || (period === "today" && !offset ? startOfDay(new Date()) : statsSpec(period, offset).start);
       const hourly = this._fetch(`hourly-energy|${sources}|${start.getTime()}`, since ? 60 * 60000 : 15 * 60000, () => loadHourlyEnergy(this._hass, resolved.energy, start));
       if (!hourly.data) return { kind, value: null };
       const hours = new Map();
@@ -388,7 +390,7 @@ class SolarFlowCard extends HTMLElement {
 
   // Recorder history of the power sensors for today or the last 3 days,
   // shared by the chart and the day's highlights.
-  _powerHistory(resolved, period) {
+  _powerHistory(resolved, period, offset = 0) {
     const live = { ...resolved.live, ...bankHistorySources(this._hass, this._config) };
     // `<key>_history` under entities: a recorded twin of a live sensor (e.g.
     // a 5-minute copy of a sensor kept out of the recorder) for the charts.
@@ -399,8 +401,8 @@ class SolarFlowCard extends HTMLElement {
     }
     const ids = Object.values(live).filter(Boolean).map((entry) => entry.entityId);
     if (!ids.length || typeof this._hass.callWS !== "function") return null;
-    const spec = powerSpec(period);
-    const entry = this._fetch(`history|${period}|${sourcesKey(live)}|${spec.start.toDateString()}`, spec.ttl, () =>
+    const spec = powerSpec(period, offset);
+    const entry = this._fetch(`history|${period}|${sourcesKey(live)}|${spec.start.toDateString()}|${spec.end ? spec.end.getTime() : ""}`, spec.ttl, () =>
       loadPowerHistory(this._hass, spec, live)
     );
     return { entry, spec };
@@ -426,9 +428,9 @@ class SolarFlowCard extends HTMLElement {
     return { day, compare, at: [history?.entry.at, week.buckets?.length, month.buckets?.length, Boolean(yearAgo)] };
   }
 
-  _chartState(resolved, period, energy) {
-    const chart = this._chartStateBase(resolved, period, energy);
-    if (period !== "today" || chart?.data?.kind !== "power" || this._config.show_solar === false) return chart;
+  _chartState(resolved, period, energy, offset = 0) {
+    const chart = this._chartStateBase(resolved, period, energy, offset);
+    if (period !== "today" || offset || chart?.data?.kind !== "power" || this._config.show_solar === false) return chart;
     // The hourly PV forecast as a line next to the production.
     const forecast = this._forecastHours();
     const series = forecastSeries(forecast.hours, chart.data.spec);
@@ -464,10 +466,10 @@ class SolarFlowCard extends HTMLElement {
     return simulateBattery(forecast, pv, loadProfile(history.data));
   }
 
-  _chartStateBase(resolved, period, energy) {
+  _chartStateBase(resolved, period, energy, offset = 0) {
     if (this._config.show_chart === false) return null;
     if (period === "today" || period === "3d") {
-      const history = this._powerHistory(resolved, period);
+      const history = this._powerHistory(resolved, period, offset);
       if (!history) return null;
       const { entry, spec } = history;
       const data = entry.data ? this._powerChartData(entry.data.series, spec) : null;
@@ -562,6 +564,9 @@ class SolarFlowCard extends HTMLElement {
       }
       const periods = periodList(config);
       const period = periods.includes(this._period) ? this._period : periods.includes(config.period) ? config.period : periods[0];
+      // All time has nothing before it; `period_browse: false` hides the arrows.
+      const browse = config.period_browse !== false && period !== "all";
+      const offset = browse ? this._offset || 0 : 0;
       const showSolar = config.show_solar !== false;
       const live = liveValues(resolved, config);
       live.gridOff = gridOffline(resolved.gridStatus, config) === true;
@@ -587,12 +592,12 @@ class SolarFlowCard extends HTMLElement {
       }
       const status = liveStatus(resolved);
       const today = todayEnergy(resolved, this._energyBaseline(resolved));
-      const energy = this._periodEnergy(resolved, period, today);
-      const chart = this._chartState(resolved, period, energy);
+      const energy = this._periodEnergy(resolved, period, today, offset);
+      const chart = this._chartState(resolved, period, energy, offset);
       const forecast = batteryForecast(live, bank?.capacity && !positiveNumber(config.battery_capacity) ? { ...config, battery_capacity: bank.capacity } : config);
       const batteryDay = showBattery && config.show_forecast !== false ? this._batteryDay(resolved, forecast, showSolar) : null;
       forecast.day = batteryDay;
-      if (batteryDay && period === "today" && chart?.data?.kind === "power" && chart.data.soc) {
+      if (batteryDay && period === "today" && !offset && chart?.data?.kind === "power" && chart.data.soc) {
         chart.data = { ...chart.data, socAhead: socAheadSeries(batteryDay, chart.data.spec) };
       }
       const readings = inverterReadings(resolved, this._hass, config);
@@ -634,14 +639,14 @@ class SolarFlowCard extends HTMLElement {
       };
       if (bank && !ids.live.soc && !ids.live.battery) ids.live.soc = bank.items[0].entityId;
       const now = new Date();
-      const vstore = this._virtualStorage(resolved, config, period, now, today);
-      const money = this._savings(resolved, period, energy, vstore.net);
+      const vstore = this._virtualStorage(resolved, config, period, now, today, offset);
+      const money = this._savings(resolved, period, energy, vstore.net, null, offset);
       const payback = this._payback(resolved, today);
       this._introAt ??= Date.now();
       const introElapsed = (Date.now() - this._introAt) / 1000;
       const introAt = introElapsed < 2.6 ? introElapsed : null;
       const signature = JSON.stringify([
-        language, config, darkMode(config, this._hass), period, [...this._hiddenSeries], live, status.state, today, energy.totals, Boolean(energy.loading),
+        language, config, darkMode(config, this._hass), period, offset, [...this._hiddenSeries], live, status.state, today, energy.totals, Boolean(energy.loading),
         chart && [Boolean(chart.loading), Boolean(chart.error), chart.at], forecast.mode, Math.round(forecast.hours * 60 || 0),
         panels?.panels.map((p) => [p.today, p.power]), system, bank, insights && [insights.loading, insights.at, insights.day?.offGridMinutes], weather && [weather.condition, weather.temperature], inverterOpen,
         inverter?.map((d) => [[...d.strings.values()].map((s) => Object.values(s).map((r) => r.value)), d.temperatures.map((r) => r.value), d.battery.map((r) => r.value), d.grid.map((r) => r.value)]),
@@ -686,6 +691,8 @@ class SolarFlowCard extends HTMLElement {
         today,
         period,
         periods,
+        // The period shown, when the arrows browse: its dates and how far back.
+        browse: browse ? { offset, label: periodRangeLabel(energy.spec || statsSpec(period, offset), locale) } : null,
         totals: energy.totals || {},
         energyLoading: Boolean(energy.loading),
         payback,
@@ -849,6 +856,18 @@ class SolarFlowCard extends HTMLElement {
       element.addEventListener("click", () => {
         if (element.dataset.period === model.period) return;
         this._period = element.dataset.period;
+        this._offset = 0;
+        this._render();
+      });
+    });
+    // The arrows: a period back or forward; the dates between them return to
+    // the current period.
+    root.querySelectorAll("[data-browse]").forEach((element) => {
+      element.addEventListener("click", () => {
+        const step = element.dataset.browse;
+        const next = step === "now" ? 0 : Math.max(0, (this._offset || 0) + Number(step));
+        if (next === this._offset) return;
+        this._offset = next;
         this._render();
       });
     });
