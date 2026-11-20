@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.0-beta.2
+
+- **Showroom easier to read:** at night the pills are light glass with white values and a rim instead of dark on dark, and a little larger in the showroom scene by day too. The flows that carry power are thicker and glow more; the idle routes are a faint line instead of a white streak across the house. The battery's pill sits under the battery cabinet and says what it is ("55% battery −1.32 kW") instead of floating at the side.
+
 ## 2.2.0-beta.1
 
 - **Showroom scene for Diorama** ([#150](https://github.com/gratak/solar-flow-card/issues/150)): `diorama_style: showroom` replaces the drawn scene with a rendered modern house with a solar roof, a home battery and a power line, in the style of an EV maker's app. By day on a light studio background, at night (and with `dark_mode`) on a dark one with lit windows. The flows glow over the picture: from the roof, along the battery's wall, along the power line and to the car on the driveway; the pills keep their places. The two pictures add about 26 KB to the card. In the editor under Appearance → Scene. The drawn scene stays the default.

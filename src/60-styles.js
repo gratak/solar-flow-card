@@ -481,15 +481,21 @@ const THEME_CSS = {
     .dio-scene.showroom { aspect-ratio: 2000 / 1342; background: #f5f5f5; }
     .dio-scene.showroom.night { background: #18191d; }
     .dio-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-    .dio-scene.showroom .sfc-flow { filter: drop-shadow(0 0 3px currentColor); }
-    .dio-scene.showroom .sfc-flow-base { stroke: rgba(255,255,255,.18); }
-    .dio-scene.showroom.day .sfc-flow-base { stroke: rgba(30,40,55,.08); }
+    /* Flows: the idle routes barely there, the live ones thicker and glowing. */
+    .dio-scene.showroom { --sfc-flow-w: 5; }
+    .dio-scene.showroom .sfc-flow { filter: drop-shadow(0 0 4px currentColor) drop-shadow(0 0 8px currentColor); }
+    .dio-scene.showroom .sfc-flow-base { stroke: rgba(255,255,255,.06); stroke-width: 2.5; }
+    .dio-scene.showroom.day .sfc-flow-base { stroke: rgba(30,40,55,.07); }
+    /* Pills a little larger than in the drawn scene. */
+    .dio-scene.showroom .dio-pill { font-size: clamp(11px, 2.8cqw, 15px); padding: 7px 13px 7px 10px; }
+    .dio-scene.showroom .dio-pill small { font-size: .82em; }
     .dio-scene.showroom.day .dio-title { color: #1d2733; text-shadow: none; }
     .dio-scene.showroom.day .dio-title .sfc-badge { --sfc-badge-bg: rgba(30,40,55,.07); --sfc-badge-text: #1d2733; }
     .dio-scene.showroom.day .dio-clock { background: rgba(30,40,55,.07); color: #1d2733; }
     .dio-scene.showroom .dio-cloud, .dio-scene.showroom .dio-flash { display: none; }
-    .dio-scene.showroom.night .dio-pill { background: rgba(28,32,40,.82); color: #e6edf5; box-shadow: 0 6px 18px rgba(0,0,0,.45); backdrop-filter: blur(6px); }
-    .dio-scene.showroom.night .dio-pill small { color: #93a4b8; }
+    /* At night: light glass pills with a rim, white values. */
+    .dio-scene.showroom.night .dio-pill { background: rgba(255,255,255,.16); color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.22), 0 8px 22px rgba(0,0,0,.45); backdrop-filter: blur(10px); }
+    .dio-scene.showroom.night .dio-pill small { color: rgba(255,255,255,.72); }
     .dio-title { position: absolute; left: 4%; top: 4.5%; color: #fff; text-shadow: 0 1px 8px rgba(20,60,100,.35); }
     .dio-title h1 { margin: 0 0 4px; font-size: clamp(18px, 4.6cqw, 26px); font-weight: 800; }
     .dio-title .sfc-badge { --sfc-badge-bg: rgba(255,255,255,.28); --sfc-badge-text: #fff; text-shadow: none; backdrop-filter: blur(6px); }
