@@ -2,6 +2,7 @@
 
 ## 2.1.0-beta.12
 
+- **Spanish:** a full Spanish translation, thanks to @PedroFlores199 ([#146](https://github.com/gratak/solar-flow-card/pull/146)). Home Assistant set to any Spanish (Spain, Mexico, Argentina…) uses it automatically.
 - **Browse earlier periods:** arrows under the period tabs step back and forward: a day at a time in 24H (with that day's power chart), three days or a week at a time, a month at a time, a year at a time. The dates of the period shown sit between the arrows; a click on them returns to the current period, as does choosing another tab. The tiles, the chart, the savings and the costs follow the period shown. `period_browse: false` hides the arrows; also in the editor under Look → Period tabs.
 
 ## 2.1.0-beta.11

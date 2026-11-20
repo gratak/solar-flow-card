@@ -119,7 +119,7 @@ co2_factor: 0.7
 |---|---|---|
 | `theme` | `diorama` | `diorama`, `aurora`, `paper`, `lcars`, `atlantis`, `expanse`, `foundation`, `galaxy`, `gate` or `reactor`. |
 | `title` | station name | Card title. |
-| `language` | Home Assistant language | `en`, `pl`, `nl` or `de`; also in the visual editor. |
+| `language` | Home Assistant language | `en`, `pl`, `nl`, `de`, `pt`, `fr` or `es`; also in the visual editor. |
 | `background` | – | `glass`: a translucent, blurred card that lets the dashboard view's background image show through (light glass in Diorama and Paper, dark in the other themes). Also in the editor. |
 | `wide` | `false` | Wide layout for a wide dashboard (a panel view or a full-width section): the main view and the chart side by side, every section open below in columns, inverter details included. Below about 880 px of card width the card stays compact. Also in the editor. |
 | `show_insights` | with `wide` | "Today at a glance" (solar and consumption peaks with their time, the battery's range today, battery cycles, time without the grid) and a comparison of today with yesterday, the 7-day average and this month. Shown in the wide layout; `true` shows it in the compact layout too, `false` hides it. Also in the editor. |
@@ -518,7 +518,7 @@ Planned. Ideas and votes are welcome in [issues](https://github.com/gratak/solar
 
 ## Translations
 
-The card speaks English, Polish, Dutch (thanks to @furian88), German (thanks to @AndiBo62), European Portuguese (thanks to @dresende; Home Assistant set to Brazilian Portuguese uses it too) and French (thanks to @lboue). Every language is one JSON file in [`translations/`](translations/); adding yours takes a copy of `en.json` and no programming. See [CONTRIBUTING.md](CONTRIBUTING.md#add-or-improve-a-translation).
+The card speaks English, Polish, Dutch (thanks to @furian88), German (thanks to @AndiBo62), European Portuguese (thanks to @dresende; Home Assistant set to Brazilian Portuguese uses it too), French (thanks to @lboue) and Spanish (thanks to @PedroFlores199). Every language is one JSON file in [`translations/`](translations/); adding yours takes a copy of `en.json` and no programming. See [CONTRIBUTING.md](CONTRIBUTING.md#add-or-improve-a-translation).
 
 ## Development
 
