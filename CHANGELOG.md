@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0-beta.12
+
+- **Browse earlier periods:** arrows under the period tabs step back and forward: a day at a time in 24H (with that day's power chart), three days or a week at a time, a month at a time, a year at a time. The dates of the period shown sit between the arrows; a click on them returns to the current period, as does choosing another tab. The tiles, the chart, the savings and the costs follow the period shown. `period_browse: false` hides the arrows; also in the editor under Look → Period tabs.
+
 ## 2.1.0-beta.11
 
 - **Purchase price from a market price sensor:** for a dynamic tariff in any country, `price_import` can be a market price sensor (spot, Nord Pool, ENTSO-E, RCE…) with what the tariff adds: `price_import_add` per kWh (margin, distribution, taxes) and `price_import_multiplier` (e.g. VAT). The purchase price is (price + surcharge) × multiplier, hour by hour, also in the price chart. The purchase price sensor can now be chosen in the editor with every settlement (net-billing and net-metering too), with both fields beside it.

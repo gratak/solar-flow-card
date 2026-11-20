@@ -971,24 +971,42 @@ function pvForecastNote(m) {
 }
 
 // Long-term statistics query for a period other than today.
-function statsSpec(period) {
+// The statistics behind a period. `offset` steps back by whole periods
+// (browsing with the arrows): a day, three days, a week, a month or a year;
+// a period in the past has an end.
+function statsSpec(period, offset = 0) {
   const now = new Date();
-  if (period === "3d") return { period, start: startOfDay(addDays(now, -2)), statPeriod: "day", ttl: 15 * 60000 };
-  if (period === "7d") return { period, start: startOfDay(addDays(now, -6)), statPeriod: "day", ttl: 15 * 60000 };
-  if (period === "month") {
-    const start = startOfDay(now);
-    start.setDate(1);
-    return { period, start, statPeriod: "day", ttl: 15 * 60000 };
+  const k = Math.max(0, Math.round(Number(offset)) || 0);
+  const span = (start, days) => ({ start, end: k ? addDays(start, days) : undefined });
+  if (period === "today") return { period, ...span(startOfDay(addDays(now, -k)), 1), statPeriod: "hour", ttl: k ? 60 * 60000 : 5 * 60000 };
+  if (period === "3d") return { period, ...span(startOfDay(addDays(now, -2 - 3 * k)), 3), statPeriod: "day", ttl: k ? 60 * 60000 : 15 * 60000 };
+  if (period === "7d") return { period, ...span(startOfDay(addDays(now, -6 - 7 * k)), 7), statPeriod: "day", ttl: k ? 60 * 60000 : 15 * 60000 };
+  if (period === "month" || period === "last_month") {
+    // The previous month is the current one a month back, and always ended.
+    const back = k + (period === "last_month" ? 1 : 0);
+    const start = new Date(now.getFullYear(), now.getMonth() - back, 1);
+    const end = back ? new Date(now.getFullYear(), now.getMonth() - back + 1, 1) : undefined;
+    return { period, start, end, statPeriod: "day", ttl: back ? 60 * 60000 : 15 * 60000 };
   }
-  if (period === "last_month") {
-    // The whole previous month: it has an end.
-    const end = startOfDay(now);
-    end.setDate(1);
-    const start = new Date(end.getFullYear(), end.getMonth() - 1, 1);
-    return { period, start, end, statPeriod: "day", ttl: 60 * 60000 };
+  if (period === "year") {
+    const start = new Date(now.getFullYear() - k, 0, 1);
+    return { period, start, end: k ? new Date(now.getFullYear() - k + 1, 0, 1) : undefined, statPeriod: "month", ttl: 60 * 60000 };
   }
-  if (period === "year") return { period, start: new Date(now.getFullYear(), 0, 1), statPeriod: "month", ttl: 60 * 60000 };
   return { period, start: new Date(2015, 0, 1), statPeriod: "month", ttl: 60 * 60000 };
+}
+
+// The dates a period covers, for the line between the arrows.
+function periodRangeLabel(spec, locale) {
+  const last = addDays(spec.end || new Date(), spec.end ? -1 : 0);
+  const day = (d, opts) => d.toLocaleDateString(locale, opts);
+  if (spec.period === "today") return day(spec.start, { weekday: "short", day: "numeric", month: "short" });
+  if (spec.period === "3d" || spec.period === "7d") {
+    const sameMonth = spec.start.getMonth() === last.getMonth();
+    return `${day(spec.start, sameMonth ? { day: "numeric" } : { day: "numeric", month: "short" })} – ${day(last, { day: "numeric", month: "short", year: last.getFullYear() !== new Date().getFullYear() ? "numeric" : undefined })}`;
+  }
+  if (spec.period === "month" || spec.period === "last_month") return day(spec.start, { month: "long", year: "numeric" });
+  if (spec.period === "year") return String(spec.start.getFullYear());
+  return "";
 }
 
 async function loadStatistics(hass, spec, energy) {
@@ -1006,7 +1024,7 @@ async function loadStatistics(hass, spec, energy) {
   for (const [name, ids] of Object.entries(sources)) {
     for (const row of statRows(response, ids)) {
       const start = new Date(statStart(row.start));
-      const key = spec.statPeriod === "month" ? `${start.getFullYear()}-${start.getMonth()}` : start.toDateString();
+      const key = spec.statPeriod === "month" ? `${start.getFullYear()}-${start.getMonth()}` : spec.statPeriod === "hour" ? String(start.getTime()) : start.toDateString();
       const bucket = byKey.get(key) || { start };
       bucket[name] = Math.max(0, Number(row.change) || 0);
       byKey.set(key, bucket);
