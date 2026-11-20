@@ -1,5 +1,45 @@
 # Changelog
 
+## 2.1.0
+
+The biggest update since 2.0: a quick start in the editor, browsing earlier periods, time-of-use and dynamic tariffs, payback, and much more. Nothing to change when upgrading from 2.0.x: every new option is optional and in the visual editor. The details of each step are in the betas below.
+
+**Setup**
+- **Quick start:** for a new card the editor asks whether to use a three-step wizard (where the data comes from, prices, look) or the usual editor. DeyeCloud and Home Assistant's Energy dashboard are found automatically; for an inverter integration (Huawei Solar, SolarEdge, Fronius, GoodWe, Victron, Solarman and others) its sensors are proposed by their meaning.
+- **Works without configuration with the Energy dashboard:** without sensors of its own (or DeyeCloud), the card uses the ones set up under Settings → Dashboards → Energy.
+
+**Periods**
+- **Browse earlier periods:** arrows under the tabs step back a day (with that day's power chart), three days, a week, a month or a year. `period_browse: false` hides them.
+- **Period tabs of your choice** ([#119](https://github.com/gratak/solar-flow-card/issues/119)): `periods:` picks and orders the tabs, with two new ones: `last_month` and `year`.
+
+**Prices and money**
+- **Purchase prices by period:** for time-of-use tariffs, `price_import_periods` lists prices with their hours, days (working days, weekend) and months, as many as the tariff has; `holidays_as_weekend` counts Poland's public holidays as weekend days.
+- **Dynamic tariffs in any country:** a market price sensor (spot, Nord Pool, ENTSO-E, RCE…) as the purchase price, with `price_import_add` and `price_import_multiplier`: (price + surcharge) × multiplier, hour by hour.
+- **Payback** ([#124](https://github.com/gratak/solar-flow-card/issues/124)): `payback: { cost, saved_before }` shows how much of the system's cost the savings have paid back and when it will be paid off; hour by hour with changing prices.
+- **Costs:** `show_costs: true` adds the cost of the energy bought and the value of the energy sold.
+- **Cheapest hours:** the cheapest hours in a row among the coming ones (`price_window`) and coming negative prices.
+
+**Home and installation**
+- **Grid down** ([#140](https://github.com/gratak/solar-flow-card/issues/140)): with `grid_status` (automatic with DeyeCloud) the card shows "Grid down" instead of "Balanced".
+- **Grid guard:** `voltage_limit` marks a phase above 253 V; `main_fuse` shows each phase's share of the main fuse.
+- **Battery over the next day:** the charge level simulated hour by hour from the PV forecast and the home's usual consumption.
+- **Consumers:** where the home's power goes, device by device.
+- **Phase names** ([#136](https://github.com/gratak/solar-flow-card/issues/136)): `phase_names: [House, Garage, Pump]`.
+
+**Look**
+- **An electric car in Diorama** ([#126](https://github.com/gratak/solar-flow-card/issues/126)): `ev: { power, soc, name, color }`.
+- **Dark Diorama** ([#125](https://github.com/gratak/solar-flow-card/issues/125)): `dark_mode: true` or `auto`.
+- **Your colours:** `colors: { solar, load, grid, battery }`.
+- **Spanish:** thanks to @PedroFlores199 ([#146](https://github.com/gratak/solar-flow-card/pull/146)).
+
+**Automations**
+- **Blueprints for the solar surplus:** switch a device on with surplus, and charge the car from surplus; importable from the README.
+
+**Fixes**
+- Battery and grid power on the 24H and 3D charts with one-way sensors ([#120](https://github.com/gratak/solar-flow-card/issues/120)).
+- Narrow cards: period tabs, Diorama pills, LCARS readouts and folded headers no longer get cut.
+- The "Year ago" comparison column shows only with real data.
+
 ## 2.1.0-beta.12
 
 - **Spanish:** a full Spanish translation, thanks to @PedroFlores199 ([#146](https://github.com/gratak/solar-flow-card/pull/146)). Home Assistant set to any Spanish (Spain, Mexico, Argentina…) uses it automatically.
