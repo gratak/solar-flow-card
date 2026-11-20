@@ -120,7 +120,7 @@ function evCarSvg(night, color, charging, box = [244, 274, 84, 58.2]) {
     out += `<filter id="dio-ev-paint" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="${rgb[0] * k} 0 0 0 0  0 ${rgb[1] * k} 0 0 0  0 0 ${rgb[2] * k} 0 0  0 0 0 1 0"/></filter>`;
   }
   out += `<image href="${evCarImage()}" x="${x}" y="${y}" width="${w}" height="${h}" ${tint ? 'filter="url(#dio-ev-paint)"' : ""}/>`;
-  if (charging) out += `<circle cx="${x + w * 0.935}" cy="${y + h * 0.3}" r="2.2" fill="#2fd39a"/><circle cx="${x + w * 0.935}" cy="${y + h * 0.3}" r="4.6" fill="#2fd39a" opacity=".3"/>`;
+  if (charging) out += `<circle cx="${x + w * 0.935}" cy="${y + h * 0.3}" r="${(w * 0.026).toFixed(1)}" fill="#2fd39a"/><circle cx="${x + w * 0.935}" cy="${y + h * 0.3}" r="${(w * 0.055).toFixed(1)}" fill="#2fd39a" opacity=".3"/>`;
   return out;
 }
 
@@ -293,20 +293,57 @@ function showroomImage(kind) {
   return showroomUrls[kind];
 }
 
+// The showroom scene in the picture's own pixels (2000 × 1342), cropped to
+// the house: live flows as thin glowing lines with a running pulse, and each
+// value as a label tied by a fine line to a dot on what it measures.
+const SR_VIEW = [140, 30, 1720, 1312];
+
 function showroomScene(m, night) {
-  const L = m.live;
-  // From the picture's pixels to the drawing's units (520 wide).
-  const k = 520 / 2000;
-  const d = (path) => path.replace(/-?\d+(\.\d+)?/g, (n) => (Number(n) * k).toFixed(1));
-  let g = '<g fill="none" stroke-linecap="round">';
-  if (m.config.showSolar) g += flowPath(d("M1080 470 Q1150 620 1135 790"), L.solarActive, false, "pv");
-  if (m.config.showBattery) g += flowPath(d("M845 930 Q990 985 1120 905"), L.chargeActive || L.dischargeActive, L.chargeActive, "battery");
-  g += flowPath(d("M1683 388 Q1560 560 1412 566 Q1300 700 1150 830"), L.importActive || L.exportActive, L.exportActive, "grid");
-  if (m.ev) g += flowPath(d("M1165 905 Q1270 975 1370 960"), m.ev.charging, false, "load");
-  g += "</g>";
-  if (m.ev) g += evCarSvg(night, m.ev.color, m.ev.charging, [1330 * k, 805 * k, 380 * k, 264 * k]);
-  return `<img class="dio-photo" src="${showroomImage(night ? "night" : "day")}" alt="" aria-hidden="true">
-      <svg viewBox="0 0 520 349" aria-hidden="true">${g}</svg>`;
+  const { t, locale, live: L } = m;
+  const [X0, Y0, W, H] = SR_VIEW;
+  const pos = (x, y) => `left:${(((x - X0) / W) * 100).toFixed(2)}%;top:${(((y - Y0) / H) * 100).toFixed(2)}%`;
+  let flows = "";
+  let leads = "";
+  let tags = "";
+  // A route carrying power: a faint line and a pulse running the way it flows.
+  const flow = (cls, d, active, reverse) => {
+    if (!active) return;
+    flows += `<path class="sr-line ${cls}" d="${d}"/><path class="sr-pulse ${cls} ${reverse ? "rev" : ""}" d="${d}" pathLength="100" filter="url(#sr-glow)"/>`;
+  };
+  // A value: a dot on its element, a fine line, and the label.
+  const tag = (cls, [ex, ey], [ax, ay], align, label, value, note, entityId) => {
+    leads += `<path class="sr-lead" d="M${ex} ${ey} L${ax} ${ay}"/><circle class="sr-halo ${cls}" cx="${ex}" cy="${ey}" r="20"/><circle class="sr-dot ${cls}" cx="${ex}" cy="${ey}" r="8"/>`;
+    tags += `<button class="sr-tag ${cls} ${align}" style="${pos(ax, ay)}" ${entityAttr(entityId)}>
+        <small>${escapeHtml(label)}</small><b>${escapeHtml(value)}${note ? ` <em>${escapeHtml(note)}</em>` : ""}</b>
+      </button>`;
+  };
+  const hub = [1135, 900];
+  if (m.config.showSolar) {
+    flow("pv", "M1060 440 Q1150 620 1135 870", L.solarActive, false);
+    tag("pv", [1060, 440], [1000, 300], "up", t.solar, formatPower(L.solar, locale), "", m.ids.live.solar);
+  }
+  if (m.config.showBattery) {
+    flow("battery", "M840 935 Q990 990 1125 910", L.chargeActive || L.dischargeActive, L.chargeActive);
+    const note = L.dischargeActive ? `−${formatPower(L.discharge, locale)}` : L.chargeActive ? `+${formatPower(L.charge, locale)}` : t.idle.toLowerCase();
+    tag("battery", [815, 935], [650, 1000], "left", t.battery, formatPercent(L.soc, locale), note, batteryEntityId(m));
+  }
+  flow("grid", "M1683 392 Q1560 560 1412 566 Q1300 700 1140 880", L.importActive || L.exportActive, L.exportActive);
+  const gridValue = L.importActive ? L.gridImport : L.exportActive ? L.gridExport : Math.abs(L.grid);
+  tag("grid", [1683, 392], [1640, 372], "up", t.grid, formatPower(gridValue, locale), gridStatus(m).toLowerCase(), gridEntityId(m));
+  tag("load", hub, [980, 1105], "down", t.home, formatPower(L.load, locale), "", m.ids.live.load);
+  let car = "";
+  if (m.ev) {
+    flow("load", "M1150 910 Q1270 985 1400 960", m.ev.charging, false);
+    const value = m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle;
+    tag("load", [1520, 990], [1600, 1105], "down", m.ev.name || t.evCar, value, m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : "", m.ev.entityId);
+    car = evCarSvg(night, m.ev.color, m.ev.charging, [1330, 805, 380, 264]);
+  }
+  const svg = `<svg viewBox="${SR_VIEW.join(" ")}" aria-hidden="true">
+      <defs><filter id="sr-glow" filterUnits="userSpaceOnUse" x="0" y="0" width="2000" height="1342"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <image href="${showroomImage(night ? "night" : "day")}" x="0" y="0" width="2000" height="1342" preserveAspectRatio="none"/>
+      ${car}<g fill="none">${flows}</g><g>${leads}</g>
+    </svg>`;
+  return { svg, tags };
 }
 
 function renderDiorama(m) {
@@ -314,11 +351,9 @@ function renderDiorama(m) {
   const { svg, sky } = dioramaScene(m);
   const showroom = m.config.diorama_style === "showroom";
   const photoNight = showroom && (sky.phase === "night" || m.dark);
-  // The showroom picture is 2000 × 1342: its pills are placed in its pixels.
-  const [PW, PH] = showroom ? [2000, 1342] : [520, 360];
-  const at = (x, y, sx, sy) => (showroom ? [sx, sy] : [x, y]);
+  const room = showroom ? showroomScene(m, photoNight) : null;
   const pill = (x, y, cls, value, note, entityId) => `
-    <button class="dio-pill ${cls}" style="left:${((x / PW) * 100).toFixed(1)}%;top:${((y / PH) * 100).toFixed(1)}%" ${entityAttr(entityId)}>
+    <button class="dio-pill ${cls}" style="left:${((x / 520) * 100).toFixed(1)}%;top:${((y / 360) * 100).toFixed(1)}%" ${entityAttr(entityId)}>
       <i class="${cls}"></i>${escapeHtml(value)} <small>${escapeHtml(note)}</small>
     </button>`;
   const batteryNote = live.dischargeActive ? `−${formatPower(live.discharge, locale)}` : live.chargeActive ? `+${formatPower(live.charge, locale)}` : t.idle;
@@ -339,15 +374,16 @@ function renderDiorama(m) {
   const showShare = Boolean(shares) && sectionShown(m, "sources");
   return `
     ${sectionShown(m, "flow") ? `<div class="dio-scene ${showroom ? `showroom ${photoNight ? "night" : "day"}` : ""}" style="--sky-a:${sky.sky[0]};--sky-b:${sky.sky[1]}">
-      ${showroom ? showroomScene(m, photoNight) : `<svg viewBox="0 0 520 360" aria-hidden="true">${svg}</svg>`}
-      <div class="dio-title"><h1>${escapeHtml(m.name)}</h1>${liveBadge(m)}</div>
-      <div class="dio-clock">${escapeHtml(clockText(m))}${isNum(m.weather?.temperature) ? ` <button class="dio-temp" ${entityAttr(m.weather.entityId)}>${escapeHtml(`${formatNumber(m.weather.temperature, locale, 0)}${m.weather.unit}`)}</button>` : ""}</div>
-      ${m.config.showSolar ? pill(...at(288, 78, 640, 90), "pv", formatPower(live.solar, locale), t.fromRoof, m.ids.live.solar) : ""}
-      ${m.config.showBattery ? pill(...at(22, 208, 300, 1000), "battery", formatPercent(live.soc, locale), showroom ? `${t.battery.toLowerCase()} ${batteryNote}` : batteryNote, batteryEntityId(m)) : ""}
-      ${pill(...at(378, 240, 1560, 640), "grid", formatPower(gridValue, locale), live.gridOff ? t.gridOff.toLowerCase() : `${live.exportActive ? "↑ " : live.importActive ? "↓ " : ""}${t.grid.toLowerCase()}`, gridEntityId(m))}
-      ${pill(...at(m.ev ? 70 : 120, 296, m.ev ? 300 : 520, 1170), "load", formatPower(live.load, locale), t.inHome, m.ids.live.load)}
-      ${m.ev ? pill(...at(342, 294, 1460, 1170), "load", m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle,
-        m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : m.ev.name || t.evCar, m.ev.entityId) : ""}
+      ${room ? room.svg : `<svg viewBox="0 0 520 360" aria-hidden="true">${svg}</svg>`}
+      ${room ? '<div class="dio-head">' : ""}<div class="dio-title"><h1>${escapeHtml(m.name)}</h1>${liveBadge(m)}</div>
+      <div class="dio-clock">${escapeHtml(clockText(m))}${isNum(m.weather?.temperature) ? ` <button class="dio-temp" ${entityAttr(m.weather.entityId)}>${escapeHtml(`${formatNumber(m.weather.temperature, locale, 0)}${m.weather.unit}`)}</button>` : ""}</div>${room ? "</div>" : ""}
+      ${room ? room.tags : `
+      ${m.config.showSolar ? pill(288, 78, "pv", formatPower(live.solar, locale), t.fromRoof, m.ids.live.solar) : ""}
+      ${m.config.showBattery ? pill(22, 208, "battery", formatPercent(live.soc, locale), batteryNote, batteryEntityId(m)) : ""}
+      ${pill(378, 240, "grid", formatPower(gridValue, locale), live.gridOff ? t.gridOff.toLowerCase() : `${live.exportActive ? "↑ " : live.importActive ? "↓ " : ""}${t.grid.toLowerCase()}`, gridEntityId(m))}
+      ${pill(m.ev ? 70 : 120, 296, "load", formatPower(live.load, locale), t.inHome, m.ids.live.load)}
+      ${m.ev ? pill(342, 294, "load", m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle,
+        m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : m.ev.name || t.evCar, m.ev.entityId) : ""}`}
     </div>` : ""}
     ${showChips || showShare ? `<div class="dio-bottom">
       ${showChips ? `<div class="dio-chips">

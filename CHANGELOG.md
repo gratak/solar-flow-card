@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.2.0-beta.3
+
+- **Showroom redesigned, closer to an EV maker's app:**
+  - Flows are thin glowing lines with a pulse of light running the way the power flows, shown only while power flows; no more dotted lines or faint idle streaks.
+  - The pills are replaced by labels: the name in the element's colour above a large value, tied by a fine line to a dot on what it measures (the roof, the battery cabinet, the pole, the house, the car), so it is clear which value belongs where.
+  - The picture is cropped to the house, so the house is larger; the clock moves under the title.
+  - Labels stay readable in every combination of day/night and a light or dark card.
+
 ## 2.2.0-beta.2
 
 - **Showroom easier to read:** at night the pills are light glass with white values and a rim instead of dark on dark, and a little larger in the showroom scene by day too. The flows that carry power are thicker and glow more; the idle routes are a faint line instead of a white streak across the house. The battery's pill sits under the battery cabinet and says what it is ("55% battery −1.32 kW") instead of floating at the side.

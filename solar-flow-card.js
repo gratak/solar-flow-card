@@ -38,7 +38,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "2.2.0-beta.2";
+const CARD_VERSION = "2.2.0-beta.3";
 // The card's type is custom:home-energy-hub since 2.0.0. The old name stays
 // registered so dashboards with custom:solar-flow-card keep working.
 const CARD_TAG = "home-energy-hub";
@@ -7563,7 +7563,7 @@ function evCarSvg(night, color, charging, box = [244, 274, 84, 58.2]) {
     out += `<filter id="dio-ev-paint" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="${rgb[0] * k} 0 0 0 0  0 ${rgb[1] * k} 0 0 0  0 0 ${rgb[2] * k} 0 0  0 0 0 1 0"/></filter>`;
   }
   out += `<image href="${evCarImage()}" x="${x}" y="${y}" width="${w}" height="${h}" ${tint ? 'filter="url(#dio-ev-paint)"' : ""}/>`;
-  if (charging) out += `<circle cx="${x + w * 0.935}" cy="${y + h * 0.3}" r="2.2" fill="#2fd39a"/><circle cx="${x + w * 0.935}" cy="${y + h * 0.3}" r="4.6" fill="#2fd39a" opacity=".3"/>`;
+  if (charging) out += `<circle cx="${x + w * 0.935}" cy="${y + h * 0.3}" r="${(w * 0.026).toFixed(1)}" fill="#2fd39a"/><circle cx="${x + w * 0.935}" cy="${y + h * 0.3}" r="${(w * 0.055).toFixed(1)}" fill="#2fd39a" opacity=".3"/>`;
   return out;
 }
 
@@ -7736,20 +7736,57 @@ function showroomImage(kind) {
   return showroomUrls[kind];
 }
 
+// The showroom scene in the picture's own pixels (2000 × 1342), cropped to
+// the house: live flows as thin glowing lines with a running pulse, and each
+// value as a label tied by a fine line to a dot on what it measures.
+const SR_VIEW = [140, 30, 1720, 1312];
+
 function showroomScene(m, night) {
-  const L = m.live;
-  // From the picture's pixels to the drawing's units (520 wide).
-  const k = 520 / 2000;
-  const d = (path) => path.replace(/-?\d+(\.\d+)?/g, (n) => (Number(n) * k).toFixed(1));
-  let g = '<g fill="none" stroke-linecap="round">';
-  if (m.config.showSolar) g += flowPath(d("M1080 470 Q1150 620 1135 790"), L.solarActive, false, "pv");
-  if (m.config.showBattery) g += flowPath(d("M845 930 Q990 985 1120 905"), L.chargeActive || L.dischargeActive, L.chargeActive, "battery");
-  g += flowPath(d("M1683 388 Q1560 560 1412 566 Q1300 700 1150 830"), L.importActive || L.exportActive, L.exportActive, "grid");
-  if (m.ev) g += flowPath(d("M1165 905 Q1270 975 1370 960"), m.ev.charging, false, "load");
-  g += "</g>";
-  if (m.ev) g += evCarSvg(night, m.ev.color, m.ev.charging, [1330 * k, 805 * k, 380 * k, 264 * k]);
-  return `<img class="dio-photo" src="${showroomImage(night ? "night" : "day")}" alt="" aria-hidden="true">
-      <svg viewBox="0 0 520 349" aria-hidden="true">${g}</svg>`;
+  const { t, locale, live: L } = m;
+  const [X0, Y0, W, H] = SR_VIEW;
+  const pos = (x, y) => `left:${(((x - X0) / W) * 100).toFixed(2)}%;top:${(((y - Y0) / H) * 100).toFixed(2)}%`;
+  let flows = "";
+  let leads = "";
+  let tags = "";
+  // A route carrying power: a faint line and a pulse running the way it flows.
+  const flow = (cls, d, active, reverse) => {
+    if (!active) return;
+    flows += `<path class="sr-line ${cls}" d="${d}"/><path class="sr-pulse ${cls} ${reverse ? "rev" : ""}" d="${d}" pathLength="100" filter="url(#sr-glow)"/>`;
+  };
+  // A value: a dot on its element, a fine line, and the label.
+  const tag = (cls, [ex, ey], [ax, ay], align, label, value, note, entityId) => {
+    leads += `<path class="sr-lead" d="M${ex} ${ey} L${ax} ${ay}"/><circle class="sr-halo ${cls}" cx="${ex}" cy="${ey}" r="20"/><circle class="sr-dot ${cls}" cx="${ex}" cy="${ey}" r="8"/>`;
+    tags += `<button class="sr-tag ${cls} ${align}" style="${pos(ax, ay)}" ${entityAttr(entityId)}>
+        <small>${escapeHtml(label)}</small><b>${escapeHtml(value)}${note ? ` <em>${escapeHtml(note)}</em>` : ""}</b>
+      </button>`;
+  };
+  const hub = [1135, 900];
+  if (m.config.showSolar) {
+    flow("pv", "M1060 440 Q1150 620 1135 870", L.solarActive, false);
+    tag("pv", [1060, 440], [1000, 300], "up", t.solar, formatPower(L.solar, locale), "", m.ids.live.solar);
+  }
+  if (m.config.showBattery) {
+    flow("battery", "M840 935 Q990 990 1125 910", L.chargeActive || L.dischargeActive, L.chargeActive);
+    const note = L.dischargeActive ? `−${formatPower(L.discharge, locale)}` : L.chargeActive ? `+${formatPower(L.charge, locale)}` : t.idle.toLowerCase();
+    tag("battery", [815, 935], [650, 1000], "left", t.battery, formatPercent(L.soc, locale), note, batteryEntityId(m));
+  }
+  flow("grid", "M1683 392 Q1560 560 1412 566 Q1300 700 1140 880", L.importActive || L.exportActive, L.exportActive);
+  const gridValue = L.importActive ? L.gridImport : L.exportActive ? L.gridExport : Math.abs(L.grid);
+  tag("grid", [1683, 392], [1640, 372], "up", t.grid, formatPower(gridValue, locale), gridStatus(m).toLowerCase(), gridEntityId(m));
+  tag("load", hub, [980, 1105], "down", t.home, formatPower(L.load, locale), "", m.ids.live.load);
+  let car = "";
+  if (m.ev) {
+    flow("load", "M1150 910 Q1270 985 1400 960", m.ev.charging, false);
+    const value = m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle;
+    tag("load", [1520, 990], [1600, 1105], "down", m.ev.name || t.evCar, value, m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : "", m.ev.entityId);
+    car = evCarSvg(night, m.ev.color, m.ev.charging, [1330, 805, 380, 264]);
+  }
+  const svg = `<svg viewBox="${SR_VIEW.join(" ")}" aria-hidden="true">
+      <defs><filter id="sr-glow" filterUnits="userSpaceOnUse" x="0" y="0" width="2000" height="1342"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <image href="${showroomImage(night ? "night" : "day")}" x="0" y="0" width="2000" height="1342" preserveAspectRatio="none"/>
+      ${car}<g fill="none">${flows}</g><g>${leads}</g>
+    </svg>`;
+  return { svg, tags };
 }
 
 function renderDiorama(m) {
@@ -7757,11 +7794,9 @@ function renderDiorama(m) {
   const { svg, sky } = dioramaScene(m);
   const showroom = m.config.diorama_style === "showroom";
   const photoNight = showroom && (sky.phase === "night" || m.dark);
-  // The showroom picture is 2000 × 1342: its pills are placed in its pixels.
-  const [PW, PH] = showroom ? [2000, 1342] : [520, 360];
-  const at = (x, y, sx, sy) => (showroom ? [sx, sy] : [x, y]);
+  const room = showroom ? showroomScene(m, photoNight) : null;
   const pill = (x, y, cls, value, note, entityId) => `
-    <button class="dio-pill ${cls}" style="left:${((x / PW) * 100).toFixed(1)}%;top:${((y / PH) * 100).toFixed(1)}%" ${entityAttr(entityId)}>
+    <button class="dio-pill ${cls}" style="left:${((x / 520) * 100).toFixed(1)}%;top:${((y / 360) * 100).toFixed(1)}%" ${entityAttr(entityId)}>
       <i class="${cls}"></i>${escapeHtml(value)} <small>${escapeHtml(note)}</small>
     </button>`;
   const batteryNote = live.dischargeActive ? `−${formatPower(live.discharge, locale)}` : live.chargeActive ? `+${formatPower(live.charge, locale)}` : t.idle;
@@ -7782,15 +7817,16 @@ function renderDiorama(m) {
   const showShare = Boolean(shares) && sectionShown(m, "sources");
   return `
     ${sectionShown(m, "flow") ? `<div class="dio-scene ${showroom ? `showroom ${photoNight ? "night" : "day"}` : ""}" style="--sky-a:${sky.sky[0]};--sky-b:${sky.sky[1]}">
-      ${showroom ? showroomScene(m, photoNight) : `<svg viewBox="0 0 520 360" aria-hidden="true">${svg}</svg>`}
-      <div class="dio-title"><h1>${escapeHtml(m.name)}</h1>${liveBadge(m)}</div>
-      <div class="dio-clock">${escapeHtml(clockText(m))}${isNum(m.weather?.temperature) ? ` <button class="dio-temp" ${entityAttr(m.weather.entityId)}>${escapeHtml(`${formatNumber(m.weather.temperature, locale, 0)}${m.weather.unit}`)}</button>` : ""}</div>
-      ${m.config.showSolar ? pill(...at(288, 78, 640, 90), "pv", formatPower(live.solar, locale), t.fromRoof, m.ids.live.solar) : ""}
-      ${m.config.showBattery ? pill(...at(22, 208, 300, 1000), "battery", formatPercent(live.soc, locale), showroom ? `${t.battery.toLowerCase()} ${batteryNote}` : batteryNote, batteryEntityId(m)) : ""}
-      ${pill(...at(378, 240, 1560, 640), "grid", formatPower(gridValue, locale), live.gridOff ? t.gridOff.toLowerCase() : `${live.exportActive ? "↑ " : live.importActive ? "↓ " : ""}${t.grid.toLowerCase()}`, gridEntityId(m))}
-      ${pill(...at(m.ev ? 70 : 120, 296, m.ev ? 300 : 520, 1170), "load", formatPower(live.load, locale), t.inHome, m.ids.live.load)}
-      ${m.ev ? pill(...at(342, 294, 1460, 1170), "load", m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle,
-        m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : m.ev.name || t.evCar, m.ev.entityId) : ""}
+      ${room ? room.svg : `<svg viewBox="0 0 520 360" aria-hidden="true">${svg}</svg>`}
+      ${room ? '<div class="dio-head">' : ""}<div class="dio-title"><h1>${escapeHtml(m.name)}</h1>${liveBadge(m)}</div>
+      <div class="dio-clock">${escapeHtml(clockText(m))}${isNum(m.weather?.temperature) ? ` <button class="dio-temp" ${entityAttr(m.weather.entityId)}>${escapeHtml(`${formatNumber(m.weather.temperature, locale, 0)}${m.weather.unit}`)}</button>` : ""}</div>${room ? "</div>" : ""}
+      ${room ? room.tags : `
+      ${m.config.showSolar ? pill(288, 78, "pv", formatPower(live.solar, locale), t.fromRoof, m.ids.live.solar) : ""}
+      ${m.config.showBattery ? pill(22, 208, "battery", formatPercent(live.soc, locale), batteryNote, batteryEntityId(m)) : ""}
+      ${pill(378, 240, "grid", formatPower(gridValue, locale), live.gridOff ? t.gridOff.toLowerCase() : `${live.exportActive ? "↑ " : live.importActive ? "↓ " : ""}${t.grid.toLowerCase()}`, gridEntityId(m))}
+      ${pill(m.ev ? 70 : 120, 296, "load", formatPower(live.load, locale), t.inHome, m.ids.live.load)}
+      ${m.ev ? pill(342, 294, "load", m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle,
+        m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : m.ev.name || t.evCar, m.ev.entityId) : ""}`}
     </div>` : ""}
     ${showChips || showShare ? `<div class="dio-bottom">
       ${showChips ? `<div class="dio-chips">
@@ -9154,10 +9190,10 @@ const BASE_CSS = `
   .sfc-phase.import { --sfc-c: var(--sfc-bad, #f0524a); }
   /* The grid's status in the themes' flow views. */
   ha-card.grid-export :is(.aur-node, .atl-label, .exp-box, .fnd-node, .gal-readout, .rx-node).grid > :is(em, small:last-child),
-  ha-card.grid-export :is(.gt-row.grid em, .dio-pill.grid small) { color: var(--sfc-good, #3fb950); }
+  ha-card.grid-export :is(.gt-row.grid em, .dio-pill.grid small, .sr-tag.grid em) { color: var(--sfc-good, #3fb950); }
   ha-card.grid-import :is(.aur-node, .atl-label, .exp-box, .fnd-node, .gal-readout, .rx-node).grid > :is(em, small:last-child),
-  ha-card.grid-off :is(.gt-row.grid em, .dio-pill.grid small) { color: var(--sfc-bad, #f0524a); }
-  ha-card.grid-import :is(.gt-row.grid em, .dio-pill.grid small) { color: var(--sfc-bad, #f0524a); }
+  ha-card.grid-off :is(.gt-row.grid em, .dio-pill.grid small, .sr-tag.grid em) { color: var(--sfc-bad, #f0524a); }
+  ha-card.grid-import :is(.gt-row.grid em, .dio-pill.grid small, .sr-tag.grid em) { color: var(--sfc-bad, #f0524a); }
   .sfc-bank + .sfc-phases { margin-top: 8px; }
   .sfc-phase.sfc-inv i { --sfc-c: var(--sfc-pv); }
   .sfc-bat { --sfc-c: var(--sfc-battery); }
@@ -9191,6 +9227,7 @@ const BASE_CSS = `
   /* Reduced motion: flows keep moving, slower; decorative effects stop. */
   @media (prefers-reduced-motion: reduce) {
     .sfc-flow { animation-duration: calc(var(--sfc-dash-time, 18s) * 3); }
+    .sr-pulse { animation-duration: 7s; }
     .atl-pulse, .aur-ring, .lc-track i, .lc-status, .exp-spin, .fnd-orbit, .fnd-sphere, .gal-warp, .gal-target, .gal-cross,
     .dio-cloud, .dio-star, .dio-glow, .dio-rain line, .dio-snow circle, .dio-fog rect, .dio-flash, .gt-ripples circle, .gt-glyphs, .gt-status, .gt-chevron-light,
     .rx-ticks, .rx-seg, .rx-holes rect, .rx-arcs, .rx-core, .rx-halo, .rx-rays, .rx-star, .rx-sun, .rx-fog > *, .rx-rain line, .rx-drops g, .rx-snow circle, .rx-flash, .rx-mode, .boot :is(.rx-frame, .rx-reactor, .rx-boot-ticks, .rx-gauge, .rx-node, .rx-inv, .rx-gtext), .boot .rx-scan p, .rx-bootseg path { animation: none !important; }
@@ -9212,11 +9249,6 @@ const FIT_CSS = `
   @container (max-width: 290px) { .sfc-phase { padding: 8px 6px; } .sfc-phase strong { font-size: 13px; letter-spacing: 0; } }
   /* The narrowest Diorama: the house pills show their values only. */
   @container (max-width: 340px) { .dio-pill.load small { display: none; } }
-  /* The showroom picture leaves less room for the pills: values only below the house. */
-  @container (max-width: 420px) {
-    .dio-scene.showroom .dio-pill.load small { display: none; }
-    .dio-scene.showroom .dio-pill.pv { top: 19% !important; }
-  }
   @container (max-width: 225px) { .sfc-phase { padding: 7px 4px; } .sfc-phase strong { font-size: 11px; letter-spacing: -.02em; } .sfc-phase small { font-size: 10px; } }
   /* The forecast days share their columns, so the widest day name fits. */
   @supports (grid-template-columns: subgrid) {
@@ -9301,25 +9333,40 @@ const THEME_CSS = {
     }
     .dio-scene { position: relative; aspect-ratio: 520 / 360; background: linear-gradient(180deg, var(--sky-a) 0%, var(--sky-b) 70%); }
     .dio-scene svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-    /* Showroom style: the rendered house fills the scene, flows glow on it. */
-    .dio-scene.showroom { aspect-ratio: 2000 / 1342; background: #f5f5f5; }
+    /* Showroom style: a rendered house; live flows as thin glowing lines with a
+       running pulse; each value a label tied to a dot on its element. */
+    .dio-scene.showroom { aspect-ratio: 1720 / 1312; background: #f5f5f5; }
     .dio-scene.showroom.night { background: #18191d; }
-    .dio-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-    /* Flows: the idle routes barely there, the live ones thicker and glowing. */
-    .dio-scene.showroom { --sfc-flow-w: 5; }
-    .dio-scene.showroom .sfc-flow { filter: drop-shadow(0 0 4px currentColor) drop-shadow(0 0 8px currentColor); }
-    .dio-scene.showroom .sfc-flow-base { stroke: rgba(255,255,255,.06); stroke-width: 2.5; }
-    .dio-scene.showroom.day .sfc-flow-base { stroke: rgba(30,40,55,.07); }
-    /* Pills a little larger than in the drawn scene. */
-    .dio-scene.showroom .dio-pill { font-size: clamp(11px, 2.8cqw, 15px); padding: 7px 13px 7px 10px; }
-    .dio-scene.showroom .dio-pill small { font-size: .82em; }
+    .dio-scene.showroom .pv { --sr-c: var(--sfc-pv); } .dio-scene.showroom .battery { --sr-c: var(--sfc-battery); }
+    .dio-scene.showroom .grid { --sr-c: var(--sfc-grid); } .dio-scene.showroom .load { --sr-c: var(--sfc-load); }
+    .sr-line { fill: none; stroke: var(--sr-c); stroke-width: 1.5px; vector-effect: non-scaling-stroke; opacity: .5; }
+    .sr-pulse { fill: none; stroke: var(--sr-c); stroke-width: 3px; vector-effect: non-scaling-stroke; stroke-linecap: round;
+      stroke-dasharray: 9 41; animation: sr-run 2.4s linear infinite; }
+    .sr-pulse.rev { animation-direction: reverse; }
+    @keyframes sr-run { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -50; } }
+    .sr-lead { fill: none; stroke: rgba(255,255,255,.38); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+    .sr-dot { fill: var(--sr-c); stroke: rgba(255,255,255,.85); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+    .sr-halo { fill: var(--sr-c); opacity: .22; }
+    .day .sr-lead { stroke: rgba(20,30,45,.32); }
+    .day .sr-dot { stroke: #fff; }
+    .dio-scene.showroom .sr-tag { position: absolute; display: grid; gap: 1px; padding: 0; border: 0; background: none; color: #fff; font: inherit; cursor: pointer;
+      white-space: nowrap; text-shadow: 0 1px 10px rgba(0,0,0,.65); }
+    .sr-tag.up { transform: translate(-50%, -100%); text-align: center; justify-items: center; }
+    .sr-tag.down { transform: translate(-50%, 4px); text-align: center; justify-items: center; }
+    .sr-tag.left { transform: translate(calc(-100% - 6px), -50%); text-align: right; justify-items: end; }
+    .sr-tag small { color: var(--sr-c); font-size: clamp(9px, 2.3cqw, 11px); font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+    .sr-tag b { font-size: clamp(16px, 4.6cqw, 24px); font-weight: 600; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+    .sr-tag em { font-style: normal; font-size: .6em; font-weight: 500; opacity: .78; letter-spacing: 0; }
+    .dio-scene.showroom.day .sr-tag { color: #17202b; text-shadow: 0 1px 8px rgba(255,255,255,.9); }
+    .no-anim .sr-pulse { animation: none; }
     .dio-scene.showroom.day .dio-title { color: #1d2733; text-shadow: none; }
     .dio-scene.showroom.day .dio-title .sfc-badge { --sfc-badge-bg: rgba(30,40,55,.07); --sfc-badge-text: #1d2733; }
     .dio-scene.showroom.day .dio-clock { background: rgba(30,40,55,.07); color: #1d2733; }
     .dio-scene.showroom .dio-cloud, .dio-scene.showroom .dio-flash { display: none; }
-    /* At night: light glass pills with a rim, white values. */
-    .dio-scene.showroom.night .dio-pill { background: rgba(255,255,255,.16); color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.22), 0 8px 22px rgba(0,0,0,.45); backdrop-filter: blur(10px); }
-    .dio-scene.showroom.night .dio-pill small { color: rgba(255,255,255,.72); }
+    /* The clock under the title: the corner above the pole is the grid's label. */
+    .dio-scene.showroom .dio-clock { right: auto; left: 4%; top: auto; bottom: auto; margin-top: 6px; position: static; display: inline-block; }
+    .dio-scene.showroom .dio-head { position: absolute; left: 4%; top: 4.5%; display: grid; justify-items: start; gap: 6px; }
+    .dio-scene.showroom .dio-head .dio-title { position: static; }
     .dio-title { position: absolute; left: 4%; top: 4.5%; color: #fff; text-shadow: 0 1px 8px rgba(20,60,100,.35); }
     .dio-title h1 { margin: 0 0 4px; font-size: clamp(18px, 4.6cqw, 26px); font-weight: 800; }
     .dio-title .sfc-badge { --sfc-badge-bg: rgba(255,255,255,.28); --sfc-badge-text: #fff; text-shadow: none; backdrop-filter: blur(6px); }
