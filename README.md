@@ -207,8 +207,8 @@ A font installed on your device is used too, with neither option.
 | Id | Section |
 |---|---|
 | `flow` | The theme's main view (the animated scene) |
-| `today` | Diorama: the three "today" tiles under the scene |
-| `sources` | Diorama: "Where today's home power comes from" |
+| `today` | Diorama and Aurora: the three "today" tiles under the flow |
+| `sources` | Diorama and Aurora: "Where today's home power comes from" |
 | `inverter` | Inverter details (opened from the inverter in the main view) |
 | `forecast` | Battery forecast |
 | `pv_forecast` | PV production forecast |

@@ -706,7 +706,7 @@ class SolarFlowCardEditor extends HTMLElement {
       <div class="sections">${rows.map(({ id, on }, i) => `
         <div class="section ${on ? "" : "off"}">
           <input type="checkbox" data-section="${id}" ${on ? "checked" : ""} aria-label="${escapeHtml(this._sectionName(t, id))}" />
-          <span>${escapeHtml(this._sectionName(t, id))}${id === "today" || id === "sources" ? ` <small>(Diorama)</small>` : ""}</span>
+          <span>${escapeHtml(this._sectionName(t, id))}${id === "today" || id === "sources" ? ` <small>(Diorama, Aurora)</small>` : ""}</span>
           ${collapsible && on && (SECTION_HTML[id] || isCustomId(id)) && id !== "inverter" ? `<label class="fold"><input type="checkbox" data-fold="${id}" ${collapsed.includes(id) ? "checked" : ""} /> ${escapeHtml(t.editorFolded)}</label>` : ""}
           ${on ? `<button type="button" data-move="${i}" data-dir="-1" title="${escapeHtml(t.editorUp)}" ${i === 0 ? "disabled" : ""}>↑</button>
           <button type="button" data-move="${i}" data-dir="1" title="${escapeHtml(t.editorDown)}" ${!rows[i + 1]?.on ? "disabled" : ""}>↓</button>` : ""}

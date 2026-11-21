@@ -38,7 +38,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "2.2.0";
+const CARD_VERSION = "2.2.1";
 // The card's type is custom:home-energy-hub since 2.0.0. The old name stays
 // registered so dashboards with custom:solar-flow-card keep working.
 const CARD_TAG = "home-energy-hub";
@@ -4464,10 +4464,16 @@ function resolveEntities(hass, config) {
     return match ? { entityId: match[0], stateObj: match[1] } : null;
   };
   const configured = config.entities || {};
+  // A battery or grid sensor set in the card owns its group: DeyeCloud's
+  // charge/discharge or import/export sensors are not added beside it (#163).
+  const own = (key) => {
+    const group = Object.values(POWER_GROUPS).find((keys) => keys.includes(key)) || [key];
+    return group.some((k) => configured[k]);
+  };
   const live = {};
   for (const [name, def] of Object.entries(LIVE_METRICS)) {
     live[name] = pick(configured[def.key])
-      || (def.deye ? find((a) => a.sensor_type === "station_latest" && a.metric_key === def.deye) : null);
+      || (def.deye && !own(def.key) ? find((a) => a.sensor_type === "station_latest" && a.metric_key === def.deye) : null);
   }
   // Station values DeyeCloud leaves empty: fall back to the inverter's own
   // device sensor with the same meaning (same sign conventions).
@@ -4475,7 +4481,7 @@ function resolveEntities(hass, config) {
     && String(s.attributes?.device_type || "").includes("INVERTER"));
   const numeric = (entry) => entry && stateNumber(entry.stateObj) !== null;
   for (const [name, keys] of Object.entries(LIVE_DEVICE_FALLBACK)) {
-    if (configured[LIVE_METRICS[name].key] || numeric(live[name])) continue;
+    if (own(LIVE_METRICS[name].key) || numeric(live[name])) continue;
     const wanted = keys.map(normalizeKey);
     const match = devices.find(([, s]) => wanted.includes(normalizeKey(deviceKey(s))) && stateNumber(s) !== null);
     if (match) live[name] = { entityId: match[0], stateObj: match[1] };
@@ -7824,18 +7830,10 @@ function showroomScene(m, night) {
   return { svg, tags };
 }
 
-function renderDiorama(m) {
-  const { t, locale, live } = m;
-  const { svg, sky } = dioramaScene(m);
-  const showroom = m.config.diorama_style !== "classic";
-  const photoNight = showroom && (sky.phase === "night" || m.dark);
-  const room = showroom ? showroomScene(m, photoNight) : null;
-  const pill = (x, y, cls, value, note, entityId) => `
-    <button class="dio-pill ${cls}" style="left:${((x / 520) * 100).toFixed(1)}%;top:${((y / 360) * 100).toFixed(1)}%" ${entityAttr(entityId)}>
-      <i class="${cls}"></i>${escapeHtml(value)} <small>${escapeHtml(note)}</small>
-    </button>`;
-  const batteryNote = live.dischargeActive ? `−${formatPower(live.discharge, locale)}` : live.chargeActive ? `+${formatPower(live.charge, locale)}` : t.idle;
-  const gridValue = live.importActive ? live.gridImport : live.exportActive ? live.gridExport : Math.abs(live.grid);
+// The day so far below the scene: today's tiles (`today`) and where the
+// home's power came from (`sources`). Diorama and Aurora (#163).
+function todayOverview(m) {
+  const { t, locale } = m;
   const when = batteryWhen(m);
   const today = m.today;
   const load = today.load;
@@ -7851,18 +7849,6 @@ function renderDiorama(m) {
   const showChips = sectionShown(m, "today");
   const showShare = Boolean(shares) && sectionShown(m, "sources");
   return `
-    ${sectionShown(m, "flow") ? `<div class="dio-scene ${showroom ? `showroom ${photoNight ? "night" : "day"}` : ""}" style="--sky-a:${sky.sky[0]};--sky-b:${sky.sky[1]}">
-      ${room ? room.svg : `<svg viewBox="0 0 520 360" aria-hidden="true">${svg}</svg>`}
-      ${room ? '<div class="dio-head">' : ""}<div class="dio-title"><h1>${escapeHtml(m.name)}</h1>${liveBadge(m)}</div>
-      <div class="dio-clock">${escapeHtml(clockText(m))}${isNum(m.weather?.temperature) ? ` <button class="dio-temp" ${entityAttr(m.weather.entityId)}>${escapeHtml(`${formatNumber(m.weather.temperature, locale, 0)}${m.weather.unit}`)}</button>` : ""}</div>${room ? "</div>" : ""}
-      ${room ? room.tags : `
-      ${m.config.showSolar ? pill(288, 78, "pv", formatPower(live.solar, locale), t.fromRoof, m.ids.live.solar) : ""}
-      ${m.config.showBattery ? pill(22, 208, "battery", formatPercent(live.soc, locale), batteryNote, batteryEntityId(m)) : ""}
-      ${pill(378, 240, "grid", formatPower(gridValue, locale), live.gridOff ? t.gridOff.toLowerCase() : `${live.exportActive ? "↑ " : live.importActive ? "↓ " : ""}${t.grid.toLowerCase()}`, gridEntityId(m))}
-      ${pill(m.ev ? 70 : 120, 296, "load", formatPower(live.load, locale), t.inHome, m.ids.live.load)}
-      ${m.ev ? pill(342, 294, "load", m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle,
-        m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : m.ev.name || t.evCar, m.ev.entityId) : ""}`}
-    </div>` : ""}
     ${showChips || showShare ? `<div class="dio-bottom">
       ${showChips ? `<div class="dio-chips">
         ${m.config.showSolar
@@ -7881,7 +7867,35 @@ function renderDiorama(m) {
           ${m.virtualStorage ? `<div class="dio-legend">${[["pv", t.solar], ["battery", t.battery], ["vstore", t.vsShort], ["grid", t.grid]]
             .map(([cls, name], i) => (shares[i] >= 0.5 ? `<span class="${cls}">${escapeHtml(name)} ${escapeHtml(formatPercent(shares[i], locale))}</span>` : "")).join("")}</div>` : ""}
         </div>` : ""}
+    </div>` : ""}`;
+}
+
+function renderDiorama(m) {
+  const { t, locale, live } = m;
+  const { svg, sky } = dioramaScene(m);
+  const showroom = m.config.diorama_style !== "classic";
+  const photoNight = showroom && (sky.phase === "night" || m.dark);
+  const room = showroom ? showroomScene(m, photoNight) : null;
+  const pill = (x, y, cls, value, note, entityId) => `
+    <button class="dio-pill ${cls}" style="left:${((x / 520) * 100).toFixed(1)}%;top:${((y / 360) * 100).toFixed(1)}%" ${entityAttr(entityId)}>
+      <i class="${cls}"></i>${escapeHtml(value)} <small>${escapeHtml(note)}</small>
+    </button>`;
+  const batteryNote = live.dischargeActive ? `−${formatPower(live.discharge, locale)}` : live.chargeActive ? `+${formatPower(live.charge, locale)}` : t.idle;
+  const gridValue = live.importActive ? live.gridImport : live.exportActive ? live.gridExport : Math.abs(live.grid);
+  return `
+    ${sectionShown(m, "flow") ? `<div class="dio-scene ${showroom ? `showroom ${photoNight ? "night" : "day"}` : ""}" style="--sky-a:${sky.sky[0]};--sky-b:${sky.sky[1]}">
+      ${room ? room.svg : `<svg viewBox="0 0 520 360" aria-hidden="true">${svg}</svg>`}
+      ${room ? '<div class="dio-head">' : ""}<div class="dio-title"><h1>${escapeHtml(m.name)}</h1>${liveBadge(m)}</div>
+      <div class="dio-clock">${escapeHtml(clockText(m))}${isNum(m.weather?.temperature) ? ` <button class="dio-temp" ${entityAttr(m.weather.entityId)}>${escapeHtml(`${formatNumber(m.weather.temperature, locale, 0)}${m.weather.unit}`)}</button>` : ""}</div>${room ? "</div>" : ""}
+      ${room ? room.tags : `
+      ${m.config.showSolar ? pill(288, 78, "pv", formatPower(live.solar, locale), t.fromRoof, m.ids.live.solar) : ""}
+      ${m.config.showBattery ? pill(22, 208, "battery", formatPercent(live.soc, locale), batteryNote, batteryEntityId(m)) : ""}
+      ${pill(378, 240, "grid", formatPower(gridValue, locale), live.gridOff ? t.gridOff.toLowerCase() : `${live.exportActive ? "↑ " : live.importActive ? "↓ " : ""}${t.grid.toLowerCase()}`, gridEntityId(m))}
+      ${pill(m.ev ? 70 : 120, 296, "load", formatPower(live.load, locale), t.inHome, m.ids.live.load)}
+      ${m.ev ? pill(342, 294, "load", m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle,
+        m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : m.ev.name || t.evCar, m.ev.entityId) : ""}`}
     </div>` : ""}
+    ${todayOverview(m)}
     <div class="sfc-sections">${standardSections(m)}</div>`;
 }
 
@@ -7937,6 +7951,7 @@ function renderAurora(m) {
       ${ring("home", 238, 282, t.home, powerParts(live.load, locale), "", "", m.ids.live.load)}
       <button class="aur-hub" style="${pos(238, 165)}" data-action="inverter" title="${escapeHtml(t.inverterDetails)}">${MINI_ICONS.chip}</button>
     </div>
+    ${todayOverview(m)}
     <div class="sfc-sections">${standardSections(m)}</div>`;
 }
 
@@ -9526,6 +9541,27 @@ const THEME_CSS = {
     .sfc-kicker { font-family: var(--sfc-num-font); }
     .sfc-tab { font-family: var(--sfc-num-font); text-transform: uppercase; }
     .sfc-flow { filter: drop-shadow(0 0 4px currentColor); }
+    /* Today's tiles and where the power came from (#163). */
+    .theme-aurora .dio-bottom { position: relative; padding: 4px 20px 12px; }
+    .theme-aurora .dio-chips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .theme-aurora .dio-chip { --c: #9fb3d9; min-width: 0; padding: 11px 12px; border: 1px solid color-mix(in srgb, var(--c) 35%, transparent); border-radius: 16px;
+      text-align: left; color: var(--sfc-text); background: color-mix(in srgb, var(--c) 9%, rgba(255,255,255,.02)); box-shadow: 0 0 18px color-mix(in srgb, var(--c) 12%, transparent); }
+    .theme-aurora .dio-chip.sun { --c: var(--sfc-pv); } .theme-aurora .dio-chip.bat { --c: var(--sfc-battery); }
+    .theme-aurora .dio-chip.grid { --c: var(--sfc-grid); } .theme-aurora .dio-chip.home { --c: var(--sfc-load); }
+    .theme-aurora .dio-chip small { display: block; color: var(--sfc-muted); font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .theme-aurora .dio-chip b { display: block; margin-top: 3px; color: var(--c); font-family: var(--sfc-num-font); font-size: clamp(14px, 3.6cqw, 19px); font-weight: 700; }
+    .theme-aurora .dio-chip em { display: block; margin-top: 1px; color: var(--sfc-muted); font-size: 11px; font-style: normal; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .theme-aurora .dio-share { margin-top: 14px; }
+    .theme-aurora .dio-share header { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; font-weight: 600; }
+    .theme-aurora .dio-share header span { color: var(--sfc-muted); }
+    .theme-aurora .dio-track { height: 10px; margin-top: 7px; display: flex; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.07); }
+    .theme-aurora .dio-track > div { box-shadow: 0 0 10px currentColor; }
+    .theme-aurora .dio-track .pv { background: var(--sfc-pv); color: var(--sfc-pv); } .theme-aurora .dio-track .battery { background: var(--sfc-battery); color: var(--sfc-battery); }
+    .theme-aurora .dio-track .grid { background: var(--sfc-grid); color: var(--sfc-grid); } .theme-aurora .dio-track .vstore { background: #3cc5d6; color: #3cc5d6; }
+    .theme-aurora .dio-legend { display: flex; flex-wrap: wrap; gap: 2px 12px; margin-top: 6px; font-size: 11px; color: var(--sfc-muted); }
+    .theme-aurora .dio-legend span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 5px; border-radius: 50%; background: currentColor; }
+    .theme-aurora .dio-legend .pv::before { background: var(--sfc-pv); } .theme-aurora .dio-legend .battery::before { background: var(--sfc-battery); }
+    .theme-aurora .dio-legend .vstore::before { background: #3cc5d6; } .theme-aurora .dio-legend .grid::before { background: var(--sfc-grid); }
   `,
   // ------------------------------------------------------------------ Paper
   paper: `
@@ -11762,7 +11798,7 @@ class SolarFlowCardEditor extends HTMLElement {
       <div class="sections">${rows.map(({ id, on }, i) => `
         <div class="section ${on ? "" : "off"}">
           <input type="checkbox" data-section="${id}" ${on ? "checked" : ""} aria-label="${escapeHtml(this._sectionName(t, id))}" />
-          <span>${escapeHtml(this._sectionName(t, id))}${id === "today" || id === "sources" ? ` <small>(Diorama)</small>` : ""}</span>
+          <span>${escapeHtml(this._sectionName(t, id))}${id === "today" || id === "sources" ? ` <small>(Diorama, Aurora)</small>` : ""}</span>
           ${collapsible && on && (SECTION_HTML[id] || isCustomId(id)) && id !== "inverter" ? `<label class="fold"><input type="checkbox" data-fold="${id}" ${collapsed.includes(id) ? "checked" : ""} /> ${escapeHtml(t.editorFolded)}</label>` : ""}
           ${on ? `<button type="button" data-move="${i}" data-dir="-1" title="${escapeHtml(t.editorUp)}" ${i === 0 ? "disabled" : ""}>↑</button>
           <button type="button" data-move="${i}" data-dir="1" title="${escapeHtml(t.editorDown)}" ${!rows[i + 1]?.on ? "disabled" : ""}>↓</button>` : ""}

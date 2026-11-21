@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.1
+
+- **Your own battery and grid sensors win** ([#163](https://github.com/gratak/solar-flow-card/issues/163)): with DeyeCloud installed beside another integration (DeyeLocal, Solarman…), a battery or grid sensor set in the card was overridden by DeyeCloud's own charge/discharge or import/export sensors. A sensor set under `entities:` now owns its group (battery or grid), and DeyeCloud no longer fills in the others beside it.
+- **Today's tiles in Aurora** ([#163](https://github.com/gratak/solar-flow-card/issues/163)): the three "today" tiles and "Where today's home power comes from" now show under Aurora's rings too, in its neon style. They follow the same `today` and `sources` sections as in Diorama, so leaving those out of `sections:` hides them.
+
 ## 2.2.0
 
 **A new Diorama** ([#150](https://github.com/gratak/solar-flow-card/issues/150)), in the style of an EV maker's app. The details of each step are in the betas below.

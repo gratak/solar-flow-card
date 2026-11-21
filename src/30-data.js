@@ -151,10 +151,16 @@ function resolveEntities(hass, config) {
     return match ? { entityId: match[0], stateObj: match[1] } : null;
   };
   const configured = config.entities || {};
+  // A battery or grid sensor set in the card owns its group: DeyeCloud's
+  // charge/discharge or import/export sensors are not added beside it (#163).
+  const own = (key) => {
+    const group = Object.values(POWER_GROUPS).find((keys) => keys.includes(key)) || [key];
+    return group.some((k) => configured[k]);
+  };
   const live = {};
   for (const [name, def] of Object.entries(LIVE_METRICS)) {
     live[name] = pick(configured[def.key])
-      || (def.deye ? find((a) => a.sensor_type === "station_latest" && a.metric_key === def.deye) : null);
+      || (def.deye && !own(def.key) ? find((a) => a.sensor_type === "station_latest" && a.metric_key === def.deye) : null);
   }
   // Station values DeyeCloud leaves empty: fall back to the inverter's own
   // device sensor with the same meaning (same sign conventions).
@@ -162,7 +168,7 @@ function resolveEntities(hass, config) {
     && String(s.attributes?.device_type || "").includes("INVERTER"));
   const numeric = (entry) => entry && stateNumber(entry.stateObj) !== null;
   for (const [name, keys] of Object.entries(LIVE_DEVICE_FALLBACK)) {
-    if (configured[LIVE_METRICS[name].key] || numeric(live[name])) continue;
+    if (own(LIVE_METRICS[name].key) || numeric(live[name])) continue;
     const wanted = keys.map(normalizeKey);
     const match = devices.find(([, s]) => wanted.includes(normalizeKey(deviceKey(s))) && stateNumber(s) !== null);
     if (match) live[name] = { entityId: match[0], stateObj: match[1] };

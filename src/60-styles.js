@@ -631,6 +631,27 @@ const THEME_CSS = {
     .sfc-kicker { font-family: var(--sfc-num-font); }
     .sfc-tab { font-family: var(--sfc-num-font); text-transform: uppercase; }
     .sfc-flow { filter: drop-shadow(0 0 4px currentColor); }
+    /* Today's tiles and where the power came from (#163). */
+    .theme-aurora .dio-bottom { position: relative; padding: 4px 20px 12px; }
+    .theme-aurora .dio-chips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .theme-aurora .dio-chip { --c: #9fb3d9; min-width: 0; padding: 11px 12px; border: 1px solid color-mix(in srgb, var(--c) 35%, transparent); border-radius: 16px;
+      text-align: left; color: var(--sfc-text); background: color-mix(in srgb, var(--c) 9%, rgba(255,255,255,.02)); box-shadow: 0 0 18px color-mix(in srgb, var(--c) 12%, transparent); }
+    .theme-aurora .dio-chip.sun { --c: var(--sfc-pv); } .theme-aurora .dio-chip.bat { --c: var(--sfc-battery); }
+    .theme-aurora .dio-chip.grid { --c: var(--sfc-grid); } .theme-aurora .dio-chip.home { --c: var(--sfc-load); }
+    .theme-aurora .dio-chip small { display: block; color: var(--sfc-muted); font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .theme-aurora .dio-chip b { display: block; margin-top: 3px; color: var(--c); font-family: var(--sfc-num-font); font-size: clamp(14px, 3.6cqw, 19px); font-weight: 700; }
+    .theme-aurora .dio-chip em { display: block; margin-top: 1px; color: var(--sfc-muted); font-size: 11px; font-style: normal; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .theme-aurora .dio-share { margin-top: 14px; }
+    .theme-aurora .dio-share header { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; font-weight: 600; }
+    .theme-aurora .dio-share header span { color: var(--sfc-muted); }
+    .theme-aurora .dio-track { height: 10px; margin-top: 7px; display: flex; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.07); }
+    .theme-aurora .dio-track > div { box-shadow: 0 0 10px currentColor; }
+    .theme-aurora .dio-track .pv { background: var(--sfc-pv); color: var(--sfc-pv); } .theme-aurora .dio-track .battery { background: var(--sfc-battery); color: var(--sfc-battery); }
+    .theme-aurora .dio-track .grid { background: var(--sfc-grid); color: var(--sfc-grid); } .theme-aurora .dio-track .vstore { background: #3cc5d6; color: #3cc5d6; }
+    .theme-aurora .dio-legend { display: flex; flex-wrap: wrap; gap: 2px 12px; margin-top: 6px; font-size: 11px; color: var(--sfc-muted); }
+    .theme-aurora .dio-legend span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 5px; border-radius: 50%; background: currentColor; }
+    .theme-aurora .dio-legend .pv::before { background: var(--sfc-pv); } .theme-aurora .dio-legend .battery::before { background: var(--sfc-battery); }
+    .theme-aurora .dio-legend .vstore::before { background: #3cc5d6; } .theme-aurora .dio-legend .grid::before { background: var(--sfc-grid); }
   `,
   // ------------------------------------------------------------------ Paper
   paper: `

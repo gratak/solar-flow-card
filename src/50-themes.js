@@ -353,18 +353,10 @@ function showroomScene(m, night) {
   return { svg, tags };
 }
 
-function renderDiorama(m) {
-  const { t, locale, live } = m;
-  const { svg, sky } = dioramaScene(m);
-  const showroom = m.config.diorama_style !== "classic";
-  const photoNight = showroom && (sky.phase === "night" || m.dark);
-  const room = showroom ? showroomScene(m, photoNight) : null;
-  const pill = (x, y, cls, value, note, entityId) => `
-    <button class="dio-pill ${cls}" style="left:${((x / 520) * 100).toFixed(1)}%;top:${((y / 360) * 100).toFixed(1)}%" ${entityAttr(entityId)}>
-      <i class="${cls}"></i>${escapeHtml(value)} <small>${escapeHtml(note)}</small>
-    </button>`;
-  const batteryNote = live.dischargeActive ? `−${formatPower(live.discharge, locale)}` : live.chargeActive ? `+${formatPower(live.charge, locale)}` : t.idle;
-  const gridValue = live.importActive ? live.gridImport : live.exportActive ? live.gridExport : Math.abs(live.grid);
+// The day so far below the scene: today's tiles (`today`) and where the
+// home's power came from (`sources`). Diorama and Aurora (#163).
+function todayOverview(m) {
+  const { t, locale } = m;
   const when = batteryWhen(m);
   const today = m.today;
   const load = today.load;
@@ -380,18 +372,6 @@ function renderDiorama(m) {
   const showChips = sectionShown(m, "today");
   const showShare = Boolean(shares) && sectionShown(m, "sources");
   return `
-    ${sectionShown(m, "flow") ? `<div class="dio-scene ${showroom ? `showroom ${photoNight ? "night" : "day"}` : ""}" style="--sky-a:${sky.sky[0]};--sky-b:${sky.sky[1]}">
-      ${room ? room.svg : `<svg viewBox="0 0 520 360" aria-hidden="true">${svg}</svg>`}
-      ${room ? '<div class="dio-head">' : ""}<div class="dio-title"><h1>${escapeHtml(m.name)}</h1>${liveBadge(m)}</div>
-      <div class="dio-clock">${escapeHtml(clockText(m))}${isNum(m.weather?.temperature) ? ` <button class="dio-temp" ${entityAttr(m.weather.entityId)}>${escapeHtml(`${formatNumber(m.weather.temperature, locale, 0)}${m.weather.unit}`)}</button>` : ""}</div>${room ? "</div>" : ""}
-      ${room ? room.tags : `
-      ${m.config.showSolar ? pill(288, 78, "pv", formatPower(live.solar, locale), t.fromRoof, m.ids.live.solar) : ""}
-      ${m.config.showBattery ? pill(22, 208, "battery", formatPercent(live.soc, locale), batteryNote, batteryEntityId(m)) : ""}
-      ${pill(378, 240, "grid", formatPower(gridValue, locale), live.gridOff ? t.gridOff.toLowerCase() : `${live.exportActive ? "↑ " : live.importActive ? "↓ " : ""}${t.grid.toLowerCase()}`, gridEntityId(m))}
-      ${pill(m.ev ? 70 : 120, 296, "load", formatPower(live.load, locale), t.inHome, m.ids.live.load)}
-      ${m.ev ? pill(342, 294, "load", m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle,
-        m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : m.ev.name || t.evCar, m.ev.entityId) : ""}`}
-    </div>` : ""}
     ${showChips || showShare ? `<div class="dio-bottom">
       ${showChips ? `<div class="dio-chips">
         ${m.config.showSolar
@@ -410,7 +390,35 @@ function renderDiorama(m) {
           ${m.virtualStorage ? `<div class="dio-legend">${[["pv", t.solar], ["battery", t.battery], ["vstore", t.vsShort], ["grid", t.grid]]
             .map(([cls, name], i) => (shares[i] >= 0.5 ? `<span class="${cls}">${escapeHtml(name)} ${escapeHtml(formatPercent(shares[i], locale))}</span>` : "")).join("")}</div>` : ""}
         </div>` : ""}
+    </div>` : ""}`;
+}
+
+function renderDiorama(m) {
+  const { t, locale, live } = m;
+  const { svg, sky } = dioramaScene(m);
+  const showroom = m.config.diorama_style !== "classic";
+  const photoNight = showroom && (sky.phase === "night" || m.dark);
+  const room = showroom ? showroomScene(m, photoNight) : null;
+  const pill = (x, y, cls, value, note, entityId) => `
+    <button class="dio-pill ${cls}" style="left:${((x / 520) * 100).toFixed(1)}%;top:${((y / 360) * 100).toFixed(1)}%" ${entityAttr(entityId)}>
+      <i class="${cls}"></i>${escapeHtml(value)} <small>${escapeHtml(note)}</small>
+    </button>`;
+  const batteryNote = live.dischargeActive ? `−${formatPower(live.discharge, locale)}` : live.chargeActive ? `+${formatPower(live.charge, locale)}` : t.idle;
+  const gridValue = live.importActive ? live.gridImport : live.exportActive ? live.gridExport : Math.abs(live.grid);
+  return `
+    ${sectionShown(m, "flow") ? `<div class="dio-scene ${showroom ? `showroom ${photoNight ? "night" : "day"}` : ""}" style="--sky-a:${sky.sky[0]};--sky-b:${sky.sky[1]}">
+      ${room ? room.svg : `<svg viewBox="0 0 520 360" aria-hidden="true">${svg}</svg>`}
+      ${room ? '<div class="dio-head">' : ""}<div class="dio-title"><h1>${escapeHtml(m.name)}</h1>${liveBadge(m)}</div>
+      <div class="dio-clock">${escapeHtml(clockText(m))}${isNum(m.weather?.temperature) ? ` <button class="dio-temp" ${entityAttr(m.weather.entityId)}>${escapeHtml(`${formatNumber(m.weather.temperature, locale, 0)}${m.weather.unit}`)}</button>` : ""}</div>${room ? "</div>" : ""}
+      ${room ? room.tags : `
+      ${m.config.showSolar ? pill(288, 78, "pv", formatPower(live.solar, locale), t.fromRoof, m.ids.live.solar) : ""}
+      ${m.config.showBattery ? pill(22, 208, "battery", formatPercent(live.soc, locale), batteryNote, batteryEntityId(m)) : ""}
+      ${pill(378, 240, "grid", formatPower(gridValue, locale), live.gridOff ? t.gridOff.toLowerCase() : `${live.exportActive ? "↑ " : live.importActive ? "↓ " : ""}${t.grid.toLowerCase()}`, gridEntityId(m))}
+      ${pill(m.ev ? 70 : 120, 296, "load", formatPower(live.load, locale), t.inHome, m.ids.live.load)}
+      ${m.ev ? pill(342, 294, "load", m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle,
+        m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : m.ev.name || t.evCar, m.ev.entityId) : ""}`}
     </div>` : ""}
+    ${todayOverview(m)}
     <div class="sfc-sections">${standardSections(m)}</div>`;
 }
 
@@ -466,6 +474,7 @@ function renderAurora(m) {
       ${ring("home", 238, 282, t.home, powerParts(live.load, locale), "", "", m.ids.live.load)}
       <button class="aur-hub" style="${pos(238, 165)}" data-action="inverter" title="${escapeHtml(t.inverterDetails)}">${MINI_ICONS.chip}</button>
     </div>
+    ${todayOverview(m)}
     <div class="sfc-sections">${standardSections(m)}</div>`;
 }
 
