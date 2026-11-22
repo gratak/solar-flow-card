@@ -522,7 +522,7 @@ Planned. Ideas and votes are welcome in [issues](https://github.com/gratak/solar
 
 ## Translations
 
-The card speaks English, Polish, Dutch (thanks to @furian88), German (thanks to @AndiBo62), European Portuguese (thanks to @dresende; Home Assistant set to Brazilian Portuguese uses it too), French (thanks to @lboue) and Spanish (thanks to @PedroFlores199). Every language is one JSON file in [`translations/`](translations/); adding yours takes a copy of `en.json` and no programming. See [CONTRIBUTING.md](CONTRIBUTING.md#add-or-improve-a-translation).
+The card speaks English, Polish, Dutch (thanks to @furian88), German (thanks to @AndiBo62), European Portuguese (thanks to @dresende; Home Assistant set to Brazilian Portuguese uses it too), French (thanks to @lboue), Spanish (thanks to @PedroFlores199) and Italian (thanks to @mvalerio71). Every language is one JSON file in [`translations/`](translations/); adding yours takes a copy of `en.json` and no programming. See [CONTRIBUTING.md](CONTRIBUTING.md#add-or-improve-a-translation).
 
 ## Development
 
