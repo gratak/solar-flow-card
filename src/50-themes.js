@@ -381,7 +381,8 @@ function todayOverview(m) {
   const production = m.config.showSolar && isNum(solar) && solar > 0.05
     ? [solar - exported - charged, charged, exported].map((v) => clamp((v / solar) * 100, 0, 100))
     : null;
-  const showProduction = Boolean(production) && sectionShown(m, "production");
+  // Off unless `sections:` lists it: one more bar is not for everyone.
+  const showProduction = Boolean(production) && Boolean(m.sections?.includes("production"));
   const productionParts = [["load", t.home], ["battery", t.battery], ["grid", t.grid]];
   return `
     ${showChips || showShare || showProduction ? `<div class="dio-bottom">

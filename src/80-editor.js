@@ -158,7 +158,7 @@ const SECTION_SHOW_KEYS = { energy: "show_energy", forecast: "show_forecast", sy
 function editorSections(config) {
   const order = ["flow", "today", "sources", "production", ...SECTION_ORDER, ...customIds(config)];
   const listed = sectionList(config);
-  const on = listed || order.filter((id) => config[SECTION_SHOW_KEYS[id]] !== false && (id !== "insights" && id !== "comparison" || insightsShown(config)));
+  const on = listed || order.filter((id) => id !== "production" && config[SECTION_SHOW_KEYS[id]] !== false && (id !== "insights" && id !== "comparison" || insightsShown(config)));
   return [...on.map((id) => ({ id, on: true })), ...order.filter((id) => !on.includes(id)).map((id) => ({ id, on: false }))];
 }
 
