@@ -593,8 +593,8 @@ function comparisonHtml(m) {
 }
 
 // The sections below a theme's main view, and the `sections:` option that
-// picks and orders them. `flow`, `today` and `sources` are parts of the
-// themes' main view (the last two in Diorama).
+// picks and orders them. `flow`, `today`, `sources` and `production` are
+// parts of the themes' main view (the last three in Diorama and Aurora).
 const SECTION_HTML = {
   inverter: inverterHtml,
   forecast: forecastHtml,
@@ -608,7 +608,7 @@ const SECTION_HTML = {
   comparison: comparisonHtml,
   panels: panelsHtml,
 };
-const SECTION_IDS = ["flow", "today", "sources", ...Object.keys(SECTION_HTML)];
+const SECTION_IDS = ["flow", "today", "sources", "production", ...Object.keys(SECTION_HTML)];
 const SECTION_ORDER = ["inverter", "forecast", "pv_forecast", "prices", "virtual_storage", "system", "consumers", "energy", "insights", "comparison", "panels"];
 const SECTION_ORDER_WIDE = ["energy", "inverter", "forecast", "pv_forecast", "prices", "virtual_storage", "insights", "comparison", "system", "consumers", "panels"];
 

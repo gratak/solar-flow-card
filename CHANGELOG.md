@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.2
+
+- **Where today's solar went** ([#163](https://github.com/gratak/solar-flow-card/issues/163)): a new bar under "Where today's home power comes from" splits today's solar production into what the home used, what charged the battery and what went to the grid, with the self-consumption share. Charging and export are capped by the production, so a battery charged from the grid at night does not count as solar. Diorama and Aurora; the `production` section (in the editor under Sections) shows or hides it.
+- The headers of these bars keep their figure on one line on narrow cards.
+
 ## 2.2.1
 
 - **Your own battery and grid sensors win** ([#163](https://github.com/gratak/solar-flow-card/issues/163)): with DeyeCloud installed beside another integration (DeyeLocal, Solarman…), a battery or grid sensor set in the card was overridden by DeyeCloud's own charge/discharge or import/export sensors. A sensor set under `entities:` now owns its group (battery or grid), and DeyeCloud no longer fills in the others beside it.

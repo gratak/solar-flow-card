@@ -209,6 +209,7 @@ A font installed on your device is used too, with neither option.
 | `flow` | The theme's main view (the animated scene) |
 | `today` | Diorama and Aurora: the three "today" tiles under the flow |
 | `sources` | Diorama and Aurora: "Where today's home power comes from" |
+| `production` | Diorama and Aurora: "Where today's solar went": the share used in the home, stored in the battery and sent to the grid, with the self-consumption |
 | `inverter` | Inverter details (opened from the inverter in the main view) |
 | `forecast` | Battery forecast |
 | `pv_forecast` | PV production forecast |

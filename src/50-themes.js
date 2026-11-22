@@ -354,7 +354,8 @@ function showroomScene(m, night) {
 }
 
 // The day so far below the scene: today's tiles (`today`) and where the
-// home's power came from (`sources`). Diorama and Aurora (#163).
+// home's power came from (`sources`) and where today's solar went
+// (`production`). Diorama and Aurora (#163).
 function todayOverview(m) {
   const { t, locale } = m;
   const when = batteryWhen(m);
@@ -371,8 +372,19 @@ function todayOverview(m) {
   const ownShare = todayOwnShare(m);
   const showChips = sectionShown(m, "today");
   const showShare = Boolean(shares) && sectionShown(m, "sources");
+  // Where today's solar went (#163): the home, the battery, the grid. Export
+  // and charging are capped by the production, so a battery charged from the
+  // grid at night does not count as solar.
+  const solar = today.solar;
+  const exported = isNum(today.gridExport) ? clamp(today.gridExport, 0, solar) : 0;
+  const charged = isNum(today.charge) && m.config.showBattery ? clamp(today.charge, 0, solar - exported) : 0;
+  const production = m.config.showSolar && isNum(solar) && solar > 0.05
+    ? [solar - exported - charged, charged, exported].map((v) => clamp((v / solar) * 100, 0, 100))
+    : null;
+  const showProduction = Boolean(production) && sectionShown(m, "production");
+  const productionParts = [["load", t.home], ["battery", t.battery], ["grid", t.grid]];
   return `
-    ${showChips || showShare ? `<div class="dio-bottom">
+    ${showChips || showShare || showProduction ? `<div class="dio-bottom">
       ${showChips ? `<div class="dio-chips">
         ${m.config.showSolar
           ? `<button class="dio-chip sun" ${entityAttr(m.ids.energy.solar)}><small>${escapeHtml(t.chipRoof)}</small><b>${escapeHtml(formatEnergy(today.solar, locale))}</b>${pvForecastNote(m) ? `<em>${escapeHtml(pvForecastNote(m))}</em>` : ""}</button>`
@@ -389,6 +401,14 @@ function todayOverview(m) {
             .map(([cls, name], i) => `<div class="${cls}" style="width:${shares[i]}%" title="${escapeHtml(`${name} ${formatPercent(shares[i], locale)}`)}"></div>`).join("")}</div>
           ${m.virtualStorage ? `<div class="dio-legend">${[["pv", t.solar], ["battery", t.battery], ["vstore", t.vsShort], ["grid", t.grid]]
             .map(([cls, name], i) => (shares[i] >= 0.5 ? `<span class="${cls}">${escapeHtml(name)} ${escapeHtml(formatPercent(shares[i], locale))}</span>` : "")).join("")}</div>` : ""}
+        </div>` : ""}
+      ${showProduction ? `
+        <div class="dio-share production">
+          <header>${escapeHtml(t.whereTo)}<span>${escapeHtml(t.selfUse.toLowerCase())} ${escapeHtml(formatPercent(100 - production[2], locale))}</span></header>
+          <div class="dio-track">${productionParts
+            .map(([cls, name], i) => `<div class="${cls}" style="width:${production[i]}%" title="${escapeHtml(`${name} ${formatPercent(production[i], locale)}`)}"></div>`).join("")}</div>
+          <div class="dio-legend">${productionParts
+            .map(([cls, name], i) => (production[i] >= 0.5 ? `<span class="${cls}">${escapeHtml(name)} ${escapeHtml(formatPercent(production[i], locale))}</span>` : "")).join("")}</div>
         </div>` : ""}
     </div>` : ""}`;
 }
