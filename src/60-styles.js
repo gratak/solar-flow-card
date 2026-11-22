@@ -554,10 +554,11 @@ const THEME_CSS = {
     .dio-chip b { display: block; margin-top: 2px; font-size: clamp(15px, 3.8cqw, 20px); font-weight: 800; }
     .dio-chip em { display: block; margin-top: 1px; font-size: 11px; font-style: normal; font-weight: 700; color: #b07a12; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .dio-share { margin-top: 14px; }
-    .dio-share header { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; }
-    .dio-share header span { color: #6a7d92; font-weight: 700; }
+    .dio-share header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 8px; font-size: 12px; font-weight: 800; }
+    .dio-share header span { color: #6a7d92; font-weight: 700; white-space: nowrap; }
     .dio-track { height: 14px; margin-top: 7px; display: flex; overflow: hidden; border-radius: 999px; background: #eef2f6; }
     .dio-track .pv { background: #ffc23d; } .dio-track .battery { background: #2bc48f; } .dio-track .grid { background: #7aa4f2; } .dio-track .vstore { background: #3cc5d6; }
+    .dio-track .load { background: #f28b74; } .dio-legend .load::before { background: #f28b74; }
     .dio-legend { display: flex; flex-wrap: wrap; gap: 2px 12px; margin-top: 6px; font-size: 11px; font-weight: 700; color: #6a7d92; }
     .dio-legend span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 5px; border-radius: 50%; background: currentColor; }
     .dio-legend .pv::before { background: #ffc23d; } .dio-legend .battery::before { background: #2bc48f; } .dio-legend .vstore::before { background: #3cc5d6; } .dio-legend .grid::before { background: #7aa4f2; }
@@ -642,12 +643,13 @@ const THEME_CSS = {
     .theme-aurora .dio-chip b { display: block; margin-top: 3px; color: var(--c); font-family: var(--sfc-num-font); font-size: clamp(14px, 3.6cqw, 19px); font-weight: 700; }
     .theme-aurora .dio-chip em { display: block; margin-top: 1px; color: var(--sfc-muted); font-size: 11px; font-style: normal; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .theme-aurora .dio-share { margin-top: 14px; }
-    .theme-aurora .dio-share header { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; font-weight: 600; }
-    .theme-aurora .dio-share header span { color: var(--sfc-muted); }
+    .theme-aurora .dio-share header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 8px; font-size: 12px; font-weight: 600; }
+    .theme-aurora .dio-share header span { color: var(--sfc-muted); white-space: nowrap; }
     .theme-aurora .dio-track { height: 10px; margin-top: 7px; display: flex; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.07); }
     .theme-aurora .dio-track > div { box-shadow: 0 0 10px currentColor; }
     .theme-aurora .dio-track .pv { background: var(--sfc-pv); color: var(--sfc-pv); } .theme-aurora .dio-track .battery { background: var(--sfc-battery); color: var(--sfc-battery); }
     .theme-aurora .dio-track .grid { background: var(--sfc-grid); color: var(--sfc-grid); } .theme-aurora .dio-track .vstore { background: #3cc5d6; color: #3cc5d6; }
+    .theme-aurora .dio-track .load { background: var(--sfc-load); color: var(--sfc-load); } .theme-aurora .dio-legend .load::before { background: var(--sfc-load); }
     .theme-aurora .dio-legend { display: flex; flex-wrap: wrap; gap: 2px 12px; margin-top: 6px; font-size: 11px; color: var(--sfc-muted); }
     .theme-aurora .dio-legend span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 5px; border-radius: 50%; background: currentColor; }
     .theme-aurora .dio-legend .pv::before { background: var(--sfc-pv); } .theme-aurora .dio-legend .battery::before { background: var(--sfc-battery); }

@@ -38,7 +38,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "2.2.1";
+const CARD_VERSION = "2.2.2";
 // The card's type is custom:home-energy-hub since 2.0.0. The old name stays
 // registered so dashboards with custom:solar-flow-card keep working.
 const CARD_TAG = "home-energy-hub";
@@ -199,6 +199,7 @@ const TRANSLATIONS = {
     "chipStored": "Stored",
     "chipHome": "Used today",
     "whereFrom": "Where today's power came from",
+    "whereTo": "Where today's solar went",
     "noData": "No energy sensors found",
     "noDataHelp": "Set up Home Assistant's Energy dashboard, install the DeyeCloud integration, or pick your sensors in the card's editor.",
     "editorTheme": "Theme",
@@ -465,6 +466,7 @@ const TRANSLATIONS = {
       "flow": "Main view (animation)",
       "today": "Today's tiles",
       "sources": "Where today's power came from",
+      "production": "Where today's solar went",
       "inverter": "Inverter details",
       "forecast": "Battery forecast",
       "pv_forecast": "PV forecast",
@@ -770,6 +772,7 @@ const TRANSLATIONS = {
     "chipStored": "Gespeichert",
     "chipHome": "Heute verbraucht",
     "whereFrom": "Woher der Strom heute kam",
+    "whereTo": "Wohin der Solarstrom heute ging",
     "noData": "Keine Energiesensoren gefunden",
     "noDataHelp": "Richte das Energie-Dashboard von Home Assistant ein, installiere die DeyeCloud-Integration oder wähle deine Sensoren im Editor der Karte.",
     "editorTheme": "Design",
@@ -1036,6 +1039,7 @@ const TRANSLATIONS = {
       "flow": "Hauptansicht (Animation)",
       "today": "Kacheln von heute",
       "sources": "Woher der Strom heute kam",
+      "production": "Wohin der Solarstrom heute ging",
       "inverter": "Wechselrichterdetails",
       "forecast": "Batterieprognose",
       "pv_forecast": "PV-Prognose",
@@ -1341,6 +1345,7 @@ const TRANSLATIONS = {
     "chipStored": "Almacenado",
     "chipHome": "Consumido hoy",
     "whereFrom": "De dónde vino la energía de hoy",
+    "whereTo": "A dónde fue la producción solar de hoy",
     "noData": "No se han encontrado sensores de energía",
     "noDataHelp": "Configura el panel de Energía de Home Assistant, instala la integración DeyeCloud o elige tus sensores en el editor de la tarjeta.",
     "editorTheme": "Tema",
@@ -1607,6 +1612,7 @@ const TRANSLATIONS = {
       "flow": "Vista principal (animación)",
       "today": "Recuadros de hoy",
       "sources": "De dónde vino la energía de hoy",
+      "production": "A dónde fue la producción solar de hoy",
       "inverter": "Detalles del inversor",
       "forecast": "Previsión de batería",
       "pv_forecast": "Previsión FV",
@@ -1912,6 +1918,7 @@ const TRANSLATIONS = {
     "chipStored": "Stocké",
     "chipHome": "Utilisé aujourd'hui",
     "whereFrom": "D'où venait l'énergie du jour",
+    "whereTo": "Où est allée la production solaire du jour",
     "noData": "Aucun capteur d'énergie trouvé",
     "noDataHelp": "Configurez le tableau de bord Énergie de Home Assistant, installez l'intégration DeyeCloud ou choisissez vos capteurs dans l'éditeur de la carte.",
     "editorTheme": "Thème",
@@ -2178,6 +2185,7 @@ const TRANSLATIONS = {
       "flow": "Vue principale (animation)",
       "today": "Tuiles du jour",
       "sources": "D'où venait l'énergie du jour",
+      "production": "Où est allée la production solaire du jour",
       "inverter": "Détails de l'onduleur",
       "forecast": "Prévision batterie",
       "pv_forecast": "Prévision PV",
@@ -2483,6 +2491,7 @@ const TRANSLATIONS = {
     "chipStored": "Immagazzinata",
     "chipHome": "Consumo di oggi",
     "whereFrom": "Origine dell'energia di oggi",
+    "whereTo": "Dove è andata la produzione solare di oggi",
     "noData": "Nessun sensore di energia trovato",
     "noDataHelp": "Configura il pannello Energia di Home Assistant, installa l'integrazione DeyeCloud oppure seleziona i sensori nell'editor della scheda.",
     "editorTheme": "Tema",
@@ -2749,6 +2758,7 @@ const TRANSLATIONS = {
       "flow": "Vista principale (animazione)",
       "today": "Riquadri di oggi",
       "sources": "Origine dell'energia di oggi",
+      "production": "Dove è andata la produzione solare di oggi",
       "inverter": "Dettagli inverter",
       "forecast": "Previsione della batteria",
       "pv_forecast": "Previsione FV",
@@ -3054,6 +3064,7 @@ const TRANSLATIONS = {
     "chipStored": "Opgeslagen",
     "chipHome": "Vandaag gebruikt",
     "whereFrom": "Waar de energie van vandaag vandaan kwam",
+    "whereTo": "Waar de zonnestroom vandaag heen ging",
     "noData": "Geen energiesensoren gevonden",
     "noDataHelp": "Stel het Energie-dashboard van Home Assistant in, installeer de DeyeCloud-integratie of kies je sensoren in de editor van de kaart.",
     "editorTheme": "Thema",
@@ -3320,6 +3331,7 @@ const TRANSLATIONS = {
       "flow": "Hoofdweergave (animatie)",
       "today": "Tegels van vandaag",
       "sources": "Waar de stroom vandaag vandaan kwam",
+      "production": "Waar de zonnestroom vandaag heen ging",
       "inverter": "Omvormerdetails",
       "forecast": "Batterijprognose",
       "pv_forecast": "PV-prognose",
@@ -3625,6 +3637,7 @@ const TRANSLATIONS = {
     "chipStored": "W magazynie",
     "chipHome": "Zużycie dziś",
     "whereFrom": "Skąd dziś prąd w domu",
+    "whereTo": "Gdzie poszła dzisiejsza produkcja",
     "noData": "Nie znaleziono czujników energii",
     "noDataHelp": "Skonfiguruj panel Energia w Home Assistant, zainstaluj integrację DeyeCloud albo wskaż czujniki w edytorze karty.",
     "editorTheme": "Motyw",
@@ -3891,6 +3904,7 @@ const TRANSLATIONS = {
       "flow": "Widok główny (animacja)",
       "today": "Kafelki dnia",
       "sources": "Skąd dziś prąd w domu",
+      "production": "Gdzie poszła dzisiejsza produkcja",
       "inverter": "Szczegóły falownika",
       "forecast": "Prognoza magazynu",
       "pv_forecast": "Prognoza PV",
@@ -4196,6 +4210,7 @@ const TRANSLATIONS = {
     "chipStored": "Armazenado",
     "chipHome": "Usado hoje",
     "whereFrom": "De onde veio a energia de hoje",
+    "whereTo": "Para onde foi a produção solar de hoje",
     "noData": "Nenhum sensor de energia encontrado",
     "noDataHelp": "Configure o painel Energia do Home Assistant, instale a integração DeyeCloud ou escolha os seus sensores no editor do cartão.",
     "editorTheme": "Tema",
@@ -4462,6 +4477,7 @@ const TRANSLATIONS = {
       "flow": "Vista principal (animação)",
       "today": "Blocos de hoje",
       "sources": "De onde veio a energia de hoje",
+      "production": "Para onde foi a produção solar de hoje",
       "inverter": "Detalhes do inversor",
       "forecast": "Previsão da bateria",
       "pv_forecast": "Previsão FV",
@@ -7576,8 +7592,8 @@ function comparisonHtml(m) {
 }
 
 // The sections below a theme's main view, and the `sections:` option that
-// picks and orders them. `flow`, `today` and `sources` are parts of the
-// themes' main view (the last two in Diorama).
+// picks and orders them. `flow`, `today`, `sources` and `production` are
+// parts of the themes' main view (the last three in Diorama and Aurora).
 const SECTION_HTML = {
   inverter: inverterHtml,
   forecast: forecastHtml,
@@ -7591,7 +7607,7 @@ const SECTION_HTML = {
   comparison: comparisonHtml,
   panels: panelsHtml,
 };
-const SECTION_IDS = ["flow", "today", "sources", ...Object.keys(SECTION_HTML)];
+const SECTION_IDS = ["flow", "today", "sources", "production", ...Object.keys(SECTION_HTML)];
 const SECTION_ORDER = ["inverter", "forecast", "pv_forecast", "prices", "virtual_storage", "system", "consumers", "energy", "insights", "comparison", "panels"];
 const SECTION_ORDER_WIDE = ["energy", "inverter", "forecast", "pv_forecast", "prices", "virtual_storage", "insights", "comparison", "system", "consumers", "panels"];
 
@@ -8402,7 +8418,8 @@ function showroomScene(m, night) {
 }
 
 // The day so far below the scene: today's tiles (`today`) and where the
-// home's power came from (`sources`). Diorama and Aurora (#163).
+// home's power came from (`sources`) and where today's solar went
+// (`production`). Diorama and Aurora (#163).
 function todayOverview(m) {
   const { t, locale } = m;
   const when = batteryWhen(m);
@@ -8419,8 +8436,20 @@ function todayOverview(m) {
   const ownShare = todayOwnShare(m);
   const showChips = sectionShown(m, "today");
   const showShare = Boolean(shares) && sectionShown(m, "sources");
+  // Where today's solar went (#163): the home, the battery, the grid. Export
+  // and charging are capped by the production, so a battery charged from the
+  // grid at night does not count as solar.
+  const solar = today.solar;
+  const exported = isNum(today.gridExport) ? clamp(today.gridExport, 0, solar) : 0;
+  const charged = isNum(today.charge) && m.config.showBattery ? clamp(today.charge, 0, solar - exported) : 0;
+  const production = m.config.showSolar && isNum(solar) && solar > 0.05
+    ? [solar - exported - charged, charged, exported].map((v) => clamp((v / solar) * 100, 0, 100))
+    : null;
+  // Off unless `sections:` lists it: one more bar is not for everyone.
+  const showProduction = Boolean(production) && Boolean(m.sections?.includes("production"));
+  const productionParts = [["load", t.home], ["battery", t.battery], ["grid", t.grid]];
   return `
-    ${showChips || showShare ? `<div class="dio-bottom">
+    ${showChips || showShare || showProduction ? `<div class="dio-bottom">
       ${showChips ? `<div class="dio-chips">
         ${m.config.showSolar
           ? `<button class="dio-chip sun" ${entityAttr(m.ids.energy.solar)}><small>${escapeHtml(t.chipRoof)}</small><b>${escapeHtml(formatEnergy(today.solar, locale))}</b>${pvForecastNote(m) ? `<em>${escapeHtml(pvForecastNote(m))}</em>` : ""}</button>`
@@ -8437,6 +8466,14 @@ function todayOverview(m) {
             .map(([cls, name], i) => `<div class="${cls}" style="width:${shares[i]}%" title="${escapeHtml(`${name} ${formatPercent(shares[i], locale)}`)}"></div>`).join("")}</div>
           ${m.virtualStorage ? `<div class="dio-legend">${[["pv", t.solar], ["battery", t.battery], ["vstore", t.vsShort], ["grid", t.grid]]
             .map(([cls, name], i) => (shares[i] >= 0.5 ? `<span class="${cls}">${escapeHtml(name)} ${escapeHtml(formatPercent(shares[i], locale))}</span>` : "")).join("")}</div>` : ""}
+        </div>` : ""}
+      ${showProduction ? `
+        <div class="dio-share production">
+          <header>${escapeHtml(t.whereTo)}<span>${escapeHtml(t.selfUse.toLowerCase())} ${escapeHtml(formatPercent(100 - production[2], locale))}</span></header>
+          <div class="dio-track">${productionParts
+            .map(([cls, name], i) => `<div class="${cls}" style="width:${production[i]}%" title="${escapeHtml(`${name} ${formatPercent(production[i], locale)}`)}"></div>`).join("")}</div>
+          <div class="dio-legend">${productionParts
+            .map(([cls, name], i) => (production[i] >= 0.5 ? `<span class="${cls}">${escapeHtml(name)} ${escapeHtml(formatPercent(production[i], locale))}</span>` : "")).join("")}</div>
         </div>` : ""}
     </div>` : ""}`;
 }
@@ -10035,10 +10072,11 @@ const THEME_CSS = {
     .dio-chip b { display: block; margin-top: 2px; font-size: clamp(15px, 3.8cqw, 20px); font-weight: 800; }
     .dio-chip em { display: block; margin-top: 1px; font-size: 11px; font-style: normal; font-weight: 700; color: #b07a12; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .dio-share { margin-top: 14px; }
-    .dio-share header { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; }
-    .dio-share header span { color: #6a7d92; font-weight: 700; }
+    .dio-share header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 8px; font-size: 12px; font-weight: 800; }
+    .dio-share header span { color: #6a7d92; font-weight: 700; white-space: nowrap; }
     .dio-track { height: 14px; margin-top: 7px; display: flex; overflow: hidden; border-radius: 999px; background: #eef2f6; }
     .dio-track .pv { background: #ffc23d; } .dio-track .battery { background: #2bc48f; } .dio-track .grid { background: #7aa4f2; } .dio-track .vstore { background: #3cc5d6; }
+    .dio-track .load { background: #f28b74; } .dio-legend .load::before { background: #f28b74; }
     .dio-legend { display: flex; flex-wrap: wrap; gap: 2px 12px; margin-top: 6px; font-size: 11px; font-weight: 700; color: #6a7d92; }
     .dio-legend span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 5px; border-radius: 50%; background: currentColor; }
     .dio-legend .pv::before { background: #ffc23d; } .dio-legend .battery::before { background: #2bc48f; } .dio-legend .vstore::before { background: #3cc5d6; } .dio-legend .grid::before { background: #7aa4f2; }
@@ -10123,12 +10161,13 @@ const THEME_CSS = {
     .theme-aurora .dio-chip b { display: block; margin-top: 3px; color: var(--c); font-family: var(--sfc-num-font); font-size: clamp(14px, 3.6cqw, 19px); font-weight: 700; }
     .theme-aurora .dio-chip em { display: block; margin-top: 1px; color: var(--sfc-muted); font-size: 11px; font-style: normal; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .theme-aurora .dio-share { margin-top: 14px; }
-    .theme-aurora .dio-share header { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; font-weight: 600; }
-    .theme-aurora .dio-share header span { color: var(--sfc-muted); }
+    .theme-aurora .dio-share header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 8px; font-size: 12px; font-weight: 600; }
+    .theme-aurora .dio-share header span { color: var(--sfc-muted); white-space: nowrap; }
     .theme-aurora .dio-track { height: 10px; margin-top: 7px; display: flex; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.07); }
     .theme-aurora .dio-track > div { box-shadow: 0 0 10px currentColor; }
     .theme-aurora .dio-track .pv { background: var(--sfc-pv); color: var(--sfc-pv); } .theme-aurora .dio-track .battery { background: var(--sfc-battery); color: var(--sfc-battery); }
     .theme-aurora .dio-track .grid { background: var(--sfc-grid); color: var(--sfc-grid); } .theme-aurora .dio-track .vstore { background: #3cc5d6; color: #3cc5d6; }
+    .theme-aurora .dio-track .load { background: var(--sfc-load); color: var(--sfc-load); } .theme-aurora .dio-legend .load::before { background: var(--sfc-load); }
     .theme-aurora .dio-legend { display: flex; flex-wrap: wrap; gap: 2px 12px; margin-top: 6px; font-size: 11px; color: var(--sfc-muted); }
     .theme-aurora .dio-legend span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 5px; border-radius: 50%; background: currentColor; }
     .theme-aurora .dio-legend .pv::before { background: var(--sfc-pv); } .theme-aurora .dio-legend .battery::before { background: var(--sfc-battery); }
@@ -11819,9 +11858,9 @@ const WIZARD_PRESETS = {
 // default order without the ones a `show_…: false` hides.
 const SECTION_SHOW_KEYS = { energy: "show_energy", forecast: "show_forecast", system: "show_system", panels: "show_panels" };
 function editorSections(config) {
-  const order = ["flow", "today", "sources", ...SECTION_ORDER, ...customIds(config)];
+  const order = ["flow", "today", "sources", "production", ...SECTION_ORDER, ...customIds(config)];
   const listed = sectionList(config);
-  const on = listed || order.filter((id) => config[SECTION_SHOW_KEYS[id]] !== false && (id !== "insights" && id !== "comparison" || insightsShown(config)));
+  const on = listed || order.filter((id) => id !== "production" && config[SECTION_SHOW_KEYS[id]] !== false && (id !== "insights" && id !== "comparison" || insightsShown(config)));
   return [...on.map((id) => ({ id, on: true })), ...order.filter((id) => !on.includes(id)).map((id) => ({ id, on: false }))];
 }
 
@@ -12369,7 +12408,7 @@ class SolarFlowCardEditor extends HTMLElement {
       <div class="sections">${rows.map(({ id, on }, i) => `
         <div class="section ${on ? "" : "off"}">
           <input type="checkbox" data-section="${id}" ${on ? "checked" : ""} aria-label="${escapeHtml(this._sectionName(t, id))}" />
-          <span>${escapeHtml(this._sectionName(t, id))}${id === "today" || id === "sources" ? ` <small>(Diorama, Aurora)</small>` : ""}</span>
+          <span>${escapeHtml(this._sectionName(t, id))}${["today", "sources", "production"].includes(id) ? ` <small>(Diorama, Aurora)</small>` : ""}</span>
           ${collapsible && on && (SECTION_HTML[id] || isCustomId(id)) && id !== "inverter" ? `<label class="fold"><input type="checkbox" data-fold="${id}" ${collapsed.includes(id) ? "checked" : ""} /> ${escapeHtml(t.editorFolded)}</label>` : ""}
           ${on ? `<button type="button" data-move="${i}" data-dir="-1" title="${escapeHtml(t.editorUp)}" ${i === 0 ? "disabled" : ""}>↑</button>
           <button type="button" data-move="${i}" data-dir="1" title="${escapeHtml(t.editorDown)}" ${!rows[i + 1]?.on ? "disabled" : ""}>↓</button>` : ""}

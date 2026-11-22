@@ -156,9 +156,9 @@ const WIZARD_PRESETS = {
 // default order without the ones a `show_…: false` hides.
 const SECTION_SHOW_KEYS = { energy: "show_energy", forecast: "show_forecast", system: "show_system", panels: "show_panels" };
 function editorSections(config) {
-  const order = ["flow", "today", "sources", ...SECTION_ORDER, ...customIds(config)];
+  const order = ["flow", "today", "sources", "production", ...SECTION_ORDER, ...customIds(config)];
   const listed = sectionList(config);
-  const on = listed || order.filter((id) => config[SECTION_SHOW_KEYS[id]] !== false && (id !== "insights" && id !== "comparison" || insightsShown(config)));
+  const on = listed || order.filter((id) => id !== "production" && config[SECTION_SHOW_KEYS[id]] !== false && (id !== "insights" && id !== "comparison" || insightsShown(config)));
   return [...on.map((id) => ({ id, on: true })), ...order.filter((id) => !on.includes(id)).map((id) => ({ id, on: false }))];
 }
 
@@ -706,7 +706,7 @@ class SolarFlowCardEditor extends HTMLElement {
       <div class="sections">${rows.map(({ id, on }, i) => `
         <div class="section ${on ? "" : "off"}">
           <input type="checkbox" data-section="${id}" ${on ? "checked" : ""} aria-label="${escapeHtml(this._sectionName(t, id))}" />
-          <span>${escapeHtml(this._sectionName(t, id))}${id === "today" || id === "sources" ? ` <small>(Diorama, Aurora)</small>` : ""}</span>
+          <span>${escapeHtml(this._sectionName(t, id))}${["today", "sources", "production"].includes(id) ? ` <small>(Diorama, Aurora)</small>` : ""}</span>
           ${collapsible && on && (SECTION_HTML[id] || isCustomId(id)) && id !== "inverter" ? `<label class="fold"><input type="checkbox" data-fold="${id}" ${collapsed.includes(id) ? "checked" : ""} /> ${escapeHtml(t.editorFolded)}</label>` : ""}
           ${on ? `<button type="button" data-move="${i}" data-dir="-1" title="${escapeHtml(t.editorUp)}" ${i === 0 ? "disabled" : ""}>↑</button>
           <button type="button" data-move="${i}" data-dir="1" title="${escapeHtml(t.editorDown)}" ${!rows[i + 1]?.on ? "disabled" : ""}>↓</button>` : ""}

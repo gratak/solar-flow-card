@@ -209,6 +209,7 @@ A font installed on your device is used too, with neither option.
 | `flow` | The theme's main view (the animated scene) |
 | `today` | Diorama and Aurora: the three "today" tiles under the flow |
 | `sources` | Diorama and Aurora: "Where today's home power comes from" |
+| `production` | Diorama and Aurora: "Where today's solar went": the share used in the home, stored in the battery and sent to the grid, with the self-consumption. Off unless listed (in the editor: tick it under Sections) |
 | `inverter` | Inverter details (opened from the inverter in the main view) |
 | `forecast` | Battery forecast |
 | `pv_forecast` | PV production forecast |
@@ -521,7 +522,7 @@ Planned. Ideas and votes are welcome in [issues](https://github.com/gratak/solar
 
 ## Translations
 
-The card speaks English, Polish, Dutch (thanks to @furian88), German (thanks to @AndiBo62), European Portuguese (thanks to @dresende; Home Assistant set to Brazilian Portuguese uses it too), French (thanks to @lboue) and Spanish (thanks to @PedroFlores199). Every language is one JSON file in [`translations/`](translations/); adding yours takes a copy of `en.json` and no programming. See [CONTRIBUTING.md](CONTRIBUTING.md#add-or-improve-a-translation).
+The card speaks English, Polish, Dutch (thanks to @furian88), German (thanks to @AndiBo62), European Portuguese (thanks to @dresende; Home Assistant set to Brazilian Portuguese uses it too), French (thanks to @lboue), Spanish (thanks to @PedroFlores199) and Italian (thanks to @mvalerio71). Every language is one JSON file in [`translations/`](translations/); adding yours takes a copy of `en.json` and no programming. See [CONTRIBUTING.md](CONTRIBUTING.md#add-or-improve-a-translation).
 
 ## Development
 
