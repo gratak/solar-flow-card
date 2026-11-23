@@ -249,15 +249,20 @@ custom_sections:
         max: 5000
       - sensor.grid_voltage_l1  # just the sensor: its own name and unit
   - title: Heat pump
+    icon: mdi:heat-pump        # optional: an icon beside the title
     entities:
       - sensor.heat_pump_power
       - entity: sensor.buffer_temperature
         decimals: 1            # optional: digits after the decimal point
         unit: °C               # optional: instead of the sensor's unit
+        icon: mdi:thermometer  # optional: an icon before the name
+        tap_action:            # optional: what a tap does
+          action: navigate     # more-info (default), navigate, url or none
+          navigation_path: /lovelace/heating
 sections: [flow, custom_1, energy, system]
 ```
 
-Power and energy are shown like everywhere in the card (W/kW, kWh). Other values are shown with their unit and as many decimals as the sensor reports (at most two), and text states as they are. A tap on a tile opens the sensor.
+Power and energy are shown like everywhere in the card (W/kW, kWh). Other values are shown with their unit and as many decimals as the sensor reports (at most two), and text states as they are. A tap on a tile opens the sensor, unless its `tap_action` says otherwise: `navigate` goes to another view (`navigation_path: /lovelace/…`), `url` opens a link (`url_path: https://…`) and `none` does nothing. The section's icon and each sensor's name, icon and tap action can be set in the editor too.
 
 **Several cards instead of one.** To place parts of the card separately on a dashboard, add the card several times, each with its own `sections:`. A card without `flow` shows its sections as one plain card (no box inside a box). The cards share the history and statistics they load, so Home Assistant is asked only once:
 

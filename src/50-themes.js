@@ -366,9 +366,12 @@ function todayOverview(m) {
   // Virtual storage: the import balanced by export within the same hour.
   const fromVirtual = m.virtualStorage?.day ? clamp(m.virtualStorage.day.balanced, 0, imported) : 0;
   const fromGrid = imported - fromVirtual;
-  const shares = isNum(load) && load > 0.05
-    ? [Math.max(0, load - imported - fromBattery) / load, fromBattery / load, fromVirtual / load, fromGrid / load].map((v) => clamp(v * 100, 0, 100))
-    : null;
+  // Shares of everything that came in. The grid can bring more than the home
+  // used (a battery charged from it at night), so they are scaled to add up
+  // to 100%.
+  const parts = [Math.max(0, load - imported - fromBattery), fromBattery, fromVirtual, fromGrid];
+  const inflow = Math.max(load, parts.reduce((sum, v) => sum + v, 0));
+  const shares = isNum(load) && load > 0.05 ? parts.map((v) => clamp((v / inflow) * 100, 0, 100)) : null;
   const ownShare = todayOwnShare(m);
   const showChips = sectionShown(m, "today");
   const showShare = Boolean(shares) && sectionShown(m, "sources");
@@ -400,8 +403,8 @@ function todayOverview(m) {
           <header>${escapeHtml(t.whereFrom)}<span>${escapeHtml(t.autarky.toLowerCase())} ${escapeHtml(formatPercent(ownShare, locale))}</span></header>
           <div class="dio-track">${[["pv", t.solar], ["battery", t.battery], ["vstore", t.vsShort], ["grid", t.grid]]
             .map(([cls, name], i) => `<div class="${cls}" style="width:${shares[i]}%" title="${escapeHtml(`${name} ${formatPercent(shares[i], locale)}`)}"></div>`).join("")}</div>
-          ${m.virtualStorage ? `<div class="dio-legend">${[["pv", t.solar], ["battery", t.battery], ["vstore", t.vsShort], ["grid", t.grid]]
-            .map(([cls, name], i) => (shares[i] >= 0.5 ? `<span class="${cls}">${escapeHtml(name)} ${escapeHtml(formatPercent(shares[i], locale))}</span>` : "")).join("")}</div>` : ""}
+          <div class="dio-legend">${[["pv", t.solar], ["battery", t.battery], ["vstore", t.vsShort], ["grid", t.grid]]
+            .map(([cls, name], i) => (shares[i] >= 0.5 ? `<span class="${cls}">${escapeHtml(name)} ${escapeHtml(formatPercent(shares[i], locale))}</span>` : "")).join("")}</div>
         </div>` : ""}
       ${showProduction ? `
         <div class="dio-share production">

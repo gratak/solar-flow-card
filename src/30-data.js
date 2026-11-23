@@ -1745,10 +1745,33 @@ function customSections(hass, config) {
         unit: def.unit !== undefined ? String(def.unit) : stateObj?.attributes?.unit_of_measurement || "",
         decimals: Number.isInteger(def.decimals) && def.decimals >= 0 && def.decimals <= 4 ? def.decimals : null,
         share: isNum(value) && max > 0 ? clamp((Math.abs(value) / max) * 100, 0, 100) : null,
+        icon: iconName(def.icon),
+        tap: tapAction(def.tap_action),
       };
     }).filter(Boolean);
-    return { id: `custom_${i + 1}`, title: section.title ? String(section.title) : null, items };
+    return { id: `custom_${i + 1}`, title: section.title ? String(section.title) : null, icon: iconName(section.icon), items };
   }).filter((section) => section && section.items.length);
+}
+
+// An icon in Home Assistant's form (mdi:solar-power), or null.
+function iconName(value) {
+  return typeof value === "string" && /^[a-z0-9-]+:[a-z0-9-]+$/i.test(value.trim()) ? value.trim() : null;
+}
+
+// A tile's `tap_action` as in Home Assistant's cards: more-info (the
+// default), navigate, url or none (#168). A link must be http(s) or a path.
+function tapAction(value) {
+  if (!value || typeof value !== "object") return null;
+  const action = String(value.action || "");
+  if (action === "none") return { action };
+  if (action === "navigate" && typeof value.navigation_path === "string" && value.navigation_path.trim().startsWith("/")) {
+    return { action, navigation_path: value.navigation_path.trim() };
+  }
+  if (action === "url" && typeof value.url_path === "string" && /^(https?:\/\/|\/)/i.test(value.url_path.trim())) {
+    return { action, url_path: value.url_path.trim() };
+  }
+  if (action === "more-info" && typeof value.entity === "string" && value.entity) return { action, entity: value.entity };
+  return null;
 }
 
 // A custom tile's value: power and energy as everywhere in the card, other

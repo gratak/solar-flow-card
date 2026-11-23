@@ -837,6 +837,20 @@ class SolarFlowCard extends HTMLElement {
         }));
       });
     });
+    // A custom tile's tap_action (#168): another view or a link.
+    root.querySelectorAll("[data-tap]").forEach((element) => {
+      element.addEventListener("click", (event) => {
+        event.stopPropagation();
+        let tap;
+        try { tap = JSON.parse(element.dataset.tap); } catch (error) { return; }
+        if (tap.action === "navigate" && tap.navigation_path?.startsWith("/")) {
+          window.history.pushState(null, "", tap.navigation_path);
+          window.dispatchEvent(new CustomEvent("location-changed", { detail: { replace: false } }));
+        } else if (tap.action === "url" && /^(https?:\/\/|\/)/i.test(tap.url_path || "")) {
+          window.open(tap.url_path, "_blank", "noopener");
+        }
+      });
+    });
     root.querySelectorAll('[data-action="inverter"]').forEach((element) => {
       element.addEventListener("click", (event) => {
         event.stopPropagation();

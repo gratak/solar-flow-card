@@ -707,16 +707,25 @@ function customSectionHtml(m, id) {
   const columns = count === 4 ? 2 : Math.min(count, 3);
   return `
     <section class="sfc-section sfc-custom">
-      <div class="sfc-head"><div><h3>${escapeHtml(c.title || t.customTitle)}</h3></div></div>
+      <div class="sfc-head"><div>${c.icon ? `<span class="sfc-kicker"><ha-icon icon="${escapeHtml(c.icon)}"></ha-icon></span>` : ""}<h3>${escapeHtml(c.title || t.customTitle)}</h3></div></div>
       <div class="sfc-phases" style="--n:${columns}">
         ${c.items.map((item) => `
-        <button class="sfc-phase" ${item.entityId ? `data-entity="${escapeHtml(item.entityId)}"` : ""} title="${escapeHtml(item.entityId)}">
-          <small>${escapeHtml(item.name)}</small>
+        <button class="sfc-phase ${item.tap?.action === "none" ? "sfc-static" : ""}" ${customTapAttr(item)} title="${escapeHtml(item.entityId)}">
+          <small>${item.icon ? `<ha-icon icon="${escapeHtml(item.icon)}"></ha-icon>` : ""}${escapeHtml(item.name)}</small>
           <strong>${escapeHtml(customValue(item, locale))}</strong>
           ${isNum(item.share) ? `<i style="--p:${item.share.toFixed(0)}%"></i>` : ""}
         </button>`).join("")}
       </div>
     </section>`;
+}
+
+// What a tap on a custom tile does: the sensor's more-info unless
+// `tap_action` says otherwise (#168).
+function customTapAttr(item) {
+  if (!item.tap) return item.entityId ? `data-entity="${escapeHtml(item.entityId)}"` : "";
+  if (item.tap.action === "none") return "";
+  if (item.tap.action === "more-info") return `data-entity="${escapeHtml(item.tap.entity)}"`;
+  return `data-tap="${escapeHtml(JSON.stringify(item.tap))}"`;
 }
 
 // `defaults`: a theme's own set and order, `exclude`: sections the theme
