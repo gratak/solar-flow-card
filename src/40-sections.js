@@ -710,7 +710,7 @@ function customSectionHtml(m, id) {
       <div class="sfc-head"><div>${c.icon ? `<span class="sfc-kicker"><ha-icon icon="${escapeHtml(c.icon)}"></ha-icon></span>` : ""}<h3>${escapeHtml(c.title || t.customTitle)}</h3></div></div>
       <div class="sfc-phases" style="--n:${columns}">
         ${c.items.map((item) => `
-        <button class="sfc-phase ${item.tap?.action === "none" ? "sfc-static" : ""}" ${customTapAttr(item)} title="${escapeHtml(item.entityId)}">
+        <button class="sfc-phase ${item.tap?.action === "none" && !item.hold && !item.doubleTap ? "sfc-static" : ""}" ${customTapAttr(item)} title="${escapeHtml(item.entityId)}">
           <small>${item.icon ? `<ha-icon icon="${escapeHtml(item.icon)}"></ha-icon>` : ""}${escapeHtml(item.name)}</small>
           <strong>${escapeHtml(customValue(item, locale))}</strong>
           ${isNum(item.share) ? `<i style="--p:${item.share.toFixed(0)}%"></i>` : ""}
@@ -719,13 +719,17 @@ function customSectionHtml(m, id) {
     </section>`;
 }
 
-// What a tap on a custom tile does: the sensor's more-info unless
-// `tap_action` says otherwise (#168).
+// What a tap, a hold and a double tap on a custom tile do (#168). Only a
+// tap, opening the sensor: the card's usual data-entity.
 function customTapAttr(item) {
-  if (!item.tap) return item.entityId ? `data-entity="${escapeHtml(item.entityId)}"` : "";
-  if (item.tap.action === "none") return "";
-  if (item.tap.action === "more-info") return `data-entity="${escapeHtml(item.tap.entity)}"`;
-  return `data-tap="${escapeHtml(JSON.stringify(item.tap))}"`;
+  const { tap, hold, doubleTap } = item;
+  const hold_ = hold && hold.action !== "none" ? hold : null;
+  const double = doubleTap && doubleTap.action !== "none" ? doubleTap : null;
+  if (!hold_ && !double) {
+    if (tap?.action === "none") return "";
+    if (!tap || tap.action === "more-info") return item.entityId || tap?.entity ? `data-entity="${escapeHtml(tap?.entity || item.entityId)}"` : "";
+  }
+  return `data-act="${escapeHtml(JSON.stringify({ entity: item.entityId, tap: tap || { action: "more-info" }, hold: hold_, double_tap: double }))}"`;
 }
 
 // `defaults`: a theme's own set and order, `exclude`: sections the theme

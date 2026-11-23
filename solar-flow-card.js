@@ -548,7 +548,7 @@ const TRANSLATIONS = {
     "editorRemove": "Remove",
     "editorConfirmRemove": "Remove this item and its settings?",
     "editorCustom": "Custom sections",
-    "editorCustomHint": "Sections of your own with any sensors, e.g. each phase's power and voltage. Each one can be placed, folded or hidden under Sections like the others. Each sensor's name, icon and tap action are set here; a max (for a bar) or a unit in YAML.",
+    "editorCustomHint": "Sections of your own with any sensors, e.g. each phase's power and voltage. Each one can be placed, folded or hidden under Sections like the others. Each sensor's name, icon and actions (tap, hold, double tap) are set here; a max (for a bar) or a unit in YAML.",
     "editorCustomTitle": "Title",
     "editorCustomSensor": "Sensor {n}",
     "editorCustomAdd": "Add a section",
@@ -556,6 +556,8 @@ const TRANSLATIONS = {
     "editorItemName": "Name",
     "editorIcon": "Icon",
     "editorTapAction": "On tap",
+    "editorHoldAction": "On hold",
+    "editorDoubleTapAction": "On double tap",
     "editorTapMoreInfo": "Sensor details",
     "editorTapNavigate": "Go to a view",
     "editorTapUrl": "Open a link",
@@ -1129,7 +1131,7 @@ const TRANSLATIONS = {
     "editorRemove": "Entfernen",
     "editorConfirmRemove": "Diesen Eintrag mit seinen Einstellungen entfernen?",
     "editorCustom": "Eigene Abschnitte",
-    "editorCustomHint": "Abschnitte mit beliebigen Sensoren, z. B. Leistung und Spannung jeder Phase. Jeder lässt sich unter Abschnitte wie die anderen anordnen, einklappen oder ausblenden. Name, Symbol und Tipp-Aktion je Sensor stehen hier; max (für einen Balken) und Einheit in YAML.",
+    "editorCustomHint": "Abschnitte mit beliebigen Sensoren, z. B. Leistung und Spannung jeder Phase. Jeder lässt sich unter Abschnitte wie die anderen anordnen, einklappen oder ausblenden. Name, Symbol und Aktionen (Tippen, Halten, Doppeltippen) je Sensor stehen hier; max (für einen Balken) und Einheit in YAML.",
     "editorCustomTitle": "Titel",
     "editorCustomSensor": "Sensor {n}",
     "editorCustomAdd": "Abschnitt hinzufügen",
@@ -1137,6 +1139,8 @@ const TRANSLATIONS = {
     "editorItemName": "Name",
     "editorIcon": "Symbol",
     "editorTapAction": "Beim Tippen",
+    "editorHoldAction": "Beim Halten",
+    "editorDoubleTapAction": "Beim Doppeltippen",
     "editorTapMoreInfo": "Sensordetails",
     "editorTapNavigate": "Zu einer Ansicht",
     "editorTapUrl": "Link öffnen",
@@ -1710,7 +1714,7 @@ const TRANSLATIONS = {
     "editorRemove": "Quitar",
     "editorConfirmRemove": "¿Quitar este elemento y sus ajustes?",
     "editorCustom": "Secciones personalizadas",
-    "editorCustomHint": "Secciones propias con cualquier sensor, p. ej., la potencia y la tensión de cada fase. Cada una se puede colocar, plegar u ocultar en Secciones como las demás. El nombre, el icono y la acción al tocar de cada sensor se definen aquí; un máximo (para una barra) o una unidad, en YAML.",
+    "editorCustomHint": "Secciones propias con cualquier sensor, p. ej., la potencia y la tensión de cada fase. Cada una se puede colocar, plegar u ocultar en Secciones como las demás. El nombre, el icono y las acciones (tocar, mantener, tocar dos veces) de cada sensor se definen aquí; un máximo (para una barra) o una unidad, en YAML.",
     "editorCustomTitle": "Título",
     "editorCustomSensor": "Sensor {n}",
     "editorCustomAdd": "Añadir una sección",
@@ -1718,6 +1722,8 @@ const TRANSLATIONS = {
     "editorItemName": "Nombre",
     "editorIcon": "Icono",
     "editorTapAction": "Al tocar",
+    "editorHoldAction": "Al mantener pulsado",
+    "editorDoubleTapAction": "Al tocar dos veces",
     "editorTapMoreInfo": "Detalles del sensor",
     "editorTapNavigate": "Ir a una vista",
     "editorTapUrl": "Abrir un enlace",
@@ -2291,7 +2297,7 @@ const TRANSLATIONS = {
     "editorRemove": "Supprimer",
     "editorConfirmRemove": "Supprimer cet élément et ses réglages ?",
     "editorCustom": "Sections personnalisées",
-    "editorCustomHint": "Vos propres sections avec les capteurs de votre choix, par ex. la puissance et la tension de chaque phase. Chacune peut être placée, repliée ou masquée dans Sections comme les autres. Le nom, l'icône et l'action au toucher de chaque capteur se règlent ici ; un max (pour une barre) ou une unité en YAML.",
+    "editorCustomHint": "Vos propres sections avec les capteurs de votre choix, par ex. la puissance et la tension de chaque phase. Chacune peut être placée, repliée ou masquée dans Sections comme les autres. Le nom, l'icône et les actions (toucher, appui long, double toucher) de chaque capteur se règlent ici ; un max (pour une barre) ou une unité en YAML.",
     "editorCustomTitle": "Titre",
     "editorCustomSensor": "Capteur {n}",
     "editorCustomAdd": "Ajouter une section",
@@ -2299,6 +2305,8 @@ const TRANSLATIONS = {
     "editorItemName": "Nom",
     "editorIcon": "Icône",
     "editorTapAction": "Au toucher",
+    "editorHoldAction": "À l'appui long",
+    "editorDoubleTapAction": "Au double toucher",
     "editorTapMoreInfo": "Détails du capteur",
     "editorTapNavigate": "Aller à une vue",
     "editorTapUrl": "Ouvrir un lien",
@@ -2872,7 +2880,7 @@ const TRANSLATIONS = {
     "editorRemove": "Rimuovi",
     "editorConfirmRemove": "Rimuovere questo elemento e le relative impostazioni?",
     "editorCustom": "Sezioni personalizzate",
-    "editorCustomHint": "Sezioni personalizzate con sensori a scelta, ad esempio potenza e tensione di ogni fase. Come per le altre sezioni, puoi scegliere posizione, visualizzazione compressa o visibilità. Nome, icona e azione al tocco di ogni sensore si impostano qui; un valore massimo (per una barra) o un'unità in YAML.",
+    "editorCustomHint": "Sezioni personalizzate con sensori a scelta, ad esempio potenza e tensione di ogni fase. Come per le altre sezioni, puoi scegliere posizione, visualizzazione compressa o visibilità. Nome, icona e azioni (tocco, pressione prolungata, doppio tocco) di ogni sensore si impostano qui; un valore massimo (per una barra) o un'unità in YAML.",
     "editorCustomTitle": "Titolo",
     "editorCustomSensor": "Sensore {n}",
     "editorCustomAdd": "Aggiungi una sezione",
@@ -2880,6 +2888,8 @@ const TRANSLATIONS = {
     "editorItemName": "Nome",
     "editorIcon": "Icona",
     "editorTapAction": "Al tocco",
+    "editorHoldAction": "Alla pressione prolungata",
+    "editorDoubleTapAction": "Al doppio tocco",
     "editorTapMoreInfo": "Dettagli del sensore",
     "editorTapNavigate": "Vai a una vista",
     "editorTapUrl": "Apri un link",
@@ -3453,7 +3463,7 @@ const TRANSLATIONS = {
     "editorRemove": "Verwijderen",
     "editorConfirmRemove": "Dit item met zijn instellingen verwijderen?",
     "editorCustom": "Eigen secties",
-    "editorCustomHint": "Secties met sensoren naar keuze, bijv. vermogen en spanning per fase. Elke sectie kan onder Secties net als de andere worden geplaatst, ingeklapt of verborgen. Naam, pictogram en tikactie per sensor stel je hier in; een max (voor een balk) of een eenheid in YAML.",
+    "editorCustomHint": "Secties met sensoren naar keuze, bijv. vermogen en spanning per fase. Elke sectie kan onder Secties net als de andere worden geplaatst, ingeklapt of verborgen. Naam, pictogram en acties (tikken, vasthouden, dubbeltikken) per sensor stel je hier in; een max (voor een balk) of een eenheid in YAML.",
     "editorCustomTitle": "Titel",
     "editorCustomSensor": "Sensor {n}",
     "editorCustomAdd": "Sectie toevoegen",
@@ -3461,6 +3471,8 @@ const TRANSLATIONS = {
     "editorItemName": "Naam",
     "editorIcon": "Pictogram",
     "editorTapAction": "Bij tikken",
+    "editorHoldAction": "Bij vasthouden",
+    "editorDoubleTapAction": "Bij dubbeltikken",
     "editorTapMoreInfo": "Sensordetails",
     "editorTapNavigate": "Naar een weergave",
     "editorTapUrl": "Link openen",
@@ -4034,7 +4046,7 @@ const TRANSLATIONS = {
     "editorRemove": "Usuń",
     "editorConfirmRemove": "Usunąć ten element razem z ustawieniami?",
     "editorCustom": "Własne sekcje",
-    "editorCustomHint": "Sekcje z dowolnymi czujnikami, np. moc i napięcie każdej fazy. Każdą można ustawić, zwinąć lub ukryć w Sekcjach, tak jak pozostałe. Nazwę, ikonę i akcję po dotknięciu każdego czujnika ustawisz tutaj, a max (dla paska) lub jednostkę w YAML.",
+    "editorCustomHint": "Sekcje z dowolnymi czujnikami, np. moc i napięcie każdej fazy. Każdą można ustawić, zwinąć lub ukryć w Sekcjach, tak jak pozostałe. Nazwę, ikonę i akcje (dotknięcie, przytrzymanie, dwukrotne dotknięcie) każdego czujnika ustawisz tutaj, a max (dla paska) lub jednostkę w YAML.",
     "editorCustomTitle": "Tytuł",
     "editorCustomSensor": "Czujnik {n}",
     "editorCustomAdd": "Dodaj sekcję",
@@ -4042,6 +4054,8 @@ const TRANSLATIONS = {
     "editorItemName": "Nazwa",
     "editorIcon": "Ikona",
     "editorTapAction": "Po dotknięciu",
+    "editorHoldAction": "Po przytrzymaniu",
+    "editorDoubleTapAction": "Po dwukrotnym dotknięciu",
     "editorTapMoreInfo": "Szczegóły czujnika",
     "editorTapNavigate": "Przejdź do widoku",
     "editorTapUrl": "Otwórz link",
@@ -4615,7 +4629,7 @@ const TRANSLATIONS = {
     "editorRemove": "Remover",
     "editorConfirmRemove": "Remover este item e as suas configurações?",
     "editorCustom": "Secções personalizadas",
-    "editorCustomHint": "Secções próprias com quaisquer sensores, p.ex. a potência e tensão de cada fase. Cada uma pode ser posicionada, recolhida ou ocultada em Secções como as outras. O nome, o ícone e a ação ao tocar de cada sensor definem-se aqui; um máximo (para uma barra) ou uma unidade em YAML.",
+    "editorCustomHint": "Secções próprias com quaisquer sensores, p.ex. a potência e tensão de cada fase. Cada uma pode ser posicionada, recolhida ou ocultada em Secções como as outras. O nome, o ícone e as ações (tocar, manter premido, tocar duas vezes) de cada sensor definem-se aqui; um máximo (para uma barra) ou uma unidade em YAML.",
     "editorCustomTitle": "Título",
     "editorCustomSensor": "Sensor {n}",
     "editorCustomAdd": "Adicionar uma secção",
@@ -4623,6 +4637,8 @@ const TRANSLATIONS = {
     "editorItemName": "Nome",
     "editorIcon": "Ícone",
     "editorTapAction": "Ao tocar",
+    "editorHoldAction": "Ao manter premido",
+    "editorDoubleTapAction": "Ao tocar duas vezes",
     "editorTapMoreInfo": "Detalhes do sensor",
     "editorTapNavigate": "Ir para uma vista",
     "editorTapUrl": "Abrir uma ligação",
@@ -6711,6 +6727,8 @@ function customSections(hass, config) {
         share: isNum(value) && max > 0 ? clamp((Math.abs(value) / max) * 100, 0, 100) : null,
         icon: iconName(def.icon),
         tap: tapAction(def.tap_action),
+        hold: tapAction(def.hold_action),
+        doubleTap: tapAction(def.double_tap_action),
       };
     }).filter(Boolean);
     return { id: `custom_${i + 1}`, title: section.title ? String(section.title) : null, icon: iconName(section.icon), items };
@@ -6722,19 +6740,20 @@ function iconName(value) {
   return typeof value === "string" && /^[a-z0-9-]+:[a-z0-9-]+$/i.test(value.trim()) ? value.trim() : null;
 }
 
-// A tile's `tap_action` as in Home Assistant's cards: more-info (the
-// default), navigate, url or none (#168). A link must be http(s) or a path.
+// A tile's tap, hold or double-tap action as in Home Assistant's cards
+// (#168): more-info, navigate (a view's path, or `#…` for a Bubble Card
+// pop-up), url (http(s) or a path) or none; anything else is ignored.
 function tapAction(value) {
   if (!value || typeof value !== "object") return null;
   const action = String(value.action || "");
   if (action === "none") return { action };
-  if (action === "navigate" && typeof value.navigation_path === "string" && value.navigation_path.trim().startsWith("/")) {
+  if (action === "navigate" && typeof value.navigation_path === "string" && /^[/#]/.test(value.navigation_path.trim())) {
     return { action, navigation_path: value.navigation_path.trim() };
   }
   if (action === "url" && typeof value.url_path === "string" && /^(https?:\/\/|\/)/i.test(value.url_path.trim())) {
     return { action, url_path: value.url_path.trim() };
   }
-  if (action === "more-info" && typeof value.entity === "string" && value.entity) return { action, entity: value.entity };
+  if (action === "more-info") return typeof value.entity === "string" && value.entity ? { action, entity: value.entity } : { action };
   return null;
 }
 
@@ -7796,7 +7815,7 @@ function customSectionHtml(m, id) {
       <div class="sfc-head"><div>${c.icon ? `<span class="sfc-kicker"><ha-icon icon="${escapeHtml(c.icon)}"></ha-icon></span>` : ""}<h3>${escapeHtml(c.title || t.customTitle)}</h3></div></div>
       <div class="sfc-phases" style="--n:${columns}">
         ${c.items.map((item) => `
-        <button class="sfc-phase ${item.tap?.action === "none" ? "sfc-static" : ""}" ${customTapAttr(item)} title="${escapeHtml(item.entityId)}">
+        <button class="sfc-phase ${item.tap?.action === "none" && !item.hold && !item.doubleTap ? "sfc-static" : ""}" ${customTapAttr(item)} title="${escapeHtml(item.entityId)}">
           <small>${item.icon ? `<ha-icon icon="${escapeHtml(item.icon)}"></ha-icon>` : ""}${escapeHtml(item.name)}</small>
           <strong>${escapeHtml(customValue(item, locale))}</strong>
           ${isNum(item.share) ? `<i style="--p:${item.share.toFixed(0)}%"></i>` : ""}
@@ -7805,13 +7824,17 @@ function customSectionHtml(m, id) {
     </section>`;
 }
 
-// What a tap on a custom tile does: the sensor's more-info unless
-// `tap_action` says otherwise (#168).
+// What a tap, a hold and a double tap on a custom tile do (#168). Only a
+// tap, opening the sensor: the card's usual data-entity.
 function customTapAttr(item) {
-  if (!item.tap) return item.entityId ? `data-entity="${escapeHtml(item.entityId)}"` : "";
-  if (item.tap.action === "none") return "";
-  if (item.tap.action === "more-info") return `data-entity="${escapeHtml(item.tap.entity)}"`;
-  return `data-tap="${escapeHtml(JSON.stringify(item.tap))}"`;
+  const { tap, hold, doubleTap } = item;
+  const hold_ = hold && hold.action !== "none" ? hold : null;
+  const double = doubleTap && doubleTap.action !== "none" ? doubleTap : null;
+  if (!hold_ && !double) {
+    if (tap?.action === "none") return "";
+    if (!tap || tap.action === "more-info") return item.entityId || tap?.entity ? `data-entity="${escapeHtml(tap?.entity || item.entityId)}"` : "";
+  }
+  return `data-act="${escapeHtml(JSON.stringify({ entity: item.entityId, tap: tap || { action: "more-info" }, hold: hold_, double_tap: double }))}"`;
 }
 
 // `defaults`: a theme's own set and order, `exclude`: sections the theme
@@ -11736,18 +11759,36 @@ class SolarFlowCard extends HTMLElement {
         }));
       });
     });
-    // A custom tile's tap_action (#168): another view or a link.
-    root.querySelectorAll("[data-tap]").forEach((element) => {
+    // A custom tile's tap, hold and double-tap actions (#168).
+    const run = (act, entity) => {
+      if (!act || act.action === "none") return;
+      if (act.action === "more-info") {
+        this.dispatchEvent(new CustomEvent("hass-more-info", { bubbles: true, composed: true, detail: { entityId: act.entity || entity } }));
+      } else if (act.action === "navigate" && /^[/#]/.test(act.navigation_path || "")) {
+        window.history.pushState(null, "", act.navigation_path);
+        window.dispatchEvent(new CustomEvent("location-changed", { detail: { replace: false } }));
+      } else if (act.action === "url" && /^(https?:\/\/|\/)/i.test(act.url_path || "")) {
+        window.open(act.url_path, "_blank", "noopener");
+      }
+    };
+    root.querySelectorAll("[data-act]").forEach((element) => {
+      let acts;
+      try { acts = JSON.parse(element.dataset.act); } catch (error) { return; }
+      let holdTimer = null;
+      let tapTimer = null;
+      let held = false;
+      element.addEventListener("pointerdown", () => {
+        held = false;
+        if (acts.hold) holdTimer = setTimeout(() => { held = true; run(acts.hold, acts.entity); }, 500);
+      });
+      for (const type of ["pointerup", "pointerleave", "pointercancel"]) element.addEventListener(type, () => clearTimeout(holdTimer));
+      element.addEventListener("contextmenu", (event) => { if (acts.hold) event.preventDefault(); });
       element.addEventListener("click", (event) => {
         event.stopPropagation();
-        let tap;
-        try { tap = JSON.parse(element.dataset.tap); } catch (error) { return; }
-        if (tap.action === "navigate" && tap.navigation_path?.startsWith("/")) {
-          window.history.pushState(null, "", tap.navigation_path);
-          window.dispatchEvent(new CustomEvent("location-changed", { detail: { replace: false } }));
-        } else if (tap.action === "url" && /^(https?:\/\/|\/)/i.test(tap.url_path || "")) {
-          window.open(tap.url_path, "_blank", "noopener");
-        }
+        if (held) { held = false; return; }
+        if (!acts.double_tap) { run(acts.tap, acts.entity); return; }
+        if (tapTimer) { clearTimeout(tapTimer); tapTimer = null; run(acts.double_tap, acts.entity); return; }
+        tapTimer = setTimeout(() => { tapTimer = null; run(acts.tap, acts.entity); }, 250);
       });
     });
     root.querySelectorAll('[data-action="inverter"]').forEach((element) => {
@@ -12296,19 +12337,27 @@ class SolarFlowCardEditor extends HTMLElement {
     return c?.title ? String(c.title) : `${t.customTitle} ${match[1]}`;
   }
 
-  // A custom tile's own name, icon and tap action (#168).
+  // A custom tile's own name, icon and tap, hold and double-tap actions (#168).
   _customItemHtml(t, i, j, item) {
     const def = typeof item === "string" ? {} : item;
-    const action = def.tap_action?.action || "";
-    const target = action === "navigate" ? def.tap_action.navigation_path : action === "url" ? def.tap_action.url_path : "";
     const key = (field) => `data-custom-item="${i}.${j}.${field}"`;
+    const actionHtml = (name, label, options) => {
+      const value = def[name] || {};
+      const action = value.action || "";
+      const target = action === "navigate" ? value.navigation_path : action === "url" ? value.url_path : "";
+      return `
+        <label><span>${escapeHtml(label)}</span><select ${key(`${name}.action`)}>${options
+          .map(([v, text]) => `<option value="${v}" ${action === v ? "selected" : ""}>${escapeHtml(text)}</option>`).join("")}</select></label>
+        ${action === "navigate" || action === "url" ? `<label><span>${escapeHtml(action === "navigate" ? t.editorTapPath : t.editorTapLink)}</span><input type="text" ${key(`${name}.target`)} value="${escapeHtml(target ?? "")}" placeholder="${action === "navigate" ? "/lovelace/energy · #popup" : "https://"}" /></label>` : ""}`;
+    };
+    const moves = [["navigate", t.editorTapNavigate], ["url", t.editorTapUrl]];
     return `
       <div class="cs-extra">
         <label><span>${escapeHtml(t.editorItemName)}</span><input type="text" ${key("name")} value="${escapeHtml(def.name ?? "")}" /></label>
         <label><span>${escapeHtml(t.editorIcon)}</span><input type="text" ${key("icon")} value="${escapeHtml(def.icon ?? "")}" placeholder="mdi:flash" /></label>
-        <label><span>${escapeHtml(t.editorTapAction)}</span><select ${key("action")}>${[["", t.editorTapMoreInfo], ["navigate", t.editorTapNavigate], ["url", t.editorTapUrl], ["none", t.editorTapNone]]
-          .map(([value, label]) => `<option value="${value}" ${action === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select></label>
-        ${action === "navigate" || action === "url" ? `<label><span>${escapeHtml(action === "navigate" ? t.editorTapPath : t.editorTapLink)}</span><input type="text" ${key("target")} value="${escapeHtml(target ?? "")}" placeholder="${action === "navigate" ? "/lovelace/energy" : "https://"}" /></label>` : ""}
+        ${actionHtml("tap_action", t.editorTapAction, [["", t.editorTapMoreInfo], ...moves, ["none", t.editorTapNone]])}
+        ${actionHtml("hold_action", t.editorHoldAction, [["", t.editorTapNone], ["more-info", t.editorTapMoreInfo], ...moves])}
+        ${actionHtml("double_tap_action", t.editorDoubleTapAction, [["", t.editorTapNone], ["more-info", t.editorTapMoreInfo], ...moves])}
       </div>`;
   }
 
@@ -12317,16 +12366,17 @@ class SolarFlowCardEditor extends HTMLElement {
     const current = list[si]?.entities[ei];
     if (!current) return;
     const def = typeof current === "string" ? { entity: current } : { ...current };
-    if (field === "name" || field === "icon") {
-      if (value) def[field] = value;
-      else delete def[field];
-    } else if (field === "action") {
-      if (value === "navigate") def.tap_action = { action: "navigate", navigation_path: def.tap_action?.navigation_path || "/" };
-      else if (value === "url") def.tap_action = { action: "url", url_path: def.tap_action?.url_path || "" };
-      else if (value === "none") def.tap_action = { action: "none" };
-      else delete def.tap_action;
-    } else if (field === "target" && def.tap_action) {
-      def.tap_action = def.tap_action.action === "navigate" ? { action: "navigate", navigation_path: value || "/" } : { action: "url", url_path: value };
+    const [name, part] = field.split(".");
+    if (!part) {
+      if (value) def[name] = value;
+      else delete def[name];
+    } else if (part === "action") {
+      if (value === "navigate") def[name] = { action: "navigate", navigation_path: def[name]?.navigation_path || "/" };
+      else if (value === "url") def[name] = { action: "url", url_path: def[name]?.url_path || "" };
+      else if (value) def[name] = { action: value };
+      else delete def[name];
+    } else if (part === "target" && def[name]) {
+      def[name] = def[name].action === "navigate" ? { action: "navigate", navigation_path: value || "/" } : { action: "url", url_path: value };
     }
     // Only the sensor left: back to the short form.
     list[si].entities[ei] = Object.keys(def).length === 1 ? def.entity : def;
@@ -12923,7 +12973,7 @@ class SolarFlowCardEditor extends HTMLElement {
         .pickers { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
         .cs-entity { display: grid; gap: 6px; align-content: start; }
         .row2 { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 10px; }
-        .cs-extra { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 6px; padding-left: 8px; border-left: 2px solid var(--divider-color, rgba(127,127,127,.35)); }
+        .cs-extra { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); align-items: end; gap: 6px; padding-left: 8px; border-left: 2px solid var(--divider-color, rgba(127,127,127,.35)); }
         .switch { display: flex; justify-content: space-between; align-items: center; gap: 12px; color: var(--primary-text-color); font-size: 14px; }
         .switch label { color: inherit; font-size: inherit; }
         input[type="checkbox"] { width: 19px; height: 19px; flex: none; accent-color: var(--primary-color, #03a9f4); }
@@ -13099,8 +13149,8 @@ class SolarFlowCardEditor extends HTMLElement {
       this._writeCustom(list);
     }));
     root.querySelectorAll("[data-custom-item]").forEach((input) => input.addEventListener("change", (e) => {
-      const [si, ei, field] = input.dataset.customItem.split(".");
-      this._setCustomItem(Number(si), Number(ei), field, e.target.value.trim());
+      const [si, ei, ...field] = input.dataset.customItem.split(".");
+      this._setCustomItem(Number(si), Number(ei), field.join("."), e.target.value.trim());
     }));
     root.querySelector("[data-add-custom]")?.addEventListener("click", () => this._addCustom());
     root.querySelectorAll("[data-remove-custom]").forEach((button) => button.addEventListener("click", () => {

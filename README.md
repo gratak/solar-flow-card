@@ -259,10 +259,15 @@ custom_sections:
         tap_action:            # optional: what a tap does
           action: navigate     # more-info (default), navigate, url or none
           navigation_path: /lovelace/heating
+        hold_action:           # optional: what a hold does (none by default)
+          action: navigate
+          navigation_path: "#heating"   # a Bubble Card pop-up
+        double_tap_action:     # optional: what a double tap does (none by default)
+          action: more-info
 sections: [flow, custom_1, energy, system]
 ```
 
-Power and energy are shown like everywhere in the card (W/kW, kWh). Other values are shown with their unit and as many decimals as the sensor reports (at most two), and text states as they are. A tap on a tile opens the sensor, unless its `tap_action` says otherwise: `navigate` goes to another view (`navigation_path: /lovelace/…`), `url` opens a link (`url_path: https://…`) and `none` does nothing. The section's icon and each sensor's name, icon and tap action can be set in the editor too.
+Power and energy are shown like everywhere in the card (W/kW, kWh). Other values are shown with their unit and as many decimals as the sensor reports (at most two), and text states as they are. A tap on a tile opens the sensor, unless its `tap_action` says otherwise. `hold_action` and `double_tap_action` work the same way and do nothing unless set. Each takes `more-info` (optionally with another `entity`), `navigate` to another view (`navigation_path: /lovelace/…`, or `"#…"` to open a Bubble Card pop-up), `url` to open a link (`url_path: https://…`) or `none`. The section's icon and each sensor's name, icon and three actions can be set in the editor too.
 
 **Several cards instead of one.** To place parts of the card separately on a dashboard, add the card several times, each with its own `sections:`. A card without `flow` shows its sections as one plain card (no box inside a box). The cards share the history and statistics they load, so Home Assistant is asked only once:
 

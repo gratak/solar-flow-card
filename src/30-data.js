@@ -1747,6 +1747,8 @@ function customSections(hass, config) {
         share: isNum(value) && max > 0 ? clamp((Math.abs(value) / max) * 100, 0, 100) : null,
         icon: iconName(def.icon),
         tap: tapAction(def.tap_action),
+        hold: tapAction(def.hold_action),
+        doubleTap: tapAction(def.double_tap_action),
       };
     }).filter(Boolean);
     return { id: `custom_${i + 1}`, title: section.title ? String(section.title) : null, icon: iconName(section.icon), items };
@@ -1758,19 +1760,20 @@ function iconName(value) {
   return typeof value === "string" && /^[a-z0-9-]+:[a-z0-9-]+$/i.test(value.trim()) ? value.trim() : null;
 }
 
-// A tile's `tap_action` as in Home Assistant's cards: more-info (the
-// default), navigate, url or none (#168). A link must be http(s) or a path.
+// A tile's tap, hold or double-tap action as in Home Assistant's cards
+// (#168): more-info, navigate (a view's path, or `#…` for a Bubble Card
+// pop-up), url (http(s) or a path) or none; anything else is ignored.
 function tapAction(value) {
   if (!value || typeof value !== "object") return null;
   const action = String(value.action || "");
   if (action === "none") return { action };
-  if (action === "navigate" && typeof value.navigation_path === "string" && value.navigation_path.trim().startsWith("/")) {
+  if (action === "navigate" && typeof value.navigation_path === "string" && /^[/#]/.test(value.navigation_path.trim())) {
     return { action, navigation_path: value.navigation_path.trim() };
   }
   if (action === "url" && typeof value.url_path === "string" && /^(https?:\/\/|\/)/i.test(value.url_path.trim())) {
     return { action, url_path: value.url_path.trim() };
   }
-  if (action === "more-info" && typeof value.entity === "string" && value.entity) return { action, entity: value.entity };
+  if (action === "more-info") return typeof value.entity === "string" && value.entity ? { action, entity: value.entity } : { action };
   return null;
 }
 

@@ -837,18 +837,36 @@ class SolarFlowCard extends HTMLElement {
         }));
       });
     });
-    // A custom tile's tap_action (#168): another view or a link.
-    root.querySelectorAll("[data-tap]").forEach((element) => {
+    // A custom tile's tap, hold and double-tap actions (#168).
+    const run = (act, entity) => {
+      if (!act || act.action === "none") return;
+      if (act.action === "more-info") {
+        this.dispatchEvent(new CustomEvent("hass-more-info", { bubbles: true, composed: true, detail: { entityId: act.entity || entity } }));
+      } else if (act.action === "navigate" && /^[/#]/.test(act.navigation_path || "")) {
+        window.history.pushState(null, "", act.navigation_path);
+        window.dispatchEvent(new CustomEvent("location-changed", { detail: { replace: false } }));
+      } else if (act.action === "url" && /^(https?:\/\/|\/)/i.test(act.url_path || "")) {
+        window.open(act.url_path, "_blank", "noopener");
+      }
+    };
+    root.querySelectorAll("[data-act]").forEach((element) => {
+      let acts;
+      try { acts = JSON.parse(element.dataset.act); } catch (error) { return; }
+      let holdTimer = null;
+      let tapTimer = null;
+      let held = false;
+      element.addEventListener("pointerdown", () => {
+        held = false;
+        if (acts.hold) holdTimer = setTimeout(() => { held = true; run(acts.hold, acts.entity); }, 500);
+      });
+      for (const type of ["pointerup", "pointerleave", "pointercancel"]) element.addEventListener(type, () => clearTimeout(holdTimer));
+      element.addEventListener("contextmenu", (event) => { if (acts.hold) event.preventDefault(); });
       element.addEventListener("click", (event) => {
         event.stopPropagation();
-        let tap;
-        try { tap = JSON.parse(element.dataset.tap); } catch (error) { return; }
-        if (tap.action === "navigate" && tap.navigation_path?.startsWith("/")) {
-          window.history.pushState(null, "", tap.navigation_path);
-          window.dispatchEvent(new CustomEvent("location-changed", { detail: { replace: false } }));
-        } else if (tap.action === "url" && /^(https?:\/\/|\/)/i.test(tap.url_path || "")) {
-          window.open(tap.url_path, "_blank", "noopener");
-        }
+        if (held) { held = false; return; }
+        if (!acts.double_tap) { run(acts.tap, acts.entity); return; }
+        if (tapTimer) { clearTimeout(tapTimer); tapTimer = null; run(acts.double_tap, acts.entity); return; }
+        tapTimer = setTimeout(() => { tapTimer = null; run(acts.tap, acts.entity); }, 250);
       });
     });
     root.querySelectorAll('[data-action="inverter"]').forEach((element) => {

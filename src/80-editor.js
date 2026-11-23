@@ -477,19 +477,27 @@ class SolarFlowCardEditor extends HTMLElement {
     return c?.title ? String(c.title) : `${t.customTitle} ${match[1]}`;
   }
 
-  // A custom tile's own name, icon and tap action (#168).
+  // A custom tile's own name, icon and tap, hold and double-tap actions (#168).
   _customItemHtml(t, i, j, item) {
     const def = typeof item === "string" ? {} : item;
-    const action = def.tap_action?.action || "";
-    const target = action === "navigate" ? def.tap_action.navigation_path : action === "url" ? def.tap_action.url_path : "";
     const key = (field) => `data-custom-item="${i}.${j}.${field}"`;
+    const actionHtml = (name, label, options) => {
+      const value = def[name] || {};
+      const action = value.action || "";
+      const target = action === "navigate" ? value.navigation_path : action === "url" ? value.url_path : "";
+      return `
+        <label><span>${escapeHtml(label)}</span><select ${key(`${name}.action`)}>${options
+          .map(([v, text]) => `<option value="${v}" ${action === v ? "selected" : ""}>${escapeHtml(text)}</option>`).join("")}</select></label>
+        ${action === "navigate" || action === "url" ? `<label><span>${escapeHtml(action === "navigate" ? t.editorTapPath : t.editorTapLink)}</span><input type="text" ${key(`${name}.target`)} value="${escapeHtml(target ?? "")}" placeholder="${action === "navigate" ? "/lovelace/energy · #popup" : "https://"}" /></label>` : ""}`;
+    };
+    const moves = [["navigate", t.editorTapNavigate], ["url", t.editorTapUrl]];
     return `
       <div class="cs-extra">
         <label><span>${escapeHtml(t.editorItemName)}</span><input type="text" ${key("name")} value="${escapeHtml(def.name ?? "")}" /></label>
         <label><span>${escapeHtml(t.editorIcon)}</span><input type="text" ${key("icon")} value="${escapeHtml(def.icon ?? "")}" placeholder="mdi:flash" /></label>
-        <label><span>${escapeHtml(t.editorTapAction)}</span><select ${key("action")}>${[["", t.editorTapMoreInfo], ["navigate", t.editorTapNavigate], ["url", t.editorTapUrl], ["none", t.editorTapNone]]
-          .map(([value, label]) => `<option value="${value}" ${action === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select></label>
-        ${action === "navigate" || action === "url" ? `<label><span>${escapeHtml(action === "navigate" ? t.editorTapPath : t.editorTapLink)}</span><input type="text" ${key("target")} value="${escapeHtml(target ?? "")}" placeholder="${action === "navigate" ? "/lovelace/energy" : "https://"}" /></label>` : ""}
+        ${actionHtml("tap_action", t.editorTapAction, [["", t.editorTapMoreInfo], ...moves, ["none", t.editorTapNone]])}
+        ${actionHtml("hold_action", t.editorHoldAction, [["", t.editorTapNone], ["more-info", t.editorTapMoreInfo], ...moves])}
+        ${actionHtml("double_tap_action", t.editorDoubleTapAction, [["", t.editorTapNone], ["more-info", t.editorTapMoreInfo], ...moves])}
       </div>`;
   }
 
@@ -498,16 +506,17 @@ class SolarFlowCardEditor extends HTMLElement {
     const current = list[si]?.entities[ei];
     if (!current) return;
     const def = typeof current === "string" ? { entity: current } : { ...current };
-    if (field === "name" || field === "icon") {
-      if (value) def[field] = value;
-      else delete def[field];
-    } else if (field === "action") {
-      if (value === "navigate") def.tap_action = { action: "navigate", navigation_path: def.tap_action?.navigation_path || "/" };
-      else if (value === "url") def.tap_action = { action: "url", url_path: def.tap_action?.url_path || "" };
-      else if (value === "none") def.tap_action = { action: "none" };
-      else delete def.tap_action;
-    } else if (field === "target" && def.tap_action) {
-      def.tap_action = def.tap_action.action === "navigate" ? { action: "navigate", navigation_path: value || "/" } : { action: "url", url_path: value };
+    const [name, part] = field.split(".");
+    if (!part) {
+      if (value) def[name] = value;
+      else delete def[name];
+    } else if (part === "action") {
+      if (value === "navigate") def[name] = { action: "navigate", navigation_path: def[name]?.navigation_path || "/" };
+      else if (value === "url") def[name] = { action: "url", url_path: def[name]?.url_path || "" };
+      else if (value) def[name] = { action: value };
+      else delete def[name];
+    } else if (part === "target" && def[name]) {
+      def[name] = def[name].action === "navigate" ? { action: "navigate", navigation_path: value || "/" } : { action: "url", url_path: value };
     }
     // Only the sensor left: back to the short form.
     list[si].entities[ei] = Object.keys(def).length === 1 ? def.entity : def;
@@ -1104,7 +1113,7 @@ class SolarFlowCardEditor extends HTMLElement {
         .pickers { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
         .cs-entity { display: grid; gap: 6px; align-content: start; }
         .row2 { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 10px; }
-        .cs-extra { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 6px; padding-left: 8px; border-left: 2px solid var(--divider-color, rgba(127,127,127,.35)); }
+        .cs-extra { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); align-items: end; gap: 6px; padding-left: 8px; border-left: 2px solid var(--divider-color, rgba(127,127,127,.35)); }
         .switch { display: flex; justify-content: space-between; align-items: center; gap: 12px; color: var(--primary-text-color); font-size: 14px; }
         .switch label { color: inherit; font-size: inherit; }
         input[type="checkbox"] { width: 19px; height: 19px; flex: none; accent-color: var(--primary-color, #03a9f4); }
@@ -1280,8 +1289,8 @@ class SolarFlowCardEditor extends HTMLElement {
       this._writeCustom(list);
     }));
     root.querySelectorAll("[data-custom-item]").forEach((input) => input.addEventListener("change", (e) => {
-      const [si, ei, field] = input.dataset.customItem.split(".");
-      this._setCustomItem(Number(si), Number(ei), field, e.target.value.trim());
+      const [si, ei, ...field] = input.dataset.customItem.split(".");
+      this._setCustomItem(Number(si), Number(ei), field.join("."), e.target.value.trim());
     }));
     root.querySelector("[data-add-custom]")?.addEventListener("click", () => this._addCustom());
     root.querySelectorAll("[data-remove-custom]").forEach((button) => button.addEventListener("click", () => {
