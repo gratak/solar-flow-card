@@ -477,7 +477,7 @@ class SolarFlowCardEditor extends HTMLElement {
     return c?.title ? String(c.title) : `${t.customTitle} ${match[1]}`;
   }
 
-  // A custom tile's own name, icon and tap, hold and double-tap actions (#168).
+  // A custom tile's own name, icon and tap, double-tap and hold actions (#168).
   _customItemHtml(t, i, j, item) {
     const def = typeof item === "string" ? {} : item;
     const key = (field) => `data-custom-item="${i}.${j}.${field}"`;
@@ -496,8 +496,8 @@ class SolarFlowCardEditor extends HTMLElement {
         <label><span>${escapeHtml(t.editorItemName)}</span><input type="text" ${key("name")} value="${escapeHtml(def.name ?? "")}" /></label>
         <label><span>${escapeHtml(t.editorIcon)}</span><input type="text" ${key("icon")} value="${escapeHtml(def.icon ?? "")}" placeholder="mdi:flash" /></label>
         ${actionHtml("tap_action", t.editorTapAction, [["", t.editorTapMoreInfo], ...moves, ["none", t.editorTapNone]])}
-        ${actionHtml("hold_action", t.editorHoldAction, [["", t.editorTapNone], ["more-info", t.editorTapMoreInfo], ...moves])}
         ${actionHtml("double_tap_action", t.editorDoubleTapAction, [["", t.editorTapNone], ["more-info", t.editorTapMoreInfo], ...moves])}
+        ${actionHtml("hold_action", t.editorHoldAction, [["", t.editorTapNone], ["more-info", t.editorTapMoreInfo], ...moves])}
       </div>`;
   }
 

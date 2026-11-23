@@ -484,7 +484,7 @@
   "editorRemove": "Entfernen",
   "editorConfirmRemove": "Diesen Eintrag mit seinen Einstellungen entfernen?",
   "editorCustom": "Eigene Abschnitte",
-  "editorCustomHint": "Abschnitte mit beliebigen Sensoren, z. B. Leistung und Spannung jeder Phase. Jeder lässt sich unter Abschnitte wie die anderen anordnen, einklappen oder ausblenden. Name, Symbol und Aktionen (Tippen, Halten, Doppeltippen) je Sensor stehen hier; max (für einen Balken) und Einheit in YAML.",
+  "editorCustomHint": "Abschnitte mit beliebigen Sensoren, z. B. Leistung und Spannung jeder Phase. Jeder lässt sich unter Abschnitte wie die anderen anordnen, einklappen oder ausblenden. Name, Symbol und Aktionen (Tippen, Doppeltippen, Halten) je Sensor stehen hier; max (für einen Balken) und Einheit in YAML.",
   "editorCustomTitle": "Titel",
   "editorCustomSensor": "Sensor {n}",
   "editorCustomAdd": "Abschnitt hinzufügen",

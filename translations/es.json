@@ -484,7 +484,7 @@
   "editorRemove": "Quitar",
   "editorConfirmRemove": "¿Quitar este elemento y sus ajustes?",
   "editorCustom": "Secciones personalizadas",
-  "editorCustomHint": "Secciones propias con cualquier sensor, p. ej., la potencia y la tensión de cada fase. Cada una se puede colocar, plegar u ocultar en Secciones como las demás. El nombre, el icono y las acciones (tocar, mantener, tocar dos veces) de cada sensor se definen aquí; un máximo (para una barra) o una unidad, en YAML.",
+  "editorCustomHint": "Secciones propias con cualquier sensor, p. ej., la potencia y la tensión de cada fase. Cada una se puede colocar, plegar u ocultar en Secciones como las demás. El nombre, el icono y las acciones (tocar, tocar dos veces, mantener) de cada sensor se definen aquí; un máximo (para una barra) o una unidad, en YAML.",
   "editorCustomTitle": "Título",
   "editorCustomSensor": "Sensor {n}",
   "editorCustomAdd": "Añadir una sección",

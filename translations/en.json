@@ -484,7 +484,7 @@
   "editorRemove": "Remove",
   "editorConfirmRemove": "Remove this item and its settings?",
   "editorCustom": "Custom sections",
-  "editorCustomHint": "Sections of your own with any sensors, e.g. each phase's power and voltage. Each one can be placed, folded or hidden under Sections like the others. Each sensor's name, icon and actions (tap, hold, double tap) are set here; a max (for a bar) or a unit in YAML.",
+  "editorCustomHint": "Sections of your own with any sensors, e.g. each phase's power and voltage. Each one can be placed, folded or hidden under Sections like the others. Each sensor's name, icon and actions (tap, double tap, hold) are set here; a max (for a bar) or a unit in YAML.",
   "editorCustomTitle": "Title",
   "editorCustomSensor": "Sensor {n}",
   "editorCustomAdd": "Add a section",

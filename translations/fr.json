@@ -484,7 +484,7 @@
   "editorRemove": "Supprimer",
   "editorConfirmRemove": "Supprimer cet élément et ses réglages ?",
   "editorCustom": "Sections personnalisées",
-  "editorCustomHint": "Vos propres sections avec les capteurs de votre choix, par ex. la puissance et la tension de chaque phase. Chacune peut être placée, repliée ou masquée dans Sections comme les autres. Le nom, l'icône et les actions (toucher, appui long, double toucher) de chaque capteur se règlent ici ; un max (pour une barre) ou une unité en YAML.",
+  "editorCustomHint": "Vos propres sections avec les capteurs de votre choix, par ex. la puissance et la tension de chaque phase. Chacune peut être placée, repliée ou masquée dans Sections comme les autres. Le nom, l'icône et les actions (toucher, double toucher, appui long) de chaque capteur se règlent ici ; un max (pour une barre) ou une unité en YAML.",
   "editorCustomTitle": "Titre",
   "editorCustomSensor": "Capteur {n}",
   "editorCustomAdd": "Ajouter une section",

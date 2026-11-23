@@ -548,7 +548,7 @@ const TRANSLATIONS = {
     "editorRemove": "Remove",
     "editorConfirmRemove": "Remove this item and its settings?",
     "editorCustom": "Custom sections",
-    "editorCustomHint": "Sections of your own with any sensors, e.g. each phase's power and voltage. Each one can be placed, folded or hidden under Sections like the others. Each sensor's name, icon and actions (tap, hold, double tap) are set here; a max (for a bar) or a unit in YAML.",
+    "editorCustomHint": "Sections of your own with any sensors, e.g. each phase's power and voltage. Each one can be placed, folded or hidden under Sections like the others. Each sensor's name, icon and actions (tap, double tap, hold) are set here; a max (for a bar) or a unit in YAML.",
     "editorCustomTitle": "Title",
     "editorCustomSensor": "Sensor {n}",
     "editorCustomAdd": "Add a section",
@@ -1131,7 +1131,7 @@ const TRANSLATIONS = {
     "editorRemove": "Entfernen",
     "editorConfirmRemove": "Diesen Eintrag mit seinen Einstellungen entfernen?",
     "editorCustom": "Eigene Abschnitte",
-    "editorCustomHint": "Abschnitte mit beliebigen Sensoren, z. B. Leistung und Spannung jeder Phase. Jeder lässt sich unter Abschnitte wie die anderen anordnen, einklappen oder ausblenden. Name, Symbol und Aktionen (Tippen, Halten, Doppeltippen) je Sensor stehen hier; max (für einen Balken) und Einheit in YAML.",
+    "editorCustomHint": "Abschnitte mit beliebigen Sensoren, z. B. Leistung und Spannung jeder Phase. Jeder lässt sich unter Abschnitte wie die anderen anordnen, einklappen oder ausblenden. Name, Symbol und Aktionen (Tippen, Doppeltippen, Halten) je Sensor stehen hier; max (für einen Balken) und Einheit in YAML.",
     "editorCustomTitle": "Titel",
     "editorCustomSensor": "Sensor {n}",
     "editorCustomAdd": "Abschnitt hinzufügen",
@@ -1714,7 +1714,7 @@ const TRANSLATIONS = {
     "editorRemove": "Quitar",
     "editorConfirmRemove": "¿Quitar este elemento y sus ajustes?",
     "editorCustom": "Secciones personalizadas",
-    "editorCustomHint": "Secciones propias con cualquier sensor, p. ej., la potencia y la tensión de cada fase. Cada una se puede colocar, plegar u ocultar en Secciones como las demás. El nombre, el icono y las acciones (tocar, mantener, tocar dos veces) de cada sensor se definen aquí; un máximo (para una barra) o una unidad, en YAML.",
+    "editorCustomHint": "Secciones propias con cualquier sensor, p. ej., la potencia y la tensión de cada fase. Cada una se puede colocar, plegar u ocultar en Secciones como las demás. El nombre, el icono y las acciones (tocar, tocar dos veces, mantener) de cada sensor se definen aquí; un máximo (para una barra) o una unidad, en YAML.",
     "editorCustomTitle": "Título",
     "editorCustomSensor": "Sensor {n}",
     "editorCustomAdd": "Añadir una sección",
@@ -2297,7 +2297,7 @@ const TRANSLATIONS = {
     "editorRemove": "Supprimer",
     "editorConfirmRemove": "Supprimer cet élément et ses réglages ?",
     "editorCustom": "Sections personnalisées",
-    "editorCustomHint": "Vos propres sections avec les capteurs de votre choix, par ex. la puissance et la tension de chaque phase. Chacune peut être placée, repliée ou masquée dans Sections comme les autres. Le nom, l'icône et les actions (toucher, appui long, double toucher) de chaque capteur se règlent ici ; un max (pour une barre) ou une unité en YAML.",
+    "editorCustomHint": "Vos propres sections avec les capteurs de votre choix, par ex. la puissance et la tension de chaque phase. Chacune peut être placée, repliée ou masquée dans Sections comme les autres. Le nom, l'icône et les actions (toucher, double toucher, appui long) de chaque capteur se règlent ici ; un max (pour une barre) ou une unité en YAML.",
     "editorCustomTitle": "Titre",
     "editorCustomSensor": "Capteur {n}",
     "editorCustomAdd": "Ajouter une section",
@@ -2880,7 +2880,7 @@ const TRANSLATIONS = {
     "editorRemove": "Rimuovi",
     "editorConfirmRemove": "Rimuovere questo elemento e le relative impostazioni?",
     "editorCustom": "Sezioni personalizzate",
-    "editorCustomHint": "Sezioni personalizzate con sensori a scelta, ad esempio potenza e tensione di ogni fase. Come per le altre sezioni, puoi scegliere posizione, visualizzazione compressa o visibilità. Nome, icona e azioni (tocco, pressione prolungata, doppio tocco) di ogni sensore si impostano qui; un valore massimo (per una barra) o un'unità in YAML.",
+    "editorCustomHint": "Sezioni personalizzate con sensori a scelta, ad esempio potenza e tensione di ogni fase. Come per le altre sezioni, puoi scegliere posizione, visualizzazione compressa o visibilità. Nome, icona e azioni (tocco, doppio tocco, pressione prolungata) di ogni sensore si impostano qui; un valore massimo (per una barra) o un'unità in YAML.",
     "editorCustomTitle": "Titolo",
     "editorCustomSensor": "Sensore {n}",
     "editorCustomAdd": "Aggiungi una sezione",
@@ -3463,7 +3463,7 @@ const TRANSLATIONS = {
     "editorRemove": "Verwijderen",
     "editorConfirmRemove": "Dit item met zijn instellingen verwijderen?",
     "editorCustom": "Eigen secties",
-    "editorCustomHint": "Secties met sensoren naar keuze, bijv. vermogen en spanning per fase. Elke sectie kan onder Secties net als de andere worden geplaatst, ingeklapt of verborgen. Naam, pictogram en acties (tikken, vasthouden, dubbeltikken) per sensor stel je hier in; een max (voor een balk) of een eenheid in YAML.",
+    "editorCustomHint": "Secties met sensoren naar keuze, bijv. vermogen en spanning per fase. Elke sectie kan onder Secties net als de andere worden geplaatst, ingeklapt of verborgen. Naam, pictogram en acties (tikken, dubbeltikken, vasthouden) per sensor stel je hier in; een max (voor een balk) of een eenheid in YAML.",
     "editorCustomTitle": "Titel",
     "editorCustomSensor": "Sensor {n}",
     "editorCustomAdd": "Sectie toevoegen",
@@ -4046,7 +4046,7 @@ const TRANSLATIONS = {
     "editorRemove": "Usuń",
     "editorConfirmRemove": "Usunąć ten element razem z ustawieniami?",
     "editorCustom": "Własne sekcje",
-    "editorCustomHint": "Sekcje z dowolnymi czujnikami, np. moc i napięcie każdej fazy. Każdą można ustawić, zwinąć lub ukryć w Sekcjach, tak jak pozostałe. Nazwę, ikonę i akcje (dotknięcie, przytrzymanie, dwukrotne dotknięcie) każdego czujnika ustawisz tutaj, a max (dla paska) lub jednostkę w YAML.",
+    "editorCustomHint": "Sekcje z dowolnymi czujnikami, np. moc i napięcie każdej fazy. Każdą można ustawić, zwinąć lub ukryć w Sekcjach, tak jak pozostałe. Nazwę, ikonę i akcje (dotknięcie, podwójne dotknięcie, przytrzymanie) każdego czujnika ustawisz tutaj, a max (dla paska) lub jednostkę w YAML.",
     "editorCustomTitle": "Tytuł",
     "editorCustomSensor": "Czujnik {n}",
     "editorCustomAdd": "Dodaj sekcję",
@@ -4055,7 +4055,7 @@ const TRANSLATIONS = {
     "editorIcon": "Ikona",
     "editorTapAction": "Po dotknięciu",
     "editorHoldAction": "Po przytrzymaniu",
-    "editorDoubleTapAction": "Po dwukrotnym dotknięciu",
+    "editorDoubleTapAction": "Po podwójnym dotknięciu",
     "editorTapMoreInfo": "Szczegóły czujnika",
     "editorTapNavigate": "Przejdź do widoku",
     "editorTapUrl": "Otwórz link",
@@ -4629,7 +4629,7 @@ const TRANSLATIONS = {
     "editorRemove": "Remover",
     "editorConfirmRemove": "Remover este item e as suas configurações?",
     "editorCustom": "Secções personalizadas",
-    "editorCustomHint": "Secções próprias com quaisquer sensores, p.ex. a potência e tensão de cada fase. Cada uma pode ser posicionada, recolhida ou ocultada em Secções como as outras. O nome, o ícone e as ações (tocar, manter premido, tocar duas vezes) de cada sensor definem-se aqui; um máximo (para uma barra) ou uma unidade em YAML.",
+    "editorCustomHint": "Secções próprias com quaisquer sensores, p.ex. a potência e tensão de cada fase. Cada uma pode ser posicionada, recolhida ou ocultada em Secções como as outras. O nome, o ícone e as ações (tocar, tocar duas vezes, manter premido) de cada sensor definem-se aqui; um máximo (para uma barra) ou uma unidade em YAML.",
     "editorCustomTitle": "Título",
     "editorCustomSensor": "Sensor {n}",
     "editorCustomAdd": "Adicionar uma secção",
@@ -12337,7 +12337,7 @@ class SolarFlowCardEditor extends HTMLElement {
     return c?.title ? String(c.title) : `${t.customTitle} ${match[1]}`;
   }
 
-  // A custom tile's own name, icon and tap, hold and double-tap actions (#168).
+  // A custom tile's own name, icon and tap, double-tap and hold actions (#168).
   _customItemHtml(t, i, j, item) {
     const def = typeof item === "string" ? {} : item;
     const key = (field) => `data-custom-item="${i}.${j}.${field}"`;
@@ -12356,8 +12356,8 @@ class SolarFlowCardEditor extends HTMLElement {
         <label><span>${escapeHtml(t.editorItemName)}</span><input type="text" ${key("name")} value="${escapeHtml(def.name ?? "")}" /></label>
         <label><span>${escapeHtml(t.editorIcon)}</span><input type="text" ${key("icon")} value="${escapeHtml(def.icon ?? "")}" placeholder="mdi:flash" /></label>
         ${actionHtml("tap_action", t.editorTapAction, [["", t.editorTapMoreInfo], ...moves, ["none", t.editorTapNone]])}
-        ${actionHtml("hold_action", t.editorHoldAction, [["", t.editorTapNone], ["more-info", t.editorTapMoreInfo], ...moves])}
         ${actionHtml("double_tap_action", t.editorDoubleTapAction, [["", t.editorTapNone], ["more-info", t.editorTapMoreInfo], ...moves])}
+        ${actionHtml("hold_action", t.editorHoldAction, [["", t.editorTapNone], ["more-info", t.editorTapMoreInfo], ...moves])}
       </div>`;
   }
 

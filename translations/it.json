@@ -484,7 +484,7 @@
   "editorRemove": "Rimuovi",
   "editorConfirmRemove": "Rimuovere questo elemento e le relative impostazioni?",
   "editorCustom": "Sezioni personalizzate",
-  "editorCustomHint": "Sezioni personalizzate con sensori a scelta, ad esempio potenza e tensione di ogni fase. Come per le altre sezioni, puoi scegliere posizione, visualizzazione compressa o visibilità. Nome, icona e azioni (tocco, pressione prolungata, doppio tocco) di ogni sensore si impostano qui; un valore massimo (per una barra) o un'unità in YAML.",
+  "editorCustomHint": "Sezioni personalizzate con sensori a scelta, ad esempio potenza e tensione di ogni fase. Come per le altre sezioni, puoi scegliere posizione, visualizzazione compressa o visibilità. Nome, icona e azioni (tocco, doppio tocco, pressione prolungata) di ogni sensore si impostano qui; un valore massimo (per una barra) o un'unità in YAML.",
   "editorCustomTitle": "Titolo",
   "editorCustomSensor": "Sensore {n}",
   "editorCustomAdd": "Aggiungi una sezione",
