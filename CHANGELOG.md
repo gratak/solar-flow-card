@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.2.3
+
+- **Custom sections, more like the card's own** ([#168](https://github.com/gratak/solar-flow-card/issues/168)):
+  - an icon beside the section's title (`icon: mdi:…`);
+  - each sensor's own name and icon;
+  - tap, double-tap and hold actions per sensor (`tap_action`, `double_tap_action`, `hold_action`), as in Home Assistant's cards: `more-info`, `navigate` to another view or, with a path starting with `#`, a Bubble Card pop-up, `url` to open a link, or `none`. A tap opens the sensor unless set otherwise; a double tap and a hold do nothing unless set.
+  All of it in the editor under Sections → Custom sections, or in YAML.
+- **"Where today's home power comes from" always has its legend** ([#163](https://github.com/gratak/solar-flow-card/issues/163)), with each source's share, like the "where it went" bar. Before, it showed only with virtual storage.
+- **The shares in "Where today's home power comes from" add up to 100%:** when the grid brought more than the home used that day (a battery charged from the grid at night), the grid's share was cut off at 100% and the bar overflowed; the shares are now scaled to everything that came in.
+
 ## 2.2.2
 
 - **Where today's solar went** ([#163](https://github.com/gratak/solar-flow-card/issues/163)): a new bar under "Where today's home power comes from" splits today's solar production into what the home used, what charged the battery and what went to the grid, with the self-consumption share. Charging and export are capped by the production, so a battery charged from the grid at night does not count as solar. Diorama and Aurora. It is off by default: tick it under Sections in the editor, or add `production` to `sections:`.

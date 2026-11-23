@@ -46,6 +46,10 @@ const BASE_CSS = `
     font-size: 10px; font-weight: 800; letter-spacing: .05em;
   }
   .sfc-kicker svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; }
+  .sfc-kicker ha-icon { --mdc-icon-size: 16px; display: flex; }
+  .sfc-phase small ha-icon { --mdc-icon-size: 14px; display: inline-flex; margin-right: 4px; vertical-align: -2px; color: var(--sfc-accent); }
+  .sfc-phase small ha-icon > * { display: inline-block !important; }
+  .sfc-phase.sfc-static { cursor: default; }
   .sfc-hint { min-width: 0; color: var(--sfc-muted); font-size: 11px; text-align: right; }
   .sfc-link { border: 0; background: none; color: var(--sfc-accent); font-weight: 700; font-size: 12px; cursor: pointer; padding: 0; }
   .sfc-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700;
