@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.4
+
+- **Smooth flows** ([#170](https://github.com/gratak/solar-flow-card/issues/170)): the card redraws whenever a value changes, and every redraw started the flow animations over, so they jerked back every few seconds instead of moving on. The animations now run on the page's clock and carry on where they were, in every theme.
+- **Chart tips stay readable** ([#170](https://github.com/gratak/solar-flow-card/issues/170)): the tip under the mouse no longer vanishes when the card redraws, and on a phone it stays after the finger lifts, until a tap elsewhere.
+
 ## 2.2.3
 
 - **Custom sections, more like the card's own** ([#168](https://github.com/gratak/solar-flow-card/issues/168)):

@@ -732,6 +732,7 @@ class SolarFlowCard extends HTMLElement {
         wide ? wideLayout(theme, THEME_RENDER[theme](model)) : withoutFlow(theme, THEME_RENDER[theme](model), flowShown),
       );
       if (!painted) return;
+      this._syncAnimations();
       this._wire(model);
       if (wide) this._balanceWide();
       if (theme === "diorama") this._fitPills();
@@ -777,6 +778,18 @@ class SolarFlowCard extends HTMLElement {
     }
     card.innerHTML = html;
     return true;
+  }
+
+  // The flows' animations run on the page's clock, so a redraw (at every new
+  // value) picks each one up where it was instead of starting it over, which
+  // made the flows jerk (#170). Only the endless ones: the start-up animation
+  // keeps its own time.
+  _syncAnimations() {
+    const root = this.shadowRoot;
+    if (!root?.getAnimations) return;
+    for (const animation of root.getAnimations()) {
+      if (animation.effect?.getTiming?.().iterations === Infinity && animation.startTime !== 0) animation.startTime = 0;
+    }
   }
 
   // Balance once the card has a layout; retried for a few frames while
@@ -932,6 +945,6 @@ class SolarFlowCard extends HTMLElement {
         }
       });
     });
-    wireChart(root, model.chart?.data, model.t, model.locale, model.hiddenSeries);
+    wireChart(root, model.chart?.data, model.t, model.locale, model.hiddenSeries, (this._chartHover ||= {}));
   }
 }

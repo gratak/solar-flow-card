@@ -946,17 +946,22 @@ function chartTipHtml(data, index, t, locale, hidden) {
     ${rows.map(([kind, label, value]) => `<span class="${kind}"><i></i>${escapeHtml(label)}<b>${escapeHtml(formatEnergy(value, locale))}</b></span>`).join("")}`;
 }
 
-function wireChart(root, data, t, locale, hidden) {
+// `hover` outlives a render: the card redraws when a value changes, and the
+// tip comes back where it was instead of vanishing (#170). On a touch screen
+// the tip stays after the finger lifts, until a tap elsewhere.
+function wireChart(root, data, t, locale, hidden, hover = {}) {
   const plot = root.querySelector(".sfc-plot");
   if (!plot || !data) return;
   const cursor = plot.querySelector(".sfc-cursor");
   const tip = plot.querySelector(".sfc-tip");
   const count = data.kind === "power" ? data.spec.count : data.buckets.length;
   const hide = () => {
+    hover.x = null;
     cursor.hidden = true;
     tip.hidden = true;
   };
   const show = (event) => {
+    hover.x = event.clientX;
     const box = plot.getBoundingClientRect();
     const index = Math.floor(clamp((event.clientX - box.left) / box.width, 0, 0.9999) * count);
     const html = chartTipHtml(data, index, t, locale, hidden);
@@ -971,7 +976,17 @@ function wireChart(root, data, t, locale, hidden) {
   };
   plot.addEventListener("pointermove", show);
   plot.addEventListener("pointerdown", show);
-  plot.addEventListener("pointerleave", hide);
+  plot.addEventListener("pointerleave", (event) => { if (event.pointerType !== "touch") hide(); });
+  hover.hide = hide;
+  // Once per card: a tap outside the chart closes the tip of the chart shown now.
+  if (!hover.wired) {
+    hover.wired = true;
+    root.addEventListener("pointerdown", (event) => {
+      const current = root.querySelector(".sfc-plot");
+      if (current && !event.composedPath().includes(current)) hover.hide?.();
+    });
+  }
+  if (hover.x !== null && hover.x !== undefined) show({ clientX: hover.x });
 }
 
 // The power chart's time axis: today (5-minute buckets) or the last three
