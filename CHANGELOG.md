@@ -2,6 +2,12 @@
 
 ## 2.3.0-beta.1
 
+- **A schematic Diorama scene** ([#173](https://github.com/gratak/solar-flow-card/issues/173)): `diorama_style: schematic` draws the flow as clearly as an inverter maker's portal:
+  - solar on top, the grid on the left, the battery on the right and the home below, each on a small isometric tile, and the car beside the home;
+  - straight lines in each source's colour, with moving dots and an arrow towards where the power goes; a route without power is a faint grey line;
+  - a large value under each element, with the grid's direction and the battery's level;
+  - today's figures beside the drawing on a wide card, or below it on a narrow one: self-sufficiency, self-consumption, the battery level and the solar surplus (green) or deficit (red) right now.
+  In the editor under Appearance → Scene, beside Showroom and Classic. It follows your colours and the dark mode.
 - **Your colours everywhere** ([#174](https://github.com/gratak/solar-flow-card/issues/174)): `colors:` (Your colours in the editor) lost to Diorama's own colours with `dark_mode` (on, or auto at night or with a dark theme), and the "where from" and "where it went" bars under the Diorama scene never used them. They now apply in every theme, light or dark, to the flows, the charts and the bars alike.
 
 ## 2.2.4
