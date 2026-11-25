@@ -3,7 +3,7 @@
 ## 2.3.0-beta.1
 
 - **A schematic Diorama scene** ([#173](https://github.com/gratak/solar-flow-card/issues/173)): `diorama_style: schematic` draws the flow as clearly as an inverter maker's portal:
-  - solar on top, the grid on the left, the battery on the right and the home below, each on a small isometric tile, and the car beside the home;
+  - the Diorama's own drawings in a cross, each on a small isometric tile in its colour: solar panels on top, the pylon on the left, the battery cabinet with its charge level on the right, the house with its solar roof (windows lit at night) below, and the car beside it;
   - straight lines in each source's colour, with moving dots and an arrow towards where the power goes; a route without power is a faint grey line;
   - a large value under each element, with the grid's direction and the battery's level;
   - today's figures beside the drawing on a wide card, or below it on a narrow one: self-sufficiency, self-consumption, the battery level and the solar surplus (green) or deficit (red) right now.

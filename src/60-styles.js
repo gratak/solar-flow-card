@@ -497,12 +497,6 @@ const THEME_CSS = {
     .sc-tile { --c: var(--sfc-load); } .sc-tile.pv { --c: var(--sfc-pv); } .sc-tile.grid { --c: var(--sfc-grid); } .sc-tile.battery { --c: var(--sfc-battery); }
     .sc-tile .top { fill: color-mix(in srgb, var(--c) 34%, var(--sc-base)); }
     .sc-tile .side.l { fill: color-mix(in srgb, var(--c) 55%, var(--sc-shade)); } .sc-tile .side.r { fill: color-mix(in srgb, var(--c) 35%, var(--sc-shade)); }
-    .sc-ic .panel { fill: #2c4f87; } .sc-ic .cells { fill: none; stroke: rgba(255,255,255,.4); stroke-width: .8; } .sc-ic .leg { stroke: #7b8794; stroke-width: 2; }
-    .sc-ic .pylon { fill: none; stroke: #66727f; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
-    .sfc.dark .sc-ic .pylon { stroke: #a9b5c2; }
-    .sc-ic .f { fill: #f1f3f5; } .sc-ic .s { fill: #cdd4dc; } .sc-ic .t { fill: #fbfcfd; } .sc-ic .bolt { fill: var(--sfc-battery); }
-    .sc-ic .roof { fill: #39404a; } .sc-ic path.cells { fill: #2c4f87; stroke: none; } .sc-ic .door { fill: #8a6a4c; }
-    .sc-ic .car { fill: #eef1f4; stroke: #98a3ae; stroke-width: 1; } .sc-ic .glass { fill: #3a4551; } .sc-ic .wheel { fill: #2a2f36; }
     .sc-idle { fill: none; stroke: color-mix(in srgb, var(--sfc-text) 12%, transparent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     .sc-line { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: .8; }
     .sc-line.pv, .sc-arrow.pv, .sc-dot.pv { stroke: var(--sfc-pv); fill: var(--sfc-pv); }

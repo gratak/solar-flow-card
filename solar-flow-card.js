@@ -8647,37 +8647,83 @@ function todayOverview(m) {
 const SC_W = 400;
 const SC_H = 346;
 
+// The same isometric drawing as the classic Diorama, on a small scale: a
+// tile and the Diorama's own house, battery cabinet, pylon and solar panels.
+const SC_S = 13;
+const SC_T = 2.15;
+
+function scIso(cx, cy) {
+  const P = (x, y, z = 0) => [cx + (x - y) * SC_S * 0.866, cy + (x + y) * SC_S * 0.5 - z * SC_S];
+  const pts = (...ps) => ps.map((q) => P(...q).map((v) => v.toFixed(1)).join(",")).join(" ");
+  const poly = (fill, ...ps) => `<polygon points="${pts(...ps)}" ${fill.startsWith("class=") ? fill : `fill="${fill}"`}/>`;
+  const box = (x, y, w, d, h, top, left, right, z = 0) =>
+    poly(left, [x, y + d, z], [x + w, y + d, z], [x + w, y + d, z + h], [x, y + d, z + h])
+    + poly(right, [x + w, y, z], [x + w, y + d, z], [x + w, y + d, z + h], [x + w, y, z + h])
+    + poly(top, [x, y, z + h], [x + w, y, z + h], [x + w, y + d, z + h], [x, y + d, z + h]);
+  return { P, poly, box };
+}
+
 function scTile(x, y, cls) {
-  return `<g class="sc-tile ${cls}">
-    <path class="side l" d="M${x - 48} ${y}L${x} ${y + 24}L${x} ${y + 34}L${x - 48} ${y + 10}Z"/>
-    <path class="side r" d="M${x} ${y + 24}L${x + 48} ${y}L${x + 48} ${y + 10}L${x} ${y + 34}Z"/>
-    <path class="top" d="M${x - 48} ${y}L${x} ${y - 24}L${x + 48} ${y}L${x} ${y + 24}Z"/>
-  </g>`;
+  const { poly } = scIso(x, y);
+  const t = SC_T;
+  return `<g class="sc-tile ${cls}">${poly('class="side l"', [-t, t, 0], [t, t, 0], [t, t, -0.7], [-t, t, -0.7])}${poly('class="side r"', [t, -t, 0], [t, t, 0], [t, t, -0.7], [t, -t, -0.7])}${poly('class="top"', [-t, -t, 0], [t, -t, 0], [t, t, 0], [-t, t, 0])}</g>`;
 }
 
 const SC_ICONS = {
-  pv: (x, y) => `<g class="sc-ic">
-    <path d="M${x - 8} ${y + 4}V${y + 12}M${x + 14} ${y - 4}V${y + 5}" class="leg"/>
-    <path class="panel" d="M${x - 32} ${y - 2}L${x + 4} ${y - 24}L${x + 34} ${y - 10}L${x - 2} ${y + 12}Z"/>
-    <path class="cells" d="M${x - 20} ${y - 9}L${x + 10} ${y + 5}M${x - 8} ${y - 17}L${x + 22} ${y - 3}M${x - 20} ${y + 5}L${x + 16} ${y - 17}M${x - 26} ${y + 2}L${x + 10} ${y - 20}M${x - 14} ${y + 9}L${x + 22} ${y - 13}"/>
-  </g>`,
-  grid: (x, y) => `<g class="sc-ic"><path class="pylon" d="M${x - 12} ${y + 8}L${x - 2} ${y - 42}H${x + 2}L${x + 12} ${y + 8}M${x - 17} ${y - 30}H${x + 17}M${x - 12} ${y - 19}H${x + 12}M${x - 6} ${y - 30}L${x + 8} ${y - 19}M${x + 6} ${y - 30}L${x - 8} ${y - 19}M${x - 9} ${y - 8}L${x + 10} ${y + 8}M${x + 9} ${y - 8}L${x - 10} ${y + 8}"/></g>`,
-  battery: (x, y) => `<g class="sc-ic">
-    <path class="f" d="M${x - 16} ${y - 2}L${x} ${y + 6}V${y - 34}L${x - 16} ${y - 42}Z"/>
-    <path class="s" d="M${x} ${y + 6}L${x + 16} ${y - 2}V${y - 42}L${x} ${y - 34}Z"/>
-    <path class="t" d="M${x - 16} ${y - 42}L${x} ${y - 34}L${x + 16} ${y - 42}L${x} ${y - 50}Z"/>
-    <path class="bolt" d="M${x - 6} ${y - 26}L${x - 10} ${y - 16}L${x - 7} ${y - 15}L${x - 9} ${y - 7}L${x - 3} ${y - 19}L${x - 6} ${y - 20}Z"/>
-  </g>`,
-  home: (x, y) => `<g class="sc-ic">
-    <path class="f" d="M${x - 26} ${y}L${x} ${y + 13}V${y - 13}L${x - 13} ${y - 38}L${x - 26} ${y - 26}Z"/>
-    <path class="s" d="M${x} ${y + 13}L${x + 26} ${y}V${y - 26}L${x} ${y - 13}Z"/>
-    <path class="roof" d="M${x} ${y - 13}L${x + 26} ${y - 26}L${x + 13} ${y - 51}L${x - 13} ${y - 38}Z"/>
-    <path class="cells" d="M${x + 2} ${y - 20}L${x + 21} ${y - 29.5}L${x + 14} ${y - 43}L${x - 5} ${y - 33.5}Z"/>
-    <path class="door" d="M${x - 16} ${y + 1}L${x - 9} ${y + 4.5}V${y - 7}L${x - 16} ${y - 10.5}Z"/>
-  </g>`,
-  ev: (x, y) => `<g class="sc-ic"><path class="car" d="M${x - 24} ${y + 2}V${y - 6}L${x - 16} ${y - 10}L${x - 9} ${y - 20}H${x + 10}L${x + 18} ${y - 10}L${x + 24} ${y - 8}V${y + 2}Z"/>
-    <path class="glass" d="M${x - 7} ${y - 17}H${x + 8}L${x + 13} ${y - 10}H${x - 12}Z"/>
-    <circle class="wheel" cx="${x - 13}" cy="${y + 2}" r="4.5"/><circle class="wheel" cx="${x + 13}" cy="${y + 2}" r="4.5"/></g>`,
+  pv: (x, y) => {
+    const { poly, P } = scIso(x, y);
+    let g = "";
+    for (const [a, b] of [[-1.25, -1.2], [1.25, -1.2]]) {
+      const [l0, l1] = [P(a, b + 0.9, 0), P(a, b + 0.9, 0.55)];
+      g += `<path d="M${l0}L${l1}" stroke="#6e7f93" stroke-width="1.6"/>`;
+    }
+    for (let c = 0; c < 4; c++) {
+      const x0 = -1.75 + c * 0.88;
+      const x1 = x0 + 0.82;
+      g += poly("#1f3d6b", [x0, 1.0, 0.25], [x1, 1.0, 0.25], [x1, -0.9, 1.45], [x0, -0.9, 1.45]);
+      g += poly("#2c5591", [x0 + 0.06, 0.88, 0.33], [x1 - 0.06, 0.88, 0.33], [x1 - 0.06, -0.78, 1.37], [x0 + 0.06, -0.78, 1.37]);
+    }
+    return `<g class="sc-ic">${g}</g>`;
+  },
+  grid: (x, y) => {
+    const { P } = scIso(x, y);
+    const [bx, by] = P(0, 0);
+    const [tx, ty] = P(0, 0, 4.3);
+    return `<g class="sc-ic" stroke="#6e7f93" stroke-width="1.8" fill="none" stroke-linejoin="round">
+      <path d="M${bx - 11} ${by}L${tx} ${ty}L${bx + 11} ${by}"/>
+      <path d="M${tx - 17} ${ty + 12}H${tx + 17}M${tx - 12} ${ty + 30}H${tx + 12}M${bx - 7} ${by - 22}L${bx + 7} ${by - 44}M${bx + 7} ${by - 22}L${bx - 7} ${by - 44}"/></g>`;
+  },
+  battery: (x, y, soc) => {
+    const { poly, box } = scIso(x, y);
+    const level = isNum(soc) ? clamp(soc, 0, 100) / 100 : 0;
+    return `<g class="sc-ic">${box(-0.75, -0.55, 1.5, 1.1, 2.4, "#e6f6ef", "#d4efe3", "#b9e2d0")}
+      ${poly("#cfe7dc", [-0.5, 0.55, 0.45], [0.5, 0.55, 0.45], [0.5, 0.55, 1.95], [-0.5, 0.55, 1.95])}
+      ${poly(level < 0.2 ? "#f26b5b" : "#1fbf86", [-0.5, 0.55, 0.45], [0.5, 0.55, 0.45], [0.5, 0.55, 0.45 + 1.5 * level], [-0.5, 0.55, 0.45 + 1.5 * level])}</g>`;
+  },
+  home: (x, y, night) => {
+    const { poly, box } = scIso(x, y);
+    const windows = night ? "#ffd86b" : "#9fd3f5";
+    let g = box(-1.8, -1.35, 3.6, 2.7, 2.0, "#f4efe6", "#f8f4ec", "#e3dccd");
+    g += poly("#c7865a", [-0.45, 1.35, 0], [0.25, 1.35, 0], [0.25, 1.35, 1.2], [-0.45, 1.35, 1.2]);
+    g += poly(windows, [-1.45, 1.35, 0.8], [-0.8, 1.35, 0.8], [-0.8, 1.35, 1.45], [-1.45, 1.35, 1.45]);
+    g += poly(windows, [0.7, 1.35, 0.8], [1.4, 1.35, 0.8], [1.4, 1.35, 1.45], [0.7, 1.35, 1.45]);
+    g += poly(windows, [1.8, -0.8, 0.8], [1.8, -0.1, 0.8], [1.8, -0.1, 1.45], [1.8, -0.8, 1.45]);
+    g += poly("#d9573f", [-2.0, 1.55, 2.0], [2.0, 1.55, 2.0], [2.0, 0, 3.2], [-2.0, 0, 3.2]);
+    g += poly("#e8e0d2", [2.0, -1.55, 2.0], [2.0, 1.55, 2.0], [2.0, 0, 3.2]);
+    const slope = (t) => [1.4 - 1.25 * t, 2.1 + 0.96 * t];
+    for (let c = 0; c < 4; c++) {
+      const x0 = -1.75 + c * 0.88;
+      const x1 = x0 + 0.82;
+      const [ya, za] = slope(0.08);
+      const [yb, zb] = slope(0.9);
+      g += poly("#1f3d6b", [x0, ya, za], [x1, ya, za], [x1, yb, zb], [x0, yb, zb]);
+      const [yc, zc] = slope(0.14);
+      const [yd, zd] = slope(0.84);
+      g += poly("#2c5591", [x0 + 0.05, yc, zc], [x1 - 0.05, yc, zc], [x1 - 0.05, yd, zd], [x0 + 0.05, yd, zd]);
+    }
+    return `<g class="sc-ic">${g}</g>`;
+  },
+  ev: (x, y, ev, night) => `<g class="sc-ic">${evCarSvg(night, ev.color, ev.charging, [x - 36, y - 38, 72, 50])}</g>`,
 };
 
 // An arrowhead at the end (x, y) of a line arriving from direction `dir`.
@@ -8696,9 +8742,9 @@ function schematicScene(m) {
   // Each route: its path from the source towards the home, whether it is
   // live, whether the power runs the other way, the arrow at each end.
   const routes = [
-    showSolar && { cls: "pv", d: "M200 128V222", on: live.solarActive, rev: false, to: [200, 222, "down"], from: [200, 128] },
-    { cls: "grid", d: "M128 158H186V222", on: live.importActive || live.exportActive, rev: live.exportActive, to: [186, 222, "down"], back: [128, 158, "left"], from: [128, 158], fromBack: [186, 222] },
-    showBattery && { cls: "battery", d: "M272 158H214V222", on: live.chargeActive || live.dischargeActive, rev: live.chargeActive, to: [214, 222, "down"], back: [272, 158, "right"], from: [272, 158], fromBack: [214, 222] },
+    showSolar && { cls: "pv", d: "M200 128V210", on: live.solarActive, rev: false, to: [200, 210, "down"], from: [200, 128] },
+    { cls: "grid", d: "M128 158H182V214", on: live.importActive || live.exportActive, rev: live.exportActive, to: [182, 214, "down"], back: [128, 158, "left"], from: [128, 158], fromBack: [182, 214] },
+    showBattery && { cls: "battery", d: "M272 158H218V218", on: live.chargeActive || live.dischargeActive, rev: live.chargeActive, to: [218, 218, "down"], back: [272, 158, "right"], from: [272, 158], fromBack: [218, 218] },
     m.ev && { cls: "load", d: "M234 278H272", on: m.ev.charging, rev: false, to: [272, 278, "right"], from: [234, 278] },
   ].filter(Boolean);
   const lines = routes.map((r) => {
@@ -8708,12 +8754,13 @@ function schematicScene(m) {
     return `<path class="sc-line ${r.cls}" d="${r.d}"/>${flowPath(r.d, true, r.rev, r.cls).replace(/<path class="sfc-flow-base[^>]*>/, "")}`
       + `${scArrow(...end, r.cls)}<circle class="sc-dot ${r.cls}" cx="${start[0]}" cy="${start[1]}" r="3.5"/>`;
   }).join("");
+  const night = dioramaSky(m.now).phase === "night";
   const tiles = [
-    showSolar && scTile(...P.pv, "pv") + SC_ICONS.pv(P.pv[0], P.pv[1] - 4),
-    scTile(...P.grid, "grid") + SC_ICONS.grid(P.grid[0], P.grid[1] - 4),
-    showBattery && scTile(...P.battery, "battery") + SC_ICONS.battery(P.battery[0], P.battery[1] + 2),
-    scTile(...P.home, "load") + SC_ICONS.home(P.home[0], P.home[1] + 4),
-    m.ev && scTile(...P.ev, "ev") + SC_ICONS.ev(P.ev[0], P.ev[1] - 2),
+    showSolar && scTile(...P.pv, "pv") + SC_ICONS.pv(...P.pv),
+    scTile(...P.grid, "grid") + SC_ICONS.grid(...P.grid),
+    showBattery && scTile(...P.battery, "battery") + SC_ICONS.battery(...P.battery, live.soc),
+    scTile(...P.home, "load") + SC_ICONS.home(...P.home, night),
+    m.ev && scTile(...P.ev, "ev") + SC_ICONS.ev(...P.ev, m.ev, night || m.dark),
   ].filter(Boolean).join("");
   const value = ([x, y], cls, text, note, entityId) => `
     <button class="sc-val ${cls}" style="left:${((x / SC_W) * 100).toFixed(1)}%;top:${(((y + 38) / SC_H) * 100).toFixed(1)}%" ${entityAttr(entityId)}>
@@ -10284,12 +10331,6 @@ const THEME_CSS = {
     .sc-tile { --c: var(--sfc-load); } .sc-tile.pv { --c: var(--sfc-pv); } .sc-tile.grid { --c: var(--sfc-grid); } .sc-tile.battery { --c: var(--sfc-battery); }
     .sc-tile .top { fill: color-mix(in srgb, var(--c) 34%, var(--sc-base)); }
     .sc-tile .side.l { fill: color-mix(in srgb, var(--c) 55%, var(--sc-shade)); } .sc-tile .side.r { fill: color-mix(in srgb, var(--c) 35%, var(--sc-shade)); }
-    .sc-ic .panel { fill: #2c4f87; } .sc-ic .cells { fill: none; stroke: rgba(255,255,255,.4); stroke-width: .8; } .sc-ic .leg { stroke: #7b8794; stroke-width: 2; }
-    .sc-ic .pylon { fill: none; stroke: #66727f; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
-    .sfc.dark .sc-ic .pylon { stroke: #a9b5c2; }
-    .sc-ic .f { fill: #f1f3f5; } .sc-ic .s { fill: #cdd4dc; } .sc-ic .t { fill: #fbfcfd; } .sc-ic .bolt { fill: var(--sfc-battery); }
-    .sc-ic .roof { fill: #39404a; } .sc-ic path.cells { fill: #2c4f87; stroke: none; } .sc-ic .door { fill: #8a6a4c; }
-    .sc-ic .car { fill: #eef1f4; stroke: #98a3ae; stroke-width: 1; } .sc-ic .glass { fill: #3a4551; } .sc-ic .wheel { fill: #2a2f36; }
     .sc-idle { fill: none; stroke: color-mix(in srgb, var(--sfc-text) 12%, transparent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     .sc-line { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: .8; }
     .sc-line.pv, .sc-arrow.pv, .sc-dot.pv { stroke: var(--sfc-pv); fill: var(--sfc-pv); }
