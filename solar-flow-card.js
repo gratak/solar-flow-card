@@ -8503,6 +8503,16 @@ const SR_ICONS = {
   car: '<svg viewBox="0 0 24 24"><path d="M3 17v-4.5L5.5 7h13l2.5 5.5V17"/><path d="M3 13h18M5 17h2M17 17h2"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>',
 };
 
+// An arrowhead where a showroom route ends, pointing the way the power goes
+// (#173): at the path's end, or at its start when the power runs back.
+function srArrow(d, reverse, cls) {
+  const n = d.match(/-?\d+(?:\.\d+)?/g).map(Number);
+  const [tx, ty, fx, fy] = reverse ? [n[0], n[1], n[2], n[3]] : [n[n.length - 2], n[n.length - 1], n[n.length - 4], n[n.length - 3]];
+  const a = Math.atan2(ty - fy, tx - fx);
+  const at = (dx, dy) => `${(tx + dx * Math.cos(a) - dy * Math.sin(a)).toFixed(1)} ${(ty + dx * Math.sin(a) + dy * Math.cos(a)).toFixed(1)}`;
+  return `<path class="sr-arrow ${cls}" d="M${at(0, 0)}L${at(-52, -24)}L${at(-36, 0)}L${at(-52, 24)}Z"/>`;
+}
+
 function showroomScene(m, night) {
   const { t, locale, live: L } = m;
   const icons = m.config.showroom_labels === "icons";
@@ -8512,7 +8522,7 @@ function showroomScene(m, night) {
   // A route carrying power: a faint line and a pulse running the way it flows.
   const flow = (cls, d, active, reverse) => {
     if (!active) return;
-    flows += `<path class="sr-line ${cls}" d="${d}"/><path class="sr-pulse ${cls} ${reverse ? "rev" : ""}" d="${d}" pathLength="100" filter="url(#sr-glow)"/>`;
+    flows += `<path class="sr-line ${cls}" d="${d}"/><path class="sr-pulse ${cls} ${reverse ? "rev" : ""}" d="${d}" pathLength="100" filter="url(#sr-glow)"/>${srArrow(d, reverse, cls)}`;
   };
   // [class, icon, name, value, note, entity, chip anchor [x, y], chip placement]
   const items = [];
@@ -10139,7 +10149,8 @@ const THEME_CSS = {
     .dio-scene.showroom.night { background: #18191d; }
     .dio-scene.showroom .pv { --sr-c: var(--sfc-pv); } .dio-scene.showroom .battery { --sr-c: var(--sfc-battery); }
     .dio-scene.showroom .grid { --sr-c: var(--sfc-grid); } .dio-scene.showroom .load { --sr-c: var(--sfc-load); }
-    .sr-line { fill: none; stroke: var(--sr-c); stroke-width: 1.5px; vector-effect: non-scaling-stroke; opacity: .5; }
+    .sr-line { fill: none; stroke: var(--sr-c); stroke-width: 2.5px; vector-effect: non-scaling-stroke; stroke-linecap: round; opacity: .85; }
+    .sr-arrow { fill: var(--sr-c); stroke: none; filter: drop-shadow(0 0 6px var(--sr-c)); }
     .sr-pulse { fill: none; stroke: var(--sr-c); stroke-width: 3px; vector-effect: non-scaling-stroke; stroke-linecap: round;
       stroke-dasharray: 9 41; animation: sr-run 2.4s linear infinite; }
     .sr-pulse.rev { animation-direction: reverse; }
