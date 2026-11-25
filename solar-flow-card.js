@@ -184,6 +184,8 @@ const TRANSLATIONS = {
     "stored": "Stored",
     "autonomy": "Autonomy until",
     "stateOfCharge": "Charge",
+    "pvSurplus": "PV surplus",
+    "pvDeficit": "PV deficit",
     "autarkyToday": "Self-sufficiency today",
     "statusNominal": "Status: nominal",
     "statusWarn": "Status: caution",
@@ -503,6 +505,7 @@ const TRANSLATIONS = {
     "editorDioramaStyle": "Scene",
     "editorStyleDrawn": "Classic (drawn)",
     "editorStyleShowroom": "Showroom (a rendered house)",
+    "editorStyleSchematic": "Schematic (a clear flow diagram)",
     "editorShowroomLabels": "Values",
     "editorLabelsBar": "A strip along the bottom",
     "editorLabelsIcons": "Icons beside each element",
@@ -767,6 +770,8 @@ const TRANSLATIONS = {
     "stored": "Gespeichert",
     "autonomy": "Autonomie bis",
     "stateOfCharge": "Ladung",
+    "pvSurplus": "PV-Überschuss",
+    "pvDeficit": "PV-Defizit",
     "autarkyToday": "Autarkie heute",
     "statusNominal": "Status: nominal",
     "statusWarn": "Status: Vorsicht",
@@ -1086,6 +1091,7 @@ const TRANSLATIONS = {
     "editorDioramaStyle": "Szene",
     "editorStyleDrawn": "Klassisch (gezeichnet)",
     "editorStyleShowroom": "Showroom (gerendertes Haus)",
+    "editorStyleSchematic": "Schema (klares Flussdiagramm)",
     "editorShowroomLabels": "Werte",
     "editorLabelsBar": "Leiste am unteren Rand",
     "editorLabelsIcons": "Symbole neben jedem Element",
@@ -1350,6 +1356,8 @@ const TRANSLATIONS = {
     "stored": "Almacenado",
     "autonomy": "Autonomía hasta",
     "stateOfCharge": "Carga",
+    "pvSurplus": "Excedente FV",
+    "pvDeficit": "Déficit FV",
     "autarkyToday": "Autosuficiencia hoy",
     "statusNominal": "Estado: nominal",
     "statusWarn": "Estado: precaución",
@@ -1669,6 +1677,7 @@ const TRANSLATIONS = {
     "editorDioramaStyle": "Escena",
     "editorStyleDrawn": "Clásica (dibujada)",
     "editorStyleShowroom": "Showroom (casa renderizada)",
+    "editorStyleSchematic": "Esquema (flujo claro)",
     "editorShowroomLabels": "Valores",
     "editorLabelsBar": "Franja abajo",
     "editorLabelsIcons": "Iconos junto a cada elemento",
@@ -1933,6 +1942,8 @@ const TRANSLATIONS = {
     "stored": "Stocké",
     "autonomy": "Autonomie jusqu'à",
     "stateOfCharge": "Charge",
+    "pvSurplus": "Surplus PV",
+    "pvDeficit": "Déficit PV",
     "autarkyToday": "Autosuffisance du jour",
     "statusNominal": "État : nominal",
     "statusWarn": "État : attention",
@@ -2252,6 +2263,7 @@ const TRANSLATIONS = {
     "editorDioramaStyle": "Scène",
     "editorStyleDrawn": "Classique (dessinée)",
     "editorStyleShowroom": "Showroom (maison en rendu 3D)",
+    "editorStyleSchematic": "Schéma (flux lisible)",
     "editorShowroomLabels": "Valeurs",
     "editorLabelsBar": "Bandeau en bas",
     "editorLabelsIcons": "Icônes près de chaque élément",
@@ -2516,6 +2528,8 @@ const TRANSLATIONS = {
     "stored": "Immagazzinata",
     "autonomy": "Autonomia fino alle",
     "stateOfCharge": "Carica",
+    "pvSurplus": "Surplus FV",
+    "pvDeficit": "Deficit FV",
     "autarkyToday": "Autosufficienza di oggi",
     "statusNominal": "Stato: regolare",
     "statusWarn": "Stato: attenzione",
@@ -2835,6 +2849,7 @@ const TRANSLATIONS = {
     "editorDioramaStyle": "Scena",
     "editorStyleDrawn": "Classica (disegnata)",
     "editorStyleShowroom": "Showroom (casa renderizzata)",
+    "editorStyleSchematic": "Schema (flusso chiaro)",
     "editorShowroomLabels": "Valori",
     "editorLabelsBar": "Una striscia in basso",
     "editorLabelsIcons": "Icone accanto a ogni elemento",
@@ -3099,6 +3114,8 @@ const TRANSLATIONS = {
     "stored": "Opgeslagen",
     "autonomy": "Autonomie tot",
     "stateOfCharge": "Lading",
+    "pvSurplus": "PV-overschot",
+    "pvDeficit": "PV-tekort",
     "autarkyToday": "Zelfvoorziening vandaag",
     "statusNominal": "Status: nominaal",
     "statusWarn": "Status: let op",
@@ -3418,6 +3435,7 @@ const TRANSLATIONS = {
     "editorDioramaStyle": "Scène",
     "editorStyleDrawn": "Klassiek (getekend)",
     "editorStyleShowroom": "Showroom (gerenderd huis)",
+    "editorStyleSchematic": "Schema (duidelijk stroomschema)",
     "editorShowroomLabels": "Waarden",
     "editorLabelsBar": "Strook onderaan",
     "editorLabelsIcons": "Pictogrammen bij elk onderdeel",
@@ -3682,6 +3700,8 @@ const TRANSLATIONS = {
     "stored": "Zapas",
     "autonomy": "Autonomia do",
     "stateOfCharge": "Stan magazynu",
+    "pvSurplus": "Nadwyżka PV",
+    "pvDeficit": "Niedobór PV",
     "autarkyToday": "Samowystarcz. dziś",
     "statusNominal": "Status: nominalny",
     "statusWarn": "Status: uwaga",
@@ -4001,6 +4021,7 @@ const TRANSLATIONS = {
     "editorDioramaStyle": "Scena",
     "editorStyleDrawn": "Klasyczna (rysunek)",
     "editorStyleShowroom": "Showroom (render domu)",
+    "editorStyleSchematic": "Schemat (czytelny przepływ)",
     "editorShowroomLabels": "Opisy wartości",
     "editorLabelsBar": "Pasek na dole",
     "editorLabelsIcons": "Ikony przy elementach",
@@ -4265,6 +4286,8 @@ const TRANSLATIONS = {
     "stored": "Armazenado",
     "autonomy": "Autonomia até",
     "stateOfCharge": "Carga",
+    "pvSurplus": "Excedente FV",
+    "pvDeficit": "Défice FV",
     "autarkyToday": "Autossuficiência hoje",
     "statusNominal": "Estado: nominal",
     "statusWarn": "Estado: atenção",
@@ -4584,6 +4607,7 @@ const TRANSLATIONS = {
     "editorDioramaStyle": "Cena",
     "editorStyleDrawn": "Clássica (desenhada)",
     "editorStyleShowroom": "Showroom (casa em render)",
+    "editorStyleSchematic": "Esquema (fluxo claro)",
     "editorShowroomLabels": "Valores",
     "editorLabelsBar": "Faixa em baixo",
     "editorLabelsIcons": "Ícones junto a cada elemento",
@@ -8615,12 +8639,120 @@ function todayOverview(m) {
     </div>` : ""}`;
 }
 
+// Diorama's schematic scene (`diorama_style: schematic`, #173): the sources
+// in a cross on small isometric tiles (solar on top, the grid on the left,
+// the battery on the right, the home below, the car beside it), straight
+// lines in each source's colour with an arrow towards where the power goes,
+// a large value under each element, and today's key figures beside them.
+const SC_W = 400;
+const SC_H = 346;
+
+function scTile(x, y, cls) {
+  return `<g class="sc-tile ${cls}">
+    <path class="side l" d="M${x - 48} ${y}L${x} ${y + 24}L${x} ${y + 34}L${x - 48} ${y + 10}Z"/>
+    <path class="side r" d="M${x} ${y + 24}L${x + 48} ${y}L${x + 48} ${y + 10}L${x} ${y + 34}Z"/>
+    <path class="top" d="M${x - 48} ${y}L${x} ${y - 24}L${x + 48} ${y}L${x} ${y + 24}Z"/>
+  </g>`;
+}
+
+const SC_ICONS = {
+  pv: (x, y) => `<g class="sc-ic">
+    <path d="M${x - 8} ${y + 4}V${y + 12}M${x + 14} ${y - 4}V${y + 5}" class="leg"/>
+    <path class="panel" d="M${x - 32} ${y - 2}L${x + 4} ${y - 24}L${x + 34} ${y - 10}L${x - 2} ${y + 12}Z"/>
+    <path class="cells" d="M${x - 20} ${y - 9}L${x + 10} ${y + 5}M${x - 8} ${y - 17}L${x + 22} ${y - 3}M${x - 20} ${y + 5}L${x + 16} ${y - 17}M${x - 26} ${y + 2}L${x + 10} ${y - 20}M${x - 14} ${y + 9}L${x + 22} ${y - 13}"/>
+  </g>`,
+  grid: (x, y) => `<g class="sc-ic"><path class="pylon" d="M${x - 12} ${y + 8}L${x - 2} ${y - 42}H${x + 2}L${x + 12} ${y + 8}M${x - 17} ${y - 30}H${x + 17}M${x - 12} ${y - 19}H${x + 12}M${x - 6} ${y - 30}L${x + 8} ${y - 19}M${x + 6} ${y - 30}L${x - 8} ${y - 19}M${x - 9} ${y - 8}L${x + 10} ${y + 8}M${x + 9} ${y - 8}L${x - 10} ${y + 8}"/></g>`,
+  battery: (x, y) => `<g class="sc-ic">
+    <path class="f" d="M${x - 16} ${y - 2}L${x} ${y + 6}V${y - 34}L${x - 16} ${y - 42}Z"/>
+    <path class="s" d="M${x} ${y + 6}L${x + 16} ${y - 2}V${y - 42}L${x} ${y - 34}Z"/>
+    <path class="t" d="M${x - 16} ${y - 42}L${x} ${y - 34}L${x + 16} ${y - 42}L${x} ${y - 50}Z"/>
+    <path class="bolt" d="M${x - 6} ${y - 26}L${x - 10} ${y - 16}L${x - 7} ${y - 15}L${x - 9} ${y - 7}L${x - 3} ${y - 19}L${x - 6} ${y - 20}Z"/>
+  </g>`,
+  home: (x, y) => `<g class="sc-ic">
+    <path class="f" d="M${x - 26} ${y}L${x} ${y + 13}V${y - 13}L${x - 13} ${y - 38}L${x - 26} ${y - 26}Z"/>
+    <path class="s" d="M${x} ${y + 13}L${x + 26} ${y}V${y - 26}L${x} ${y - 13}Z"/>
+    <path class="roof" d="M${x} ${y - 13}L${x + 26} ${y - 26}L${x + 13} ${y - 51}L${x - 13} ${y - 38}Z"/>
+    <path class="cells" d="M${x + 2} ${y - 20}L${x + 21} ${y - 29.5}L${x + 14} ${y - 43}L${x - 5} ${y - 33.5}Z"/>
+    <path class="door" d="M${x - 16} ${y + 1}L${x - 9} ${y + 4.5}V${y - 7}L${x - 16} ${y - 10.5}Z"/>
+  </g>`,
+  ev: (x, y) => `<g class="sc-ic"><path class="car" d="M${x - 24} ${y + 2}V${y - 6}L${x - 16} ${y - 10}L${x - 9} ${y - 20}H${x + 10}L${x + 18} ${y - 10}L${x + 24} ${y - 8}V${y + 2}Z"/>
+    <path class="glass" d="M${x - 7} ${y - 17}H${x + 8}L${x + 13} ${y - 10}H${x - 12}Z"/>
+    <circle class="wheel" cx="${x - 13}" cy="${y + 2}" r="4.5"/><circle class="wheel" cx="${x + 13}" cy="${y + 2}" r="4.5"/></g>`,
+};
+
+// An arrowhead at the end (x, y) of a line arriving from direction `dir`.
+function scArrow(x, y, dir, cls) {
+  const d = { down: `M${x - 5} ${y - 7}L${x} ${y}L${x + 5} ${y - 7}Z`, left: `M${x + 7} ${y - 5}L${x} ${y}L${x + 7} ${y + 5}Z`,
+    right: `M${x - 7} ${y - 5}L${x} ${y}L${x - 7} ${y + 5}Z`, up: `M${x - 5} ${y + 7}L${x} ${y}L${x + 5} ${y + 7}Z` }[dir];
+  return `<path class="sc-arrow ${cls}" d="${d}"/>`;
+}
+
+function schematicScene(m) {
+  const { t, locale, live, today } = m;
+  const showSolar = m.config.showSolar;
+  const showBattery = m.config.showBattery;
+  const P = { pv: [200, 58], grid: [80, 158], battery: [320, 158], home: [200, 274], ev: [322, 274] };
+  const gridValue = live.importActive ? live.gridImport : live.exportActive ? live.gridExport : Math.abs(live.grid);
+  // Each route: its path from the source towards the home, whether it is
+  // live, whether the power runs the other way, the arrow at each end.
+  const routes = [
+    showSolar && { cls: "pv", d: "M200 128V222", on: live.solarActive, rev: false, to: [200, 222, "down"], from: [200, 128] },
+    { cls: "grid", d: "M128 158H186V222", on: live.importActive || live.exportActive, rev: live.exportActive, to: [186, 222, "down"], back: [128, 158, "left"], from: [128, 158], fromBack: [186, 222] },
+    showBattery && { cls: "battery", d: "M272 158H214V222", on: live.chargeActive || live.dischargeActive, rev: live.chargeActive, to: [214, 222, "down"], back: [272, 158, "right"], from: [272, 158], fromBack: [214, 222] },
+    m.ev && { cls: "load", d: "M234 278H272", on: m.ev.charging, rev: false, to: [272, 278, "right"], from: [234, 278] },
+  ].filter(Boolean);
+  const lines = routes.map((r) => {
+    if (!r.on) return `<path class="sc-idle" d="${r.d}"/>`;
+    const end = r.rev ? r.back : r.to;
+    const start = r.rev ? r.fromBack : r.from;
+    return `<path class="sc-line ${r.cls}" d="${r.d}"/>${flowPath(r.d, true, r.rev, r.cls).replace(/<path class="sfc-flow-base[^>]*>/, "")}`
+      + `${scArrow(...end, r.cls)}<circle class="sc-dot ${r.cls}" cx="${start[0]}" cy="${start[1]}" r="3.5"/>`;
+  }).join("");
+  const tiles = [
+    showSolar && scTile(...P.pv, "pv") + SC_ICONS.pv(P.pv[0], P.pv[1] - 4),
+    scTile(...P.grid, "grid") + SC_ICONS.grid(P.grid[0], P.grid[1] - 4),
+    showBattery && scTile(...P.battery, "battery") + SC_ICONS.battery(P.battery[0], P.battery[1] + 2),
+    scTile(...P.home, "load") + SC_ICONS.home(P.home[0], P.home[1] + 4),
+    m.ev && scTile(...P.ev, "ev") + SC_ICONS.ev(P.ev[0], P.ev[1] - 2),
+  ].filter(Boolean).join("");
+  const value = ([x, y], cls, text, note, entityId) => `
+    <button class="sc-val ${cls}" style="left:${((x / SC_W) * 100).toFixed(1)}%;top:${(((y + 38) / SC_H) * 100).toFixed(1)}%" ${entityAttr(entityId)}>
+      <b>${escapeHtml(text)}</b>${note ? `<small>${escapeHtml(note)}</small>` : ""}</button>`;
+  const values = [
+    showSolar && value(P.pv, "pv", formatPower(live.solar, locale), "", m.ids.live.solar),
+    value(P.grid, "grid", formatPower(gridValue, locale), gridStatus(m), gridEntityId(m)),
+    showBattery && value(P.battery, "battery", formatPower(live.dischargeActive ? live.discharge : live.charge, locale), formatPercent(live.soc, locale), batteryEntityId(m)),
+    value(P.home, "load", formatPower(live.load, locale), "", m.ids.live.load),
+    m.ev && value(P.ev, "load", m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle, t.evShort, m.ev.entityId),
+  ].filter(Boolean).join("");
+  // Today's key figures, as in an inverter maker's portal.
+  const own = todayOwnShare(m);
+  const selfUse = showSolar && isNum(today.solar) && today.solar > 0.05
+    ? clamp(((today.solar - (isNum(today.gridExport) ? today.gridExport : 0)) / today.solar) * 100, 0, 100) : null;
+  const balance = showSolar && isNum(live.solar) && isNum(live.load) ? live.solar - live.load : null;
+  const kpi = (cls, number, label, entityId) => `<button class="sc-kpi ${cls}" ${entityAttr(entityId)}><b>${escapeHtml(number)}</b><small>${escapeHtml(label)}</small></button>`;
+  const kpis = [
+    isNum(own) && kpi("", formatPercent(own, locale), t.autarky, null),
+    isNum(selfUse) && kpi("", formatPercent(selfUse, locale), t.selfUse, null),
+    showBattery && isNum(live.soc) && kpi("", formatPercent(live.soc, locale), t.stateOfCharge, m.ids.live.soc),
+    isNum(balance) && kpi(balance < 0 ? "bad" : "good", `${balance < 0 ? "−" : "+"}${formatPower(Math.abs(balance), locale)}`, balance < 0 ? t.pvDeficit : t.pvSurplus, m.ids.live.solar),
+  ].filter(Boolean).join("");
+  // The title and the clock sit above the drawing (renderDiorama puts them
+  // before `tags`), so they never cover the solar tile.
+  return {
+    svg: "",
+    tags: `<div class="sc-stage"><svg viewBox="0 0 ${SC_W} ${SC_H}" aria-hidden="true"><g class="sc-tiles">${tiles}</g><g fill="none">${lines}</g></svg>${values}</div>`,
+    kpis,
+  };
+}
+
 function renderDiorama(m) {
   const { t, locale, live } = m;
   const { svg, sky } = dioramaScene(m);
-  const showroom = m.config.diorama_style !== "classic";
+  const schematic = m.config.diorama_style === "schematic";
+  const showroom = !schematic && m.config.diorama_style !== "classic";
   const photoNight = showroom && (sky.phase === "night" || m.dark);
-  const room = showroom ? showroomScene(m, photoNight) : null;
+  const room = showroom ? showroomScene(m, photoNight) : schematic ? schematicScene(m) : null;
   const pill = (x, y, cls, value, note, entityId) => `
     <button class="dio-pill ${cls}" style="left:${((x / 520) * 100).toFixed(1)}%;top:${((y / 360) * 100).toFixed(1)}%" ${entityAttr(entityId)}>
       <i class="${cls}"></i>${escapeHtml(value)} <small>${escapeHtml(note)}</small>
@@ -8628,7 +8760,7 @@ function renderDiorama(m) {
   const batteryNote = live.dischargeActive ? `−${formatPower(live.discharge, locale)}` : live.chargeActive ? `+${formatPower(live.charge, locale)}` : t.idle;
   const gridValue = live.importActive ? live.gridImport : live.exportActive ? live.gridExport : Math.abs(live.grid);
   return `
-    ${sectionShown(m, "flow") ? `<div class="dio-scene ${showroom ? `showroom ${photoNight ? "night" : "day"}` : ""}" style="--sky-a:${sky.sky[0]};--sky-b:${sky.sky[1]}">
+    ${sectionShown(m, "flow") ? `${schematic ? '<div class="sc-wrap">' : ""}<div class="dio-scene ${showroom ? `showroom ${photoNight ? "night" : "day"}` : schematic ? "schematic" : ""}" style="--sky-a:${sky.sky[0]};--sky-b:${sky.sky[1]}">
       ${room ? room.svg : `<svg viewBox="0 0 520 360" aria-hidden="true">${svg}</svg>`}
       ${room ? '<div class="dio-head">' : ""}<div class="dio-title"><h1>${escapeHtml(m.name)}</h1>${liveBadge(m)}</div>
       <div class="dio-clock">${escapeHtml(clockText(m))}${isNum(m.weather?.temperature) ? ` <button class="dio-temp" ${entityAttr(m.weather.entityId)}>${escapeHtml(`${formatNumber(m.weather.temperature, locale, 0)}${m.weather.unit}`)}</button>` : ""}</div>${room ? "</div>" : ""}
@@ -8639,7 +8771,7 @@ function renderDiorama(m) {
       ${pill(m.ev ? 70 : 120, 296, "load", formatPower(live.load, locale), t.inHome, m.ids.live.load)}
       ${m.ev ? pill(342, 294, "load", m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle,
         m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : m.ev.name || t.evCar, m.ev.entityId) : ""}`}
-    </div>` : ""}
+    </div>${schematic ? `${room.kpis ? `<div class="sc-kpis">${room.kpis}</div>` : ""}</div>` : ""}` : ""}
     ${todayOverview(m)}
     <div class="sfc-sections">${standardSections(m)}</div>`;
 }
@@ -10134,6 +10266,48 @@ const THEME_CSS = {
     .dio-scene > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
     /* Showroom style: a rendered house; live flows as thin glowing lines with a
        running pulse; each value a label tied to a dot on its element. */
+    /* The schematic scene (#173): tiles in a cross, straight lines with arrows, today's figures beside. */
+    .sc-wrap { display: grid; grid-template-columns: minmax(0, 1fr); }
+    @container (min-width: 560px) { .sc-wrap { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: center; } }
+    .dio-scene.schematic { aspect-ratio: auto; background: none; padding: 14px 16px 0; --sc-base: #ffffff; --sc-shade: #7d8995;
+      --sfc-flow-w: 5; --sfc-dash: .1 11; --sfc-dash-time: 14s; }
+    .sfc.dark .dio-scene.schematic { --sc-base: #233041; --sc-shade: #0a1017; }
+    .dio-scene.schematic .dio-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 6px 10px; }
+    .dio-scene.schematic .dio-title, .dio-scene.schematic .dio-clock { position: static; }
+    .dio-scene.schematic .dio-title { color: var(--sfc-text); text-shadow: none; }
+    .dio-scene.schematic .dio-title .sfc-badge { --sfc-badge-bg: color-mix(in srgb, var(--sfc-text) 8%, transparent); --sfc-badge-text: var(--sfc-text); backdrop-filter: none; }
+    .dio-scene.schematic .dio-clock { color: var(--sfc-text); background: color-mix(in srgb, var(--sfc-text) 8%, transparent); backdrop-filter: none; }
+    .dio-scene.schematic .dio-temp { border-left-color: color-mix(in srgb, var(--sfc-text) 25%, transparent); }
+    .sc-stage { position: relative; aspect-ratio: 400 / 346; }
+    .sc-stage > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+    .sc-tile { --c: var(--sfc-load); } .sc-tile.pv { --c: var(--sfc-pv); } .sc-tile.grid { --c: var(--sfc-grid); } .sc-tile.battery { --c: var(--sfc-battery); }
+    .sc-tile .top { fill: color-mix(in srgb, var(--c) 34%, var(--sc-base)); }
+    .sc-tile .side.l { fill: color-mix(in srgb, var(--c) 55%, var(--sc-shade)); } .sc-tile .side.r { fill: color-mix(in srgb, var(--c) 35%, var(--sc-shade)); }
+    .sc-ic .panel { fill: #2c4f87; } .sc-ic .cells { fill: none; stroke: rgba(255,255,255,.4); stroke-width: .8; } .sc-ic .leg { stroke: #7b8794; stroke-width: 2; }
+    .sc-ic .pylon { fill: none; stroke: #66727f; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
+    .sfc.dark .sc-ic .pylon { stroke: #a9b5c2; }
+    .sc-ic .f { fill: #f1f3f5; } .sc-ic .s { fill: #cdd4dc; } .sc-ic .t { fill: #fbfcfd; } .sc-ic .bolt { fill: var(--sfc-battery); }
+    .sc-ic .roof { fill: #39404a; } .sc-ic path.cells { fill: #2c4f87; stroke: none; } .sc-ic .door { fill: #8a6a4c; }
+    .sc-ic .car { fill: #eef1f4; stroke: #98a3ae; stroke-width: 1; } .sc-ic .glass { fill: #3a4551; } .sc-ic .wheel { fill: #2a2f36; }
+    .sc-idle { fill: none; stroke: color-mix(in srgb, var(--sfc-text) 12%, transparent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .sc-line { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: .8; }
+    .sc-line.pv, .sc-arrow.pv, .sc-dot.pv { stroke: var(--sfc-pv); fill: var(--sfc-pv); }
+    .sc-line.grid, .sc-arrow.grid, .sc-dot.grid { stroke: var(--sfc-grid); fill: var(--sfc-grid); }
+    .sc-line.battery, .sc-arrow.battery, .sc-dot.battery { stroke: var(--sfc-battery); fill: var(--sfc-battery); }
+    .sc-line.load, .sc-arrow.load, .sc-dot.load { stroke: var(--sfc-load); fill: var(--sfc-load); }
+    .sc-line { fill: none !important; } .sc-arrow, .sc-dot { stroke: none !important; }
+    .dio-scene.schematic .sfc-flow { stroke-linejoin: round; }
+    .sc-val { position: absolute; transform: translateX(-50%); display: grid; justify-items: center; gap: 0; padding: 0 4px; border: 0; background: none;
+      color: var(--sfc-text); font: inherit; line-height: 1.15; white-space: nowrap; cursor: pointer; }
+    .sc-val b { font-size: clamp(14px, 4.4cqw, 21px); font-weight: 800; font-family: var(--sfc-num-font, inherit); }
+    .sc-val small { font-size: clamp(10px, 2.6cqw, 12px); font-weight: 700; color: var(--sfc-muted); }
+    .sc-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 4px 16px 12px; }
+    @container (min-width: 560px) { .sc-kpis { grid-template-columns: minmax(0, 1fr); padding: 54px 16px 12px 0; } }
+    .sc-kpi { display: grid; gap: 1px; min-width: 0; padding: 10px 12px; border: 0; border-radius: 14px; text-align: left; font: inherit;
+      color: var(--sfc-text); background: color-mix(in srgb, var(--sfc-text) 5%, transparent); }
+    .sc-kpi b { font-size: clamp(16px, 4cqw, 20px); font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sc-kpi small { font-size: 12px; font-weight: 700; color: var(--sfc-muted); overflow-wrap: anywhere; }
+    .sc-kpi.bad b { color: var(--sfc-bad, #d64545); } .sc-kpi.good b { color: var(--sfc-good, #1f9d55); }
     .dio-scene.showroom { aspect-ratio: 1720 / 1312; background: #f5f5f5; }
     .dio-scene.showroom.night { background: #18191d; }
     .dio-scene.showroom .pv { --sr-c: var(--sfc-pv); } .dio-scene.showroom .battery { --sr-c: var(--sfc-battery); }
@@ -12478,9 +12652,9 @@ class SolarFlowCardEditor extends HTMLElement {
           </select>
         </label>
         ${(this._config.theme || "diorama") === "diorama" ? `<label><span>${escapeHtml(t.editorDioramaStyle)}</span>
-          <select data-select="diorama_style">${[["", t.editorStyleShowroom], ["classic", t.editorStyleDrawn]].map(([value, label]) => `<option value="${value}" ${(this._config.diorama_style === "classic" ? "classic" : "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
+          <select data-select="diorama_style">${[["", t.editorStyleShowroom], ["schematic", t.editorStyleSchematic], ["classic", t.editorStyleDrawn]].map(([value, label]) => `<option value="${value}" ${(["classic", "schematic"].includes(this._config.diorama_style) ? this._config.diorama_style : "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
         </label>` : ""}
-        ${(this._config.theme || "diorama") === "diorama" && this._config.diorama_style !== "classic" ? `<label><span>${escapeHtml(t.editorShowroomLabels)}</span>
+        ${(this._config.theme || "diorama") === "diorama" && !["classic", "schematic"].includes(this._config.diorama_style) ? `<label><span>${escapeHtml(t.editorShowroomLabels)}</span>
           <select data-select="showroom_labels">${[["", t.editorLabelsBar], ["icons", t.editorLabelsIcons]].map(([value, label]) => `<option value="${value}" ${(this._config.showroom_labels || "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
         </label>` : ""}
         ${DARK_THEMES.includes(this._config.theme || "diorama") ? `<label><span>${escapeHtml(t.editorDarkMode)}</span>

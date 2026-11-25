@@ -479,6 +479,48 @@ const THEME_CSS = {
     .dio-scene > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
     /* Showroom style: a rendered house; live flows as thin glowing lines with a
        running pulse; each value a label tied to a dot on its element. */
+    /* The schematic scene (#173): tiles in a cross, straight lines with arrows, today's figures beside. */
+    .sc-wrap { display: grid; grid-template-columns: minmax(0, 1fr); }
+    @container (min-width: 560px) { .sc-wrap { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: center; } }
+    .dio-scene.schematic { aspect-ratio: auto; background: none; padding: 14px 16px 0; --sc-base: #ffffff; --sc-shade: #7d8995;
+      --sfc-flow-w: 5; --sfc-dash: .1 11; --sfc-dash-time: 14s; }
+    .sfc.dark .dio-scene.schematic { --sc-base: #233041; --sc-shade: #0a1017; }
+    .dio-scene.schematic .dio-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 6px 10px; }
+    .dio-scene.schematic .dio-title, .dio-scene.schematic .dio-clock { position: static; }
+    .dio-scene.schematic .dio-title { color: var(--sfc-text); text-shadow: none; }
+    .dio-scene.schematic .dio-title .sfc-badge { --sfc-badge-bg: color-mix(in srgb, var(--sfc-text) 8%, transparent); --sfc-badge-text: var(--sfc-text); backdrop-filter: none; }
+    .dio-scene.schematic .dio-clock { color: var(--sfc-text); background: color-mix(in srgb, var(--sfc-text) 8%, transparent); backdrop-filter: none; }
+    .dio-scene.schematic .dio-temp { border-left-color: color-mix(in srgb, var(--sfc-text) 25%, transparent); }
+    .sc-stage { position: relative; aspect-ratio: 400 / 346; }
+    .sc-stage > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+    .sc-tile { --c: var(--sfc-load); } .sc-tile.pv { --c: var(--sfc-pv); } .sc-tile.grid { --c: var(--sfc-grid); } .sc-tile.battery { --c: var(--sfc-battery); }
+    .sc-tile .top { fill: color-mix(in srgb, var(--c) 34%, var(--sc-base)); }
+    .sc-tile .side.l { fill: color-mix(in srgb, var(--c) 55%, var(--sc-shade)); } .sc-tile .side.r { fill: color-mix(in srgb, var(--c) 35%, var(--sc-shade)); }
+    .sc-ic .panel { fill: #2c4f87; } .sc-ic .cells { fill: none; stroke: rgba(255,255,255,.4); stroke-width: .8; } .sc-ic .leg { stroke: #7b8794; stroke-width: 2; }
+    .sc-ic .pylon { fill: none; stroke: #66727f; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
+    .sfc.dark .sc-ic .pylon { stroke: #a9b5c2; }
+    .sc-ic .f { fill: #f1f3f5; } .sc-ic .s { fill: #cdd4dc; } .sc-ic .t { fill: #fbfcfd; } .sc-ic .bolt { fill: var(--sfc-battery); }
+    .sc-ic .roof { fill: #39404a; } .sc-ic path.cells { fill: #2c4f87; stroke: none; } .sc-ic .door { fill: #8a6a4c; }
+    .sc-ic .car { fill: #eef1f4; stroke: #98a3ae; stroke-width: 1; } .sc-ic .glass { fill: #3a4551; } .sc-ic .wheel { fill: #2a2f36; }
+    .sc-idle { fill: none; stroke: color-mix(in srgb, var(--sfc-text) 12%, transparent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .sc-line { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: .8; }
+    .sc-line.pv, .sc-arrow.pv, .sc-dot.pv { stroke: var(--sfc-pv); fill: var(--sfc-pv); }
+    .sc-line.grid, .sc-arrow.grid, .sc-dot.grid { stroke: var(--sfc-grid); fill: var(--sfc-grid); }
+    .sc-line.battery, .sc-arrow.battery, .sc-dot.battery { stroke: var(--sfc-battery); fill: var(--sfc-battery); }
+    .sc-line.load, .sc-arrow.load, .sc-dot.load { stroke: var(--sfc-load); fill: var(--sfc-load); }
+    .sc-line { fill: none !important; } .sc-arrow, .sc-dot { stroke: none !important; }
+    .dio-scene.schematic .sfc-flow { stroke-linejoin: round; }
+    .sc-val { position: absolute; transform: translateX(-50%); display: grid; justify-items: center; gap: 0; padding: 0 4px; border: 0; background: none;
+      color: var(--sfc-text); font: inherit; line-height: 1.15; white-space: nowrap; cursor: pointer; }
+    .sc-val b { font-size: clamp(14px, 4.4cqw, 21px); font-weight: 800; font-family: var(--sfc-num-font, inherit); }
+    .sc-val small { font-size: clamp(10px, 2.6cqw, 12px); font-weight: 700; color: var(--sfc-muted); }
+    .sc-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 4px 16px 12px; }
+    @container (min-width: 560px) { .sc-kpis { grid-template-columns: minmax(0, 1fr); padding: 54px 16px 12px 0; } }
+    .sc-kpi { display: grid; gap: 1px; min-width: 0; padding: 10px 12px; border: 0; border-radius: 14px; text-align: left; font: inherit;
+      color: var(--sfc-text); background: color-mix(in srgb, var(--sfc-text) 5%, transparent); }
+    .sc-kpi b { font-size: clamp(16px, 4cqw, 20px); font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sc-kpi small { font-size: 12px; font-weight: 700; color: var(--sfc-muted); overflow-wrap: anywhere; }
+    .sc-kpi.bad b { color: var(--sfc-bad, #d64545); } .sc-kpi.good b { color: var(--sfc-good, #1f9d55); }
     .dio-scene.showroom { aspect-ratio: 1720 / 1312; background: #f5f5f5; }
     .dio-scene.showroom.night { background: #18191d; }
     .dio-scene.showroom .pv { --sr-c: var(--sfc-pv); } .dio-scene.showroom .battery { --sr-c: var(--sfc-battery); }

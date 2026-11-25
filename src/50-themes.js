@@ -417,12 +417,120 @@ function todayOverview(m) {
     </div>` : ""}`;
 }
 
+// Diorama's schematic scene (`diorama_style: schematic`, #173): the sources
+// in a cross on small isometric tiles (solar on top, the grid on the left,
+// the battery on the right, the home below, the car beside it), straight
+// lines in each source's colour with an arrow towards where the power goes,
+// a large value under each element, and today's key figures beside them.
+const SC_W = 400;
+const SC_H = 346;
+
+function scTile(x, y, cls) {
+  return `<g class="sc-tile ${cls}">
+    <path class="side l" d="M${x - 48} ${y}L${x} ${y + 24}L${x} ${y + 34}L${x - 48} ${y + 10}Z"/>
+    <path class="side r" d="M${x} ${y + 24}L${x + 48} ${y}L${x + 48} ${y + 10}L${x} ${y + 34}Z"/>
+    <path class="top" d="M${x - 48} ${y}L${x} ${y - 24}L${x + 48} ${y}L${x} ${y + 24}Z"/>
+  </g>`;
+}
+
+const SC_ICONS = {
+  pv: (x, y) => `<g class="sc-ic">
+    <path d="M${x - 8} ${y + 4}V${y + 12}M${x + 14} ${y - 4}V${y + 5}" class="leg"/>
+    <path class="panel" d="M${x - 32} ${y - 2}L${x + 4} ${y - 24}L${x + 34} ${y - 10}L${x - 2} ${y + 12}Z"/>
+    <path class="cells" d="M${x - 20} ${y - 9}L${x + 10} ${y + 5}M${x - 8} ${y - 17}L${x + 22} ${y - 3}M${x - 20} ${y + 5}L${x + 16} ${y - 17}M${x - 26} ${y + 2}L${x + 10} ${y - 20}M${x - 14} ${y + 9}L${x + 22} ${y - 13}"/>
+  </g>`,
+  grid: (x, y) => `<g class="sc-ic"><path class="pylon" d="M${x - 12} ${y + 8}L${x - 2} ${y - 42}H${x + 2}L${x + 12} ${y + 8}M${x - 17} ${y - 30}H${x + 17}M${x - 12} ${y - 19}H${x + 12}M${x - 6} ${y - 30}L${x + 8} ${y - 19}M${x + 6} ${y - 30}L${x - 8} ${y - 19}M${x - 9} ${y - 8}L${x + 10} ${y + 8}M${x + 9} ${y - 8}L${x - 10} ${y + 8}"/></g>`,
+  battery: (x, y) => `<g class="sc-ic">
+    <path class="f" d="M${x - 16} ${y - 2}L${x} ${y + 6}V${y - 34}L${x - 16} ${y - 42}Z"/>
+    <path class="s" d="M${x} ${y + 6}L${x + 16} ${y - 2}V${y - 42}L${x} ${y - 34}Z"/>
+    <path class="t" d="M${x - 16} ${y - 42}L${x} ${y - 34}L${x + 16} ${y - 42}L${x} ${y - 50}Z"/>
+    <path class="bolt" d="M${x - 6} ${y - 26}L${x - 10} ${y - 16}L${x - 7} ${y - 15}L${x - 9} ${y - 7}L${x - 3} ${y - 19}L${x - 6} ${y - 20}Z"/>
+  </g>`,
+  home: (x, y) => `<g class="sc-ic">
+    <path class="f" d="M${x - 26} ${y}L${x} ${y + 13}V${y - 13}L${x - 13} ${y - 38}L${x - 26} ${y - 26}Z"/>
+    <path class="s" d="M${x} ${y + 13}L${x + 26} ${y}V${y - 26}L${x} ${y - 13}Z"/>
+    <path class="roof" d="M${x} ${y - 13}L${x + 26} ${y - 26}L${x + 13} ${y - 51}L${x - 13} ${y - 38}Z"/>
+    <path class="cells" d="M${x + 2} ${y - 20}L${x + 21} ${y - 29.5}L${x + 14} ${y - 43}L${x - 5} ${y - 33.5}Z"/>
+    <path class="door" d="M${x - 16} ${y + 1}L${x - 9} ${y + 4.5}V${y - 7}L${x - 16} ${y - 10.5}Z"/>
+  </g>`,
+  ev: (x, y) => `<g class="sc-ic"><path class="car" d="M${x - 24} ${y + 2}V${y - 6}L${x - 16} ${y - 10}L${x - 9} ${y - 20}H${x + 10}L${x + 18} ${y - 10}L${x + 24} ${y - 8}V${y + 2}Z"/>
+    <path class="glass" d="M${x - 7} ${y - 17}H${x + 8}L${x + 13} ${y - 10}H${x - 12}Z"/>
+    <circle class="wheel" cx="${x - 13}" cy="${y + 2}" r="4.5"/><circle class="wheel" cx="${x + 13}" cy="${y + 2}" r="4.5"/></g>`,
+};
+
+// An arrowhead at the end (x, y) of a line arriving from direction `dir`.
+function scArrow(x, y, dir, cls) {
+  const d = { down: `M${x - 5} ${y - 7}L${x} ${y}L${x + 5} ${y - 7}Z`, left: `M${x + 7} ${y - 5}L${x} ${y}L${x + 7} ${y + 5}Z`,
+    right: `M${x - 7} ${y - 5}L${x} ${y}L${x - 7} ${y + 5}Z`, up: `M${x - 5} ${y + 7}L${x} ${y}L${x + 5} ${y + 7}Z` }[dir];
+  return `<path class="sc-arrow ${cls}" d="${d}"/>`;
+}
+
+function schematicScene(m) {
+  const { t, locale, live, today } = m;
+  const showSolar = m.config.showSolar;
+  const showBattery = m.config.showBattery;
+  const P = { pv: [200, 58], grid: [80, 158], battery: [320, 158], home: [200, 274], ev: [322, 274] };
+  const gridValue = live.importActive ? live.gridImport : live.exportActive ? live.gridExport : Math.abs(live.grid);
+  // Each route: its path from the source towards the home, whether it is
+  // live, whether the power runs the other way, the arrow at each end.
+  const routes = [
+    showSolar && { cls: "pv", d: "M200 128V222", on: live.solarActive, rev: false, to: [200, 222, "down"], from: [200, 128] },
+    { cls: "grid", d: "M128 158H186V222", on: live.importActive || live.exportActive, rev: live.exportActive, to: [186, 222, "down"], back: [128, 158, "left"], from: [128, 158], fromBack: [186, 222] },
+    showBattery && { cls: "battery", d: "M272 158H214V222", on: live.chargeActive || live.dischargeActive, rev: live.chargeActive, to: [214, 222, "down"], back: [272, 158, "right"], from: [272, 158], fromBack: [214, 222] },
+    m.ev && { cls: "load", d: "M234 278H272", on: m.ev.charging, rev: false, to: [272, 278, "right"], from: [234, 278] },
+  ].filter(Boolean);
+  const lines = routes.map((r) => {
+    if (!r.on) return `<path class="sc-idle" d="${r.d}"/>`;
+    const end = r.rev ? r.back : r.to;
+    const start = r.rev ? r.fromBack : r.from;
+    return `<path class="sc-line ${r.cls}" d="${r.d}"/>${flowPath(r.d, true, r.rev, r.cls).replace(/<path class="sfc-flow-base[^>]*>/, "")}`
+      + `${scArrow(...end, r.cls)}<circle class="sc-dot ${r.cls}" cx="${start[0]}" cy="${start[1]}" r="3.5"/>`;
+  }).join("");
+  const tiles = [
+    showSolar && scTile(...P.pv, "pv") + SC_ICONS.pv(P.pv[0], P.pv[1] - 4),
+    scTile(...P.grid, "grid") + SC_ICONS.grid(P.grid[0], P.grid[1] - 4),
+    showBattery && scTile(...P.battery, "battery") + SC_ICONS.battery(P.battery[0], P.battery[1] + 2),
+    scTile(...P.home, "load") + SC_ICONS.home(P.home[0], P.home[1] + 4),
+    m.ev && scTile(...P.ev, "ev") + SC_ICONS.ev(P.ev[0], P.ev[1] - 2),
+  ].filter(Boolean).join("");
+  const value = ([x, y], cls, text, note, entityId) => `
+    <button class="sc-val ${cls}" style="left:${((x / SC_W) * 100).toFixed(1)}%;top:${(((y + 38) / SC_H) * 100).toFixed(1)}%" ${entityAttr(entityId)}>
+      <b>${escapeHtml(text)}</b>${note ? `<small>${escapeHtml(note)}</small>` : ""}</button>`;
+  const values = [
+    showSolar && value(P.pv, "pv", formatPower(live.solar, locale), "", m.ids.live.solar),
+    value(P.grid, "grid", formatPower(gridValue, locale), gridStatus(m), gridEntityId(m)),
+    showBattery && value(P.battery, "battery", formatPower(live.dischargeActive ? live.discharge : live.charge, locale), formatPercent(live.soc, locale), batteryEntityId(m)),
+    value(P.home, "load", formatPower(live.load, locale), "", m.ids.live.load),
+    m.ev && value(P.ev, "load", m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle, t.evShort, m.ev.entityId),
+  ].filter(Boolean).join("");
+  // Today's key figures, as in an inverter maker's portal.
+  const own = todayOwnShare(m);
+  const selfUse = showSolar && isNum(today.solar) && today.solar > 0.05
+    ? clamp(((today.solar - (isNum(today.gridExport) ? today.gridExport : 0)) / today.solar) * 100, 0, 100) : null;
+  const balance = showSolar && isNum(live.solar) && isNum(live.load) ? live.solar - live.load : null;
+  const kpi = (cls, number, label, entityId) => `<button class="sc-kpi ${cls}" ${entityAttr(entityId)}><b>${escapeHtml(number)}</b><small>${escapeHtml(label)}</small></button>`;
+  const kpis = [
+    isNum(own) && kpi("", formatPercent(own, locale), t.autarky, null),
+    isNum(selfUse) && kpi("", formatPercent(selfUse, locale), t.selfUse, null),
+    showBattery && isNum(live.soc) && kpi("", formatPercent(live.soc, locale), t.stateOfCharge, m.ids.live.soc),
+    isNum(balance) && kpi(balance < 0 ? "bad" : "good", `${balance < 0 ? "−" : "+"}${formatPower(Math.abs(balance), locale)}`, balance < 0 ? t.pvDeficit : t.pvSurplus, m.ids.live.solar),
+  ].filter(Boolean).join("");
+  // The title and the clock sit above the drawing (renderDiorama puts them
+  // before `tags`), so they never cover the solar tile.
+  return {
+    svg: "",
+    tags: `<div class="sc-stage"><svg viewBox="0 0 ${SC_W} ${SC_H}" aria-hidden="true"><g class="sc-tiles">${tiles}</g><g fill="none">${lines}</g></svg>${values}</div>`,
+    kpis,
+  };
+}
+
 function renderDiorama(m) {
   const { t, locale, live } = m;
   const { svg, sky } = dioramaScene(m);
-  const showroom = m.config.diorama_style !== "classic";
+  const schematic = m.config.diorama_style === "schematic";
+  const showroom = !schematic && m.config.diorama_style !== "classic";
   const photoNight = showroom && (sky.phase === "night" || m.dark);
-  const room = showroom ? showroomScene(m, photoNight) : null;
+  const room = showroom ? showroomScene(m, photoNight) : schematic ? schematicScene(m) : null;
   const pill = (x, y, cls, value, note, entityId) => `
     <button class="dio-pill ${cls}" style="left:${((x / 520) * 100).toFixed(1)}%;top:${((y / 360) * 100).toFixed(1)}%" ${entityAttr(entityId)}>
       <i class="${cls}"></i>${escapeHtml(value)} <small>${escapeHtml(note)}</small>
@@ -430,7 +538,7 @@ function renderDiorama(m) {
   const batteryNote = live.dischargeActive ? `−${formatPower(live.discharge, locale)}` : live.chargeActive ? `+${formatPower(live.charge, locale)}` : t.idle;
   const gridValue = live.importActive ? live.gridImport : live.exportActive ? live.gridExport : Math.abs(live.grid);
   return `
-    ${sectionShown(m, "flow") ? `<div class="dio-scene ${showroom ? `showroom ${photoNight ? "night" : "day"}` : ""}" style="--sky-a:${sky.sky[0]};--sky-b:${sky.sky[1]}">
+    ${sectionShown(m, "flow") ? `${schematic ? '<div class="sc-wrap">' : ""}<div class="dio-scene ${showroom ? `showroom ${photoNight ? "night" : "day"}` : schematic ? "schematic" : ""}" style="--sky-a:${sky.sky[0]};--sky-b:${sky.sky[1]}">
       ${room ? room.svg : `<svg viewBox="0 0 520 360" aria-hidden="true">${svg}</svg>`}
       ${room ? '<div class="dio-head">' : ""}<div class="dio-title"><h1>${escapeHtml(m.name)}</h1>${liveBadge(m)}</div>
       <div class="dio-clock">${escapeHtml(clockText(m))}${isNum(m.weather?.temperature) ? ` <button class="dio-temp" ${entityAttr(m.weather.entityId)}>${escapeHtml(`${formatNumber(m.weather.temperature, locale, 0)}${m.weather.unit}`)}</button>` : ""}</div>${room ? "</div>" : ""}
@@ -441,7 +549,7 @@ function renderDiorama(m) {
       ${pill(m.ev ? 70 : 120, 296, "load", formatPower(live.load, locale), t.inHome, m.ids.live.load)}
       ${m.ev ? pill(342, 294, "load", m.ev.charging ? formatPower(m.ev.power, locale) : isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : t.idle,
         m.ev.charging && isNum(m.ev.soc) ? formatPercent(m.ev.soc, locale) : m.ev.name || t.evCar, m.ev.entityId) : ""}`}
-    </div>` : ""}
+    </div>${schematic ? `${room.kpis ? `<div class="sc-kpis">${room.kpis}</div>` : ""}</div>` : ""}` : ""}
     ${todayOverview(m)}
     <div class="sfc-sections">${standardSections(m)}</div>`;
 }

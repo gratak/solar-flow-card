@@ -590,9 +590,9 @@ class SolarFlowCardEditor extends HTMLElement {
           </select>
         </label>
         ${(this._config.theme || "diorama") === "diorama" ? `<label><span>${escapeHtml(t.editorDioramaStyle)}</span>
-          <select data-select="diorama_style">${[["", t.editorStyleShowroom], ["classic", t.editorStyleDrawn]].map(([value, label]) => `<option value="${value}" ${(this._config.diorama_style === "classic" ? "classic" : "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
+          <select data-select="diorama_style">${[["", t.editorStyleShowroom], ["schematic", t.editorStyleSchematic], ["classic", t.editorStyleDrawn]].map(([value, label]) => `<option value="${value}" ${(["classic", "schematic"].includes(this._config.diorama_style) ? this._config.diorama_style : "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
         </label>` : ""}
-        ${(this._config.theme || "diorama") === "diorama" && this._config.diorama_style !== "classic" ? `<label><span>${escapeHtml(t.editorShowroomLabels)}</span>
+        ${(this._config.theme || "diorama") === "diorama" && !["classic", "schematic"].includes(this._config.diorama_style) ? `<label><span>${escapeHtml(t.editorShowroomLabels)}</span>
           <select data-select="showroom_labels">${[["", t.editorLabelsBar], ["icons", t.editorLabelsIcons]].map(([value, label]) => `<option value="${value}" ${(this._config.showroom_labels || "") === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}</select>
         </label>` : ""}
         ${DARK_THEMES.includes(this._config.theme || "diorama") ? `<label><span>${escapeHtml(t.editorDarkMode)}</span>
