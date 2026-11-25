@@ -38,7 +38,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "2.2.4";
+const CARD_VERSION = "2.3.0-beta.1";
 // The card's type is custom:home-energy-hub since 2.0.0. The old name stays
 // registered so dashboards with custom:solar-flow-card keep working.
 const CARD_TAG = "home-energy-hub";
@@ -10114,7 +10114,8 @@ function colorCss(config) {
   const rules = Object.entries(COLOR_VARS)
     .filter(([key]) => typeof colors[key] === "string" && /^(#[0-9a-f]{3,8}|[a-z]{3,20}|(rgb|hsl)a?\([\d\s.,%/]+\))$/i.test(colors[key].trim()))
     .map(([key, name]) => `${name}: ${colors[key].trim()};`);
-  return rules.length ? `\n  ha-card.sfc { ${rules.join(" ")} }\n` : "";
+  // Stronger than any theme's own colours, its dark variant included (#174).
+  return rules.length ? `\n  ha-card.sfc.sfc.sfc { ${rules.join(" ")} }\n` : "";
 }
 
 const THEME_CSS = {
@@ -10216,11 +10217,11 @@ const THEME_CSS = {
     .dio-share header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 8px; font-size: 12px; font-weight: 800; }
     .dio-share header span { color: #6a7d92; font-weight: 700; white-space: nowrap; }
     .dio-track { height: 14px; margin-top: 7px; display: flex; overflow: hidden; border-radius: 999px; background: #eef2f6; }
-    .dio-track .pv { background: #ffc23d; } .dio-track .battery { background: #2bc48f; } .dio-track .grid { background: #7aa4f2; } .dio-track .vstore { background: #3cc5d6; }
-    .dio-track .load { background: #f28b74; } .dio-legend .load::before { background: #f28b74; }
+    .dio-track .pv { background: var(--sfc-pv); } .dio-track .battery { background: var(--sfc-battery); } .dio-track .grid { background: var(--sfc-grid); } .dio-track .vstore { background: #3cc5d6; }
+    .dio-track .load { background: var(--sfc-load); } .dio-legend .load::before { background: var(--sfc-load); }
     .dio-legend { display: flex; flex-wrap: wrap; gap: 2px 12px; margin-top: 6px; font-size: 11px; font-weight: 700; color: #6a7d92; }
     .dio-legend span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 5px; border-radius: 50%; background: currentColor; }
-    .dio-legend .pv::before { background: #ffc23d; } .dio-legend .battery::before { background: #2bc48f; } .dio-legend .vstore::before { background: #3cc5d6; } .dio-legend .grid::before { background: #7aa4f2; }
+    .dio-legend .pv::before { background: var(--sfc-pv); } .dio-legend .battery::before { background: var(--sfc-battery); } .dio-legend .vstore::before { background: #3cc5d6; } .dio-legend .grid::before { background: var(--sfc-grid); }
     .sfc-section { border: 0; border-radius: 20px; }
     .sfc-flow { --sfc-dash: 1 9; }
     /* dark_mode: the same scene with the card around it in night colours. */
