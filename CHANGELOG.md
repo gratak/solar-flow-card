@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.3.0-beta.1
+
+- **Your colours everywhere** ([#174](https://github.com/gratak/solar-flow-card/issues/174)): `colors:` (Your colours in the editor) lost to Diorama's own colours with `dark_mode` (on, or auto at night or with a dark theme), and the "where from" and "where it went" bars under the Diorama scene never used them. They now apply in every theme, light or dark, to the flows, the charts and the bars alike.
+
 ## 2.2.4
 
 - **Smooth flows** ([#170](https://github.com/gratak/solar-flow-card/issues/170)): the card redraws whenever a value changes, and every redraw started the flow animations over, so they jerked back every few seconds instead of moving on. The animations now run on the page's clock and carry on where they were, in every theme.
