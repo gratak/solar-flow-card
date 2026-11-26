@@ -226,6 +226,7 @@
   "editorShowSystem": "Installation (phases, charge onduleur, batterie)",
   "editorShowPanels": "Afficher les panneaux (optimiseurs)",
   "editorShowWeather": "Météo dans les thèmes Diorama et Réacteur",
+  "editorClearFlow": "Diorama : flèches sur les flux et batterie à la couleur de son niveau (rouge vide → vert pleine)",
   "editorWide": "Mise en page large (pour un tableau de bord large)",
   "editorInsights": "Aperçu du jour et comparaison",
   "editorSolar": "L'installation dispose de panneaux PV",

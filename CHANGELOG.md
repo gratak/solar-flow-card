@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.7
+
+- **Arrows and the battery colour are now an option** ([#173](https://github.com/gratak/solar-flow-card/issues/173)): `clear_flow: true` (in the editor under Appearance) turns on what 2.2.6 brought to the showroom scene, the arrows, the bolder lines and the battery cabinet in its level's colour, and now also works in the classic Diorama: arrows on its flows and its battery's level in the same red-to-green colour. Off by default, so the showroom picture looks as before 2.2.6.
+
 ## 2.2.6
 
 Clearer energy flow in the showroom scene ([#173](https://github.com/gratak/solar-flow-card/issues/173)):

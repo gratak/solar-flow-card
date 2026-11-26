@@ -226,6 +226,7 @@
   "editorShowSystem": "Instalação (fases, carga do inversor, bateria)",
   "editorShowPanels": "Mostrar painéis (otimizadores)",
   "editorShowWeather": "Tempo nos temas Diorama e Reator",
+  "editorClearFlow": "Diorama: setas nos fluxos e a bateria na cor do seu nível (vermelho vazia → verde cheia)",
   "editorWide": "Layout largo (num painel largo)",
   "editorInsights": "Hoje de relance e comparação",
   "editorSolar": "A instalação tem painéis FV",

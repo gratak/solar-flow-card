@@ -36,7 +36,7 @@ function editorStrings(hass, config) {
 // (EDITOR_DEFAULT_ON) or off unless set (the rest).
 const EDITOR_DEFAULT_ON = ["show_solar", "show_battery", "battery_day", "show_chart", "show_weather", "show_self_sufficiency", "show_self_use", "show_savings", "show_co2", "show_yield", "animation"];
 const EDITOR_SWITCH_GROUPS = {
-  look: [["wide", "editorWide"], ["background", "editorGlass", "glass"], ["animation", "editorAnimation"], ["load_fonts", "editorFonts"], ["collapsible", "editorCollapsible"], ["show_chart", "editorShowChart"], ["show_weather", "editorShowWeather"]],
+  look: [["clear_flow", "editorClearFlow"], ["wide", "editorWide"], ["background", "editorGlass", "glass"], ["animation", "editorAnimation"], ["load_fonts", "editorFonts"], ["collapsible", "editorCollapsible"], ["show_chart", "editorShowChart"], ["show_weather", "editorShowWeather"]],
   install: [["show_solar", "editorSolar"], ["show_battery", "editorBattery"], ["battery_day", "editorBatteryDay"], ["panels_average", "editorPanelsAverage", "per_string"]],
   summary: [["show_self_sufficiency", "editorShowSelfSufficiency"], ["show_self_use", "editorShowSelfUse"], ["show_savings", "editorShowSavings"], ["show_costs", "editorShowCosts"], ["show_co2", "editorShowCo2"], ["show_yield", "editorShowYield"], ["show_insights", "editorInsights"]],
   sensors: [["invert_grid", "editorInvertGrid"], ["invert_battery", "editorInvertBattery"]],

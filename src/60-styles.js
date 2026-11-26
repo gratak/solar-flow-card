@@ -484,7 +484,11 @@ const THEME_CSS = {
     .dio-scene.showroom.night { background: #18191d; }
     .dio-scene.showroom .pv { --sr-c: var(--sfc-pv); } .dio-scene.showroom .battery { --sr-c: var(--sfc-battery); }
     .dio-scene.showroom .grid { --sr-c: var(--sfc-grid); } .dio-scene.showroom .load { --sr-c: var(--sfc-load); }
-    .sr-line { fill: none; stroke: var(--sr-c); stroke-width: 2.5px; vector-effect: non-scaling-stroke; stroke-linecap: round; opacity: .85; }
+    .sr-line { fill: none; stroke: var(--sr-c); stroke-width: 1.5px; vector-effect: non-scaling-stroke; opacity: .5; }
+    .dio-scene.clear .sr-line { stroke-width: 2.5px; stroke-linecap: round; opacity: .85; }
+    .dio-scene.clear { --sfc-flow-w: 6; }
+    .dio-arrow { stroke: none; filter: drop-shadow(0 1px 1.5px rgba(0,0,0,.25)); } .dio-arrow.pv { fill: var(--sfc-pv); } .dio-arrow.battery { fill: var(--sfc-battery); }
+    .dio-arrow.grid { fill: var(--sfc-grid); } .dio-arrow.load { fill: var(--sfc-load); }
     .sr-arrow { fill: var(--sr-c); stroke: none; filter: drop-shadow(0 0 6px var(--sr-c)); }
     .sr-bat-glow { fill: color-mix(in srgb, var(--sr-soc) 14%, transparent); stroke: var(--sr-soc); stroke-width: 2.5px; vector-effect: non-scaling-stroke; filter: drop-shadow(0 0 8px var(--sr-soc)); }
     .sr-bat-well { fill: rgba(20,28,38,.18); stroke: color-mix(in srgb, var(--sr-soc) 60%, transparent); stroke-width: 1px; vector-effect: non-scaling-stroke; }

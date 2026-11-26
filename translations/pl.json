@@ -226,6 +226,7 @@
   "editorShowSystem": "Instalacja (fazy, obciążenie falownika, bateria)",
   "editorShowPanels": "Pokaż panele (optymalizatory)",
   "editorShowWeather": "Pogoda w motywach Diorama i Reaktor",
+  "editorClearFlow": "Diorama: strzałki przepływu i magazyn w kolorze poziomu (czerwony pusty → zielony pełny)",
   "editorWide": "Szeroki układ (na szerokim dashboardzie)",
   "editorInsights": "Dziś w skrócie i porównanie",
   "editorSolar": "Instalacja ma panele PV",

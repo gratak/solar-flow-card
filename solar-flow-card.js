@@ -38,7 +38,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "2.2.6";
+const CARD_VERSION = "2.2.7";
 // The card's type is custom:home-energy-hub since 2.0.0. The old name stays
 // registered so dashboards with custom:solar-flow-card keep working.
 const CARD_TAG = "home-energy-hub";
@@ -290,6 +290,7 @@ const TRANSLATIONS = {
     "editorShowSystem": "Installation (phases, inverter load, battery)",
     "editorShowPanels": "Show panels (optimizers)",
     "editorShowWeather": "Weather in the Diorama and Reactor themes",
+    "editorClearFlow": "Diorama: arrows on the flows and the battery in its level's colour (red empty → green full)",
     "editorWide": "Wide layout (on a wide dashboard)",
     "editorInsights": "Today at a glance and comparison",
     "editorSolar": "The installation has PV panels",
@@ -873,6 +874,7 @@ const TRANSLATIONS = {
     "editorShowSystem": "Anlage (Phasen, Wechselrichter-Last, Batterie)",
     "editorShowPanels": "Module anzeigen (Optimierer)",
     "editorShowWeather": "Wetter in den Designs Diorama und Reaktor",
+    "editorClearFlow": "Diorama: Pfeile an den Flüssen und der Speicher in der Farbe seines Ladestands (rot leer → grün voll)",
     "editorWide": "Breites Layout (auf einem breiten Dashboard)",
     "editorInsights": "Heute auf einen Blick und Vergleich",
     "editorSolar": "Die Anlage hat PV-Module",
@@ -1456,6 +1458,7 @@ const TRANSLATIONS = {
     "editorShowSystem": "Instalación (fases, carga del inversor, batería)",
     "editorShowPanels": "Mostrar paneles (optimizadores)",
     "editorShowWeather": "Tiempo en los temas Diorama y Reactor",
+    "editorClearFlow": "Diorama: flechas en los flujos y la batería del color de su nivel (rojo vacía → verde llena)",
     "editorWide": "Diseño ancho (en un panel ancho)",
     "editorInsights": "Hoy de un vistazo y comparación",
     "editorSolar": "La instalación tiene paneles FV",
@@ -2039,6 +2042,7 @@ const TRANSLATIONS = {
     "editorShowSystem": "Installation (phases, charge onduleur, batterie)",
     "editorShowPanels": "Afficher les panneaux (optimiseurs)",
     "editorShowWeather": "Météo dans les thèmes Diorama et Réacteur",
+    "editorClearFlow": "Diorama : flèches sur les flux et batterie à la couleur de son niveau (rouge vide → vert pleine)",
     "editorWide": "Mise en page large (pour un tableau de bord large)",
     "editorInsights": "Aperçu du jour et comparaison",
     "editorSolar": "L'installation dispose de panneaux PV",
@@ -2622,6 +2626,7 @@ const TRANSLATIONS = {
     "editorShowSystem": "Impianto (fasi, carico inverter, batteria)",
     "editorShowPanels": "Mostra pannelli (ottimizzatori)",
     "editorShowWeather": "Meteo nei temi Diorama e Reattore",
+    "editorClearFlow": "Diorama: frecce sui flussi e la batteria nel colore del suo livello (rosso vuota → verde piena)",
     "editorWide": "Layout largo (su una dashboard ampia)",
     "editorInsights": "Oggi in breve e confronto",
     "editorSolar": "L'impianto ha pannelli FV",
@@ -3205,6 +3210,7 @@ const TRANSLATIONS = {
     "editorShowSystem": "Installatie (fasen, omvormerbelasting, batterij)",
     "editorShowPanels": "Toon panelen (optimizers)",
     "editorShowWeather": "Weer in de thema's Diorama en Reactor",
+    "editorClearFlow": "Diorama: pijlen op de stromen en de batterij in de kleur van haar niveau (rood leeg → groen vol)",
     "editorWide": "Brede indeling (op een breed dashboard)",
     "editorInsights": "Vandaag in het kort en vergelijking",
     "editorSolar": "De installatie heeft zonnepanelen",
@@ -3788,6 +3794,7 @@ const TRANSLATIONS = {
     "editorShowSystem": "Instalacja (fazy, obciążenie falownika, bateria)",
     "editorShowPanels": "Pokaż panele (optymalizatory)",
     "editorShowWeather": "Pogoda w motywach Diorama i Reaktor",
+    "editorClearFlow": "Diorama: strzałki przepływu i magazyn w kolorze poziomu (czerwony pusty → zielony pełny)",
     "editorWide": "Szeroki układ (na szerokim dashboardzie)",
     "editorInsights": "Dziś w skrócie i porównanie",
     "editorSolar": "Instalacja ma panele PV",
@@ -4371,6 +4378,7 @@ const TRANSLATIONS = {
     "editorShowSystem": "Instalação (fases, carga do inversor, bateria)",
     "editorShowPanels": "Mostrar painéis (otimizadores)",
     "editorShowWeather": "Tempo nos temas Diorama e Reator",
+    "editorClearFlow": "Diorama: setas nos fluxos e a bateria na cor do seu nível (vermelho vazia → verde cheia)",
     "editorWide": "Layout largo (num painel largo)",
     "editorInsights": "Hoje de relance e comparação",
     "editorSolar": "A instalação tem painéis FV",
@@ -8428,7 +8436,7 @@ function dioramaScene(m) {
     g += box(-2.6, 1.6, 1.0, 0.8, 1.6, "#e6f6ef", "#d4efe3", "#b9e2d0");
     const level = isNum(m.live.soc) ? clamp(m.live.soc, 0, 100) / 100 : 0;
     g += poly("#cfe7dc", [-2.45, 2.4, 0.3], [-1.75, 2.4, 0.3], [-1.75, 2.4, 1.3], [-2.45, 2.4, 1.3]);
-    g += poly(level < 0.2 ? "#f26b5b" : "#1fbf86", [-2.45, 2.4, 0.3], [-1.75, 2.4, 0.3], [-1.75, 2.4, 0.3 + level], [-2.45, 2.4, 0.3 + level]);
+    g += poly((m.config.clear_flow === true && socColor(m.live.soc)) || (level < 0.2 ? "#f26b5b" : "#1fbf86"), [-2.45, 2.4, 0.3], [-1.75, 2.4, 0.3], [-1.75, 2.4, 0.3 + level], [-2.45, 2.4, 0.3 + level]);
     g += "</g>";
   }
   // Pylon.
@@ -8446,14 +8454,16 @@ function dioramaScene(m) {
   const pole = P(6, 1.2, 4.7);
   const wallR = P(4, 1.0, 1.9);
   const L = m.live;
+  // `clear_flow` (#173): an arrow where each live flow goes.
+  const route = (d, active, reverse, cls) => flowPath(d, active, reverse, cls) + (m.config.clear_flow === true && active ? srArrow(d, reverse, cls, 0.42, "dio-arrow") : "");
   g += '<g fill="none" stroke-linecap="round">';
-  g += flowPath(`M${roof} Q${roof[0] + 40} ${roof[1] + 30} ${inside}`, L.solarActive, false, "pv");
-  if (m.config.showBattery) g += flowPath(`M${bat} Q${(bat[0] + wallL[0]) / 2} ${bat[1] - 30} ${wallL}`, L.chargeActive || L.dischargeActive, L.chargeActive, "battery");
-  g += flowPath(`M${pole} Q${(pole[0] + wallR[0]) / 2} ${pole[1] + 30} ${wallR}`, L.importActive || L.exportActive, L.exportActive, "grid");
+  g += route(`M${roof} Q${roof[0] + 40} ${roof[1] + 30} ${inside}`, L.solarActive, false, "pv");
+  if (m.config.showBattery) g += route(`M${bat} Q${(bat[0] + wallL[0]) / 2} ${bat[1] - 30} ${wallL}`, L.chargeActive || L.dischargeActive, L.chargeActive, "battery");
+  g += route(`M${pole} Q${(pole[0] + wallR[0]) / 2} ${pole[1] + 30} ${wallR}`, L.importActive || L.exportActive, L.exportActive, "grid");
   if (m.ev) {
     const plug = P(4, 2.6, 0.7);
     const port = P(4.5, 2.05, 0.42);
-    g += flowPath(`M${plug} Q${(plug[0] + port[0]) / 2 + 6} ${Math.max(plug[1], port[1]) + 10} ${port}`, m.ev.charging, false, "load");
+    g += route(`M${plug} Q${(plug[0] + port[0]) / 2 + 6} ${Math.max(plug[1], port[1]) + 10} ${port}`, m.ev.charging, false, "load");
   }
   g += "</g>";
   // An electric car in front of the house, with its charger on the wall.
@@ -8505,12 +8515,12 @@ const SR_ICONS = {
 
 // An arrowhead where a showroom route ends, pointing the way the power goes
 // (#173): at the path's end, or at its start when the power runs back.
-function srArrow(d, reverse, cls) {
+function srArrow(d, reverse, cls, size = 1, kind = "sr-arrow") {
   const n = d.match(/-?\d+(?:\.\d+)?/g).map(Number);
   const [tx, ty, fx, fy] = reverse ? [n[0], n[1], n[2], n[3]] : [n[n.length - 2], n[n.length - 1], n[n.length - 4], n[n.length - 3]];
   const a = Math.atan2(ty - fy, tx - fx);
   const at = (dx, dy) => `${(tx + dx * Math.cos(a) - dy * Math.sin(a)).toFixed(1)} ${(ty + dx * Math.sin(a) + dy * Math.cos(a)).toFixed(1)}`;
-  return `<path class="sr-arrow ${cls}" d="M${at(0, 0)}L${at(-52, -24)}L${at(-36, 0)}L${at(-52, 24)}Z"/>`;
+  return `<path class="${kind} ${cls}" d="M${at(0, 0)}L${at(-52 * size, -24 * size)}L${at(-36 * size, 0)}L${at(-52 * size, 24 * size)}Z"/>`;
 }
 
 // A battery level's colour, in 10% steps from red (empty) through yellow
@@ -8537,13 +8547,16 @@ function srBattery(soc) {
 function showroomScene(m, night) {
   const { t, locale, live: L } = m;
   const icons = m.config.showroom_labels === "icons";
+  // `clear_flow`: arrows on the flows and the battery cabinet in its level's
+  // colour (#173); off by default, so the picture stays realistic.
+  const clear = m.config.clear_flow === true;
   const [X0, Y0, W, H] = SR_VIEW;
   const pos = (x, y) => `left:${(((x - X0) / W) * 100).toFixed(2)}%;top:${(((y - Y0) / H) * 100).toFixed(2)}%`;
   let flows = "";
   // A route carrying power: a faint line and a pulse running the way it flows.
   const flow = (cls, d, active, reverse) => {
     if (!active) return;
-    flows += `<path class="sr-line ${cls}" d="${d}"/><path class="sr-pulse ${cls} ${reverse ? "rev" : ""}" d="${d}" pathLength="100" filter="url(#sr-glow)"/>${srArrow(d, reverse, cls)}`;
+    flows += `<path class="sr-line ${cls}" d="${d}"/><path class="sr-pulse ${cls} ${reverse ? "rev" : ""}" d="${d}" pathLength="100" filter="url(#sr-glow)"/>${clear ? srArrow(d, reverse, cls) : ""}`;
   };
   // [class, icon, name, value, note, entity, chip anchor [x, y], chip placement]
   const items = [];
@@ -8554,7 +8567,7 @@ function showroomScene(m, night) {
   if (m.config.showBattery) {
     flow("battery", "M840 935 Q990 990 1125 910", L.chargeActive || L.dischargeActive, L.chargeActive);
     const note = L.dischargeActive ? `−${formatPower(L.discharge, locale)}` : L.chargeActive ? `+${formatPower(L.charge, locale)}` : t.idle.toLowerCase();
-    items.push(["battery", L.chargeActive ? MINI_ICONS.charge : MINI_ICONS.discharge, t.battery, formatPercent(L.soc, locale), note, batteryEntityId(m), [770, 935], "l", null, socColor(L.soc)]);
+    items.push(["battery", L.chargeActive ? MINI_ICONS.charge : MINI_ICONS.discharge, t.battery, formatPercent(L.soc, locale), note, batteryEntityId(m), [770, 935], "l", null, clear ? socColor(L.soc) : null]);
   }
   flow("grid", "M1683 392 Q1560 560 1412 566 Q1300 700 1140 880", L.importActive || L.exportActive, L.exportActive);
   const gridValue = L.importActive ? L.gridImport : L.exportActive ? L.gridExport : Math.abs(L.grid);
@@ -8577,7 +8590,7 @@ function showroomScene(m, night) {
   const svg = `<svg viewBox="${SR_VIEW.join(" ")}" aria-hidden="true">
       <defs><filter id="sr-glow" filterUnits="userSpaceOnUse" x="0" y="0" width="2000" height="1342"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
       <image href="${showroomImage(night ? "night" : "day")}" x="0" y="0" width="2000" height="1342" preserveAspectRatio="none"/>
-      ${m.config.showBattery ? srBattery(L.soc) : ""}${car}<g fill="none">${flows}</g>
+      ${clear && m.config.showBattery ? srBattery(L.soc) : ""}${car}<g fill="none">${flows}</g>
     </svg>`;
   return { svg, tags };
 }
@@ -8659,7 +8672,7 @@ function renderDiorama(m) {
   const batteryNote = live.dischargeActive ? `−${formatPower(live.discharge, locale)}` : live.chargeActive ? `+${formatPower(live.charge, locale)}` : t.idle;
   const gridValue = live.importActive ? live.gridImport : live.exportActive ? live.gridExport : Math.abs(live.grid);
   return `
-    ${sectionShown(m, "flow") ? `<div class="dio-scene ${showroom ? `showroom ${photoNight ? "night" : "day"}` : ""}" style="--sky-a:${sky.sky[0]};--sky-b:${sky.sky[1]}">
+    ${sectionShown(m, "flow") ? `<div class="dio-scene ${showroom ? `showroom ${photoNight ? "night" : "day"}` : ""} ${m.config.clear_flow === true ? "clear" : ""}" style="--sky-a:${sky.sky[0]};--sky-b:${sky.sky[1]}">
       ${room ? room.svg : `<svg viewBox="0 0 520 360" aria-hidden="true">${svg}</svg>`}
       ${room ? '<div class="dio-head">' : ""}<div class="dio-title"><h1>${escapeHtml(m.name)}</h1>${liveBadge(m)}</div>
       <div class="dio-clock">${escapeHtml(clockText(m))}${isNum(m.weather?.temperature) ? ` <button class="dio-temp" ${entityAttr(m.weather.entityId)}>${escapeHtml(`${formatNumber(m.weather.temperature, locale, 0)}${m.weather.unit}`)}</button>` : ""}</div>${room ? "</div>" : ""}
@@ -10170,7 +10183,11 @@ const THEME_CSS = {
     .dio-scene.showroom.night { background: #18191d; }
     .dio-scene.showroom .pv { --sr-c: var(--sfc-pv); } .dio-scene.showroom .battery { --sr-c: var(--sfc-battery); }
     .dio-scene.showroom .grid { --sr-c: var(--sfc-grid); } .dio-scene.showroom .load { --sr-c: var(--sfc-load); }
-    .sr-line { fill: none; stroke: var(--sr-c); stroke-width: 2.5px; vector-effect: non-scaling-stroke; stroke-linecap: round; opacity: .85; }
+    .sr-line { fill: none; stroke: var(--sr-c); stroke-width: 1.5px; vector-effect: non-scaling-stroke; opacity: .5; }
+    .dio-scene.clear .sr-line { stroke-width: 2.5px; stroke-linecap: round; opacity: .85; }
+    .dio-scene.clear { --sfc-flow-w: 6; }
+    .dio-arrow { stroke: none; filter: drop-shadow(0 1px 1.5px rgba(0,0,0,.25)); } .dio-arrow.pv { fill: var(--sfc-pv); } .dio-arrow.battery { fill: var(--sfc-battery); }
+    .dio-arrow.grid { fill: var(--sfc-grid); } .dio-arrow.load { fill: var(--sfc-load); }
     .sr-arrow { fill: var(--sr-c); stroke: none; filter: drop-shadow(0 0 6px var(--sr-c)); }
     .sr-bat-glow { fill: color-mix(in srgb, var(--sr-soc) 14%, transparent); stroke: var(--sr-soc); stroke-width: 2.5px; vector-effect: non-scaling-stroke; filter: drop-shadow(0 0 8px var(--sr-soc)); }
     .sr-bat-well { fill: rgba(20,28,38,.18); stroke: color-mix(in srgb, var(--sr-soc) 60%, transparent); stroke-width: 1px; vector-effect: non-scaling-stroke; }
@@ -11960,7 +11977,7 @@ function editorStrings(hass, config) {
 // (EDITOR_DEFAULT_ON) or off unless set (the rest).
 const EDITOR_DEFAULT_ON = ["show_solar", "show_battery", "battery_day", "show_chart", "show_weather", "show_self_sufficiency", "show_self_use", "show_savings", "show_co2", "show_yield", "animation"];
 const EDITOR_SWITCH_GROUPS = {
-  look: [["wide", "editorWide"], ["background", "editorGlass", "glass"], ["animation", "editorAnimation"], ["load_fonts", "editorFonts"], ["collapsible", "editorCollapsible"], ["show_chart", "editorShowChart"], ["show_weather", "editorShowWeather"]],
+  look: [["clear_flow", "editorClearFlow"], ["wide", "editorWide"], ["background", "editorGlass", "glass"], ["animation", "editorAnimation"], ["load_fonts", "editorFonts"], ["collapsible", "editorCollapsible"], ["show_chart", "editorShowChart"], ["show_weather", "editorShowWeather"]],
   install: [["show_solar", "editorSolar"], ["show_battery", "editorBattery"], ["battery_day", "editorBatteryDay"], ["panels_average", "editorPanelsAverage", "per_string"]],
   summary: [["show_self_sufficiency", "editorShowSelfSufficiency"], ["show_self_use", "editorShowSelfUse"], ["show_savings", "editorShowSavings"], ["show_costs", "editorShowCosts"], ["show_co2", "editorShowCo2"], ["show_yield", "editorShowYield"], ["show_insights", "editorInsights"]],
   sensors: [["invert_grid", "editorInvertGrid"], ["invert_battery", "editorInvertBattery"]],

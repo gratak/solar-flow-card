@@ -230,7 +230,7 @@ function dioramaScene(m) {
     g += box(-2.6, 1.6, 1.0, 0.8, 1.6, "#e6f6ef", "#d4efe3", "#b9e2d0");
     const level = isNum(m.live.soc) ? clamp(m.live.soc, 0, 100) / 100 : 0;
     g += poly("#cfe7dc", [-2.45, 2.4, 0.3], [-1.75, 2.4, 0.3], [-1.75, 2.4, 1.3], [-2.45, 2.4, 1.3]);
-    g += poly(level < 0.2 ? "#f26b5b" : "#1fbf86", [-2.45, 2.4, 0.3], [-1.75, 2.4, 0.3], [-1.75, 2.4, 0.3 + level], [-2.45, 2.4, 0.3 + level]);
+    g += poly((m.config.clear_flow === true && socColor(m.live.soc)) || (level < 0.2 ? "#f26b5b" : "#1fbf86"), [-2.45, 2.4, 0.3], [-1.75, 2.4, 0.3], [-1.75, 2.4, 0.3 + level], [-2.45, 2.4, 0.3 + level]);
     g += "</g>";
   }
   // Pylon.
@@ -248,14 +248,16 @@ function dioramaScene(m) {
   const pole = P(6, 1.2, 4.7);
   const wallR = P(4, 1.0, 1.9);
   const L = m.live;
+  // `clear_flow` (#173): an arrow where each live flow goes.
+  const route = (d, active, reverse, cls) => flowPath(d, active, reverse, cls) + (m.config.clear_flow === true && active ? srArrow(d, reverse, cls, 0.42, "dio-arrow") : "");
   g += '<g fill="none" stroke-linecap="round">';
-  g += flowPath(`M${roof} Q${roof[0] + 40} ${roof[1] + 30} ${inside}`, L.solarActive, false, "pv");
-  if (m.config.showBattery) g += flowPath(`M${bat} Q${(bat[0] + wallL[0]) / 2} ${bat[1] - 30} ${wallL}`, L.chargeActive || L.dischargeActive, L.chargeActive, "battery");
-  g += flowPath(`M${pole} Q${(pole[0] + wallR[0]) / 2} ${pole[1] + 30} ${wallR}`, L.importActive || L.exportActive, L.exportActive, "grid");
+  g += route(`M${roof} Q${roof[0] + 40} ${roof[1] + 30} ${inside}`, L.solarActive, false, "pv");
+  if (m.config.showBattery) g += route(`M${bat} Q${(bat[0] + wallL[0]) / 2} ${bat[1] - 30} ${wallL}`, L.chargeActive || L.dischargeActive, L.chargeActive, "battery");
+  g += route(`M${pole} Q${(pole[0] + wallR[0]) / 2} ${pole[1] + 30} ${wallR}`, L.importActive || L.exportActive, L.exportActive, "grid");
   if (m.ev) {
     const plug = P(4, 2.6, 0.7);
     const port = P(4.5, 2.05, 0.42);
-    g += flowPath(`M${plug} Q${(plug[0] + port[0]) / 2 + 6} ${Math.max(plug[1], port[1]) + 10} ${port}`, m.ev.charging, false, "load");
+    g += route(`M${plug} Q${(plug[0] + port[0]) / 2 + 6} ${Math.max(plug[1], port[1]) + 10} ${port}`, m.ev.charging, false, "load");
   }
   g += "</g>";
   // An electric car in front of the house, with its charger on the wall.
@@ -307,12 +309,12 @@ const SR_ICONS = {
 
 // An arrowhead where a showroom route ends, pointing the way the power goes
 // (#173): at the path's end, or at its start when the power runs back.
-function srArrow(d, reverse, cls) {
+function srArrow(d, reverse, cls, size = 1, kind = "sr-arrow") {
   const n = d.match(/-?\d+(?:\.\d+)?/g).map(Number);
   const [tx, ty, fx, fy] = reverse ? [n[0], n[1], n[2], n[3]] : [n[n.length - 2], n[n.length - 1], n[n.length - 4], n[n.length - 3]];
   const a = Math.atan2(ty - fy, tx - fx);
   const at = (dx, dy) => `${(tx + dx * Math.cos(a) - dy * Math.sin(a)).toFixed(1)} ${(ty + dx * Math.sin(a) + dy * Math.cos(a)).toFixed(1)}`;
-  return `<path class="sr-arrow ${cls}" d="M${at(0, 0)}L${at(-52, -24)}L${at(-36, 0)}L${at(-52, 24)}Z"/>`;
+  return `<path class="${kind} ${cls}" d="M${at(0, 0)}L${at(-52 * size, -24 * size)}L${at(-36 * size, 0)}L${at(-52 * size, 24 * size)}Z"/>`;
 }
 
 // A battery level's colour, in 10% steps from red (empty) through yellow
@@ -339,13 +341,16 @@ function srBattery(soc) {
 function showroomScene(m, night) {
   const { t, locale, live: L } = m;
   const icons = m.config.showroom_labels === "icons";
+  // `clear_flow`: arrows on the flows and the battery cabinet in its level's
+  // colour (#173); off by default, so the picture stays realistic.
+  const clear = m.config.clear_flow === true;
   const [X0, Y0, W, H] = SR_VIEW;
   const pos = (x, y) => `left:${(((x - X0) / W) * 100).toFixed(2)}%;top:${(((y - Y0) / H) * 100).toFixed(2)}%`;
   let flows = "";
   // A route carrying power: a faint line and a pulse running the way it flows.
   const flow = (cls, d, active, reverse) => {
     if (!active) return;
-    flows += `<path class="sr-line ${cls}" d="${d}"/><path class="sr-pulse ${cls} ${reverse ? "rev" : ""}" d="${d}" pathLength="100" filter="url(#sr-glow)"/>${srArrow(d, reverse, cls)}`;
+    flows += `<path class="sr-line ${cls}" d="${d}"/><path class="sr-pulse ${cls} ${reverse ? "rev" : ""}" d="${d}" pathLength="100" filter="url(#sr-glow)"/>${clear ? srArrow(d, reverse, cls) : ""}`;
   };
   // [class, icon, name, value, note, entity, chip anchor [x, y], chip placement]
   const items = [];
@@ -356,7 +361,7 @@ function showroomScene(m, night) {
   if (m.config.showBattery) {
     flow("battery", "M840 935 Q990 990 1125 910", L.chargeActive || L.dischargeActive, L.chargeActive);
     const note = L.dischargeActive ? `−${formatPower(L.discharge, locale)}` : L.chargeActive ? `+${formatPower(L.charge, locale)}` : t.idle.toLowerCase();
-    items.push(["battery", L.chargeActive ? MINI_ICONS.charge : MINI_ICONS.discharge, t.battery, formatPercent(L.soc, locale), note, batteryEntityId(m), [770, 935], "l", null, socColor(L.soc)]);
+    items.push(["battery", L.chargeActive ? MINI_ICONS.charge : MINI_ICONS.discharge, t.battery, formatPercent(L.soc, locale), note, batteryEntityId(m), [770, 935], "l", null, clear ? socColor(L.soc) : null]);
   }
   flow("grid", "M1683 392 Q1560 560 1412 566 Q1300 700 1140 880", L.importActive || L.exportActive, L.exportActive);
   const gridValue = L.importActive ? L.gridImport : L.exportActive ? L.gridExport : Math.abs(L.grid);
@@ -379,7 +384,7 @@ function showroomScene(m, night) {
   const svg = `<svg viewBox="${SR_VIEW.join(" ")}" aria-hidden="true">
       <defs><filter id="sr-glow" filterUnits="userSpaceOnUse" x="0" y="0" width="2000" height="1342"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
       <image href="${showroomImage(night ? "night" : "day")}" x="0" y="0" width="2000" height="1342" preserveAspectRatio="none"/>
-      ${m.config.showBattery ? srBattery(L.soc) : ""}${car}<g fill="none">${flows}</g>
+      ${clear && m.config.showBattery ? srBattery(L.soc) : ""}${car}<g fill="none">${flows}</g>
     </svg>`;
   return { svg, tags };
 }
@@ -461,7 +466,7 @@ function renderDiorama(m) {
   const batteryNote = live.dischargeActive ? `−${formatPower(live.discharge, locale)}` : live.chargeActive ? `+${formatPower(live.charge, locale)}` : t.idle;
   const gridValue = live.importActive ? live.gridImport : live.exportActive ? live.gridExport : Math.abs(live.grid);
   return `
-    ${sectionShown(m, "flow") ? `<div class="dio-scene ${showroom ? `showroom ${photoNight ? "night" : "day"}` : ""}" style="--sky-a:${sky.sky[0]};--sky-b:${sky.sky[1]}">
+    ${sectionShown(m, "flow") ? `<div class="dio-scene ${showroom ? `showroom ${photoNight ? "night" : "day"}` : ""} ${m.config.clear_flow === true ? "clear" : ""}" style="--sky-a:${sky.sky[0]};--sky-b:${sky.sky[1]}">
       ${room ? room.svg : `<svg viewBox="0 0 520 360" aria-hidden="true">${svg}</svg>`}
       ${room ? '<div class="dio-head">' : ""}<div class="dio-title"><h1>${escapeHtml(m.name)}</h1>${liveBadge(m)}</div>
       <div class="dio-clock">${escapeHtml(clockText(m))}${isNum(m.weather?.temperature) ? ` <button class="dio-temp" ${entityAttr(m.weather.entityId)}>${escapeHtml(`${formatNumber(m.weather.temperature, locale, 0)}${m.weather.unit}`)}</button>` : ""}</div>${room ? "</div>" : ""}
