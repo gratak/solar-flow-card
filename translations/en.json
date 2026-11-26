@@ -226,6 +226,7 @@
   "editorShowSystem": "Installation (phases, inverter load, battery)",
   "editorShowPanels": "Show panels (optimizers)",
   "editorShowWeather": "Weather in the Diorama and Reactor themes",
+  "editorClearFlow": "Diorama: arrows on the flows and the battery in its level's colour (red empty → green full)",
   "editorWide": "Wide layout (on a wide dashboard)",
   "editorInsights": "Today at a glance and comparison",
   "editorSolar": "The installation has PV panels",

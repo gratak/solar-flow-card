@@ -226,6 +226,7 @@
   "editorShowSystem": "Anlage (Phasen, Wechselrichter-Last, Batterie)",
   "editorShowPanels": "Module anzeigen (Optimierer)",
   "editorShowWeather": "Wetter in den Designs Diorama und Reaktor",
+  "editorClearFlow": "Diorama: Pfeile an den Flüssen und der Speicher in der Farbe seines Ladestands (rot leer → grün voll)",
   "editorWide": "Breites Layout (auf einem breiten Dashboard)",
   "editorInsights": "Heute auf einen Blick und Vergleich",
   "editorSolar": "Die Anlage hat PV-Module",

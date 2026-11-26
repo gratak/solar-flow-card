@@ -226,6 +226,7 @@
   "editorShowSystem": "Impianto (fasi, carico inverter, batteria)",
   "editorShowPanels": "Mostra pannelli (ottimizzatori)",
   "editorShowWeather": "Meteo nei temi Diorama e Reattore",
+  "editorClearFlow": "Diorama: frecce sui flussi e la batteria nel colore del suo livello (rosso vuota → verde piena)",
   "editorWide": "Layout largo (su una dashboard ampia)",
   "editorInsights": "Oggi in breve e confronto",
   "editorSolar": "L'impianto ha pannelli FV",

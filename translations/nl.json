@@ -226,6 +226,7 @@
   "editorShowSystem": "Installatie (fasen, omvormerbelasting, batterij)",
   "editorShowPanels": "Toon panelen (optimizers)",
   "editorShowWeather": "Weer in de thema's Diorama en Reactor",
+  "editorClearFlow": "Diorama: pijlen op de stromen en de batterij in de kleur van haar niveau (rood leeg → groen vol)",
   "editorWide": "Brede indeling (op een breed dashboard)",
   "editorInsights": "Vandaag in het kort en vergelijking",
   "editorSolar": "De installatie heeft zonnepanelen",
