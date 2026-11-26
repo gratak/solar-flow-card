@@ -38,7 +38,7 @@
  * Built from src/*.js by scripts/build.mjs. Edit the sources, not this file.
  */
 (() => {
-const CARD_VERSION = "2.2.5";
+const CARD_VERSION = "2.2.6";
 // The card's type is custom:home-energy-hub since 2.0.0. The old name stays
 // registered so dashboards with custom:solar-flow-card keep working.
 const CARD_TAG = "home-energy-hub";
@@ -8503,6 +8503,37 @@ const SR_ICONS = {
   car: '<svg viewBox="0 0 24 24"><path d="M3 17v-4.5L5.5 7h13l2.5 5.5V17"/><path d="M3 13h18M5 17h2M17 17h2"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>',
 };
 
+// An arrowhead where a showroom route ends, pointing the way the power goes
+// (#173): at the path's end, or at its start when the power runs back.
+function srArrow(d, reverse, cls) {
+  const n = d.match(/-?\d+(?:\.\d+)?/g).map(Number);
+  const [tx, ty, fx, fy] = reverse ? [n[0], n[1], n[2], n[3]] : [n[n.length - 2], n[n.length - 1], n[n.length - 4], n[n.length - 3]];
+  const a = Math.atan2(ty - fy, tx - fx);
+  const at = (dx, dy) => `${(tx + dx * Math.cos(a) - dy * Math.sin(a)).toFixed(1)} ${(ty + dx * Math.sin(a) + dy * Math.cos(a)).toFixed(1)}`;
+  return `<path class="sr-arrow ${cls}" d="M${at(0, 0)}L${at(-52, -24)}L${at(-36, 0)}L${at(-52, 24)}Z"/>`;
+}
+
+// A battery level's colour, in 10% steps from red (empty) through yellow
+// to green (full) (#173).
+function socColor(soc) {
+  if (!isNum(soc)) return null;
+  return `hsl(${Math.round(clamp(soc, 0, 100) / 10) * 12} 80% 45%)`;
+}
+
+// The battery cabinet in the showroom picture (#173): its front face lit in
+// the colour of the battery level and filled up to it, so it is easy to find
+// and its charge is plain to see.
+function srBattery(soc) {
+  const colour = socColor(soc) || "#8a99aa";
+  const level = isNum(soc) ? clamp(soc, 0, 100) / 100 : 0;
+  const up = 94 * level;
+  return `<g class="sr-bat" style="--sr-soc:${colour}">
+    <path class="sr-bat-glow" d="M783 868L842 890V1003L783 983Z"/>
+    <path class="sr-bat-well" d="M793 882L833 897V988L793 974Z"/>
+    ${level > 0 ? `<path class="sr-bat-fill" d="M793 ${(974 - up).toFixed(1)}L833 ${(988 - up).toFixed(1)}V988L793 974Z"/>` : ""}
+  </g>`;
+}
+
 function showroomScene(m, night) {
   const { t, locale, live: L } = m;
   const icons = m.config.showroom_labels === "icons";
@@ -8512,7 +8543,7 @@ function showroomScene(m, night) {
   // A route carrying power: a faint line and a pulse running the way it flows.
   const flow = (cls, d, active, reverse) => {
     if (!active) return;
-    flows += `<path class="sr-line ${cls}" d="${d}"/><path class="sr-pulse ${cls} ${reverse ? "rev" : ""}" d="${d}" pathLength="100" filter="url(#sr-glow)"/>`;
+    flows += `<path class="sr-line ${cls}" d="${d}"/><path class="sr-pulse ${cls} ${reverse ? "rev" : ""}" d="${d}" pathLength="100" filter="url(#sr-glow)"/>${srArrow(d, reverse, cls)}`;
   };
   // [class, icon, name, value, note, entity, chip anchor [x, y], chip placement]
   const items = [];
@@ -8523,7 +8554,7 @@ function showroomScene(m, night) {
   if (m.config.showBattery) {
     flow("battery", "M840 935 Q990 990 1125 910", L.chargeActive || L.dischargeActive, L.chargeActive);
     const note = L.dischargeActive ? `−${formatPower(L.discharge, locale)}` : L.chargeActive ? `+${formatPower(L.charge, locale)}` : t.idle.toLowerCase();
-    items.push(["battery", L.chargeActive ? MINI_ICONS.charge : MINI_ICONS.discharge, t.battery, formatPercent(L.soc, locale), note, batteryEntityId(m), [770, 935], "l"]);
+    items.push(["battery", L.chargeActive ? MINI_ICONS.charge : MINI_ICONS.discharge, t.battery, formatPercent(L.soc, locale), note, batteryEntityId(m), [770, 935], "l", null, socColor(L.soc)]);
   }
   flow("grid", "M1683 392 Q1560 560 1412 566 Q1300 700 1140 880", L.importActive || L.exportActive, L.exportActive);
   const gridValue = L.importActive ? L.gridImport : L.exportActive ? L.gridExport : Math.abs(L.grid);
@@ -8539,14 +8570,14 @@ function showroomScene(m, night) {
   }
   const tip = (name, extra) => escapeHtml(extra ? `${name} · ${extra}` : name);
   const tags = icons
-    ? items.map(([cls, icon, name, value, note, id, [x, y], place, extra]) => `
-      <button class="sr-chip ${cls} at-${place}" style="${pos(x, y)}" title="${tip(name, extra)}" ${entityAttr(id)}><span class="sr-ic">${icon}</span><b>${escapeHtml(value)}</b>${note ? `<em>${escapeHtml(note)}</em>` : ""}</button>`).join("")
-    : `<div class="sr-strip">${items.map(([cls, icon, name, value, note, id, , , extra]) => `
-      <button class="sr-cell ${cls}" title="${tip(name, extra)}" ${entityAttr(id)}><span class="sr-ic">${icon}</span><small>${escapeHtml(name)}</small><b>${escapeHtml(value)}</b>${note ? `<em>${escapeHtml(note)}</em>` : ""}</button>`).join("")}</div>`;
+    ? items.map(([cls, icon, name, value, note, id, [x, y], place, extra, tint]) => `
+      <button class="sr-chip ${cls} at-${place}" style="${pos(x, y)}${tint ? `;--sr-c:${tint}` : ""}" title="${tip(name, extra)}" ${entityAttr(id)}><span class="sr-ic">${icon}</span><b>${escapeHtml(value)}</b>${note ? `<em>${escapeHtml(note)}</em>` : ""}</button>`).join("")
+    : `<div class="sr-strip">${items.map(([cls, icon, name, value, note, id, , , extra, tint]) => `
+      <button class="sr-cell ${cls}" ${tint ? `style="--sr-c:${tint}"` : ""} title="${tip(name, extra)}" ${entityAttr(id)}><span class="sr-ic">${icon}</span><small>${escapeHtml(name)}</small><b>${escapeHtml(value)}</b>${note ? `<em>${escapeHtml(note)}</em>` : ""}</button>`).join("")}</div>`;
   const svg = `<svg viewBox="${SR_VIEW.join(" ")}" aria-hidden="true">
       <defs><filter id="sr-glow" filterUnits="userSpaceOnUse" x="0" y="0" width="2000" height="1342"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
       <image href="${showroomImage(night ? "night" : "day")}" x="0" y="0" width="2000" height="1342" preserveAspectRatio="none"/>
-      ${car}<g fill="none">${flows}</g>
+      ${m.config.showBattery ? srBattery(L.soc) : ""}${car}<g fill="none">${flows}</g>
     </svg>`;
   return { svg, tags };
 }
@@ -10139,7 +10170,11 @@ const THEME_CSS = {
     .dio-scene.showroom.night { background: #18191d; }
     .dio-scene.showroom .pv { --sr-c: var(--sfc-pv); } .dio-scene.showroom .battery { --sr-c: var(--sfc-battery); }
     .dio-scene.showroom .grid { --sr-c: var(--sfc-grid); } .dio-scene.showroom .load { --sr-c: var(--sfc-load); }
-    .sr-line { fill: none; stroke: var(--sr-c); stroke-width: 1.5px; vector-effect: non-scaling-stroke; opacity: .5; }
+    .sr-line { fill: none; stroke: var(--sr-c); stroke-width: 2.5px; vector-effect: non-scaling-stroke; stroke-linecap: round; opacity: .85; }
+    .sr-arrow { fill: var(--sr-c); stroke: none; filter: drop-shadow(0 0 6px var(--sr-c)); }
+    .sr-bat-glow { fill: color-mix(in srgb, var(--sr-soc) 14%, transparent); stroke: var(--sr-soc); stroke-width: 2.5px; vector-effect: non-scaling-stroke; filter: drop-shadow(0 0 8px var(--sr-soc)); }
+    .sr-bat-well { fill: rgba(20,28,38,.18); stroke: color-mix(in srgb, var(--sr-soc) 60%, transparent); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+    .sr-bat-fill { fill: var(--sr-soc); opacity: .9; }
     .sr-pulse { fill: none; stroke: var(--sr-c); stroke-width: 3px; vector-effect: non-scaling-stroke; stroke-linecap: round;
       stroke-dasharray: 9 41; animation: sr-run 2.4s linear infinite; }
     .sr-pulse.rev { animation-direction: reverse; }

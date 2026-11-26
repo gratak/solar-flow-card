@@ -484,7 +484,11 @@ const THEME_CSS = {
     .dio-scene.showroom.night { background: #18191d; }
     .dio-scene.showroom .pv { --sr-c: var(--sfc-pv); } .dio-scene.showroom .battery { --sr-c: var(--sfc-battery); }
     .dio-scene.showroom .grid { --sr-c: var(--sfc-grid); } .dio-scene.showroom .load { --sr-c: var(--sfc-load); }
-    .sr-line { fill: none; stroke: var(--sr-c); stroke-width: 1.5px; vector-effect: non-scaling-stroke; opacity: .5; }
+    .sr-line { fill: none; stroke: var(--sr-c); stroke-width: 2.5px; vector-effect: non-scaling-stroke; stroke-linecap: round; opacity: .85; }
+    .sr-arrow { fill: var(--sr-c); stroke: none; filter: drop-shadow(0 0 6px var(--sr-c)); }
+    .sr-bat-glow { fill: color-mix(in srgb, var(--sr-soc) 14%, transparent); stroke: var(--sr-soc); stroke-width: 2.5px; vector-effect: non-scaling-stroke; filter: drop-shadow(0 0 8px var(--sr-soc)); }
+    .sr-bat-well { fill: rgba(20,28,38,.18); stroke: color-mix(in srgb, var(--sr-soc) 60%, transparent); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+    .sr-bat-fill { fill: var(--sr-soc); opacity: .9; }
     .sr-pulse { fill: none; stroke: var(--sr-c); stroke-width: 3px; vector-effect: non-scaling-stroke; stroke-linecap: round;
       stroke-dasharray: 9 41; animation: sr-run 2.4s linear infinite; }
     .sr-pulse.rev { animation-direction: reverse; }
