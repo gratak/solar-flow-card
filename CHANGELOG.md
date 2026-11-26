@@ -1,8 +1,13 @@
 # Changelog
 
+## 2.2.6
+
+Clearer energy flow in the showroom scene ([#173](https://github.com/gratak/solar-flow-card/issues/173)):
+- **Arrows on the showroom flows** ([#173](https://github.com/gratak/solar-flow-card/issues/173)): each route carrying power ends in an arrowhead in its colour, pointing where the power goes (it moves to the other end when the grid takes the power or the battery charges), and the lines are bolder, so the direction is clear at a glance and not only from the moving pulse.
+- **The battery cabinet shows its level:** its front lights up and fills to the battery level, in a colour that runs in 10% steps from red (empty) through orange and yellow to green (full), so the battery is easy to find in the picture and its charge plain to see. The battery's icon in the values takes the same colour.
+
 ## 2.2.5
 
-- **Arrows on the showroom flows** ([#173](https://github.com/gratak/solar-flow-card/issues/173)): each route carrying power ends in an arrowhead in its colour, pointing where the power goes (it moves to the other end when the grid takes the power or the battery charges), and the lines are bolder, so the direction is clear at a glance and not only from the moving pulse.
 - **Your colours everywhere** ([#174](https://github.com/gratak/solar-flow-card/issues/174)): `colors:` (Your colours in the editor) lost to Diorama's own colours with `dark_mode` (on, or auto at night or with a dark theme), and the "where from" and "where it went" bars under the Diorama scene never used them. They now apply in every theme, light or dark, to the flows, the charts and the bars alike.
 
 ## 2.2.4

@@ -315,6 +315,27 @@ function srArrow(d, reverse, cls) {
   return `<path class="sr-arrow ${cls}" d="M${at(0, 0)}L${at(-52, -24)}L${at(-36, 0)}L${at(-52, 24)}Z"/>`;
 }
 
+// A battery level's colour, in 10% steps from red (empty) through yellow
+// to green (full) (#173).
+function socColor(soc) {
+  if (!isNum(soc)) return null;
+  return `hsl(${Math.round(clamp(soc, 0, 100) / 10) * 12} 80% 45%)`;
+}
+
+// The battery cabinet in the showroom picture (#173): its front face lit in
+// the colour of the battery level and filled up to it, so it is easy to find
+// and its charge is plain to see.
+function srBattery(soc) {
+  const colour = socColor(soc) || "#8a99aa";
+  const level = isNum(soc) ? clamp(soc, 0, 100) / 100 : 0;
+  const up = 94 * level;
+  return `<g class="sr-bat" style="--sr-soc:${colour}">
+    <path class="sr-bat-glow" d="M783 868L842 890V1003L783 983Z"/>
+    <path class="sr-bat-well" d="M793 882L833 897V988L793 974Z"/>
+    ${level > 0 ? `<path class="sr-bat-fill" d="M793 ${(974 - up).toFixed(1)}L833 ${(988 - up).toFixed(1)}V988L793 974Z"/>` : ""}
+  </g>`;
+}
+
 function showroomScene(m, night) {
   const { t, locale, live: L } = m;
   const icons = m.config.showroom_labels === "icons";
@@ -335,7 +356,7 @@ function showroomScene(m, night) {
   if (m.config.showBattery) {
     flow("battery", "M840 935 Q990 990 1125 910", L.chargeActive || L.dischargeActive, L.chargeActive);
     const note = L.dischargeActive ? `−${formatPower(L.discharge, locale)}` : L.chargeActive ? `+${formatPower(L.charge, locale)}` : t.idle.toLowerCase();
-    items.push(["battery", L.chargeActive ? MINI_ICONS.charge : MINI_ICONS.discharge, t.battery, formatPercent(L.soc, locale), note, batteryEntityId(m), [770, 935], "l"]);
+    items.push(["battery", L.chargeActive ? MINI_ICONS.charge : MINI_ICONS.discharge, t.battery, formatPercent(L.soc, locale), note, batteryEntityId(m), [770, 935], "l", null, socColor(L.soc)]);
   }
   flow("grid", "M1683 392 Q1560 560 1412 566 Q1300 700 1140 880", L.importActive || L.exportActive, L.exportActive);
   const gridValue = L.importActive ? L.gridImport : L.exportActive ? L.gridExport : Math.abs(L.grid);
@@ -351,14 +372,14 @@ function showroomScene(m, night) {
   }
   const tip = (name, extra) => escapeHtml(extra ? `${name} · ${extra}` : name);
   const tags = icons
-    ? items.map(([cls, icon, name, value, note, id, [x, y], place, extra]) => `
-      <button class="sr-chip ${cls} at-${place}" style="${pos(x, y)}" title="${tip(name, extra)}" ${entityAttr(id)}><span class="sr-ic">${icon}</span><b>${escapeHtml(value)}</b>${note ? `<em>${escapeHtml(note)}</em>` : ""}</button>`).join("")
-    : `<div class="sr-strip">${items.map(([cls, icon, name, value, note, id, , , extra]) => `
-      <button class="sr-cell ${cls}" title="${tip(name, extra)}" ${entityAttr(id)}><span class="sr-ic">${icon}</span><small>${escapeHtml(name)}</small><b>${escapeHtml(value)}</b>${note ? `<em>${escapeHtml(note)}</em>` : ""}</button>`).join("")}</div>`;
+    ? items.map(([cls, icon, name, value, note, id, [x, y], place, extra, tint]) => `
+      <button class="sr-chip ${cls} at-${place}" style="${pos(x, y)}${tint ? `;--sr-c:${tint}` : ""}" title="${tip(name, extra)}" ${entityAttr(id)}><span class="sr-ic">${icon}</span><b>${escapeHtml(value)}</b>${note ? `<em>${escapeHtml(note)}</em>` : ""}</button>`).join("")
+    : `<div class="sr-strip">${items.map(([cls, icon, name, value, note, id, , , extra, tint]) => `
+      <button class="sr-cell ${cls}" ${tint ? `style="--sr-c:${tint}"` : ""} title="${tip(name, extra)}" ${entityAttr(id)}><span class="sr-ic">${icon}</span><small>${escapeHtml(name)}</small><b>${escapeHtml(value)}</b>${note ? `<em>${escapeHtml(note)}</em>` : ""}</button>`).join("")}</div>`;
   const svg = `<svg viewBox="${SR_VIEW.join(" ")}" aria-hidden="true">
       <defs><filter id="sr-glow" filterUnits="userSpaceOnUse" x="0" y="0" width="2000" height="1342"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
       <image href="${showroomImage(night ? "night" : "day")}" x="0" y="0" width="2000" height="1342" preserveAspectRatio="none"/>
-      ${car}<g fill="none">${flows}</g>
+      ${m.config.showBattery ? srBattery(L.soc) : ""}${car}<g fill="none">${flows}</g>
     </svg>`;
   return { svg, tags };
 }
